@@ -1,0 +1,5 @@
+
+dependencies {
+	compile project(':net.akehurst.application.framework.technology.authentication')
+	compile project(':net.akehurst.application.framework.technology.commsInterface')
+}

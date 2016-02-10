@@ -1,0 +1,9 @@
+
+fileTree('.') {
+  include '**/build.gradle'
+  exclude 'build.gradle' // Exclude the root build file.
+}.each {
+  def prj = relativePath(it.parent).replace(File.separator, '.')
+  include(prj)
+  project(':'+prj).projectDir = new File(relativePath(it.parent))
+}
