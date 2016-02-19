@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-rootProject.name = 'net.akehurst.application.framework'
- 
-fileTree('.') {
-  include '**/build.gradle'
-  exclude 'build.gradle' // Exclude the root build file.
-}.each {
-  def prj = rootProject.name+'.'+relativePath(it.parent).replace(File.separator, '.')
-  include(prj)
-  project(':'+prj).projectDir = new File(relativePath(it.parent))
-  println "including "+prj+" at "+relativePath(it.parent)
+package net.akehurst.application.framework.computational.authenticatorInterface;
+
+
+public interface ICAuthenticatorNotification {
+	
+	void notifyAuthenticationSuccess(AuthenticatorSession session);
+	
+	void notifyAuthenticationFailure(AuthenticatorSession session, String message);
+
+	void notifyAuthenticationCleared(AuthenticatorSession session);
 }

@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-rootProject.name = 'net.akehurst.application.framework'
- 
-fileTree('.') {
-  include '**/build.gradle'
-  exclude 'build.gradle' // Exclude the root build file.
-}.each {
-  def prj = rootProject.name+'.'+relativePath(it.parent).replace(File.separator, '.')
-  include(prj)
-  project(':'+prj).projectDir = new File(relativePath(it.parent))
-  println "including "+prj+" at "+relativePath(it.parent)
+package net.akehurst.application.framework.technology.authentication;
+
+public interface IAuthenticatorRequest {
+
+	void requestLogin(TechSession session, String username, String password);
+	
+	void requestLogout(TechSession session);
+	
+
 }

@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-rootProject.name = 'net.akehurst.application.framework'
- 
-fileTree('.') {
-  include '**/build.gradle'
-  exclude 'build.gradle' // Exclude the root build file.
-}.each {
-  def prj = rootProject.name+'.'+relativePath(it.parent).replace(File.separator, '.')
-  include(prj)
-  project(':'+prj).projectDir = new File(relativePath(it.parent))
-  println "including "+prj+" at "+relativePath(it.parent)
+
+
+dependencies {
+	compile project(':net.akehurst.application.framework.common.components')
+	compile project(':net.akehurst.application.framework.technology.guiInterface')
+	compile project(':net.akehurst.application.framework.technology.authentication')
+	compile project(':net.akehurst.application.framework.technology.commsInterface')
+	
+	
+	compile "io.vertx:vertx-core:+"
+	compile "io.vertx:vertx-web:+"
+	compile "io.vertx:vertx-auth-shiro:+"
+	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
+	
+	compile 'org.jsoup:jsoup:+'
 }

@@ -14,14 +14,11 @@
  * limitations under the License.
  */
  
-rootProject.name = 'net.akehurst.application.framework'
+ dependencies {
  
-fileTree('.') {
-  include '**/build.gradle'
-  exclude 'build.gradle' // Exclude the root build file.
-}.each {
-  def prj = rootProject.name+'.'+relativePath(it.parent).replace(File.separator, '.')
-  include(prj)
-  project(':'+prj).projectDir = new File(relativePath(it.parent))
-  println "including "+prj+" at "+relativePath(it.parent)
-}
+ 	compile project(':net.akehurst.application.framework.common.components')
+ 	compile project(':net.akehurst.application.framework.computational.authenticatorInterface')
+	compile project(':net.akehurst.application.framework.technology.guiInterface')
+ 	
+ 
+ }

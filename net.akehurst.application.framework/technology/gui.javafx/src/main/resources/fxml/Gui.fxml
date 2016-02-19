@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <columnConstraints>
+    <ColumnConstraints  />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints  />
+    <RowConstraints />
+  </rowConstraints>
+   <children>
+      <SplitPane dividerPositions="0.3" GridPane.rowIndex="1">
+        <items>
+          <AnchorPane />
+          <AnchorPane>
+               <children>
+                  <TabPane>
+                    <tabs>
+                      <Tab text="Welcome">
+                        <content>
+                          <ScrollPane>
+                             <content>
+                                <TextArea id="textWelcome" />
+                             </content>
+                          </ScrollPane>
+                        </content>
+                      </Tab>
+                    </tabs>
+                  </TabPane>
+               </children>
+          </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</GridPane>
