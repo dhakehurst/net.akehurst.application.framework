@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.akehurst.application.framework.computational.interfaceUser.authentication;
 
+import net.akehurst.application.framework.common.AbstractDataType;
 
-dependencies {
-	compile project(':net.akehurst.application.framework.common.components')
-	compile project(':net.akehurst.application.framework.technology.interfaceGui')
-	compile project(':net.akehurst.application.framework.technology.interfaceAuthentication')
-	compile project(':net.akehurst.application.framework.technology.interfaceComms')
+public class UserSession extends AbstractDataType {
+
+	public UserSession(String sessionId, UserDetails user) {
+		this.sessionId = sessionId;
+		this.user = user;
+	}
+	String sessionId;
+	public String getId() {
+		return this.sessionId;
+	}
 	
+	UserDetails user;
 	
-	compile "io.vertx:vertx-core:3.2.1"
-	compile "io.vertx:vertx-web:3.2.1"
-	compile "io.vertx:vertx-auth-shiro:3.2.1"
-	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
-	
-	compile 'org.jsoup:jsoup:+'
+	public UserDetails getUser() {
+		return this.user;
+	}
 }

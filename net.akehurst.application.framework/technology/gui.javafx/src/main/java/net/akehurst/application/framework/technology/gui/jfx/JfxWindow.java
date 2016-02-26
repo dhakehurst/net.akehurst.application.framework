@@ -29,7 +29,6 @@ import net.akehurst.application.framework.components.AbstractComponent;
 import net.akehurst.application.framework.components.Port;
 import net.akehurst.application.framework.os.AbstractActiveObject;
 import net.akehurst.application.framework.technology.authentication.TechSession;
-import net.akehurst.application.framework.technology.commsInterface.ChannelIdentity;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
 

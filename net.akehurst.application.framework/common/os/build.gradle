@@ -14,4 +14,6 @@
  * limitations under the License.
  */
  
- 
+ dependencies {
+ 	compile 'net.akehurst.miscellaneous:net.akehurst.holser.reflect:1.0.0'
+ }

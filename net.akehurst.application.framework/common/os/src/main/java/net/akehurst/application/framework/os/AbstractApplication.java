@@ -13,19 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.akehurst.application.framework.os;
 
+import java.util.HashMap;
+import java.util.Map;
 
-dependencies {
-	compile project(':net.akehurst.application.framework.common.components')
-	compile project(':net.akehurst.application.framework.technology.interfaceGui')
-	compile project(':net.akehurst.application.framework.technology.interfaceAuthentication')
-	compile project(':net.akehurst.application.framework.technology.interfaceComms')
+abstract
+public class AbstractApplication extends AbstractActiveObject implements IApplication {
+
+	public AbstractApplication(String id, String[] args) {
+		super(id);
+	}
 	
+	public void instantiateServices() {}
+
+	public void instantiateComputational() {}
 	
-	compile "io.vertx:vertx-core:3.2.1"
-	compile "io.vertx:vertx-web:3.2.1"
-	compile "io.vertx:vertx-auth-shiro:3.2.1"
-	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
+	public void instantiateEngineering() {}
 	
-	compile 'org.jsoup:jsoup:+'
+	public void instantiateTechnology() {}
+	
+	public void connectComputationalToEngineering() {}
+	
+	public void connectEngineeringToTechnology() {}
+
+	
+
 }

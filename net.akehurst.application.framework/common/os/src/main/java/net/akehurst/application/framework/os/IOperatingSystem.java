@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.akehurst.application.framework.os;
 
+public interface IOperatingSystem {
 
-dependencies {
-	compile project(':net.akehurst.application.framework.common.components')
-	compile project(':net.akehurst.application.framework.technology.interfaceGui')
-	compile project(':net.akehurst.application.framework.technology.interfaceAuthentication')
-	compile project(':net.akehurst.application.framework.technology.interfaceComms')
-	
-	
-	compile "io.vertx:vertx-core:3.2.1"
-	compile "io.vertx:vertx-web:3.2.1"
-	compile "io.vertx:vertx-auth-shiro:3.2.1"
-	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
-	
-	compile 'org.jsoup:jsoup:+'
+	<T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws OperatingSystemExcpetion;
+
+	<T> T createService(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion;
+
+	<T> T fetchService(String serviceName) throws OperatingSystemExcpetion;
+
+	<T> T createComponent(Class<T> class_, String id) throws OperatingSystemExcpetion;
+
+	<T> T createBasicObject(Class<T> class_, String id) throws OperatingSystemExcpetion;
+
+	<T> T createDataType(Class<T> class_, String id) throws OperatingSystemExcpetion;
+
 }

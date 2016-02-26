@@ -18,5 +18,5 @@
 dependencies {
 	compile project(':net.akehurst.application.framework.common.components')
 
-	compile project(':net.akehurst.application.framework.technology.guiInterface')
+	compile project(':net.akehurst.application.framework.technology.interfaceGui')
 }

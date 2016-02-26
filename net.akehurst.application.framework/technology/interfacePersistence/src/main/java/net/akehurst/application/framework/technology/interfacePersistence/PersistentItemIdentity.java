@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.akehurst.application.framework.technology.interfacePersistence;
 
+import java.util.Arrays;
+import java.util.List;
 
-dependencies {
-	compile project(':net.akehurst.application.framework.common.components')
-	compile project(':net.akehurst.application.framework.technology.interfaceGui')
-	compile project(':net.akehurst.application.framework.technology.interfaceAuthentication')
-	compile project(':net.akehurst.application.framework.technology.interfaceComms')
+import net.akehurst.application.framework.common.AbstractDataType;
+
+public class PersistentItemIdentity extends AbstractDataType {
+
+	public PersistentItemIdentity(String... values) {
+		super(values);
+		this.values = Arrays.asList(values);
+	}
 	
-	
-	compile "io.vertx:vertx-core:3.2.1"
-	compile "io.vertx:vertx-web:3.2.1"
-	compile "io.vertx:vertx-auth-shiro:3.2.1"
-	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
-	
-	compile 'org.jsoup:jsoup:+'
+	List<String> values;
+	public List<String> getValues() {
+		return this.values;
+	}
 }
