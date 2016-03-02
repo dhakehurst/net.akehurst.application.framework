@@ -42,8 +42,13 @@ subprojects {
 	}
 
 	repositories {
+		mavenCentral()
     	mavenLocal()
     	jcenter()
+	}
+
+	dependencies {
+       	testCompile 'junit:junit:+'
 	}
 
 }
