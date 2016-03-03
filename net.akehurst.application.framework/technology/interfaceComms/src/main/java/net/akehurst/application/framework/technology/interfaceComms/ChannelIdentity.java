@@ -13,8 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.commsInterface;
+package net.akehurst.application.framework.technology.interfaceComms;
 
-public interface ISenderReceiverDestination {
+import net.akehurst.application.framework.common.AbstractDataType;
 
+public class ChannelIdentity extends AbstractDataType {
+
+	public ChannelIdentity(String value) {
+		super(value);
+		this.value = value;
+	}
+
+	String value;
+	public String getValue() {
+		return this.value;
+	}
+	
 }

@@ -13,20 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.commsInterface;
+package net.akehurst.application.framework.technology.interfaceComms;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+import java.util.Map;
 
-public class ChannelIdentity extends AbstractDataType {
+public interface ISenderReceiverNotification {
 
-	public ChannelIdentity(String value) {
-		super(value);
-		this.value = value;
-	}
-
-	String value;
-	public String getValue() {
-		return this.value;
-	}
+	void notifyReceiveMessage(ISenderReceiverSource source , Map<String, Object> data);
 	
 }

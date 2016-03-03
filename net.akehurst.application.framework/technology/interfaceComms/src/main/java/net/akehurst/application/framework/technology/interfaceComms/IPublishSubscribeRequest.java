@@ -13,8 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.commsInterface;
+package net.akehurst.application.framework.technology.interfaceComms;
 
-public interface ISenderReceiverSource {
+import java.util.List;
+import java.util.Map;
 
+public interface IPublishSubscribeRequest {
+
+	void requestSubscribeTo(ChannelIdentity channelId, Map<String, Object> channelConfiguration) throws PublishSubscribeException;
+	void requestPublisherOf(ChannelIdentity channelId, Map<String, Object> channelConfiguration) throws PublishSubscribeException;
+	
+	<T> void requestPublish(ChannelIdentity channelId, byte[] data) throws PublishSubscribeException;
+	
 }

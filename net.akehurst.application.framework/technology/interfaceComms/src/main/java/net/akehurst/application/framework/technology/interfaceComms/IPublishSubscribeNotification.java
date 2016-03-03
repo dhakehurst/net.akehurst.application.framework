@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.commsInterface;
+package net.akehurst.application.framework.technology.interfaceComms;
 
 import java.util.Map;
 
-public interface ISenderReceiverNotification {
+public interface IPublishSubscribeNotification {
 
-	void notifyReceiveMessage(ISenderReceiverSource source , Map<String, Object> data);
+	void notifyPublication(ChannelIdentity channelId, byte[] data);
 	
 }

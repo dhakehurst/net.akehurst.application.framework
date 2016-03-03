@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.commsInterface;
+package net.akehurst.application.framework.technology.interfaceComms;
 
-import java.util.Map;
+public class PublishSubscribeException extends Exception {
 
-public interface ISenderReceiverRequest {
-
-	void requestSenderOf();
-	void requestReceiverFor();
+	public PublishSubscribeException(String message, Throwable cause) {
+		super(message, cause);
+	}
 	
-	void requestSendMessage(ISenderReceiverDestination destination, Map<String, Object> data);
 }
