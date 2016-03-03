@@ -15,18 +15,25 @@
  */
 package net.akehurst.application.framework.os;
 
+import net.akehurst.application.framework.common.IIdentifiableObject;
+import net.akehurst.application.framework.components.IComponent;
+
 public interface IOperatingSystem {
 
 	<T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws OperatingSystemExcpetion;
 
-	<T> T createService(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion;
+	<T extends IIdentifiableObject> T createService(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion;
 
 	<T> T fetchService(String serviceName) throws OperatingSystemExcpetion;
 
-	<T> T createComponent(Class<T> class_, String id) throws OperatingSystemExcpetion;
+	<T extends IComponent> T createComponent(Class<T> class_, String id) throws OperatingSystemExcpetion;
 
-	<T> T createBasicObject(Class<T> class_, String id) throws OperatingSystemExcpetion;
+	<T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws OperatingSystemExcpetion;
 
-	<T> T createDataType(Class<T> class_, String id) throws OperatingSystemExcpetion;
+	<T> T createDatatype(Class<T> class_, Object... constructorArgs) throws OperatingSystemExcpetion;
+
+	<T extends IIdentifiableObject> T injectIntoActiveObject(T object) throws OperatingSystemExcpetion;
+
+	<T extends IIdentifiableObject> T injectIntoService(T object) throws OperatingSystemExcpetion;
 
 }

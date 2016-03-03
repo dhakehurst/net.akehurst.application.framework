@@ -19,13 +19,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jsoup.nodes.Document;
-
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import net.akehurst.application.framework.components.AbstractComponent;
 import net.akehurst.application.framework.components.Port;
+import net.akehurst.application.framework.os.annotations.ConfiguredValue;
+import net.akehurst.application.framework.os.annotations.PortInstance;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.authentication.TechSession;
@@ -34,16 +34,18 @@ import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
 
 public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAuthenticatorRequest {
 
-	public VertxWebsite(String objectId, int port) {
+	public VertxWebsite(String objectId) {
 		super(objectId);
-		this.verticle = new AVerticle(this, port);
-		this.scenes = new HashMap<>();
 	}
 
+	@ConfiguredValue(defaultValue="9999")
+	IpPort port;
+	
 	AVerticle verticle;
 
 	@Override
 	public void afRun() {
+		this.verticle = new AVerticle(this, port.asPrimitive());
 		Vertx vertx = Vertx.vertx();
 		vertx.deployVerticle(this.verticle);
 	}
@@ -70,9 +72,6 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		this.verticle.comms.send(session, "Gui.requestRecieveEvent", data);
 		
 	}
-	
-
-	Map<String, Document> scenes;
 
 	@Override
 	public void createStage(String stageId, boolean authenticated, URL contentRoot) {
@@ -178,17 +177,10 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	
 	
 	// --------- Ports ---------
+	@PortInstance(provides={IGuiRequest.class,IAuthenticatorRequest.class},requires={IGuiNotification.class,IAuthenticatorNotification.class})
 	Port portGui;
 
 	public Port portGui() {
-		if (null == this.portGui) {
-			this.portGui = new Port("portGui",this)
-					.provides(IGuiRequest.class, VertxWebsite.this)
-					.provides(IAuthenticatorRequest.class, VertxWebsite.this)
-					.requires(IGuiNotification.class)
-					.requires(IAuthenticatorNotification.class)
-			;
-		}
 		return this.portGui;
 	}
 }

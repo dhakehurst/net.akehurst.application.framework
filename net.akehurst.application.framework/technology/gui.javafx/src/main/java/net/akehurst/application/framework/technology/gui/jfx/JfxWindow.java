@@ -15,11 +15,13 @@
  */
 package net.akehurst.application.framework.technology.gui.jfx;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,6 +30,8 @@ import javafx.stage.Stage;
 import net.akehurst.application.framework.components.AbstractComponent;
 import net.akehurst.application.framework.components.Port;
 import net.akehurst.application.framework.os.AbstractActiveObject;
+import net.akehurst.application.framework.os.annotations.ConfiguredValue;
+import net.akehurst.application.framework.os.annotations.PortInstance;
 import net.akehurst.application.framework.technology.authentication.TechSession;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
@@ -35,12 +39,25 @@ import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
 public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	
-	public JfxWindow(String objectId,URL fxmlUrl) {
+	public JfxWindow(String objectId) {
 		super(objectId);
-		this.fxmlUrl = fxmlUrl;
 	}
 	
-	URL fxmlUrl;
+	@ConfiguredValue(defaultValue="")
+	String fxmlUrlStr;
+	
+	URL getFxmlUrl() {
+		if (this.fxmlUrlStr.isEmpty()) {
+			return null;
+		} else {
+			try {
+				return new URL(this.fxmlUrlStr);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
 	
 	Stage primary;
 //	Canvas canvas;
@@ -55,7 +72,13 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 					primary = new Stage();
 					primary.setTitle("Jfx Gui");
 
-					Parent root = FXMLLoader.load(fxmlUrl);
+					URL url = getFxmlUrl();
+					Parent root = null;
+					if (null==url) {
+						root = new Group();
+					} else {
+						root = FXMLLoader.load(url);
+					}
 					Scene scene = new Scene(root);
 
 					primary.setScene(scene);
@@ -127,13 +150,9 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 
 	//--------- Ports ---------
+	@PortInstance(provides={IGuiRequest.class},requires={IGuiNotification.class})
 	Port portGui;
 	public Port portGui() {
-		if (null==this.portGui) {
-			this.portGui = new Port("portGui", this)
-					.provides(IGuiRequest.class, JfxWindow.this)
-					.requires(IGuiNotification.class);
-		}
 		return this.portGui;
 	}
 }

@@ -32,8 +32,9 @@ import java.util.Set;
 
 import net.akehurst.application.framework.components.AbstractComponent;
 import net.akehurst.application.framework.components.Port;
+import net.akehurst.application.framework.os.annotations.PortInstance;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemIdentity;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 
 public class DerbyDatabasePersistence extends AbstractComponent implements IPersistentStore {
 
@@ -241,20 +242,51 @@ public class DerbyDatabasePersistence extends AbstractComponent implements IPers
 		return result;
 	}
 
-	public void putString(PersistentItemIdentity id, String item) {
+	public void putString(PersistentItemLocation id, String item) {
 
 	}
 
-	public String fetchString(PersistentItemIdentity id) {
+	public String fetchString(PersistentItemLocation id) {
 		return null;
 	}
 
+	// --------- IPersistentStore ---------
+	
+	@Override
+	public void connect(Map<String, Object> properties) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public <T> void store(PersistentItemLocation location, T item, Class<T> itemType) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public <T> T retrieve(PersistentItemLocation location, Class<T> itemType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public <T> Set<T> retrieve(PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public <T> Set<T> retrieveAll(Class<T> itemType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	// ---------- Ports ---------
+	@PortInstance(provides={IPersistentStore.class},requires={})
 	Port portPersist;
 
 	public Port portPersist() {
-		if (null == this.portPersist) {
-			this.portPersist = new Port("portPersist", this).provides(IPersistentStore.class, this);
-		}
 		return this.portPersist;
 	}
 }

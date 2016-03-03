@@ -15,8 +15,13 @@
  */
 package net.akehurst.application.framework.os;
 
+import net.akehurst.application.framework.os.annotations.ServiceReference;
+
 abstract
 public class AbstractActiveObject implements IActiveObject {
+	
+	@ServiceReference
+	protected IOperatingSystem os;
 	
 	public AbstractActiveObject(String id) {
 		this.id = id;

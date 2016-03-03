@@ -20,6 +20,35 @@ import java.util.Set;
 
 public interface IPersistentStore {
 
-	<T> void putItem(Class<T> type, T item);
-	<T> Set<T> getItems(Class<T> type, Map<String, Object> filter);
+	void connect(Map<String,Object> properties);
+	
+	/**
+	 * 
+	 * @param location  location of the item to store
+	 * @param item  the item to store, must be a DataType
+	 * @param itemType (optional) class that defines the datatype of the item 
+	 */
+	<T> void store(PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException;
+
+	
+	/**
+	 * 
+	 * @param location  location of the item to retrieve
+	 * @param itemType  (optional) class that defines the datatype of the item 
+	 * @return
+	 * @throws PersistentStoreException 
+	 */
+	<T> T retrieve(PersistentItemLocation location, Class<T> itemType) throws PersistentStoreException;
+	
+	/**
+	 * 
+	 * @param location  location of the items to retrieve
+	 * @param itemType  (optional) class that defines the datatype of the item 
+	 * @param filter filters out objects with the give property-value pairs
+	 * @return
+	 */
+	<T> Set<T> retrieve(PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
+	
+	
+	<T> Set<T> retrieveAll(Class<T> itemType);
 }

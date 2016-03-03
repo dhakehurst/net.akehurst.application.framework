@@ -17,7 +17,11 @@ package net.akehurst.application.framework.os;
 
 public interface IApplication {
 
-	void instantiateServices();
+	void defineArgument(boolean optional, String argumentName, boolean hasValue, String description);
+	
+	void parseArguments();
+	
+	void instantiateServices(IOperatingSystem os);
 
 	void instantiateComputational();
 	

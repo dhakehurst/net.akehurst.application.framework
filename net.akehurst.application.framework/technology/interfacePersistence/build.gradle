@@ -16,9 +16,6 @@
 
 
 dependencies {
-//	compile 'net.akehurst.application.framework:net.akehurst.application.framework.computational.userInterface:+'
-	
+
 	compile project(":${rootProject.name}.common.bits")
-	
-	compile 'org.apache.derby:derby:+'
 }

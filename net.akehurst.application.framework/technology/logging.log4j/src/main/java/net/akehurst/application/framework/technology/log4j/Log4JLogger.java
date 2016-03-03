@@ -19,15 +19,23 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class Log4JLogger implements ILogger {
+public class Log4JLogger implements IIdentifiableObject, ILogger {
 
-	public Log4JLogger(String objectId) {
-		this.log4j = LogManager.getLogger(objectId);
+	public Log4JLogger(String id) {
+		this.log4j = LogManager.getLogger(id);
+		this.id = id;
 	}
-
+	String id;
+	@Override
+	public String afId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	Logger log4j;
 	
 	@Override

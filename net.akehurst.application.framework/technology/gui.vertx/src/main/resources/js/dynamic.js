@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function Dynamic() {
-
+function Dynamic(sceneId) {
+	this.sceneId = sceneId
 }
 
 Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChannelId) {
 	var el = document.getElementById(elementId)
+	var sceneId = this.sceneId
 	el.addEventListener(eventType, function() {
 		var data = {}
 		if (null!=this.form) {
@@ -37,7 +38,7 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 				}
 			}
 		}
-		var outData = {elementId:el.id, eventType:eventType, eventData:data}
+		var outData = {sceneId:sceneId, elementId:el.id, eventType:eventType, eventData:data}
 		serverComms.send(eventChannelId, outData)
 	})
 }

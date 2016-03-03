@@ -20,9 +20,9 @@ import java.util.Map;
 
 public interface IPublishSubscribeRequest {
 
-	void requestSubscribeTo(ChannelIdentity channelId);
-	void requestPublisherOf(ChannelIdentity channelId);
+	void requestSubscribeTo(ChannelIdentity channelId, Map<String, Object> channelConfiguration) throws PublishSubscribeException;
+	void requestPublisherOf(ChannelIdentity channelId, Map<String, Object> channelConfiguration) throws PublishSubscribeException;
 	
-	<T> void requestPublish(ChannelIdentity channelId, Map<String, Object> data);
+	<T> void requestPublish(ChannelIdentity channelId, byte[] data) throws PublishSubscribeException;
 	
 }

@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.computational.authenticatorInterface;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+repositories {
+	maven { url "http://m2.objectdb.com" }
+}
 
-public class AuthenticatorUserDetails extends AbstractDataType {
+dependencies {
+	compile project(":${rootProject.name}.common.os")
 	
-	public AuthenticatorUserDetails(String name) {
-		super(name);
-		this.name = name;
-	}
-
-	String name;
-	public String getName() {
-		return this.name;
-	}
+	compile project(":${rootProject.name}.technology.interfacePersistence")
+//	compile 'javax.persistence:persistence-api:1.0.2'
+	compile 'org.eclipse.persistence:javax.persistence:2.1.0'
+	compile 'com.objectdb:objectdb:2.6.6_08'
+	compile 'javax.transaction:jta:1.1'
 }

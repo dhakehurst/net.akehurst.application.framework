@@ -17,14 +17,14 @@ package net.akehurst.application.framework.engineering.authenticator2Gui;
 
 import net.akehurst.application.framework.components.AbstractComponent;
 import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.computational.authenticatorInterface.AuthenticatorSession;
-import net.akehurst.application.framework.computational.authenticatorInterface.AuthenticatorUserDetails;
-import net.akehurst.application.framework.computational.authenticatorInterface.ICAuthenticatorNotification;
-import net.akehurst.application.framework.computational.authenticatorInterface.ICAuthenticatorRequest;
+import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorSession;
+import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorUserDetails;
+import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorNotification;
+import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
+import net.akehurst.application.framework.os.annotations.PortInstance;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.authentication.TechSession;
-import net.akehurst.application.framework.technology.authentication.TechUserDetails;
 
 public class AuthenticatorToGui extends AbstractComponent implements ICAuthenticatorRequest, IAuthenticatorNotification {
 
@@ -71,23 +71,15 @@ public class AuthenticatorToGui extends AbstractComponent implements ICAuthentic
 	}
 	
 	// --------- Ports ---------
+	@PortInstance(provides={ICAuthenticatorRequest.class},requires={ICAuthenticatorNotification.class})
 	Port portAuth;
 	public Port portAuth() {
-		if (null==this.portAuth) {
-			this.portAuth = new Port("portAuth", this)
-					.provides(ICAuthenticatorRequest.class, AuthenticatorToGui.this)
-					.requires(ICAuthenticatorNotification.class);
-		}
 		return this.portAuth;
 	}
 	
+	@PortInstance(provides={IAuthenticatorNotification.class},requires={IAuthenticatorRequest.class})
 	Port portGui;
 	public Port portGui() {
-		if (null==this.portGui) {
-			this.portGui = new Port("portGui", this)
-					.provides(IAuthenticatorNotification.class, AuthenticatorToGui.this)
-					.requires(IAuthenticatorRequest.class);
-		}
 		return this.portGui;
 	}
 }

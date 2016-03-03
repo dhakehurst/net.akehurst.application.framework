@@ -15,10 +15,10 @@
  */
 package net.akehurst.application.framework.os;
 
-public interface IActiveObject {
+import net.akehurst.application.framework.common.IIdentifiableObject;
 
-	String afId();
-	
+public interface IActiveObject extends IIdentifiableObject {
+
 	void afRun();
 	void afStart();
 	void afJoin() throws InterruptedException;

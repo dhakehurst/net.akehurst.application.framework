@@ -27,7 +27,7 @@ var serverComms = null;
 
 
 $(document).ready(function() {
-	dynamic = new Dynamic()
+	dynamic = new Dynamic(sceneId)
 	serverComms = new ServerComms('/sockjs'+sceneId, function() {
 		console.log('server comms open')
 		var outData = {sceneId: sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{} }
