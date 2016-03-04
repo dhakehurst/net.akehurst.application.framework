@@ -44,6 +44,10 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	AVerticle verticle;
 
 	@Override
+	public void afConnectParts() {
+	}
+	
+	@Override
 	public void afRun() {
 		this.verticle = new AVerticle(this, port.asPrimitive());
 		Vertx vertx = Vertx.vertx();

@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.akehurst.application.framework.os.annotations;
 
-repositories {
-	maven { url "http://m2.objectdb.com" }
-}
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-dependencies {
-	compile project(":${rootProject.name}.common.os")
-	
-	compile project(":${rootProject.name}.technology.interfacePersistence")
-	compile 'org.apache.openjpa:openjpa:2.4.1'
-	
-	testRuntime 'org.apache.derby:derby:10.12.1.1'
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ProvidesInterfaceForPort {
+	Class<?> provides();
+	String portId();
 }

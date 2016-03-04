@@ -36,6 +36,10 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 	}
 	
 	@Override
+	public void afConnectParts() {
+	}
+	
+	@Override
 	public void afStart() {
 		for(Port p: this.ports) {
 			for(Class<?>interfaceType : p.getRequired()) {

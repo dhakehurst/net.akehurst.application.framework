@@ -72,11 +72,13 @@ public class Port {
 	}
 	
 	public <T> T out(Class<T> interfaceType) {
-		Set<Object> set = this.required.get(interfaceType);
+		
 		InvocationHandler h = new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				Object result = null;
+				 //get these here to delay resolving the object until moment of call
+				Set<Object> set = required.get(interfaceType);
 				for(Object provider: set) {
 					result = method.invoke(provider, args);
 				}

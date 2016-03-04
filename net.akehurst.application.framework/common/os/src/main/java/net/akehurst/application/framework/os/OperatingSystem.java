@@ -31,6 +31,7 @@ import net.akehurst.application.framework.os.annotations.CommandLineArgument;
 import net.akehurst.application.framework.os.annotations.ComponentInstance;
 import net.akehurst.application.framework.os.annotations.ConfiguredValue;
 import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.os.annotations.ProvidesInterfaceForPort;
 import net.akehurst.application.framework.os.annotations.ServiceReference;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
@@ -57,6 +58,7 @@ public class OperatingSystem implements IOperatingSystem {
 	public <T> T fetchService(String name) {
 		return (T) this.services.get(name);
 	}
+
 
 	@Override
 	public <T extends IIdentifiableObject> T createService(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion {
@@ -121,8 +123,9 @@ public class OperatingSystem implements IOperatingSystem {
 				this.injectConfigurationValues((IIdentifiableObject) obj, id);
 				this.injectCommandLineArgs((IIdentifiableObject) obj, id);
 			}
-			this.injectPorts(obj, id);
 			this.injectParts(obj, id);
+			this.injectPorts(obj, id);
+			obj.afConnectParts();
 			return obj;
 		} catch (Exception ex) {
 			throw new OperatingSystemExcpetion("Failed to create Basic Object", ex);
@@ -368,7 +371,8 @@ public class OperatingSystem implements IOperatingSystem {
 			Port obj = cons.newInstance(id, component);
 
 			for (Class<?> interfaceType : provides) {
-				obj.provides((Class<Object>) interfaceType, component);
+				Object provider = findInternalProviderForPort(component, interfaceType, id);
+				obj.provides((Class<Object>) interfaceType, provider);
 			}
 
 			for (Class<?> interfaceType : requires) {
@@ -378,6 +382,23 @@ public class OperatingSystem implements IOperatingSystem {
 			return obj;
 		} catch (Exception ex) {
 			throw new OperatingSystemExcpetion("Failed to create Port " + id, ex);
+		}
+	}
+	
+	<T> T findInternalProviderForPort(IComponent component, Class<T> interfaceType, String portId) throws IllegalArgumentException, IllegalAccessException, OperatingSystemExcpetion {
+		ProvidesInterfaceForPort ann = null;
+		String shortPortId = portId.substring(portId.lastIndexOf('.')+1);
+		for (Field f : component.getClass().getDeclaredFields()) {
+			ann = f.getAnnotation(ProvidesInterfaceForPort.class);
+			if (null!=ann && interfaceType == ann.provides() && shortPortId.equals(ann.portId())) {
+				f.setAccessible(true);
+				return (T)f.get(component);
+			}
+		}
+		if (interfaceType.isInstance(component)) {
+			return (T)component;
+		} else {
+			throw new OperatingSystemExcpetion("Failed find internal provider of "+interfaceType.getSimpleName()+" for component "+component.afId(), null);
 		}
 	}
 }

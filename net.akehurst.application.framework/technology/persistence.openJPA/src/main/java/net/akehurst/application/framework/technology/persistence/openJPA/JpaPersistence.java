@@ -103,10 +103,31 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 
 	@Override
 	public <T> Set<T> retrieve(PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
-		// TODO Auto-generated method stub
-		return null;
+		String qs = "SELECT item FROM " + itemType.getSimpleName()+" item";
+		if (filter.isEmpty()) {
+			//do nothing, return all
+		} else {
+			qs +=" WHERE ";
+			ArrayList<Map.Entry<String, Object>> list = new ArrayList<>(filter.entrySet());
+			qs += "item."+list.get(0).getKey() + " = " + this.convert(list.get(0).getValue());
+			for(int i=1; i<list.size(); ++i) {
+				Map.Entry<String, Object> me = list.get(i);
+				qs += " AND " + "item."+me.getKey() + " = " + this.convert(me.getValue());
+			}
+		}
+		TypedQuery<T> q = this.entityManager.createQuery(qs, itemType);
+		List<T> res = q.getResultList();
+		return new HashSet<>((Collection<T>) res);
 	}
 
+	String convert(Object value) {
+		if (value instanceof String) {
+			return "'"+value+"'";
+		} else {
+			return value.toString();
+		}
+	}
+	
 	@Override
 	public <T> Set<T> retrieveAll(Class<T> itemType) {
 		String qs = "SELECT x FROM " + itemType.getSimpleName()+" x";

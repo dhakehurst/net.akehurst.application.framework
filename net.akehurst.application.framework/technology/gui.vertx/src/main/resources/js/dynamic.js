@@ -18,18 +18,19 @@ function Dynamic(sceneId) {
 }
 
 Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChannelId) {
-	var el = document.getElementById(elementId)
+	var el = $('#'+elementId)
 	var sceneId = this.sceneId
-	el.addEventListener(eventType, function() {
+	el.click(function() {
 		var data = {}
+		var p = el.parents('fieldset')
 		if (null!=this.form) {
 			for(i=0; i< this.form.length; i++) {
 				var id = this.form[i].id
 				var value = this.form[i].value
 				data[id] = value
 			}
-		} else if (this.parentElement.tagName=='FIELDSET') {
-			var childs = this.parentElement.children
+		} else if (null!=p[0]) {//this.parentElement.tagName=='FIELDSET') { //TODO: use jquery .parents to find the fieldset
+			var childs = $(p[0]).find('input')
 			for(i=0; i< childs.length; i++) {
 				if (childs[i].tagName=='INPUT') {
 					var id = childs[i].id
@@ -38,7 +39,7 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 				}
 			}
 		}
-		var outData = {sceneId:sceneId, elementId:el.id, eventType:eventType, eventData:data}
+		var outData = {sceneId:sceneId, elementId:this.id, eventType:eventType, eventData:data}
 		serverComms.send(eventChannelId, outData)
 	})
 }
@@ -53,7 +54,12 @@ Dynamic.prototype.setTitle = function(value) {
 }
 
 Dynamic.prototype.setText = function(id, value) {
-	$('#'+id).text(value)
+	var el = $('#'+id)
+	if (el.tagName='INPUT') {
+		el.val(value)
+	} else {
+		el.text(value)	
+	}
 }
 
 Dynamic.prototype.addElement = function(parentId, newElementId, type, attributes, content) {

@@ -64,6 +64,10 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 //	GraphicsContext gc;
 	
 	@Override
+	public void afConnectParts() {
+	}
+	
+	@Override
 	public void afRun() {
 		new JFXPanel();
 		Platform.runLater(new Runnable() {

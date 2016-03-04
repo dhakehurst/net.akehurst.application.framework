@@ -33,9 +33,11 @@ public class AuthenticatorToGui extends AbstractComponent implements ICAuthentic
 	}
 	
 	@Override
+	public void afConnectParts() {
+	}
+	
+	@Override
 	public void afRun() {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	// --------- ICAuthenticatorRequest ---------

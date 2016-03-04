@@ -21,4 +21,6 @@ public interface IComponent  {
 
 	void afAddPort(Port value);
 
+	void afConnectParts();
+	
 }

@@ -16,30 +16,34 @@
 package net.akehurst.application.framework.os;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
-abstract
-public class AbstractActiveSignalProcessingObject extends AbstractActiveObject {
+abstract public class AbstractActiveSignalProcessingObject extends AbstractActiveObject {
 
 	public AbstractActiveSignalProcessingObject(String id) {
 		super(id);
+		this.signals = new LinkedBlockingQueue<>();
 	}
-	
+
 	BlockingQueue<Consumer<AbstractActiveSignalProcessingObject>> signals;
+
 	@Override
 	public void afRun() {
-		try {
-			while (true) {
+
+		while (true) {
+			try {
 				Consumer<AbstractActiveSignalProcessingObject> signal = this.signals.take();
 				signal.accept(this);
+			} catch (Exception ex) {
+				ex.printStackTrace(); //TODO: make this log
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
+
 	}
-	
+
 	protected void addToQueue(Consumer<AbstractActiveSignalProcessingObject> signal) {
 		this.signals.add(signal);
 	}
-	
+
 }

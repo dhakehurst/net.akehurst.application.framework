@@ -32,6 +32,10 @@ public class StandardFilesystem extends AbstractComponent implements IFilesystem
 	}
 	
 	@Override
+	public void afConnectParts() {
+	}
+	
+	@Override
 	public void afRun() {
 		// TODO Auto-generated method stub
 		
