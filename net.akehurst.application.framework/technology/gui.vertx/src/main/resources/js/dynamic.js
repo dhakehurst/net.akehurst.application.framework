@@ -22,21 +22,38 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 	var sceneId = this.sceneId
 	el.click(function() {
 		var data = {}
-		var p = el.parents('fieldset')
+		var p = el.closest('fieldset')
 		if (null!=this.form) {
 			for(i=0; i< this.form.length; i++) {
 				var id = this.form[i].id
 				var value = this.form[i].value
 				data[id] = value
 			}
-		} else if (null!=p[0]) {//this.parentElement.tagName=='FIELDSET') { //TODO: use jquery .parents to find the fieldset
-			var childs = $(p[0]).find('input')
+		} else if (null!=p) {
+			var childs = $(p).find('input')
 			for(i=0; i< childs.length; i++) {
-				if (childs[i].tagName=='INPUT') {
-					var id = childs[i].id
-					var value = childs[i].value
-					data[id] = value							
+				var id = childs[i].id
+				var value = childs[i].value
+				data[id] = value							
+			}
+			var ts = $(p).find('table.input')
+			for(i=0; i< ts.length; i++) {
+				var tbl = ts[i]
+				var entries = []
+				for(var r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
+					var row = tbl.rows[r]
+					var e = {}
+					for(var c=0; c<row.cells.length; c++) {
+						var cell = row.cells[c]
+						var th = $(tbl).find('th').eq($(cell).index())
+						var key = th.attr('id')
+						var value = $(cell).text()
+						e[key] = value
+					}
+					entries.push(e)
 				}
+				var id = tbl.id
+				data[id] = entries
 			}
 		}
 		var outData = {sceneId:sceneId, elementId:this.id, eventType:eventType, eventData:data}
@@ -82,6 +99,16 @@ Dynamic.prototype.addElement = function(parentId, newElementId, type, attributes
 		if (null != content) {
 			child.insertAdjacentHTML('beforeend', content)
 		}
+		return 'ok'
+	}
+}
+
+Dynamic.prototype.clearElement = function(elementId) {
+	var el = $('#'+elementId)
+	if (el.length == 0) {
+		console.log('Error: cannot find parent element with id ' + elementId)
+	} else {
+		el.empty()
 		return 'ok'
 	}
 }

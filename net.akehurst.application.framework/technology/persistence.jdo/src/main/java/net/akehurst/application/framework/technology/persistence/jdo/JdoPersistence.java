@@ -53,6 +53,7 @@ import net.akehurst.application.framework.os.annotations.PortInstance;
 import net.akehurst.application.framework.os.annotations.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
+import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
@@ -259,7 +260,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> void store(PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException {
+	public <T> void store(IPersistenceTransaction transaction,PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException {
 		Transaction tx = this.manager.currentTransaction();
 		try {
 			Object toPersist = null;
@@ -287,7 +288,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> T retrieve(PersistentItemLocation location, Class<T> itemType) throws PersistentStoreException {
+	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType) throws PersistentStoreException {
 		try {
 			Class<? extends Persistable> enhancedType = fetchEnhanced(itemType);
 			Query<? extends Persistable> query = this.manager.newQuery(enhancedType, location.asPrimitive());
@@ -310,13 +311,13 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieve(PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(Class<T> itemType) {
+	public <T> Set<T> retrieveAll(IPersistenceTransaction transaction,Class<T> itemType) {
 		Query query = this.manager.newQuery(itemType);
 		Collection<T> res = (Collection<T>) query.execute();
 		return new HashSet<>(res);
@@ -328,6 +329,17 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 
 	public Port portPersist() {
 		return this.portPersist;
+	}
+
+	@Override
+	public IPersistenceTransaction  startTransaction() {
+		return null;
+	}
+
+	@Override
+	public void commitTransaction(IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

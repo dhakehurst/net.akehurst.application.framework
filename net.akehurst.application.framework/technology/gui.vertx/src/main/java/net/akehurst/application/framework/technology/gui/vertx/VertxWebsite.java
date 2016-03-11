@@ -171,6 +171,14 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
+	public void clearElement(TechSession session, String sceneId, String elementId) {
+		 JsonObject data = new JsonObject();
+		 data.put("elementId", elementId);
+		 
+		 this.verticle.comms.send(session,"Gui.clearElement", data);
+	}
+	
+	@Override
 	public void setText(TechSession session, String sceneId, String id, String value) {
 		JsonObject data = new JsonObject();
 		data.put("id", id);

@@ -15,17 +15,8 @@
  */
 package net.akehurst.application.framework.technology.persistence.openJPA;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +24,14 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import net.akehurst.application.framework.components.AbstractComponent;
 import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.os.annotations.ConfiguredValue;
 import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
@@ -57,8 +47,7 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 		super(id);
 	}
 
-
-	EntityManager entityManager;
+	EntityManagerFactory emf;
 
 	@Override
 	public void afRun() {
@@ -71,8 +60,7 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	public void connect(Map<String, Object> properties) {
 		try {
 			
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory((String)properties.get("persistenceUnitName"), properties);
-			this.entityManager = emf.createEntityManager();
+			this.emf = Persistence.createEntityManagerFactory((String)properties.get("persistenceUnitName"), properties);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -80,20 +68,36 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	};
 
 	@Override
-	public <T> void store(PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException {
+	public <T> void store(IPersistenceTransaction transaction, PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException {
 		try {
-			this.entityManager.getTransaction().begin();
-			this.entityManager.persist(item);
-			this.entityManager.getTransaction().commit();
+			JpaPersistenceTransaction trans = (JpaPersistenceTransaction)transaction;
+			trans.em.persist(item);
 		} catch (Exception ex) {
 			throw new PersistentStoreException("Failed to store item",ex);
 		}
 	}
-
+	
 	@Override
-	public <T> T retrieve(PersistentItemLocation location, Class<T> itemType) {
+	public IPersistenceTransaction startTransaction() {
+		EntityManager em = emf.createEntityManager();
+		EntityTransaction transaction = em.getTransaction();
+		transaction.begin();
+		return new JpaPersistenceTransaction(em);
+	}
+	
+	@Override
+	public void commitTransaction(IPersistenceTransaction transaction) {
+		JpaPersistenceTransaction trans = (JpaPersistenceTransaction)transaction;
+		trans.em.getTransaction().commit();
+		trans.em.close();
+		trans.em = null;
+	}
+	
+	@Override
+	public <T> T retrieve(IPersistenceTransaction transaction, PersistentItemLocation location, Class<T> itemType) {
 		try {
-			T t = this.entityManager.find(itemType, location.asPrimitive());
+			JpaPersistenceTransaction trans = (JpaPersistenceTransaction)transaction;
+			T t = trans.em.find(itemType, location.asPrimitive());
 			return t;
 		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
@@ -102,7 +106,7 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieve(PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction, PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
 		String qs = "SELECT item FROM " + itemType.getSimpleName()+" item";
 		if (filter.isEmpty()) {
 			//do nothing, return all
@@ -115,7 +119,8 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 				qs += " AND " + "item."+me.getKey() + " = " + this.convert(me.getValue());
 			}
 		}
-		TypedQuery<T> q = this.entityManager.createQuery(qs, itemType);
+		JpaPersistenceTransaction trans = (JpaPersistenceTransaction)transaction;
+		TypedQuery<T> q = trans.em.createQuery(qs, itemType);
 		List<T> res = q.getResultList();
 		return new HashSet<>((Collection<T>) res);
 	}
@@ -129,9 +134,10 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 	
 	@Override
-	public <T> Set<T> retrieveAll(Class<T> itemType) {
+	public <T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType) {
 		String qs = "SELECT x FROM " + itemType.getSimpleName()+" x";
-		TypedQuery<T> q = this.entityManager.createQuery(qs, itemType);
+		JpaPersistenceTransaction trans = (JpaPersistenceTransaction)transaction;
+		TypedQuery<T> q = trans.em.createQuery(qs, itemType);
 		List<T> res = q.getResultList();
 		return new HashSet<>((Collection<T>) res);
 	}

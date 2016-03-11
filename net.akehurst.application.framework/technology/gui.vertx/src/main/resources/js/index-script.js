@@ -42,6 +42,9 @@ $(document).ready(function() {
 	serverComms.registerHandler('Gui.addElement', function(args) {
 		dynamic.addElement(args.parentId, args.newElementId, args.type, args.attributes, args.content)
 	})
+	serverComms.registerHandler('Gui.clearElement', function(args) {
+		dynamic.clearElement(args.elementId)
+	})
 	serverComms.registerHandler('Gui.requestRecieveEvent', function(args) {
 		console.log("requestRecieveEvent "+JSON.stringify(args))
 		dynamic.requestRecieveEvent(args.elementId, args.eventType, 'IGuiNotification.notifyEventOccured')

@@ -15,13 +15,32 @@
  */
 package net.akehurst.application.framework.technology.persistence.openJPA.test.jpa;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
 public class Person {
 
-	@Id
-	public String name;
+	String name;
 	
+	@Id
+	public String getName() {
+		return this.name;
+	};
+	
+	public void setName(String value) {
+		this.name = value;
+	}
+	
+	String hairColour;
+	
+	@Basic
+	public String getHairColour() {
+		return this.hairColour;
+	}
+	
+	public void setHairColour(String value) {
+		this.hairColour = value;
+	}
 }

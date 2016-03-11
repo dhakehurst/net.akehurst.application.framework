@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import net.akehurst.application.framework.os.IOperatingSystem;
 import net.akehurst.application.framework.os.OperatingSystem;
+import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.persistence.openJPA.JpaPersistence;
@@ -67,13 +68,14 @@ public class test_JpaPersistence {
 			
 			PersistentItemLocation location = new PersistentItemLocation("");
 			Person item = new Person();
-			item.name = "Test";
+			item.setName("Test");
 
 //			Class<?> c = Class.forName("net.akehurst.application.framework.technology.persistence.openJPA.test.Person");
 //			Object o = c.newInstance();
 //			c.getField("name").set(o, "Test");
-			
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, item, Person.class);
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -92,17 +94,18 @@ public class test_JpaPersistence {
 			PersistentItemLocation location = new PersistentItemLocation("");
 			
 			Person p = new Person();
-			p.name = "Owner";
+			p.setName("Owner");
 			
 			Person p1 = new Person();
-			p1.name = "Test2";
+			p1.setName( "Test2");
 
 			Contacts contacts = new Contacts();
 			contacts.id = "myContacts";
 			contacts.owner = p;
 			contacts.people.add(p1);
-			
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, contacts, Contacts.class);
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -121,14 +124,53 @@ public class test_JpaPersistence {
 			
 			PersistentItemLocation location = new PersistentItemLocation("Test");
 			Person item = new Person();
-			item.name = "Test";
+			item.setName("Test");
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
 
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, item, Person.class);
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
 
-			Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(location, Person.class);
+			Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Person.class);
+			sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction);
 			
 			Person p = (Person)o;
 			Assert.assertNotNull(p);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	@Test
+	public void modify_Person() {
+		try {
+			IOperatingSystem os = new OperatingSystem("os");
+			JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
+
+			Map<String, Object> props = new HashMap<>();
+			props.put("persistenceUnitName", "openjpa");
+			sut.portPersist().getProvided(IPersistentStore.class).connect(props);
+			
+			PersistentItemLocation location = new PersistentItemLocation("Test");
+			Person item = new Person();
+			item.setName("Test");
+			item.setHairColour("black");
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
+
+			Person p = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Person.class);
+			Assert.assertNotNull(p);
+			p.setHairColour("brown");
+			sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction);
+
+			IPersistenceTransaction transaction2 = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+
+			Person p2 = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction2,location, Person.class);
+			Assert.assertNotNull(p2);
+			Assert.assertTrue(p2.getHairColour().equals("brown"));
+			sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction2);
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -146,18 +188,19 @@ public class test_JpaPersistence {
 			
 			PersistentItemLocation location = new PersistentItemLocation("Test");
 			Person item1 = new Person();
-			item1.name = "Test1";
+			item1.setName("Test1");
 			Person item2 = new Person();
-			item2.name = "Test2";
-			
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, item1, Person.class);
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, item2, Person.class);
+			item2.setName("Test2");
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
 
-			Set<Person> set = sut.portPersist().getProvided(IPersistentStore.class).retrieveAll(Person.class);
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item1, Person.class);
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item2, Person.class);
+
+			Set<Person> set = sut.portPersist().getProvided(IPersistentStore.class).retrieveAll(transaction,Person.class);
 			
 			Assert.assertTrue(set.size() > 0);
 			for(Person p: set) {
-				System.out.println(p.name);
+				System.out.println(p.getName());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -178,20 +221,21 @@ public class test_JpaPersistence {
 			PersistentItemLocation location = new PersistentItemLocation("myContacts");
 			
 			Person p = new Person();
-			p.name = "Owner";
+			p.setName("Owner");
 			
 			Person p1 = new Person();
-			p1.name = "Test2";
+			p1.setName("Test2");
 
 			Contacts contacts = new Contacts();
 			contacts.id = "myContacts";
 			contacts.owner = p;
 			contacts.people.add(p1);
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
 			
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, contacts, Contacts.class);
 			
-			
-			Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(location, Contacts.class);
+			Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Contacts.class);
 			
 			Contacts c = (Contacts)o;
 			Assert.assertNotNull(c);

@@ -33,6 +33,7 @@ import java.util.Set;
 import net.akehurst.application.framework.components.AbstractComponent;
 import net.akehurst.application.framework.components.Port;
 import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 
@@ -259,25 +260,25 @@ public class DerbyDatabasePersistence extends AbstractComponent implements IPers
 	}
 	
 	@Override
-	public <T> void store(PersistentItemLocation location, T item, Class<T> itemType) {
+	public <T> void store(IPersistenceTransaction transaction, PersistentItemLocation location, T item, Class<T> itemType) {
 		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
-	public <T> T retrieve(PersistentItemLocation location, Class<T> itemType) {
+	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public <T> Set<T> retrieve(PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public <T> Set<T> retrieveAll(Class<T> itemType) {
+	public <T> Set<T> retrieveAll(IPersistenceTransaction transaction,Class<T> itemType) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -288,5 +289,17 @@ public class DerbyDatabasePersistence extends AbstractComponent implements IPers
 
 	public Port portPersist() {
 		return this.portPersist;
+	}
+
+	@Override
+	public IPersistenceTransaction startTransaction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void commitTransaction(IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+		
 	}
 }

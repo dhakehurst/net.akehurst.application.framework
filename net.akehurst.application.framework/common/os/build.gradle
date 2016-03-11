@@ -15,6 +15,7 @@
  */
  
  dependencies {
+ 	compile project(":${rootProject.name}.technology.interfaceLogging");
  	compile project(":${rootProject.name}.technology.interfacePersistence");
  
  	compile 'net.akehurst.miscellaneous:net.akehurst.holser.reflect:1.0.0'

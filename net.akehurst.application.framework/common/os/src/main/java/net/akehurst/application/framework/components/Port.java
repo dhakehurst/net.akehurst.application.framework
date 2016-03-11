@@ -16,6 +16,7 @@
 package net.akehurst.application.framework.components;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -76,13 +77,17 @@ public class Port {
 		InvocationHandler h = new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				Object result = null;
-				 //get these here to delay resolving the object until moment of call
-				Set<Object> set = required.get(interfaceType);
-				for(Object provider: set) {
-					result = method.invoke(provider, args);
+				try {
+					Object result = null;
+					 //get these here to delay resolving the object until moment of call
+					Set<Object> set = required.get(interfaceType);
+					for(Object provider: set) {
+						result = method.invoke(provider, args);
+					}
+					return result;
+				} catch (InvocationTargetException ex) {
+					throw ex.getCause();
 				}
-				return result;
 			}
 		};
 		Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[]{interfaceType}, h);

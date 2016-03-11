@@ -42,6 +42,8 @@ public interface IGuiRequest {
 	 */
 	void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type, String attributes, Object content);
 	
+	void clearElement(TechSession session, String sceneId, String elementId);
+	
 	void setTitle(TechSession session, String sceneId, String text);
 	void setText(TechSession session, String sceneId, String id, String text);
 		

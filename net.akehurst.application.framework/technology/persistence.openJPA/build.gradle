@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-repositories {
-	maven { url "http://m2.objectdb.com" }
-}
+
 
 dependencies {
 	compile project(":${rootProject.name}.common.os")
@@ -25,4 +23,8 @@ dependencies {
 	compile 'org.apache.openjpa:openjpa:2.4.1'
 	
 	testRuntime 'org.apache.derby:derby:10.12.1.1'
+	
+	//compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:+'
+ //   runtime 'org.hibernate:hibernate-entitymanager:+'
+	
 }

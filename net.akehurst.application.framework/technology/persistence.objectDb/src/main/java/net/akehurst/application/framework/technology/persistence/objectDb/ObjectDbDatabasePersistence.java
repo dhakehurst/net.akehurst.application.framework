@@ -41,6 +41,7 @@ import net.akehurst.application.framework.components.AbstractComponent;
 import net.akehurst.application.framework.components.Port;
 import net.akehurst.application.framework.os.annotations.ConfiguredValue;
 import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 
@@ -76,7 +77,7 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	};
 
 	@Override
-	public <T> void store(PersistentItemLocation location, T item, Class<T> itemType) {
+	public <T> void store(IPersistenceTransaction transaction,PersistentItemLocation location, T item, Class<T> itemType) {
 		try {
 			this.entityManager.getTransaction().begin();
 			this.entityManager.persist(item);
@@ -87,7 +88,7 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	@Override
-	public <T> T retrieve(PersistentItemLocation location, Class<T> itemType) {
+	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType) {
 		try {
 			T t = this.entityManager.find(itemType, location.asPrimitive());
 			return t;
@@ -98,13 +99,13 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	@Override
-	public <T> Set<T> retrieve(PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(Class<T> itemType) {
+	public <T> Set<T> retrieveAll(IPersistenceTransaction transaction,Class<T> itemType) {
 		String qs = "SELECT x FROM " + itemType.getSimpleName()+" x";
 		TypedQuery<T> q = this.entityManager.createQuery(qs, itemType);
 		List<T> res = q.getResultList();
@@ -117,5 +118,17 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 
 	public Port portPersist() {
 		return this.portPersist;
+	}
+
+	@Override
+	public IPersistenceTransaction  startTransaction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void commitTransaction(IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+		
 	}
 }

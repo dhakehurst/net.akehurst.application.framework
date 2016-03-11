@@ -28,6 +28,7 @@ import net.akehurst.application.framework.os.annotations.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceFilesystem.FilesystemException;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesystem;
+import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
@@ -89,12 +90,12 @@ public class HJsonFile implements IIdentifiableObject, IPersistentStore {
 	
 	
 	@Override
-	public <T> void store(PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException {
+	public <T> void store(IPersistenceTransaction transaction,PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException {
 
 	}
 
 	@Override
-	public <T> T retrieve(PersistentItemLocation location, Class<T> itemType) throws PersistentStoreException {
+	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType) throws PersistentStoreException {
 		try {
 			JsonValue value = this.fetchJson(this.getJson(), location.asPrimitive());
 			if (null == value) {
@@ -109,14 +110,25 @@ public class HJsonFile implements IIdentifiableObject, IPersistentStore {
 	}
 
 	@Override
-	public <T> Set<T> retrieve(PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(Class<T> itemType) {
+	public <T> Set<T> retrieveAll(IPersistenceTransaction transaction,Class<T> itemType) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public IPersistenceTransaction startTransaction() {
+		return null;
+	}
+
+	@Override
+	public void commitTransaction(IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+		
 	}
 }

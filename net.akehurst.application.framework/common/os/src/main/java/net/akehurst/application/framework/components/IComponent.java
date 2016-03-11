@@ -15,7 +15,9 @@
  */
 package net.akehurst.application.framework.components;
 
-public interface IComponent  {
+import net.akehurst.application.framework.os.IActiveObject;
+
+public interface IComponent extends IActiveObject {
 
 	String afId();
 

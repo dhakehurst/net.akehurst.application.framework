@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import net.akehurst.application.framework.os.IOperatingSystem;
 import net.akehurst.application.framework.os.OperatingSystem;
+import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
@@ -70,8 +71,9 @@ public class test_JdoPersistence {
 			PersistentItemLocation location = new PersistentItemLocation("");
 			Person item = new Person();
 			item.name = "Test";
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
 
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, item, Person.class);
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -103,8 +105,9 @@ public class test_JdoPersistence {
 			Contacts contacts = new Contacts();
 			contacts.owner = p;
 			contacts.people.add(p1);
-			
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, contacts, Contacts.class);
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -135,8 +138,9 @@ public class test_JdoPersistence {
 
 			Contacts contacts = new Contacts();
 			contacts.people.add(p);
-			
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, contacts, Contacts.class);
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -161,10 +165,11 @@ public class test_JdoPersistence {
 			PersistentItemLocation location = new PersistentItemLocation("");
 			Person item = new Person();
 			item.name = "Test";
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
 
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, item, Person.class);
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
 
-			Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(location, Person.class);
+			Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Person.class);
 			
 			Person p = (Person)o;
 		} catch (Exception e) {
@@ -199,11 +204,12 @@ public class test_JdoPersistence {
 			contacts.id = "myContacts";
 			contacts.owner = p;
 			contacts.people.add(p1);
+			IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+
+			sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
 			
-			sut.portPersist().getProvided(IPersistentStore.class).store(location, contacts, Contacts.class);
 			
-			
-			Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(location, Contacts.class);
+			Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Contacts.class);
 			
 			Contacts c = (Contacts)o;
 			

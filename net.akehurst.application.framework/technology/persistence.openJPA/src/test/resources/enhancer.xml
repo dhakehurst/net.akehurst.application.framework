@@ -15,6 +15,7 @@
 	<target name="enhance" depends="openjpa.libs.check, build.dir.check">
 		<echo message="${cp}" />
 		<taskdef name="openjpac" classname="org.apache.openjpa.ant.PCEnhancerTask">
+		<!--<taskdef name="openjpac" classname="org.hibernate.tool.instrument.javassist.InstrumentTask">-->
 			<classpath refid="enhance.cp" />
 		</taskdef>
 		<openjpac>
@@ -26,3 +27,4 @@
 		</openjpac>
 	</target>
 </project>
+

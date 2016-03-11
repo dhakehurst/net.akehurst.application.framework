@@ -15,11 +15,19 @@
  */
 package net.akehurst.application.framework.components;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.akehurst.application.framework.os.AbstractActiveObject;
+import net.akehurst.application.framework.os.IActiveObject;
+import net.akehurst.application.framework.os.annotations.ActiveObjectInstance;
+import net.akehurst.application.framework.os.annotations.ComponentInstance;
 import net.akehurst.application.framework.os.annotations.ServiceReference;
+import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract
 public class AbstractComponent extends AbstractActiveObject implements IComponent {
@@ -29,6 +37,9 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 		this.ports = new HashSet<>();
 	}
 
+	@ServiceReference
+	ILogger logger;
+	
 	Set<Port> ports;
 	@Override
 	public void afAddPort(Port value) {
@@ -52,5 +63,36 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 		}
 		
 		super.afStart();
+	}
+	
+	@Override
+	public void afRun() {
+		try {
+			// TODO handle inheritance ?
+			List<IActiveObject> objects = new ArrayList<>();
+			for (Field f : this.getClass().getDeclaredFields()) {
+				f.setAccessible(true);
+				ComponentInstance annC = f.getAnnotation(ComponentInstance.class);
+				ActiveObjectInstance annAO = f.getAnnotation(ActiveObjectInstance.class);
+				if (null == annC && null==annAO) {
+					// do nothing
+				} else {
+					IActiveObject ao = (IActiveObject) f.get(this);
+					//TODO: support ordering of objects
+					objects.add(ao);
+				}
+			}
+			
+			for(IActiveObject ao: objects) {
+				ao.afStart();
+			}
+			
+			for(IActiveObject ao: objects) {
+				ao.afJoin();
+			}
+			
+		} catch (Exception ex) {
+			logger.log(LogLevel.ERROR, "Failed to run application "+this.afId(), ex);
+		}
 	}
 }

@@ -33,6 +33,9 @@ import net.akehurst.application.framework.os.annotations.ConfiguredValue;
 import net.akehurst.application.framework.os.annotations.PortInstance;
 import net.akehurst.application.framework.os.annotations.ProvidesInterfaceForPort;
 import net.akehurst.application.framework.os.annotations.ServiceReference;
+import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
+import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
@@ -47,6 +50,15 @@ public class OperatingSystem implements IOperatingSystem {
 		this.services.put(serviceName, this);
 	}
 
+	void logError(String message) {
+		ILogger logger = (ILogger)this.services.get("logger");
+		if (null==logger) {
+			System.err.println(message);
+		} else {
+			logger.log(LogLevel.ERROR, message);
+		}
+	}
+	
 	CommandLine commandLine;
 
 	public void setCommandLine(CommandLine value) {
@@ -232,18 +244,21 @@ public class OperatingSystem implements IOperatingSystem {
 
 					IPersistentStore config = (IPersistentStore) this.services.get(serviceName);
 					if (null == config) {
-						System.err.println("no configuration service found");
+						logError("no configuration service found");
 						Object value = this.createDatatype(f.getType(), ann.defaultValue());
 						f.set(obj, value);
 					} else {
+						IPersistenceTransaction trans = config.startTransaction();
 						Class<? extends Object> itemType = (Class<? extends Object>) f.getType();
 						PersistentItemLocation pid = new PersistentItemLocation(itemId);
-						Object value = config.retrieve(pid, itemType);
+						Object value = config.retrieve(trans,pid, itemType);
 						if (null == value) {
 							value = this.createDatatype(f.getType(), ann.defaultValue());
 						}
 						f.set(obj, value);
+						config.commitTransaction(trans);
 					}
+					
 				}
 			}
 		}

@@ -128,6 +128,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 	
 	@Override
+	public void clearElement(TechSession session, String sceneId, String elementId) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
 	public void switchTo(TechSession session, String stageId, String sceneId) {
 		// TODO Auto-generated method stub
 		
