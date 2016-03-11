@@ -102,7 +102,7 @@ subprojects {
 			licenses = ['Apache-2.0']
 			vcsUrl = 'https://github.com/dhakehurst/net.akehurst.application.framework.git'
 			version {
-				name = "${version}"
+				name = "${project.version}"
 			}
 		}
 	}

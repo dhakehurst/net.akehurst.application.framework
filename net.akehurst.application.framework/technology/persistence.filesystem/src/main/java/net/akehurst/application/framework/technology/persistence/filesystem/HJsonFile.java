@@ -100,9 +100,17 @@ public class HJsonFile implements IIdentifiableObject, IPersistentStore {
 			JsonValue value = this.fetchJson(this.getJson(), location.asPrimitive());
 			if (null == value) {
 				return null;
-			} else {
-				T t = os.createDatatype(itemType, value);
+			} else if (value.isString()){
+				T t = os.createDatatype(itemType, value.asString());
 				return t;
+			} else if (value.isNumber()) {
+				T t = os.createDatatype(itemType, value.asDouble());
+				return t;
+			} else if (value.isBoolean()) {
+				T t = os.createDatatype(itemType, value.asBoolean());
+				return t;
+			} else {
+				throw new PersistentStoreException("Unknown JSON type at " + location, null);
 			}
 		} catch (Exception ex) {
 			throw new PersistentStoreException("Failed to retrieve item from location " + location, ex);

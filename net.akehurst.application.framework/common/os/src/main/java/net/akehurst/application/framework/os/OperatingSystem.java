@@ -221,7 +221,7 @@ public class OperatingSystem implements IOperatingSystem {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
-			this.injectCommandLineArgs(class_.getSuperclass(), obj, id);
+			this.injectConfigurationValues(class_.getSuperclass(), obj, id);
 			for (Field f : class_.getDeclaredFields()) {
 				f.setAccessible(true);
 				ConfiguredValue ann = f.getAnnotation(ConfiguredValue.class);
