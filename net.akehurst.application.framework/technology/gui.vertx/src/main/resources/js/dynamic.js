@@ -63,7 +63,7 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 
 Dynamic.prototype.switchToScene = function(stageId, sceneId) {
 	var myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-	window.location.href = myLocation + stageId+sceneId+"/"
+	window.location.href = myLocation + stageId+sceneId
 }
 
 Dynamic.prototype.setTitle = function(value) {

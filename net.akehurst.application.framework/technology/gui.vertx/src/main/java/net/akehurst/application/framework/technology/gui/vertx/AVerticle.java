@@ -72,6 +72,11 @@ public class AVerticle implements Verticle {
 		router.route(routePath).handler(UserSessionHandler.create(authProvider));
 		
 		router.route(routePath).handler(requestHandler);
+//		router.route(routePath).handler((c)->{
+//			if (c.normalisedPath().endsWith("/") {
+//				c.reroute(.....);
+//			}
+//		});
 		router.route(routePath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot(webroot));
 	}
 
