@@ -103,17 +103,17 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 					rc.next();
 				}), webroot);
 			}
-			this.verticle.comms.addSocksChannel("/sockjs"+routePath, (session, channelId, data) -> {
-				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-					String sceneId = data.getString("sceneId");
-					String eventType = data.getString("eventType");
-					String elementId = data.getString("elementId");
-					Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-					this.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
-				} else  {
-					//??
-				}
-			});
+//			this.verticle.comms.addSocksChannel("/sockjs"+routePath, (session, channelId, data) -> {
+//				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
+//					String sceneId = data.getString("sceneId");
+//					String eventType = data.getString("eventType");
+//					String elementId = data.getString("elementId");
+//					Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
+//					this.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
+//				} else  {
+//					//??
+//				}
+//			});
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

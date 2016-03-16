@@ -72,7 +72,7 @@ Dynamic.prototype.setTitle = function(value) {
 
 Dynamic.prototype.setText = function(id, value) {
 	var el = $('#'+id)
-	if (el.tagName='INPUT') {
+	if (el.is('input')) {
 		el.val(value)
 	} else {
 		el.text(value)	

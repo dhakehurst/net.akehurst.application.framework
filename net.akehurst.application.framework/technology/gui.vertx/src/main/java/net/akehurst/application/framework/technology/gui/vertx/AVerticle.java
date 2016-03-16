@@ -77,6 +77,20 @@ public class AVerticle implements Verticle {
 //				c.reroute(.....);
 //			}
 //		});
+		router.route(routePath).handler((context)->{
+			this.comms.addSocksChannel("/sockjs"+routePath, (session, channelId, data) -> {
+				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
+					String sceneId = data.getString("sceneId");
+					String eventType = data.getString("eventType");
+					String elementId = data.getString("elementId");
+					Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
+					this.ws.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
+				} else  {
+					//??
+				}
+			});
+			context.next();
+		});
 		router.route(routePath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot(webroot));
 	}
 
@@ -93,6 +107,20 @@ public class AVerticle implements Verticle {
 		
 		router.route(routePath).handler(this.authHandler);//BasicAuthHandler.create(authProvider, "Please Provide Valid Credentials" ));
 		router.route(routePath).handler(requestHandler);//;
+		router.route(routePath).handler((context)->{
+			this.comms.addSocksChannel("/sockjs"+routePath, (session, channelId, data) -> {
+				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
+					String sceneId = data.getString("sceneId");
+					String eventType = data.getString("eventType");
+					String elementId = data.getString("elementId");
+					Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
+					this.ws.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
+				} else  {
+					//??
+				}
+			});
+			context.next();
+		});
 		router.route(routePath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot(webroot));
 	}
 	
