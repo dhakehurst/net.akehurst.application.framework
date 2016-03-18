@@ -154,6 +154,13 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 		
 	}
 	
+	@Override
+	public void addChart(TechSession session, String sceneId, String parentId, String chartId, Integer width, Integer height, String chartType,
+			String jsonChartData, String jsonChartOptions) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	//--------- IGuiNotification ---------
 
 

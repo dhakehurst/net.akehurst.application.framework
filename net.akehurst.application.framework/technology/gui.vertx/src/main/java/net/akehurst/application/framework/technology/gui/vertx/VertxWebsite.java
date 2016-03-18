@@ -38,15 +38,15 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		super(objectId);
 	}
 
-	@ConfiguredValue(defaultValue="9999")
+	@ConfiguredValue(defaultValue = "9999")
 	IpPort port;
-	
+
 	AVerticle verticle;
 
 	@Override
 	public void afConnectParts() {
 	}
-	
+
 	@Override
 	public void afRun() {
 		this.verticle = new AVerticle(this, port.asPrimitive());
@@ -65,16 +65,15 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		this.verticle.requestLogout(session);
 	}
 
-	
 	// --------- IGuiRequest ---------
 	@Override
 	public void requestRecieveEvent(TechSession session, String sceneId, String elementId, String eventType) {
 		JsonObject data = new JsonObject();
 		data.put("elementId", elementId);
 		data.put("eventType", eventType);
-		
+
 		this.verticle.comms.send(session, "Gui.requestRecieveEvent", data);
-		
+
 	}
 
 	@Override
@@ -82,16 +81,16 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		try {
 			String str = contentRoot.toString();
 			if (str.endsWith("/")) {
-				str = str.substring(0, str.length()-1);
+				str = str.substring(0, str.length() - 1);
 			}
-			String webroot =  str.substring(str.lastIndexOf('/')+1);
-			String routePath = stageId+"/*";
+			String webroot = str.substring(str.lastIndexOf('/') + 1);
+			String routePath = stageId + "/*";
 			if (authenticated) {
 				this.verticle.addAuthenticatedRoute(routePath, (rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
 					User u = rc.user();
 					String path = rc.normalisedPath();
-					System.out.println(path+" "+(null==u?"null":u.principal()));
+					System.out.println(path + " " + (null == u ? "null" : u.principal()));
 					rc.next();
 				}), webroot);
 			} else {
@@ -99,32 +98,32 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
 					User u = rc.user();
 					String path = rc.normalisedPath();
-					System.out.println(path+" "+(null==u?"null":u.principal()));
+					System.out.println(path + " " + (null == u ? "null" : u.principal()));
 					rc.next();
 				}), webroot);
 			}
-//			this.verticle.comms.addSocksChannel("/sockjs"+routePath, (session, channelId, data) -> {
-//				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-//					String sceneId = data.getString("sceneId");
-//					String eventType = data.getString("eventType");
-//					String elementId = data.getString("elementId");
-//					Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-//					this.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
-//				} else  {
-//					//??
-//				}
-//			});
+			// this.verticle.comms.addSocksChannel("/sockjs"+routePath, (session, channelId, data) -> {
+			// if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
+			// String sceneId = data.getString("sceneId");
+			// String eventType = data.getString("eventType");
+			// String elementId = data.getString("elementId");
+			// Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
+			// this.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
+			// } else {
+			// //??
+			// }
+			// });
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void createScene(String stageId, String sceneId, URL content) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	public void createScene(String sceneId, boolean authenticated, URL contentRoot) {
 
 	}
@@ -134,7 +133,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		JsonObject data = new JsonObject();
 		data.put("stageId", stageId);
 		data.put("sceneId", sceneId);
-		
+
 		this.verticle.comms.send(session, "Gui.switchToScene", data);
 	}
 
@@ -147,49 +146,63 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 
 	@Override
 	public void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type) {
-		 JsonObject data = new JsonObject();
-		 data.put("parentId", parentId);
-		 data.put("newElementId", newElementId);
-		 data.put("type", type);
+		JsonObject data = new JsonObject();
+		data.put("parentId", parentId);
+		data.put("newElementId", newElementId);
+		data.put("type", type);
 
-		 this.verticle.comms.send(session, "Gui.addElement", data);
+		this.verticle.comms.send(session, "Gui.addElement", data);
 
 	};
 
 	@Override
 	public void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type, String attributes, Object content) {
-		 JsonObject data = new JsonObject();
-		 data.put("parentId", parentId);
-		 data.put("newElementId", newElementId);
-		 data.put("type", type);
-		 data.put("content", content);
-		 String jsonStr = attributes.replaceAll("'", "\"");
-		 JsonObject atts = new JsonObject(jsonStr);
-		 data.put("attributes", atts);
-		 
-		 this.verticle.comms.send(session,"Gui.addElement", data);
+		JsonObject data = new JsonObject();
+		data.put("parentId", parentId);
+		data.put("newElementId", newElementId);
+		data.put("type", type);
+		data.put("content", content);
+		String jsonStr = attributes.replaceAll("'", "\"");
+		JsonObject atts = new JsonObject(jsonStr);
+		data.put("attributes", atts);
+
+		this.verticle.comms.send(session, "Gui.addElement", data);
 	}
 
 	@Override
 	public void clearElement(TechSession session, String sceneId, String elementId) {
-		 JsonObject data = new JsonObject();
-		 data.put("elementId", elementId);
-		 
-		 this.verticle.comms.send(session,"Gui.clearElement", data);
+		JsonObject data = new JsonObject();
+		data.put("elementId", elementId);
+
+		this.verticle.comms.send(session, "Gui.clearElement", data);
 	}
-	
+
 	@Override
 	public void setText(TechSession session, String sceneId, String id, String value) {
 		JsonObject data = new JsonObject();
 		data.put("id", id);
 		data.put("value", value);
-		
+
 		this.verticle.comms.send(session, "Gui.setText", data);
 	}
-	
-	
+
+	@Override
+	public void addChart(TechSession session, String sceneId, String parentId, String chartId, Integer width, Integer height, String chartType,
+			String jsonChartData, String jsonChartOptions) {
+		JsonObject data = new JsonObject();
+		data.put("parentId", parentId);
+		data.put("chartId", chartId);
+		data.put("width", width);
+		data.put("height", height);
+		data.put("chartType", chartType);
+		data.put("chartData", new JsonObject(jsonChartData));
+		data.put("chartOptions", new JsonObject(jsonChartOptions));
+
+		this.verticle.comms.send(session, "Gui.addChart", data);
+	}
+
 	// --------- Ports ---------
-	@PortInstance(provides={IGuiRequest.class,IAuthenticatorRequest.class},requires={IGuiNotification.class,IAuthenticatorNotification.class})
+	@PortInstance(provides = { IGuiRequest.class, IAuthenticatorRequest.class }, requires = { IGuiNotification.class, IAuthenticatorNotification.class })
 	Port portGui;
 
 	public Port portGui() {

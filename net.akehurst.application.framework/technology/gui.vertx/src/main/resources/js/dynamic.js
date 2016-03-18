@@ -55,6 +55,13 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 				var id = tbl.id
 				data[id] = entries
 			}
+			var tas = $(p).find('textarea.input')
+			for(i=0; i< tas.length; i++) {
+				var ta = tas[i]
+				var id = ta.id
+				var value = $(ta).val()
+				data[id] = value
+			}
 		}
 		var outData = {sceneId:sceneId, elementId:this.id, eventType:eventType, eventData:data}
 		serverComms.send(eventChannelId, outData)
@@ -111,4 +118,13 @@ Dynamic.prototype.clearElement = function(elementId) {
 		el.empty()
 		return 'ok'
 	}
+}
+
+Dynamic.prototype.addChart = function(parentId, chartId, width, height, chartType, chartData, chartOptions) {
+	//currently uses Chart.js
+	var parent = document.getElementById(parentId)
+	$(parent).append("<canvas id='"+chartId+"' width='"+width+"' height='"+height+"'></canvas>")
+	var chartContext = document.getElementById(chartId).getContext("2d")
+	var chart = new Chart(chartContext)
+	chart[chartType](chartData, chartOptions)
 }

@@ -54,6 +54,11 @@ $(document).ready(function() {
 		console.log("switchToScene "+JSON.stringify(args))
 		dynamic.switchToScene(args.stageId, args.sceneId)
 	})
+	//Charts
+	serverComms.registerHandler('Gui.addChart', function(args) {
+		console.log("addChart "+JSON.stringify(args))
+		dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
 	//eventbus = new EventBus(myLocation + '/eventbus')
 //	eventbus = new EventBus('http://localhost:9998' + '/eventbus')
 //
