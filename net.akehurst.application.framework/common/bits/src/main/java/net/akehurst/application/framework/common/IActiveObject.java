@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.os.annotations;
+package net.akehurst.application.framework.common;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public interface IActiveObject extends IIdentifiableObject {
 
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ServiceReference {
-	String name() default "";
+	void afRun();
+	void afStart();
+	void afJoin() throws InterruptedException;
+	
 }

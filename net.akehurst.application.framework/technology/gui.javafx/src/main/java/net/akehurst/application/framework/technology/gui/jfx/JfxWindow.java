@@ -27,11 +27,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
-import net.akehurst.application.framework.components.AbstractComponent;
-import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.os.AbstractActiveObject;
-import net.akehurst.application.framework.os.annotations.ConfiguredValue;
-import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.os.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.TechSession;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
@@ -87,10 +86,9 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 					primary.setScene(scene);
 					primary.sizeToScene();
-					primary.showAndWait();
+					primary.show();
+					portGui().out(IGuiNotification.class).notifyReady();
 
-//					gc = canvas.getGraphicsContext2D();
-//					gc.setStroke(Color.BLACK);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -168,8 +166,8 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	//--------- Ports ---------
 	@PortInstance(provides={IGuiRequest.class},requires={IGuiNotification.class})
-	Port portGui;
-	public Port portGui() {
+	IPort portGui;
+	public IPort portGui() {
 		return this.portGui;
 	}
 }

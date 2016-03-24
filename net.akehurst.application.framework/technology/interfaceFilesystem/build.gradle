@@ -20,5 +20,5 @@ dependencies {
 	
 	compile project(":${rootProject.name}.common.bits")
 	
-	compile 'org.apache.derby:derby:+'
+
 }

@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.os;
+package net.akehurst.application.framework.common.annotations.instance;
 
-import net.akehurst.application.framework.common.IIdentifiableObject;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface IActiveObject extends IIdentifiableObject {
-
-	void afRun();
-	void afStart();
-	void afJoin() throws InterruptedException;
-	
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CommandLineArgument {
+	String name() default "";
 }

@@ -18,14 +18,15 @@ package net.akehurst.application.framework.technology.filesystem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import net.akehurst.application.framework.components.AbstractComponent;
-import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.common.IService;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.os.AbstractComponent;
+import net.akehurst.application.framework.os.Port;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IDirectory;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesystem;
 
-public class StandardFilesystem extends AbstractComponent implements IFilesystem {
+public class StandardFilesystem extends AbstractComponent implements IFilesystem, IService {
 
 	public StandardFilesystem(String id) {
 		super(id);
@@ -39,6 +40,11 @@ public class StandardFilesystem extends AbstractComponent implements IFilesystem
 	public void afRun() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Object createReference(String locationId) {
+		return this;
 	}
 	
 	// ---------- IFilesystem ---------

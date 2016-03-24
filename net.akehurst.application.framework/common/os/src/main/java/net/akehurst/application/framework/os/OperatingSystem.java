@@ -17,22 +17,36 @@ package net.akehurst.application.framework.os;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 
+import net.akehurst.application.framework.common.IApplication;
+import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IIdentifiableObject;
-import net.akehurst.application.framework.components.IComponent;
-import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.os.annotations.ActiveObjectInstance;
-import net.akehurst.application.framework.os.annotations.CommandLineArgument;
-import net.akehurst.application.framework.os.annotations.ComponentInstance;
-import net.akehurst.application.framework.os.annotations.ConfiguredValue;
-import net.akehurst.application.framework.os.annotations.PortInstance;
-import net.akehurst.application.framework.os.annotations.ProvidesInterfaceForPort;
-import net.akehurst.application.framework.os.annotations.ServiceReference;
+import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.IService;
+import net.akehurst.application.framework.common.OperatingSystemExcpetion;
+import net.akehurst.application.framework.common.annotations.declaration.ProvidesInterfaceForPort;
+import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
+import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
+import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
+import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.common.annotations.instance.ServiceInstance;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
@@ -41,39 +55,75 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 import net.akehurst.holser.reflect.BetterMethodFinder;
 
-public class OperatingSystem implements IOperatingSystem {
+public class OperatingSystem  implements IOperatingSystem, IService {
 
 	static final String DEFAULT_CONFIGURATION_SERVICE = "configuration";
 
-	public OperatingSystem(String serviceName) {
+	public OperatingSystem(String id, String serviceName) {
+		this.afId = id;
 		this.services = new HashMap<>();
 		this.services.put(serviceName, this);
+		this.commandLineOptions = new Options();
+
 	}
 
-	void logError(String message) {
-		ILogger logger = (ILogger)this.services.get("logger");
-		if (null==logger) {
-			System.err.println(message);
-		} else {
-			logger.log(LogLevel.ERROR, message);
-		}
+	String afId;
+	@Override
+	public String afId() {
+		return this.afId;
 	}
 	
+	@Override
+	public Object createReference(String locationId) {
+		return this;
+	}
+	
+	ILogger logger() {
+		ILogger logger = this.createServiceReference("logger", "os.logger", ILogger.class);
+		return logger;
+	}
+	
+	void logError(String message, Throwable t) {
+		ILogger logger = logger();
+		if (null == logger) {
+			System.err.println(message);
+			if(null!=t) {
+				t.printStackTrace();
+			}
+		} else {
+			logger.log(LogLevel.ERROR, message,t);
+		}
+	}
+
+	Options commandLineOptions;
+	@Override
+	public void defineCommandLineArgument(boolean required, String argumentName, boolean hasValue, String description) {
+		Option opt = Option.builder().longOpt(argumentName).desc(description).required(required).hasArg(hasValue).build();
+		this.commandLineOptions.addOption(opt);
+	}
 	CommandLine commandLine;
 
-	public void setCommandLine(CommandLine value) {
-		this.commandLine = value;
+	public void setCommandLine(String[] args) {
+		try {
+			CommandLineParser parser = new DefaultParser();
+			this.commandLine = parser.parse(commandLineOptions, args);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
-	Map<String, Object> services;
+	public void outputCommandLineHelp() {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp("<app>", commandLineOptions);
+	}
+	
+	Map<String, IService> services;
 
-	public <T> T fetchService(String name) {
-		return (T) this.services.get(name);
+	public IService fetchService(String name) {
+		return this.services.get(name);
 	}
 
-
-	@Override
-	public <T extends IIdentifiableObject> T createService(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion {
+	<T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -86,9 +136,40 @@ public class OperatingSystem implements IOperatingSystem {
 		}
 	}
 
+	<T> T createServiceReference(String serviceName, String locationId, Class<T> serviceReferenceType) {
+
+		InvocationHandler h = new InvocationHandler() {
+			T serviceReference;
+			T getServiceReference() {
+				if (null==this.serviceReference) {
+					IService service = fetchService(serviceName);
+					this.serviceReference  = (T)service.createReference(locationId);
+				}
+				return this.serviceReference;
+			}
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				try {
+					T sr = this.getServiceReference();
+					 if (null==sr) {
+						 logError("Cannot find service named "+serviceName, null);
+					 } else {
+						Object result = method.invoke(sr, args);
+						return result;
+					}
+				} catch (InvocationTargetException ex) {
+					throw ex.getCause();
+				}
+				return null;
+			}
+		};
+		Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[]{serviceReferenceType}, h);
+		return (T)proxy;
+	}
+	
 	public <T extends IIdentifiableObject> T injectIntoService(T obj) throws OperatingSystemExcpetion {
 		try {
-			this.injectServices(obj, obj.afId());
+			this.injectServiceReferences(obj, obj.afId());
 			return obj;
 		} catch (Exception ex) {
 			throw new OperatingSystemExcpetion("Failed to create Service", ex);
@@ -102,9 +183,10 @@ public class OperatingSystem implements IOperatingSystem {
 			Constructor<T> cons = bmf.findConstructor(String.class, String[].class);
 			cons.setAccessible(true);
 			T obj = cons.newInstance(new Object[] { id, arguments });
-			obj.instantiateServices(this);
+			this.injectServiceInstances(obj, id);
 
-			this.injectServices(obj, id);
+			this.injectServiceReferences(obj, id);
+			obj.defineArguments();
 			obj.parseArguments();
 			if (obj instanceof IIdentifiableObject) {
 				this.injectConfigurationValues((IIdentifiableObject) obj, id);
@@ -112,9 +194,6 @@ public class OperatingSystem implements IOperatingSystem {
 			}
 			this.injectParts(obj, id);
 
-			obj.instantiateComputational();
-			obj.instantiateEngineering();
-			obj.instantiateTechnology();
 			obj.connectComputationalToEngineering();
 			obj.connectEngineeringToTechnology();
 
@@ -130,7 +209,7 @@ public class OperatingSystem implements IOperatingSystem {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
 			T obj = cons.newInstance(id);
-			this.injectServices(obj, id);
+			this.injectServiceReferences(obj, id);
 			if (obj instanceof IIdentifiableObject) {
 				this.injectConfigurationValues((IIdentifiableObject) obj, id);
 				this.injectCommandLineArgs((IIdentifiableObject) obj, id);
@@ -144,8 +223,7 @@ public class OperatingSystem implements IOperatingSystem {
 		}
 	}
 
-	@Override
-	public <T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws OperatingSystemExcpetion {
+	<T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws OperatingSystemExcpetion {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -159,7 +237,7 @@ public class OperatingSystem implements IOperatingSystem {
 
 	public <T extends IIdentifiableObject> T injectIntoActiveObject(T obj) throws OperatingSystemExcpetion {
 		try {
-			this.injectServices(obj, obj.afId());
+			this.injectServiceReferences(obj, obj.afId());
 			if (obj instanceof IIdentifiableObject) {
 				this.injectConfigurationValues((IIdentifiableObject) obj, obj.afId());
 				this.injectCommandLineArgs((IIdentifiableObject) obj, obj.afId());
@@ -183,15 +261,47 @@ public class OperatingSystem implements IOperatingSystem {
 		}
 	}
 
-	private void injectServices(Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
-		this.injectServices(obj.getClass(), obj, id);
+	private void injectServiceInstances(Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
+		this.injectServiceInstances(obj.getClass(), obj, id);
 	}
 
-	private void injectServices(Class<?> class_, Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
+	private void injectServiceInstances(Class<?> class_, Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
-			this.injectServices(class_.getSuperclass(), obj, id);
+			this.injectServiceInstances(class_.getSuperclass(), obj, id);
+			for (Field f : class_.getDeclaredFields()) {
+				try {
+					f.setAccessible(true);
+					ServiceInstance ann = f.getAnnotation(ServiceInstance.class);
+					if (null == ann) {
+						// do nothing
+					} else {
+						String serviceId = ann.id();
+						if (serviceId.isEmpty()) {
+							serviceId = f.getName();
+						} else {
+							// do nothing
+						}
+						IService service = this.createServiceInstance(serviceId, (Class<IService>) f.getType(), id + "." + serviceId);
+						f.set(obj, service);
+					}
+				} catch (Exception ex) {
+					logError(ex.getMessage(), ex);
+				}
+			}
+		}
+	}
+
+	private void injectServiceReferences(Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
+		this.injectServiceReferences(obj.getClass(), obj, id);
+	}
+
+	private void injectServiceReferences(Class<?> class_, Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
+		if (null == class_.getSuperclass()) {
+			return; // Object.class will have a null superclass, no need to inject anything for Object.class
+		} else {
+			this.injectServiceReferences(class_.getSuperclass(), obj, id);
 			for (Field f : class_.getDeclaredFields()) {
 				f.setAccessible(true);
 				ServiceReference ann = f.getAnnotation(ServiceReference.class);
@@ -204,7 +314,8 @@ public class OperatingSystem implements IOperatingSystem {
 					} else {
 						// do nothing
 					}
-					Object value = this.services.get(serviceName);
+					
+					Object value = this.createServiceReference(serviceName, id, f.getType());
 					f.set(obj, value);
 				}
 			}
@@ -244,21 +355,21 @@ public class OperatingSystem implements IOperatingSystem {
 
 					IPersistentStore config = (IPersistentStore) this.services.get(serviceName);
 					if (null == config) {
-						logError("no configuration service found");
+						logError("no configuration service found", null);
 						Object value = this.createDatatype(f.getType(), ann.defaultValue());
 						f.set(obj, value);
 					} else {
 						IPersistenceTransaction trans = config.startTransaction();
 						Class<? extends Object> itemType = (Class<? extends Object>) f.getType();
 						PersistentItemLocation pid = new PersistentItemLocation(itemId);
-						Object value = config.retrieve(trans,pid, itemType);
+						Object value = config.retrieve(trans, pid, itemType);
 						if (null == value) {
 							value = this.createDatatype(f.getType(), ann.defaultValue());
 						}
 						f.set(obj, value);
 						config.commitTransaction(trans);
 					}
-					
+
 				}
 			}
 		}
@@ -370,8 +481,8 @@ public class OperatingSystem implements IOperatingSystem {
 						// do nothing
 					}
 
-					Class<? extends Port> fType = (Class<? extends Port>) f.getType();
-					Object value = this.createPort(fType, id + "." + compId, obj, ann.provides(), ann.requires());
+					//Class<? extends Port> fType = (Class<? extends Port>) f.getType();
+					Object value = this.createPort(Port.class, id + "." + compId, obj, ann.provides(), ann.requires());
 					f.set(obj, value);
 				}
 
@@ -379,12 +490,11 @@ public class OperatingSystem implements IOperatingSystem {
 		}
 	}
 
-	Port createPort(Class<? extends Port> class_, String id, IComponent component, Class<?>[] provides, Class<?>[] requires) throws OperatingSystemExcpetion {
+	IPort createPort(Class<? extends IPort> class_, String id, IComponent component, Class<?>[] provides, Class<?>[] requires) throws OperatingSystemExcpetion {
 		try {
-			BetterMethodFinder bmf = new BetterMethodFinder(class_);
-			Constructor<Port> cons = bmf.findConstructor(id, component);
-			Port obj = cons.newInstance(id, component);
-
+			Port obj = new Port(id, component);
+			this.injectServiceReferences(obj, id);
+			
 			for (Class<?> interfaceType : provides) {
 				Object provider = findInternalProviderForPort(component, interfaceType, id);
 				obj.provides((Class<Object>) interfaceType, provider);
@@ -399,21 +509,23 @@ public class OperatingSystem implements IOperatingSystem {
 			throw new OperatingSystemExcpetion("Failed to create Port " + id, ex);
 		}
 	}
-	
-	<T> T findInternalProviderForPort(IComponent component, Class<T> interfaceType, String portId) throws IllegalArgumentException, IllegalAccessException, OperatingSystemExcpetion {
+
+	<T> T findInternalProviderForPort(IComponent component, Class<T> interfaceType, String portId)
+			throws IllegalArgumentException, IllegalAccessException, OperatingSystemExcpetion {
 		ProvidesInterfaceForPort ann = null;
-		String shortPortId = portId.substring(portId.lastIndexOf('.')+1);
+		String shortPortId = portId.substring(portId.lastIndexOf('.') + 1);
 		for (Field f : component.getClass().getDeclaredFields()) {
 			ann = f.getAnnotation(ProvidesInterfaceForPort.class);
-			if (null!=ann && interfaceType == ann.provides() && shortPortId.equals(ann.portId())) {
+			if (null != ann && interfaceType == ann.provides() && shortPortId.equals(ann.portId())) {
 				f.setAccessible(true);
-				return (T)f.get(component);
+				return (T) f.get(component);
 			}
 		}
 		if (interfaceType.isInstance(component)) {
-			return (T)component;
+			return (T) component;
 		} else {
-			throw new OperatingSystemExcpetion("Failed find internal provider of "+interfaceType.getSimpleName()+" for component "+component.afId(), null);
+			throw new OperatingSystemExcpetion("Failed find internal provider of " + interfaceType.getSimpleName() + " for component " + component.afId(),
+					null);
 		}
 	}
 }

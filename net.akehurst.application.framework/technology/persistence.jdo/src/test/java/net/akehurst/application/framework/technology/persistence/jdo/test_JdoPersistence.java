@@ -27,7 +27,8 @@ import javax.jdo.annotations.Persistent;
 import org.datanucleus.enhancement.Persistable;
 import org.junit.Test;
 
-import net.akehurst.application.framework.os.IOperatingSystem;
+import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.annotations.instance.ServiceInstance;
 import net.akehurst.application.framework.os.OperatingSystem;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
@@ -37,12 +38,18 @@ import net.akehurst.application.framework.technology.log4j.Log4JLogger;
 
 public class test_JdoPersistence {
 
+	IOperatingSystem os() {
+		return new OperatingSystem("os", "os");
+	}
+	
+	@ServiceInstance
+	Log4JLogger logger;
+	
 	@Test
 	public void connect() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os");
-			os.createService("logger", Log4JLogger.class, "test.logger");
-			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
+
+			JdoPersistence sut = os().createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
 			props.put("javax.jdo.PersistenceManagerFactoryClass", "org.datanucleus.api.jdo.JDOPersistenceManagerFactory");
@@ -57,9 +64,7 @@ public class test_JdoPersistence {
 	@Test
 	public void store_Person() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os");
-			os.createService("logger", Log4JLogger.class, "test.logger");
-			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
+			JdoPersistence sut = os().createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
 			props.put("javax.jdo.PersistenceManagerFactoryClass", "org.datanucleus.api.jdo.JDOPersistenceManagerFactory");
@@ -83,9 +88,7 @@ public class test_JdoPersistence {
 	@Test
 	public void store_Contacts() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os");
-			os.createService("logger", Log4JLogger.class, "test.logger");
-			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
+			JdoPersistence sut = os().createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
 			props.put("javax.jdo.PersistenceManagerFactoryClass", "org.datanucleus.api.jdo.JDOPersistenceManagerFactory");
@@ -117,8 +120,7 @@ public class test_JdoPersistence {
 	@Test
 	public void store_Contacts2() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os");
-			os.createService("logger", Log4JLogger.class, "test.logger");
+			IOperatingSystem os = os();
 			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -151,8 +153,7 @@ public class test_JdoPersistence {
 	@Test
 	public void retrieve_Person() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os");
-			os.createService("logger", Log4JLogger.class, "test.logger");
+			IOperatingSystem os = os();
 			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -181,8 +182,7 @@ public class test_JdoPersistence {
 	@Test
 	public void retrieve_Contacts() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os");
-			os.createService("logger", Log4JLogger.class, "test.logger");
+			IOperatingSystem os = os();
 			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();

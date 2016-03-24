@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.components;
+package net.akehurst.application.framework.os;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -24,17 +24,28 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Port {
+import net.akehurst.application.framework.common.IComponent;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
+import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
+
+public class Port implements IPort {
 
 	public Port(String id, IComponent owner) {
 		this.id = id;
 		this.owner = owner;
+		
 		this.owner.afAddPort(this);
 		this.provided = new HashMap<>();
 		this.required = new HashMap<>();
 	}
 	String id;
 	IComponent owner;
+
+	@ServiceReference
+	ILogger logger;
+
 
 	public String afId() {
 		return this.owner.afId()+"."+this.id;
@@ -78,6 +89,7 @@ public class Port {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				try {
+					logger.log(LogLevel.TRACE, method.getName());
 					Object result = null;
 					 //get these here to delay resolving the object until moment of call
 					Set<Object> set = required.get(interfaceType);
@@ -94,7 +106,7 @@ public class Port {
 		return (T)proxy;
 	}
 	
-	public void connect(Port other) {
+	public void connect(IPort other) {
 		
 		for(Class<?> req: this.getRequired()) {
 			Class<Object> t = (Class<Object>) req;

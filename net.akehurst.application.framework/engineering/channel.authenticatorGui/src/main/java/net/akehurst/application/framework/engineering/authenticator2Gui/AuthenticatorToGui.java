@@ -15,13 +15,14 @@
  */
 package net.akehurst.application.framework.engineering.authenticator2Gui;
 
-import net.akehurst.application.framework.components.AbstractComponent;
-import net.akehurst.application.framework.components.Port;
+
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorSession;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorUserDetails;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorNotification;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
-import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.os.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.authentication.TechSession;
@@ -74,14 +75,14 @@ public class AuthenticatorToGui extends AbstractComponent implements ICAuthentic
 	
 	// --------- Ports ---------
 	@PortInstance(provides={ICAuthenticatorRequest.class},requires={ICAuthenticatorNotification.class})
-	Port portAuth;
-	public Port portAuth() {
+	IPort portAuth;
+	public IPort portAuth() {
 		return this.portAuth;
 	}
 	
 	@PortInstance(provides={IAuthenticatorNotification.class},requires={IAuthenticatorRequest.class})
-	Port portGui;
-	public Port portGui() {
+	IPort portGui;
+	public IPort portGui() {
 		return this.portGui;
 	}
 }

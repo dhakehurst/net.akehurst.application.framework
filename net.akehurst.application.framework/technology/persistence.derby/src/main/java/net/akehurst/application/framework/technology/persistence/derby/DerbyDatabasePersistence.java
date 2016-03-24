@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.akehurst.application.framework.components.AbstractComponent;
-import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.os.AbstractComponent;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
@@ -285,9 +285,9 @@ public class DerbyDatabasePersistence extends AbstractComponent implements IPers
 	
 	// ---------- Ports ---------
 	@PortInstance(provides={IPersistentStore.class},requires={})
-	Port portPersist;
+	IPort portPersist;
 
-	public Port portPersist() {
+	public IPort portPersist() {
 		return this.portPersist;
 	}
 

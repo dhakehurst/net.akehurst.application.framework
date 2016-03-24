@@ -19,6 +19,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
+import net.akehurst.application.framework.common.ISignal;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
+
 abstract public class AbstractActiveSignalProcessingObject extends AbstractActiveObject {
 
 	public AbstractActiveSignalProcessingObject(String id) {
@@ -26,15 +29,25 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 		this.signals = new LinkedBlockingQueue<>();
 	}
 
-	BlockingQueue<Consumer<AbstractActiveSignalProcessingObject>> signals;
+	static class NamedSignal {
+		public NamedSignal(String name, ISignal signal) {
+			this.name = name;
+			this.signal = signal;
+		}
+		String name;
+		ISignal signal;
+	}
+	
+	BlockingQueue<NamedSignal> signals;
 
 	@Override
 	public void afRun() {
-
+		logger.log(LogLevel.TRACE, "afRun");
 		while (true) {
 			try {
-				Consumer<AbstractActiveSignalProcessingObject> signal = this.signals.take();
-				signal.accept(this);
+				NamedSignal ns = this.signals.take();
+				logger.log(LogLevel.TRACE, ns.name);
+				ns.signal.execute();
 			} catch (Exception ex) {
 				ex.printStackTrace(); //TODO: make this log
 			}
@@ -42,8 +55,8 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 
 	}
 
-	protected void addToQueue(Consumer<AbstractActiveSignalProcessingObject> signal) {
-		this.signals.add(signal);
+	protected void addToQueue(String name, ISignal signal) {
+		this.signals.add(new NamedSignal(name, signal));
 	}
 
 }

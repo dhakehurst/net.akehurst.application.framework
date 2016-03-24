@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.components.test;
+package net.akehurst.application.framework.common.annotations.instance;
 
-import java.lang.reflect.Method;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import net.akehurst.application.framework.common.IPort;
-
-
-public class MockComponentPort {
-	
-	public void connect(IPort port) {
-
-	}
-
-	public void expect(Class<?> intefaceType, String methodName, Object...expectedArgumentValues) {
-
-	}
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PortInstance {
+	String id() default "";
+	Class<?>[] provides();
+	Class<?>[] requires();
 }

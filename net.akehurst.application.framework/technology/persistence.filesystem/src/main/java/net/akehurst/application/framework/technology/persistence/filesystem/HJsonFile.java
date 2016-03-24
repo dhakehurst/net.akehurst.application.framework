@@ -23,8 +23,9 @@ import org.hjson.JsonObject;
 import org.hjson.JsonValue;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
-import net.akehurst.application.framework.os.IOperatingSystem;
-import net.akehurst.application.framework.os.annotations.ServiceReference;
+import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.IService;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceFilesystem.FilesystemException;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesystem;
@@ -33,8 +34,13 @@ import net.akehurst.application.framework.technology.interfacePersistence.IPersi
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 
-public class HJsonFile implements IIdentifiableObject, IPersistentStore {
+public class HJsonFile implements IService, IIdentifiableObject, IPersistentStore {
 
+	@Override
+	public Object createReference(String locationId) {
+		return this;
+	}
+	
 	public HJsonFile(String id) {
 		this.id = id;
 	}

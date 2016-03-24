@@ -15,17 +15,7 @@
  */
 package net.akehurst.application.framework.technology.persistence.objectDb;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,17 +24,18 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import net.akehurst.application.framework.components.AbstractComponent;
-import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.os.annotations.ConfiguredValue;
-import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.declaration.Component;
+import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.os.AbstractComponent;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 
+@Component
 public class ObjectDbDatabasePersistence extends AbstractComponent implements IPersistentStore {
 
 	public ObjectDbDatabasePersistence(String id) {
@@ -114,9 +105,9 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 
 	// ---------- Ports ---------
 	@PortInstance(provides = { IPersistentStore.class }, requires = {})
-	Port portPersist;
+	IPort portPersist;
 
-	public Port portPersist() {
+	public IPort portPersist() {
 		return this.portPersist;
 	}
 

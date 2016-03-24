@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.components;
+package net.akehurst.application.framework.os;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -21,11 +21,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.akehurst.application.framework.os.AbstractActiveObject;
-import net.akehurst.application.framework.os.IActiveObject;
-import net.akehurst.application.framework.os.annotations.ActiveObjectInstance;
-import net.akehurst.application.framework.os.annotations.ComponentInstance;
-import net.akehurst.application.framework.os.annotations.ServiceReference;
+import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.IComponent;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
+import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
@@ -36,13 +37,10 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 		super(id);
 		this.ports = new HashSet<>();
 	}
-
-	@ServiceReference
-	ILogger logger;
 	
-	Set<Port> ports;
+	Set<IPort> ports;
 	@Override
-	public void afAddPort(Port value) {
+	public void afAddPort(IPort value) {
 		this.ports.add(value);
 	}
 	
@@ -52,7 +50,8 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 	
 	@Override
 	public void afStart() {
-		for(Port p: this.ports) {
+		logger.log(LogLevel.TRACE, "afStart");
+		for(IPort p: this.ports) {
 			for(Class<?>interfaceType : p.getRequired()) {
 				if (null==p.out(interfaceType)) {
 					System.out.println("Warn: Port "+p+" has not been provided with "+interfaceType);
@@ -67,6 +66,7 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 	
 	@Override
 	public void afRun() {
+		logger.log(LogLevel.TRACE, "afRun");
 		try {
 			// TODO handle inheritance ?
 			List<IActiveObject> objects = new ArrayList<>();
@@ -92,7 +92,7 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 			}
 			
 		} catch (Exception ex) {
-			logger.log(LogLevel.ERROR, "Failed to run application "+this.afId(), ex);
+			logger.log(LogLevel.ERROR, "Failed to run component "+this.afId(), ex);
 		}
 	}
 }

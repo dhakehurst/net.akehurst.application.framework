@@ -21,4 +21,5 @@
  	compile 'net.akehurst.miscellaneous:net.akehurst.holser.reflect:1.0.0'
  	
  	compile 'commons-cli:commons-cli:1.3.1'
+ 	compile 'org.hjson:hjson:1.1.3'
  }

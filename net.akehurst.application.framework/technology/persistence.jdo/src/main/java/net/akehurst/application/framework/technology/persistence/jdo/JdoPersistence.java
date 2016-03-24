@@ -47,10 +47,11 @@ import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancer.DataNucleusClassFileTransformer;
 import org.datanucleus.store.types.converters.ByteArrayByteBufferConverter;
 
-import net.akehurst.application.framework.components.AbstractComponent;
-import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.os.annotations.PortInstance;
-import net.akehurst.application.framework.os.annotations.ServiceReference;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
+import net.akehurst.application.framework.os.AbstractComponent;
+import net.akehurst.application.framework.os.Port;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
@@ -325,9 +326,9 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 
 	// ---------- Ports ---------
 	@PortInstance(provides = { IPersistentStore.class }, requires = {})
-	Port portPersist;
+	IPort portPersist;
 
-	public Port portPersist() {
+	public IPort portPersist() {
 		return this.portPersist;
 	}
 

@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.os;
+package net.akehurst.application.framework.common;
 
-public interface IApplication {
+public interface IComponent extends IActiveObject {
 
-	void defineArgument(boolean optional, String argumentName, boolean hasValue, String description);
-	
-	void parseArguments();
-	
-	void instantiateServices(IOperatingSystem os);
+	String afId();
 
-	void instantiateComputational();
-	
-	void instantiateEngineering();
-	
-	void instantiateTechnology();
-	
-	void connectComputationalToEngineering();
-	
-	void connectEngineeringToTechnology();
+	void afAddPort(IPort value);
+
+	void afConnectParts();
 	
 }

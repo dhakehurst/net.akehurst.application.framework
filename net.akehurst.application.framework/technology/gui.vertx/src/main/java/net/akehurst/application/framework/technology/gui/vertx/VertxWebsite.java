@@ -22,10 +22,10 @@ import java.util.Map;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
-import net.akehurst.application.framework.components.AbstractComponent;
-import net.akehurst.application.framework.components.Port;
-import net.akehurst.application.framework.os.annotations.ConfiguredValue;
-import net.akehurst.application.framework.os.annotations.PortInstance;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.os.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.authentication.TechSession;
@@ -200,12 +200,33 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 
 		this.verticle.comms.send(session, "Gui.addChart", data);
 	}
+	
+	//TODO: deal with buttons
+	public void createModal(TechSession ts, String sceneId, String parentId, String modalId, String title, String modalContent) {
+		String content="";
+		content+="<div id='"+modalId+"' class='modal fade' role='dialog'>";
+		content+="  <div class='modal-dialog'>";
+		content+="    <fieldset class='modal-content'>";
+		content+="      <div class='modal-header'>";
+		content+="        <button type='button' class='close' data-dismiss='modal'>&times;</button>";
+		content+="        <h4 class='modal-title'>"+title+"</h4>";
+		content+="      </div>";
+		content+="      <div class='modal-body'>";
+		content+=modalContent;
+		content+="      </div>";
+		content+="      <div class='modal-footer'>";
+		content+="        <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+		content+="      </div>";
+		content+="    </fieldset>";
+		content+="  </div>";
+		this.addElement(ts, sceneId, parentId, modalId, "div", "{'class':'modal fade','role':'dialog'}", content);
+	}
 
 	// --------- Ports ---------
 	@PortInstance(provides = { IGuiRequest.class, IAuthenticatorRequest.class }, requires = { IGuiNotification.class, IAuthenticatorNotification.class })
-	Port portGui;
+	IPort portGui;
 
-	public Port portGui() {
+	public IPort portGui() {
 		return this.portGui;
 	}
 }

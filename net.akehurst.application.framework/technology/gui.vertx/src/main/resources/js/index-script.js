@@ -19,7 +19,7 @@ var sceneId = window.location.pathname
 var sceneArgs = window.location.search
 var end = sceneId.lastIndexOf('/')
 var sceneIdRoot = sceneId.substring(0,end)
-var stageId = sceneIdRoot //set this for pages that are not at the root
+var stageId = sceneIdRoot
 console.log("sceneId="+sceneId)
 
 var eventbus = null
@@ -58,6 +58,23 @@ $(document).ready(function() {
 	serverComms.registerHandler('Gui.addChart', function(args) {
 		console.log("addChart "+JSON.stringify(args))
 		dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
+	//2d Canvas
+	serverComms.registerHandler('Canvas.addChild', function(args) { //probably do't need this, can use addElement from Gui
+		console.log("Canvas.addChild "+JSON.stringify(args))
+		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
+	serverComms.registerHandler('Canvas.relocate', function(args) {
+		console.log("Canvas.relocate "+JSON.stringify(args))
+		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
+	serverComms.registerHandler('Canvas.resize', function(args) {
+		console.log("Canvas.resize "+JSON.stringify(args))
+		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
+	serverComms.registerHandler('Canvas.transform', function(args) {
+		console.log("Canvas.transform "+JSON.stringify(args))
+		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
 	})
 	//eventbus = new EventBus(myLocation + '/eventbus')
 //	eventbus = new EventBus('http://localhost:9998' + '/eventbus')

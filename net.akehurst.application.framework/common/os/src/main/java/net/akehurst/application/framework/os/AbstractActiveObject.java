@@ -15,13 +15,20 @@
  */
 package net.akehurst.application.framework.os;
 
-import net.akehurst.application.framework.os.annotations.ServiceReference;
+import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
+import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract
 public class AbstractActiveObject implements IActiveObject {
 	
 	@ServiceReference
 	protected IOperatingSystem os;
+	
+	@ServiceReference
+	protected ILogger logger;
 	
 	public AbstractActiveObject(String id) {
 		this.id = id;
@@ -36,6 +43,7 @@ public class AbstractActiveObject implements IActiveObject {
 
 	@Override
 	public void afStart() {
+		logger.log(LogLevel.TRACE, "afStart");
 		this.thread = new Thread((() -> this.afRun()), this.getClass().getSimpleName());
 		this.thread.setName(this.afId());
 		this.thread.start();

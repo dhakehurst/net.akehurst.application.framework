@@ -25,4 +25,8 @@ public interface IGuiNotification {
 	void notifyReady();
 		
 	void notifyEventOccured(TechSession session, String sceneId, String elementId, String eventType, Map<String, Object> data);
+	
+	void notifyDowloadRequest(TechSession session, String filename, IGuiCallback callback);
+
+	void notifyUpload(TechSession session, String filename);
 }

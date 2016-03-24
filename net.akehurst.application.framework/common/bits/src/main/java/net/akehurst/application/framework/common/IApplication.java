@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.components;
+package net.akehurst.application.framework.common;
 
-import net.akehurst.application.framework.os.IActiveObject;
+public interface IApplication {
 
-public interface IComponent extends IActiveObject {
-
-	String afId();
-
-	void afAddPort(Port value);
-
-	void afConnectParts();
+	void defineArguments();
+	void defineArgument(boolean optional, String argumentName, boolean hasValue, String description);
+	
+	void parseArguments();
+	
+	void connectComputationalToEngineering();
+	
+	void connectEngineeringToTechnology();
 	
 }

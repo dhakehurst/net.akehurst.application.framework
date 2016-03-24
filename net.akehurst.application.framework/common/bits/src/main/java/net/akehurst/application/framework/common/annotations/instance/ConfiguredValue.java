@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.os.annotations;
+package net.akehurst.application.framework.common.annotations.instance;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,6 +22,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ActiveObjectInstance {
+public @interface ConfiguredValue {
 	String id() default "";
+	String defaultValue();
+	String service() default "configuration";
 }

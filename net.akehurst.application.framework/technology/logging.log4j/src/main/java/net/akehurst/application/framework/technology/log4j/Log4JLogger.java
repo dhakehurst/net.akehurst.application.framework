@@ -20,10 +20,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
+import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class Log4JLogger implements IIdentifiableObject, ILogger {
+public class Log4JLogger implements IIdentifiableObject, ILogger, IService {
 
 	public Log4JLogger(String id) {
 		this.log4j = LogManager.getLogger(id);
@@ -37,6 +38,11 @@ public class Log4JLogger implements IIdentifiableObject, ILogger {
 	}
 	
 	Logger log4j;
+	
+	@Override
+	public Object createReference(String locationId) {
+		return new Log4JLogger(locationId);
+	}
 	
 	@Override
 	public void log(LogLevel level, String message) {

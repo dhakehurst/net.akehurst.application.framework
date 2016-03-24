@@ -25,10 +25,19 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.hjson.JsonObject;
+import org.hjson.JsonValue;
+import org.hjson.Stringify;
 
-import net.akehurst.application.framework.components.IComponent;
-import net.akehurst.application.framework.os.annotations.ComponentInstance;
-import net.akehurst.application.framework.os.annotations.ServiceReference;
+import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.IApplication;
+import net.akehurst.application.framework.common.IComponent;
+import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
+import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
+import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
+import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
@@ -37,43 +46,101 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 	public AbstractApplication(String id, String[] args) {
 		super(id);
 		this.args = args;
-		this.options = new Options();
-
-		this.defineArguments();
 	}
 
 	@ServiceReference
 	ILogger logger;
-	
+
 	String[] args;
-	Options options;
+
+	@CommandLineArgument(name = "help")
+	Boolean displayHelp;
+
+	@CommandLineArgument(name = "configuration")
+	Boolean displayConfig;
 
 	public void defineArgument(boolean required, String argumentName, boolean hasValue, String description) {
-		Option opt = Option.builder().longOpt(argumentName).desc(description).required(required).hasArg(hasValue).build();
-		this.options.addOption(opt);
-
+		this.os.defineCommandLineArgument(required, argumentName, hasValue, description);
 	}
 
 	public void parseArguments() {
-		try {
-			CommandLineParser parser = new DefaultParser();
-			CommandLine commandLine = parser.parse(options, args);
-			((OperatingSystem) this.os).setCommandLine(commandLine);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		this.os.setCommandLine(args);
 	}
 
 	public void afOutputCommandLineHelp() {
-		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("<app>", options);
+		this.os.outputCommandLineHelp();
+	}
+
+	private JsonValue fetchJsonValue() {
+		return null;
+	}
+	
+	private JsonObject fetchConfigFor(Object obj) {
+		JsonObject json = new JsonObject();
+
+		for (Field f : obj.getClass().getDeclaredFields()) {
+			f.setAccessible(true);
+			try {
+				ConfiguredValue annCL = f.getAnnotation(ConfiguredValue.class);
+				if (null == annCL) {
+					// donothing
+				} else {
+					String itemId = annCL.id();
+					if (itemId.isEmpty()) {
+						itemId = f.getName();
+					} else {
+						// do nothing
+					}
+					// TODO: handle types other than String
+					json.add(itemId, f.get(obj).toString());
+				}
+
+				ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);
+				if (null == annCI) {
+					// do nothing
+				} else {
+					String id = annCI.id();
+					if (id.isEmpty()) {
+						id = f.getName();
+					} else {
+						// do nothing
+					}
+					Object part = f.get(obj);
+					json.add(id, fetchConfigFor(part));
+				}
+				
+				ActiveObjectInstance annAI = f.getAnnotation(ActiveObjectInstance.class);
+				if (null == annAI) {
+					// do nothing
+				} else {
+					String id = annAI.id();
+					if (id.isEmpty()) {
+						id = f.getName();
+					} else {
+						// do nothing
+					}
+					Object part = f.get(obj);
+					json.add(id, fetchConfigFor(part));
+				}
+				
+			} catch (Exception ex) {
+				logger.log(LogLevel.ERROR, "Failed to fetchConfg", ex);
+			}
+		}
+
+		return json;
+	}
+
+	public void afOutputConfiguration() {
+		JsonObject app = this.fetchConfigFor(this);
+		JsonObject config = new JsonObject();
+		config.add(this.afId(), app);
+		System.out.println(config.toString(Stringify.HJSON));
 	}
 
 	public void defineArguments() {
-		this.defineArgument(false, "help", false, "Display command line argument descriptions for this application");
-	}
-
-	public void instantiateServices() {
+		this.os.defineCommandLineArgument(false, "help", false, "Display command line argument descriptions for this application");
+		this.os.defineCommandLineArgument(false, "configuration", false, "Display the configuration of this application");
 	}
 
 	public void instantiateComputational() {
@@ -94,6 +161,16 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 	@Override
 	public void afRun() {
 		try {
+			if (this.displayHelp) {
+				this.afOutputCommandLineHelp();
+				System.exit(0);
+			}
+
+			if (this.displayConfig) {
+				this.afOutputConfiguration();
+				System.exit(0);
+			}
+
 			// TODO handle inheritance ?
 			List<IActiveObject> objects = new ArrayList<>();
 			for (Field f : this.getClass().getDeclaredFields()) {
@@ -103,21 +180,21 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 					// do nothing
 				} else {
 					IActiveObject ao = (IActiveObject) f.get(this);
-					//TODO: support ordering of objects
+					// TODO: support ordering of objects
 					objects.add(ao);
 				}
 			}
-			
-			for(IActiveObject ao: objects) {
+
+			for (IActiveObject ao : objects) {
 				ao.afStart();
 			}
-			
-			for(IActiveObject ao: objects) {
+
+			for (IActiveObject ao : objects) {
 				ao.afJoin();
 			}
-			
+
 		} catch (Exception ex) {
-			logger.log(LogLevel.ERROR, "Failed to run application "+this.afId(), ex);
+			logger.log(LogLevel.ERROR, "Failed to run application " + this.afId(), ex);
 		}
 	}
 
