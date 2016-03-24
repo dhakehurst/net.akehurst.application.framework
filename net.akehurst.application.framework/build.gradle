@@ -30,7 +30,7 @@ subprojects {
 
 
 	group 'net.akehurst.application.framework'
-	version '1.0.alpha.4'
+	version '1.0.alpha.6'
 
 	task sourceJar(type: Jar) {
 	    from sourceSets.main.allJava
