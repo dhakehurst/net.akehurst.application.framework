@@ -186,13 +186,12 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 			this.injectServiceInstances(obj, id);
 
 			this.injectServiceReferences(obj, id);
+			this.injectParts(obj, id);
+			
 			obj.defineArguments();
 			obj.parseArguments();
-			if (obj instanceof IIdentifiableObject) {
-				this.injectConfigurationValues((IIdentifiableObject) obj, id);
-				this.injectCommandLineArgs((IIdentifiableObject) obj, id);
-			}
-			this.injectParts(obj, id);
+			this.injectConfigurationValues((IIdentifiableObject) obj, id);
+			this.injectCommandLineArgs((IIdentifiableObject) obj, id);
 
 			obj.connectComputationalToEngineering();
 			obj.connectEngineeringToTechnology();
@@ -210,12 +209,12 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 			Constructor<T> cons = bmf.findConstructor(String.class);
 			T obj = cons.newInstance(id);
 			this.injectServiceReferences(obj, id);
-			if (obj instanceof IIdentifiableObject) {
-				this.injectConfigurationValues((IIdentifiableObject) obj, id);
-				this.injectCommandLineArgs((IIdentifiableObject) obj, id);
-			}
 			this.injectParts(obj, id);
 			this.injectPorts(obj, id);
+//			if (obj instanceof IIdentifiableObject) {
+//				this.injectConfigurationValues((IIdentifiableObject) obj, id);
+//				this.injectCommandLineArgs((IIdentifiableObject) obj, id);
+//			}
 			obj.afConnectParts();
 			return obj;
 		} catch (Exception ex) {
@@ -238,11 +237,11 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 	public <T extends IIdentifiableObject> T injectIntoActiveObject(T obj) throws OperatingSystemExcpetion {
 		try {
 			this.injectServiceReferences(obj, obj.afId());
-			if (obj instanceof IIdentifiableObject) {
-				this.injectConfigurationValues((IIdentifiableObject) obj, obj.afId());
-				this.injectCommandLineArgs((IIdentifiableObject) obj, obj.afId());
-			}
 			this.injectParts(obj, obj.afId());
+//			if (obj instanceof IIdentifiableObject) {
+//				this.injectConfigurationValues((IIdentifiableObject) obj, obj.afId());
+//				this.injectCommandLineArgs((IIdentifiableObject) obj, obj.afId());
+//			}
 			return obj;
 		} catch (Exception ex) {
 			throw new OperatingSystemExcpetion("Failed to create Service", ex);
@@ -369,8 +368,36 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 						f.set(obj, value);
 						config.commitTransaction(trans);
 					}
-
 				}
+				
+				ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);
+				if (null == annCI) {
+					// do nothing
+				} else {
+					String partId = annCI.id();
+					if (partId.isEmpty()) {
+						partId = f.getName();
+					} else {
+						// do nothing
+					}
+					Object part = f.get(obj);
+					this.injectConfigurationValues((IIdentifiableObject)part, id+"."+partId);
+				}
+
+				ActiveObjectInstance annAI = f.getAnnotation(ActiveObjectInstance.class);
+				if (null == annAI) {
+					// do nothing
+				} else {
+					String partId = annAI.id();
+					if (partId.isEmpty()) {
+						partId = f.getName();
+					} else {
+						// do nothing
+					}
+					Object part = f.get(obj);
+					this.injectConfigurationValues((IIdentifiableObject)part, id+"."+partId);
+				}
+				
 			}
 		}
 	}
@@ -401,8 +428,38 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 					if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
 						argValue = this.commandLine.hasOption(name);
 					}
-					Object value = this.createDatatype(f.getType(), argValue);
-					f.set(obj, value);
+					if (null!=argValue) {
+						Object value = this.createDatatype(f.getType(), argValue);
+					
+						f.set(obj, value);
+					}
+				}
+				ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);
+				if (null == annCI) {
+					// do nothing
+				} else {
+					String partId = annCI.id();
+					if (partId.isEmpty()) {
+						partId = f.getName();
+					} else {
+						// do nothing
+					}
+					Object part = f.get(obj);
+					this.injectCommandLineArgs((IIdentifiableObject)part, id+"."+partId);
+				}
+
+				ActiveObjectInstance annAI = f.getAnnotation(ActiveObjectInstance.class);
+				if (null == annAI) {
+					// do nothing
+				} else {
+					String partId = annAI.id();
+					if (partId.isEmpty()) {
+						partId = f.getName();
+					} else {
+						// do nothing
+					}
+					Object part = f.get(obj);
+					this.injectCommandLineArgs((IIdentifiableObject)part, id+"."+partId);
 				}
 			}
 		}

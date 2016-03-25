@@ -18,7 +18,6 @@ package net.akehurst.application.framework.common;
 public interface IApplication {
 
 	void defineArguments();
-	void defineArgument(boolean optional, String argumentName, boolean hasValue, String description);
 	
 	void parseArguments();
 	

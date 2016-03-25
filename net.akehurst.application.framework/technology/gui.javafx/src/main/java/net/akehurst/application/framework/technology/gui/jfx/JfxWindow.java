@@ -26,6 +26,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
@@ -141,9 +143,11 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	@Override
 	public void setText(TechSession session, String sceneId, String id, String text) {
 		Node n = this.primary.getScene().lookup("#"+id);
-		if (n instanceof TextArea) {
-			((TextArea)n).setText(text);
-		}	
+		if (n instanceof TextInputControl) {
+			((TextInputControl)n).setText(text);
+		} else if (n instanceof Text) {
+			((Text)n).setText(text);
+		}
 	}
 
 	@Override

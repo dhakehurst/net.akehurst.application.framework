@@ -24,4 +24,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandLineArgument {
 	String name() default "";
+	boolean required() default false;
+	boolean hasValue() default true;
+	String description() default "";
 }
