@@ -54,10 +54,10 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 
 	String[] args;
 
-	@CommandLineArgument(name = "help", hasValue=false, description="Display the command line options for this application.")
+	@CommandLineArgument(group="help", name = "help", hasValue=false, description="Display the command line options for this application.")
 	Boolean displayHelp;
 
-	@CommandLineArgument(name = "configuration", hasValue=false, description="Display the current configuration of this application.")
+	@CommandLineArgument(group="help", name = "configuration", hasValue=false, description="Display the current configuration of this application.")
 	Boolean displayConfig;
 
 	public void parseArguments() {
@@ -150,10 +150,11 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 						} else {
 							// do nothing
 						}
+						String group = annCL.group();
 						boolean required = annCL.required();
 						boolean hasValue = annCL.hasValue();
 						String description = annCL.description();
-						this.os.defineCommandLineArgument(required, argumentName, hasValue, description);
+						this.os.defineCommandLineArgument(group, required, argumentName, hasValue, description);
 					}
 
 					ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);

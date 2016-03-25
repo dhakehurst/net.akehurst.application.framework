@@ -27,4 +27,5 @@ public @interface CommandLineArgument {
 	boolean required() default false;
 	boolean hasValue() default true;
 	String description() default "";
+	String group() default "default";
 }

@@ -18,22 +18,22 @@ package net.akehurst.application.framework.common;
 public interface IOperatingSystem {
 
 	<T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws OperatingSystemExcpetion;
-	void defineCommandLineArgument(boolean required, String argumentName, boolean hasValue, String description);
+	void defineCommandLineArgument(String groupName, boolean required, String argumentName, boolean hasValue, String description);
 	void setCommandLine(String[] args);
 	void outputCommandLineHelp();
 	
-	//<T extends IIdentifiableObject> T createService(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion;
+	<T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion;
 
 	//<T> T fetchService(String serviceName) throws OperatingSystemExcpetion;
 
 	<T extends IComponent> T createComponent(Class<T> class_, String id) throws OperatingSystemExcpetion;
 
-	//<T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws OperatingSystemExcpetion;
+	<T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws OperatingSystemExcpetion;
 
 	<T> T createDatatype(Class<T> class_, Object... constructorArgs) throws OperatingSystemExcpetion;
 
-	//<T extends IIdentifiableObject> T injectIntoActiveObject(T object) throws OperatingSystemExcpetion;
+	<T extends IIdentifiableObject> T injectIntoActiveObject(T object) throws OperatingSystemExcpetion;
 
-	//<T extends IIdentifiableObject> T injectIntoService(T object) throws OperatingSystemExcpetion;
+	<T extends IIdentifiableObject> T injectIntoService(T object) throws OperatingSystemExcpetion;
 
 }

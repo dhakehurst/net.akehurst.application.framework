@@ -21,7 +21,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,7 +31,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 
 import net.akehurst.application.framework.common.IApplication;
@@ -55,7 +59,7 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 import net.akehurst.holser.reflect.BetterMethodFinder;
 
-public class OperatingSystem  implements IOperatingSystem, IService {
+public class OperatingSystem implements IOperatingSystem, IService {
 
 	static final String DEFAULT_CONFIGURATION_SERVICE = "configuration";
 
@@ -63,67 +67,120 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 		this.afId = id;
 		this.services = new HashMap<>();
 		this.services.put(serviceName, this);
-		this.commandLineOptions = new Options();
-
+		this.commandLineOptionGroups = new HashMap<>();
 	}
 
 	String afId;
+
 	@Override
 	public String afId() {
 		return this.afId;
 	}
-	
+
 	@Override
 	public Object createReference(String locationId) {
 		return this;
 	}
-	
+
 	ILogger logger() {
 		ILogger logger = this.createServiceReference("logger", "os.logger", ILogger.class);
 		return logger;
 	}
-	
+
 	void logError(String message, Throwable t) {
 		ILogger logger = logger();
 		if (null == logger) {
 			System.err.println(message);
-			if(null!=t) {
+			if (null != t) {
 				t.printStackTrace();
 			}
 		} else {
-			logger.log(LogLevel.ERROR, message,t);
+			logger.log(LogLevel.ERROR, message, t);
 		}
 	}
 
-	Options commandLineOptions;
+
+	Map<String, Options> commandLineOptionGroups;
+
 	@Override
-	public void defineCommandLineArgument(boolean required, String argumentName, boolean hasValue, String description) {
+	public void defineCommandLineArgument(String groupName, boolean required, String argumentName, boolean hasValue, String description) {
+		// remove applicationName from start
+		int i = argumentName.indexOf('.');
+		if (i > 0) {
+			argumentName = argumentName.substring(i + 1);
+		}
+		Options group = this.commandLineOptionGroups.get(groupName);
+		if (null == group) {
+			group = new Options();
+			this.commandLineOptionGroups.put(groupName, group);
+		}
+
 		Option opt = Option.builder().longOpt(argumentName).desc(description).required(required).hasArg(hasValue).build();
-		this.commandLineOptions.addOption(opt);
+		group.addOption(opt);
 	}
+
 	CommandLine commandLine;
 
 	public void setCommandLine(String[] args) {
-		try {
-			CommandLineParser parser = new DefaultParser();
-			this.commandLine = parser.parse(commandLineOptions, args);
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		if (args.length < 1) {
+			return; // nothing to parse
+		} else {
+			try {
+				for (Options opts : this.commandLineOptionGroups.values()) {
+					CommandLineParser parser = new DefaultParser();
+					this.commandLine = parser.parse(opts, args, true);
+					if (this.commandLine.getArgList().isEmpty()) {
+						//parse has succeeded
+						return;
+					} else {
+						// try next OptionGroup
+					}
+				}
+
+					//all OptionGroups failed to parse
+					this.outputCommandLineHelp();
+					System.exit(1);
+
+			} catch (MissingOptionException ex) {
+				this.outputCommandLineHelp();
+				System.exit(1);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
+	}
+
+	Object getOptionValue(String argumentName) {
+		int i = argumentName.indexOf('.');
+		if (i > 0) {
+			argumentName = argumentName.substring(i + 1);
+		}
+		return this.commandLine.getOptionValue(argumentName);
+	}
+
+	boolean hasOption(String argumentName) {
+		int i = argumentName.indexOf('.');
+		if (i > 0) {
+			argumentName = argumentName.substring(i + 1);
+		}
+		return this.commandLine.hasOption(argumentName);
 	}
 
 	public void outputCommandLineHelp() {
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("<app>", commandLineOptions);
+		for (Options opts : this.commandLineOptionGroups.values()) {
+			formatter.printHelp(100, "<application>", "", opts, "", true);
+		}
 	}
-	
+
 	Map<String, IService> services;
 
 	public IService fetchService(String name) {
 		return this.services.get(name);
 	}
 
-	<T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion {
+	@Override
+	public <T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -140,20 +197,22 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 
 		InvocationHandler h = new InvocationHandler() {
 			T serviceReference;
+
 			T getServiceReference() {
-				if (null==this.serviceReference) {
+				if (null == this.serviceReference) {
 					IService service = fetchService(serviceName);
-					this.serviceReference  = (T)service.createReference(locationId);
+					this.serviceReference = (T) service.createReference(locationId);
 				}
 				return this.serviceReference;
 			}
+
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				try {
 					T sr = this.getServiceReference();
-					 if (null==sr) {
-						 logError("Cannot find service named "+serviceName, null);
-					 } else {
+					if (null == sr) {
+						logError("Cannot find service named " + serviceName, null);
+					} else {
 						Object result = method.invoke(sr, args);
 						return result;
 					}
@@ -163,10 +222,10 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 				return null;
 			}
 		};
-		Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[]{serviceReferenceType}, h);
-		return (T)proxy;
+		Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { serviceReferenceType }, h);
+		return (T) proxy;
 	}
-	
+
 	public <T extends IIdentifiableObject> T injectIntoService(T obj) throws OperatingSystemExcpetion {
 		try {
 			this.injectServiceReferences(obj, obj.afId());
@@ -187,7 +246,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 
 			this.injectServiceReferences(obj, id);
 			this.injectParts(obj, id);
-			
+
 			obj.defineArguments();
 			obj.parseArguments();
 			this.injectConfigurationValues((IIdentifiableObject) obj, id);
@@ -211,10 +270,10 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 			this.injectServiceReferences(obj, id);
 			this.injectParts(obj, id);
 			this.injectPorts(obj, id);
-//			if (obj instanceof IIdentifiableObject) {
-//				this.injectConfigurationValues((IIdentifiableObject) obj, id);
-//				this.injectCommandLineArgs((IIdentifiableObject) obj, id);
-//			}
+			// if (obj instanceof IIdentifiableObject) {
+			// this.injectConfigurationValues((IIdentifiableObject) obj, id);
+			// this.injectCommandLineArgs((IIdentifiableObject) obj, id);
+			// }
 			obj.afConnectParts();
 			return obj;
 		} catch (Exception ex) {
@@ -222,7 +281,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 		}
 	}
 
-	<T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws OperatingSystemExcpetion {
+	public <T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws OperatingSystemExcpetion {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -238,10 +297,10 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 		try {
 			this.injectServiceReferences(obj, obj.afId());
 			this.injectParts(obj, obj.afId());
-//			if (obj instanceof IIdentifiableObject) {
-//				this.injectConfigurationValues((IIdentifiableObject) obj, obj.afId());
-//				this.injectCommandLineArgs((IIdentifiableObject) obj, obj.afId());
-//			}
+			// if (obj instanceof IIdentifiableObject) {
+			// this.injectConfigurationValues((IIdentifiableObject) obj, obj.afId());
+			// this.injectCommandLineArgs((IIdentifiableObject) obj, obj.afId());
+			// }
 			return obj;
 		} catch (Exception ex) {
 			throw new OperatingSystemExcpetion("Failed to create Service", ex);
@@ -313,7 +372,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 					} else {
 						// do nothing
 					}
-					
+
 					Object value = this.createServiceReference(serviceName, id, f.getType());
 					f.set(obj, value);
 				}
@@ -369,7 +428,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 						config.commitTransaction(trans);
 					}
 				}
-				
+
 				ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);
 				if (null == annCI) {
 					// do nothing
@@ -381,7 +440,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 						// do nothing
 					}
 					Object part = f.get(obj);
-					this.injectConfigurationValues((IIdentifiableObject)part, id+"."+partId);
+					this.injectConfigurationValues((IIdentifiableObject) part, id + "." + partId);
 				}
 
 				ActiveObjectInstance annAI = f.getAnnotation(ActiveObjectInstance.class);
@@ -395,9 +454,9 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 						// do nothing
 					}
 					Object part = f.get(obj);
-					this.injectConfigurationValues((IIdentifiableObject)part, id+"."+partId);
+					this.injectConfigurationValues((IIdentifiableObject) part, id + "." + partId);
 				}
-				
+
 			}
 		}
 	}
@@ -420,17 +479,17 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 				} else {
 					String name = ann.name();
 					if (name.isEmpty()) {
-						name = f.getName();
+						name = id + "." + f.getName();
 					} else {
 						// do nothing
 					}
-					Object argValue = this.commandLine.getOptionValue(name);
+					Object argValue = this.getOptionValue(name); //
 					if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
-						argValue = this.commandLine.hasOption(name);
+						argValue = this.hasOption(name);
 					}
-					if (null!=argValue) {
+					if (null != argValue) {
 						Object value = this.createDatatype(f.getType(), argValue);
-					
+
 						f.set(obj, value);
 					}
 				}
@@ -445,7 +504,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 						// do nothing
 					}
 					Object part = f.get(obj);
-					this.injectCommandLineArgs((IIdentifiableObject)part, id+"."+partId);
+					this.injectCommandLineArgs((IIdentifiableObject) part, id + "." + partId);
 				}
 
 				ActiveObjectInstance annAI = f.getAnnotation(ActiveObjectInstance.class);
@@ -459,7 +518,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 						// do nothing
 					}
 					Object part = f.get(obj);
-					this.injectCommandLineArgs((IIdentifiableObject)part, id+"."+partId);
+					this.injectCommandLineArgs((IIdentifiableObject) part, id + "." + partId);
 				}
 			}
 		}
@@ -538,7 +597,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 						// do nothing
 					}
 
-					//Class<? extends Port> fType = (Class<? extends Port>) f.getType();
+					// Class<? extends Port> fType = (Class<? extends Port>) f.getType();
 					Object value = this.createPort(Port.class, id + "." + compId, obj, ann.provides(), ann.requires());
 					f.set(obj, value);
 				}
@@ -551,7 +610,7 @@ public class OperatingSystem  implements IOperatingSystem, IService {
 		try {
 			Port obj = new Port(id, component);
 			this.injectServiceReferences(obj, id);
-			
+
 			for (Class<?> interfaceType : provides) {
 				Object provider = findInternalProviderForPort(component, interfaceType, id);
 				obj.provides((Class<Object>) interfaceType, provider);
