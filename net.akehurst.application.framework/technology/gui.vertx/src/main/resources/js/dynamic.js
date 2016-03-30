@@ -17,52 +17,59 @@ function Dynamic(sceneId) {
 	this.sceneId = sceneId
 }
 
+Dynamic.prototype.fetchEventData = function(el) {
+	var data = {}
+	var p = el.closest('fieldset')
+	if (null!=this.form) {
+		for(i=0; i< this.form.length; i++) {
+			var id = this.form[i].id
+			var value = this.form[i].value
+			data[id] = value
+		}
+	} else if (null!=p) {
+		var childs = $(p).find('input')
+		for(i=0; i< childs.length; i++) {
+			var id = childs[i].id
+			var value = childs[i].value
+			data[id] = value							
+		}
+		var ts = $(p).find('table.input')
+		for(i=0; i< ts.length; i++) {
+			var tbl = ts[i]
+			var entries = []
+			for(var r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
+				var row = tbl.rows[r]
+				var e = {}
+				for(var c=0; c<row.cells.length; c++) {
+					var cell = row.cells[c]
+					var th = $(tbl).find('th').eq($(cell).index())
+					var key = th.attr('id')
+					var value = $(cell).text()
+					e[key] = value
+				}
+				entries.push(e)
+			}
+			var id = tbl.id
+			data[id] = entries
+		}
+		var tas = $(p).find('textarea.input')
+		for(i=0; i< tas.length; i++) {
+			var ta = tas[i]
+			var id = ta.id
+			var value = $(ta).val()
+			data[id] = value
+		}
+	}
+	return data
+}
+
+
 Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChannelId) {
 	var el = $('#'+elementId)
+	var dy = this
 	var sceneId = this.sceneId
 	el.click(function() {
-		var data = {}
-		var p = el.closest('fieldset')
-		if (null!=this.form) {
-			for(i=0; i< this.form.length; i++) {
-				var id = this.form[i].id
-				var value = this.form[i].value
-				data[id] = value
-			}
-		} else if (null!=p) {
-			var childs = $(p).find('input')
-			for(i=0; i< childs.length; i++) {
-				var id = childs[i].id
-				var value = childs[i].value
-				data[id] = value							
-			}
-			var ts = $(p).find('table.input')
-			for(i=0; i< ts.length; i++) {
-				var tbl = ts[i]
-				var entries = []
-				for(var r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
-					var row = tbl.rows[r]
-					var e = {}
-					for(var c=0; c<row.cells.length; c++) {
-						var cell = row.cells[c]
-						var th = $(tbl).find('th').eq($(cell).index())
-						var key = th.attr('id')
-						var value = $(cell).text()
-						e[key] = value
-					}
-					entries.push(e)
-				}
-				var id = tbl.id
-				data[id] = entries
-			}
-			var tas = $(p).find('textarea.input')
-			for(i=0; i< tas.length; i++) {
-				var ta = tas[i]
-				var id = ta.id
-				var value = $(ta).val()
-				data[id] = value
-			}
-		}
+		var data = dy.fetchEventData(el)
 		var outData = {sceneId:sceneId, elementId:this.id, eventType:eventType, eventData:data}
 		serverComms.send(eventChannelId, outData)
 	})
@@ -132,11 +139,18 @@ Dynamic.prototype.addChart = function(parentId, chartId, width, height, chartTyp
 Dynamic.prototype.addDiagram = function(parentId, diagramId, data) {
 	//currently uses Chart.js
 	var parent = document.getElementById(parentId)
-
+	var dy = this
 	var cy = cytoscape({
 		container : parent,
 		elements : data.elements,
 		style : data.style
 	})
-	
+
+	cy.on('tap', 'node', {}, function(evt) {
+		var nodeId = evt.cyTarget.id()
+		var data = dy.fetchEventData(parent)
+		data['nodeId'] = nodeId
+		var outData = {sceneId:sceneId, elementId:diagramId, eventType:'tap', eventData:data}
+		serverComms.send('IGuiNotification.notifyEventOccured', outData)
+	})
 }
