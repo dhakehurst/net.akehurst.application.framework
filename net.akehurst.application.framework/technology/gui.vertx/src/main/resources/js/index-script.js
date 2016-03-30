@@ -59,6 +59,11 @@ $(document).ready(function() {
 		console.log("addChart "+JSON.stringify(args))
 		dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
 	})
+	serverComms.registerHandler('Gui.addDiagram', function(args) {
+		console.log("addDiagram "+JSON.stringify(args))
+		dynamic.addDiagram(args.parentId, args.diagramId, args.data)
+	})
+	
 	//2d Canvas
 	serverComms.registerHandler('Canvas.addChild', function(args) { //probably do't need this, can use addElement from Gui
 		console.log("Canvas.addChild "+JSON.stringify(args))

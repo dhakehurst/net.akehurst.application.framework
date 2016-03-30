@@ -128,3 +128,15 @@ Dynamic.prototype.addChart = function(parentId, chartId, width, height, chartTyp
 	var chart = new Chart(chartContext)
 	chart[chartType](chartData, chartOptions)
 }
+
+Dynamic.prototype.addDiagram = function(parentId, diagramId, data) {
+	//currently uses Chart.js
+	var parent = document.getElementById(parentId)
+
+	var cy = cytoscape({
+		container : parent,
+		elements : data.elements,
+		style : data.style
+	})
+	
+}

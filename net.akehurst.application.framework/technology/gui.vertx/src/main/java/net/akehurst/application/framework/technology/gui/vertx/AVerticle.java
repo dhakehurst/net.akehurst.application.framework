@@ -253,38 +253,6 @@ public class AVerticle implements Verticle {
 		router.route("/download/:filename").handler(rc -> {
 			String filename = rc.request().getParam("filename");
 			Buffer buffer = Buffer.buffer();
-			// ReadStream<Object> rs = new ReadStream<Object>() {
-			//
-			// @Override
-			// public ReadStream<Object> exceptionHandler(Handler<Throwable> handler) {
-			// // TODO Auto-generated method stub
-			// return null;
-			// }
-			//
-			// @Override
-			// public ReadStream<Object> handler(Handler<Object> handler) {
-			// // TODO Auto-generated method stub
-			// return null;
-			// }
-			//
-			// @Override
-			// public ReadStream<Object> pause() {
-			// // TODO Auto-generated method stub
-			// return null;
-			// }
-			//
-			// @Override
-			// public ReadStream<Object> resume() {
-			// // TODO Auto-generated method stub
-			// return null;
-			// }
-			//
-			// @Override
-			// public ReadStream<Object> endHandler(Handler<Void> endHandler) {
-			// // TODO Auto-generated method stub
-			// return null;
-			// }
-			// };
 			ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(createTechSession(rc.session()), filename, new IGuiCallback() {
 
 				@Override
@@ -299,7 +267,7 @@ public class AVerticle implements Verticle {
 					rc.response().end(ex.getMessage());
 				}
 			});
-			// Pump.pump(rs, ws).
+
 			rc.response().putHeader("content-type", "download");
 		});
 
@@ -312,20 +280,6 @@ public class AVerticle implements Verticle {
 
 		HttpServer server = vertx.createHttpServer();
 		server.requestHandler(router::accept).listen(this.port);
-
-		// this.addPostRoute("/api/IGuiNotification/notifyStageLoaded", (rc -> {
-		// rc.response().putHeader("content-type", "application/json; charset=utf-8").end(new JsonObject().toString());
-		// JsonObject json = rc.getBodyAsJson();
-		// String stageId = json.getString("stageId");
-		// this.ws.portGui().out(IGuiNotification.class).notifyStageLoaded(new SesssionWrapper(rc.session()), stageId);
-		// }));
-		//
-		// this.addPostRoute("/api/IGuiNotification/notifySceneLoaded", (rc -> {
-		// rc.response().putHeader("content-type", "application/json; charset=utf-8").end(new JsonObject().toString());
-		// JsonObject json = rc.getBodyAsJson();
-		// String sceneId = json.getString("sceneId");
-		// this.ws.portGui().out(IGuiNotification.class).notifySceneLoaded(new SesssionWrapper(rc.session()), sceneId);
-		// }));
 
 		this.ws.portGui().out(IGuiNotification.class).notifyReady();
 

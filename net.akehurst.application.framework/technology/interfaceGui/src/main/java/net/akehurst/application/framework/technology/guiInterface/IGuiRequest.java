@@ -48,4 +48,6 @@ public interface IGuiRequest {
 	void setText(TechSession session, String sceneId, String id, String text);
 		
 	void addChart(TechSession session, String sceneId, String parentId, String chartId, Integer width, Integer height, String chartType, String jsonChartData, String jsonChartOptions);
+
+	void addDiagram(TechSession session, String sceneId, String parentId, String diagramId, String jsonDiagramData);
 }

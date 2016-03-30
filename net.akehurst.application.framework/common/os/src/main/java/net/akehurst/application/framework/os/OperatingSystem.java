@@ -99,7 +99,6 @@ public class OperatingSystem implements IOperatingSystem, IService {
 		}
 	}
 
-
 	Map<String, Options> commandLineOptionGroups;
 
 	@Override
@@ -122,31 +121,31 @@ public class OperatingSystem implements IOperatingSystem, IService {
 	CommandLine commandLine;
 
 	public void setCommandLine(String[] args) {
-		if (args.length < 1) {
-			return; // nothing to parse
-		} else {
-			try {
+		try {
+			CommandLineParser parser = new DefaultParser();
+			if (args.length < 1) {
+				this.commandLine = parser.parse(new Options(), args, true);
+				return; // nothing to parse
+			} else {
 				for (Options opts : this.commandLineOptionGroups.values()) {
-					CommandLineParser parser = new DefaultParser();
+					
 					this.commandLine = parser.parse(opts, args, true);
 					if (this.commandLine.getArgList().isEmpty()) {
-						//parse has succeeded
+						// parse has succeeded
 						return;
 					} else {
 						// try next OptionGroup
 					}
 				}
-
-					//all OptionGroups failed to parse
-					this.outputCommandLineHelp();
-					System.exit(1);
-
-			} catch (MissingOptionException ex) {
+				// all OptionGroups failed to parse
 				this.outputCommandLineHelp();
 				System.exit(1);
-			} catch (Exception ex) {
-				ex.printStackTrace();
 			}
+		} catch (MissingOptionException ex) {
+			this.outputCommandLineHelp();
+			System.exit(1);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 

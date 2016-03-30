@@ -163,6 +163,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 		
 	}
 	
+	@Override
+	public void addDiagram(TechSession session, String sceneId, String parentId, String diagramId, String jsonDiagramData) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	//--------- IGuiNotification ---------
 
 

@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import net.akehurst.application.framework.common.IPort;
@@ -199,6 +201,17 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		data.put("chartOptions", new JsonObject(jsonChartOptions));
 
 		this.verticle.comms.send(session, "Gui.addChart", data);
+	}
+	
+	@Override
+	public void addDiagram(TechSession session, String sceneId, String parentId, String diagramId, String jsonDiagramData) {
+		JsonObject data = new JsonObject();
+		data.put("parentId", parentId);
+		data.put("diagramId", diagramId);
+		JsonObject ddata = new JsonObject(jsonDiagramData);
+		data.put("data", ddata);
+
+		this.verticle.comms.send(session, "Gui.addDiagram", data);
 	}
 	
 	//TODO: deal with buttons
