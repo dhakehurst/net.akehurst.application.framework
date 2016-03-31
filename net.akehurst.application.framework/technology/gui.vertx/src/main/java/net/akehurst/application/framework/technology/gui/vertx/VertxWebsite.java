@@ -40,6 +40,25 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		super(objectId);
 	}
 
+//	@ConfiguredValue(defaultValue = "")
+//	String rootPath;
+	
+	@ConfiguredValue(defaultValue = "/test")
+	String testPath;
+	
+	@ConfiguredValue(defaultValue = "/download")
+	String downloadPath;
+	
+	@ConfiguredValue(defaultValue = "/upload")
+	String uploadPath;
+	
+	@ConfiguredValue(defaultValue = "/js")
+	String jsPath;
+	
+	@ConfiguredValue(defaultValue = "/sockjs")
+	String sockjsPath;
+	
+	
 	@ConfiguredValue(defaultValue = "9999")
 	IpPort port;
 

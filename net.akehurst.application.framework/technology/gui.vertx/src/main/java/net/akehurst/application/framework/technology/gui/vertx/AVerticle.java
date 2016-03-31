@@ -78,7 +78,7 @@ public class AVerticle implements Verticle {
 		// }
 		// });
 		router.route(routePath).handler((context) -> {
-			this.comms.addSocksChannel("/sockjs" + routePath, (session, channelId, data) -> {
+			this.comms.addSocksChannel(ws.sockjsPath + routePath, (session, channelId, data) -> {
 				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
 					String sceneId = data.getString("sceneId");
 					String eventType = data.getString("eventType");
@@ -103,7 +103,7 @@ public class AVerticle implements Verticle {
 		router.route(routePath).handler(this.authHandler);// BasicAuthHandler.create(authProvider, "Please Provide Valid Credentials" ));
 		router.route(routePath).handler(requestHandler);// ;
 		router.route(routePath).handler((context) -> {
-			this.comms.addSocksChannel("/sockjs" + routePath, (session, channelId, data) -> {
+			this.comms.addSocksChannel(ws.sockjsPath + routePath, (session, channelId, data) -> {
 				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
 					String sceneId = data.getString("sceneId");
 					String eventType = data.getString("eventType");
@@ -228,29 +228,29 @@ public class AVerticle implements Verticle {
 		this.authHandler = new MyAuthHandler(authProvider);
 
 		this.comms = new ClientServerComms(vertx, this.router, this.authProvider, "/eventbus");
-		this.comms.addOutboundAddress("Gui.setTitle");
-		this.comms.addOutboundAddress("Gui.switchToScene");
-		this.comms.addOutboundAddress("Gui.addElement");
-		this.comms.addOutboundAddress("Gui.requestRecieveEvent");
-		this.comms.addOutboundAddress("Gui.setText");
+//		this.comms.addOutboundAddress("Gui.setTitle");
+//		this.comms.addOutboundAddress("Gui.switchToScene");
+//		this.comms.addOutboundAddress("Gui.addElement");
+//		this.comms.addOutboundAddress("Gui.requestRecieveEvent");
+//		this.comms.addOutboundAddress("Gui.setText");
+//
+//		this.comms.addOutboundAddress("Canvas.addChild");
+//		this.comms.addOutboundAddress("Canvas.addChildToParent");
+//		this.comms.addOutboundAddress("Canvas.relocate");
+//		this.comms.addOutboundAddress("Canvas.resize");
+//		this.comms.addOutboundAddress("Canvas.transform");
+//		this.comms.addOutboundAddress("Canvas.setStartAnchor");
+//		this.comms.addOutboundAddress("Canvas.setEndAnchor");
+//
+//		this.comms.addInboundAddress("handleEvent");
 
-		this.comms.addOutboundAddress("Canvas.addChild");
-		this.comms.addOutboundAddress("Canvas.addChildToParent");
-		this.comms.addOutboundAddress("Canvas.relocate");
-		this.comms.addOutboundAddress("Canvas.resize");
-		this.comms.addOutboundAddress("Canvas.transform");
-		this.comms.addOutboundAddress("Canvas.setStartAnchor");
-		this.comms.addOutboundAddress("Canvas.setEndAnchor");
-
-		this.comms.addInboundAddress("handleEvent");
-
-		router.route("/test").handler(rc -> {
+		router.route(ws.testPath).handler(rc -> {
 			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
 		});
 
-		router.route("/js/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
+		router.route(ws.jsPath+"/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
 
-		router.route("/download/:filename").handler(rc -> {
+		router.route(ws.downloadPath+"/:filename").handler(rc -> {
 			String filename = rc.request().getParam("filename");
 			Buffer buffer = Buffer.buffer();
 			ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(createTechSession(rc.session()), filename, new IGuiCallback() {
@@ -271,7 +271,7 @@ public class AVerticle implements Verticle {
 			rc.response().putHeader("content-type", "download");
 		});
 
-		this.addPostRoute("/upload", rc -> {
+		this.addPostRoute(ws.uploadPath, rc -> {
 			FileUpload fu = rc.fileUploads().iterator().next();
 
 			ws.portGui().out(IGuiNotification.class).notifyUpload(createTechSession(rc.session()), fu.uploadedFileName());
