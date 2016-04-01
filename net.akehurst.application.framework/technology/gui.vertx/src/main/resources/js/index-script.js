@@ -16,71 +16,20 @@
 "use strict"
 
 var sceneId = window.location.pathname
+sceneId = sceneId.substring(stageId.length);
 var sceneArgs = window.location.search
-var end = sceneId.lastIndexOf('/')
-var sceneIdRoot = sceneId.substring(0,end)
-var stageId = sceneIdRoot
+//var end = sceneId.lastIndexOf('/')
+//var sceneIdRoot = sceneId.substring(0,end)
+//var stageId = sceneIdRoot
 console.log("sceneId="+sceneId)
 
 var eventbus = null
 var dynamic = null
-var serverComms = null;
 
 
 $(document).ready(function() {
-	dynamic = new Dynamic(sceneId)
-	serverComms = new ServerComms('/sockjs'+stageId, function() {
-		console.log('server comms open')
-		var outData = {sceneId: sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{sceneArgs:sceneArgs} }
-		serverComms.send('IGuiNotification.notifyEventOccured', outData)		
-	})
-	serverComms.registerHandler('Gui.setTitle', function(args) {
-		dynamic.setTitle(args.value)
-	})
-	serverComms.registerHandler('Gui.setText', function(args) {
-		dynamic.setText(args.id, args.value)
-	})
-	serverComms.registerHandler('Gui.addElement', function(args) {
-		dynamic.addElement(args.parentId, args.newElementId, args.type, args.attributes, args.content)
-	})
-	serverComms.registerHandler('Gui.clearElement', function(args) {
-		dynamic.clearElement(args.elementId)
-	})
-	serverComms.registerHandler('Gui.requestRecieveEvent', function(args) {
-		console.log("requestRecieveEvent "+JSON.stringify(args))
-		dynamic.requestRecieveEvent(args.elementId, args.eventType, 'IGuiNotification.notifyEventOccured')
-	})
-	serverComms.registerHandler('Gui.switchToScene', function(args) {
-		console.log("switchToScene "+JSON.stringify(args))
-		dynamic.switchToScene(args.stageId, args.sceneId)
-	})
-	//Charts
-	serverComms.registerHandler('Gui.addChart', function(args) {
-		console.log("addChart "+JSON.stringify(args))
-		dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
-	})
-	serverComms.registerHandler('Gui.addDiagram', function(args) {
-		console.log("addDiagram "+JSON.stringify(args))
-		dynamic.addDiagram(args.parentId, args.diagramId, args.data)
-	})
-	
-	//2d Canvas
-	serverComms.registerHandler('Canvas.addChild', function(args) { //probably do't need this, can use addElement from Gui
-		console.log("Canvas.addChild "+JSON.stringify(args))
-		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
-	})
-	serverComms.registerHandler('Canvas.relocate', function(args) {
-		console.log("Canvas.relocate "+JSON.stringify(args))
-		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
-	})
-	serverComms.registerHandler('Canvas.resize', function(args) {
-		console.log("Canvas.resize "+JSON.stringify(args))
-		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
-	})
-	serverComms.registerHandler('Canvas.transform', function(args) {
-		console.log("Canvas.transform "+JSON.stringify(args))
-		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
-	})
+	dynamic = new Dynamic(stageId, sceneId)
+
 	//eventbus = new EventBus(myLocation + '/eventbus')
 //	eventbus = new EventBus('http://localhost:9998' + '/eventbus')
 //

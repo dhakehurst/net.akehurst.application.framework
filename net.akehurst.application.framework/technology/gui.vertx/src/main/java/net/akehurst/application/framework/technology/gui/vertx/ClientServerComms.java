@@ -27,6 +27,7 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -49,40 +50,42 @@ public class ClientServerComms {
 		this.vertx = vertx;
 		this.router = router;
 		this.authProvider = authProvider;
-		//for session comms
+		// for session comms
 		this.socks = new HashMap<>();
 		this.activeSessions = new HashMap<>();
-		
-		//for publication to all
+
+		// for publication to all
 		this.busPath = busPath;
 		this.eventbus = vertx.eventBus();
 		this.outbound = new ArrayList<>();
 		this.inbound = new ArrayList<>();
 	}
-	
+
 	Vertx vertx;
 	Router router;
 	AuthProvider authProvider;
-	
-	String busPath;	
+
+	String busPath;
 	EventBus eventbus;
-	
+
 	Map<String, Session> activeSessions;
+
 	TechSession createTechSession(Session session) {
 		this.activeSessions.put(session.id(), session);
 		TechUserDetails user = null;
 		UserHolder holder = session.get("__vertx.userHolder");
-		if (null!=holder && null!=holder.user) {
+		if (null != holder && null != holder.user) {
 			String n = holder.user.principal().getString("username");
 			user = new TechUserDetails(n);
 		} else {
-			//not authenticated, leave user as null
+			// not authenticated, leave user as null
 		}
-		return new TechSession(session.id(),user);
+		return new TechSession(session.id(), user);
 	}
+
 	Session getSession(String sessionId) {
 		Session session = this.activeSessions.get(sessionId);
-		if (null==session) {
+		if (null == session) {
 			return null;
 		} else {
 			if (session.isDestroyed()) {
@@ -93,21 +96,16 @@ public class ClientServerComms {
 			}
 		}
 	}
-	
+
 	@FunctionalInterface
-	public interface F3<T1,T2,T3> {
+	public interface F3<T1, T2, T3> {
 		void apply(T1 o1, T2 o2, T3 o3);
 	}
-	
+
 	public void addSocksChannel(String socksRoutePath, F3<TechSession, String, JsonObject> handler) {
 		router.route(socksRoutePath).handler(CookieHandler.create());
-	    router.route(socksRoutePath).handler(BodyHandler.create().setBodyLimit(50*1024*1024));
-	    router.route(socksRoutePath).handler(
-	    		SessionHandler.create(
-	    				LocalSessionStore.create(vertx)
-	    		).setCookieHttpOnlyFlag(false)
-	    		.setCookieSecureFlag(false)
-	    );
+		router.route(socksRoutePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+		router.route(socksRoutePath).handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
 		router.route(socksRoutePath).handler(UserSessionHandler.create(authProvider));
 		SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
 		router.route(socksRoutePath).handler(sockJSHandler);
@@ -124,8 +122,9 @@ public class ClientServerComms {
 			});
 		});
 	}
-	
+
 	Map<Session, SockJSSocket> socks;
+
 	public void send(TechSession session, String channelId, JsonObject data) {
 		JsonObject msg = new JsonObject();
 		msg.put("channelId", channelId);
@@ -134,7 +133,7 @@ public class ClientServerComms {
 		SockJSSocket ss = this.socks.get(sess);
 		ss.write(Buffer.factory.buffer(msg.encode()));
 	}
-	
+
 	List<String> outbound;
 	List<String> inbound;
 
@@ -147,7 +146,7 @@ public class ClientServerComms {
 		this.inbound.add(address);
 		this.refreshEventBus();
 	}
-	
+
 	void refreshEventBus() {
 		if (null == this.router) {
 
@@ -160,16 +159,16 @@ public class ClientServerComms {
 				options.addInboundPermitted(new PermittedOptions().setAddress(a));
 			}
 			router.clear();
-			router.route(this.busPath+"/*").handler(SockJSHandler.create(vertx).bridge(options));
+			router.route(this.busPath + "/*").handler(SockJSHandler.create(vertx).bridge(options));
 		}
 	}
-	
+
 	void send(String user, String address, JsonObject data) {
 		DeliveryOptions options = new DeliveryOptions();
 		options.addHeader("user", user);
-		this.eventbus.publish(address, data, options );
+		this.eventbus.publish(address, data, options);
 	}
-	
+
 	void publish(String address, JsonObject data) {
 		this.eventbus.publish(address, data);
 	}

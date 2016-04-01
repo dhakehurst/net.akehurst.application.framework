@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function Dynamic(sceneId) {
+function Dynamic(stageId, sceneId) {
+	this.stageId = stageId
 	this.sceneId = sceneId
+	this.initComms();
 }
 
 Dynamic.prototype.fetchEventData = function(el) {
@@ -65,13 +67,14 @@ Dynamic.prototype.fetchEventData = function(el) {
 
 
 Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChannelId) {
+	var dyn = this
 	var el = $('#'+elementId)
 	var dy = this
 	var sceneId = this.sceneId
 	el.click(function() {
 		var data = dy.fetchEventData(el)
 		var outData = {sceneId:sceneId, elementId:this.id, eventType:eventType, eventData:data}
-		serverComms.send(eventChannelId, outData)
+		dyn.commsSend(eventChannelId, outData)
 	})
 }
 
@@ -137,6 +140,7 @@ Dynamic.prototype.addChart = function(parentId, chartId, width, height, chartTyp
 }
 
 Dynamic.prototype.addDiagram = function(parentId, diagramId, data) {
+	var dyn = this
 	//currently uses Chart.js
 	var parent = document.getElementById(parentId)
 	var dy = this
@@ -150,7 +154,67 @@ Dynamic.prototype.addDiagram = function(parentId, diagramId, data) {
 		var nodeId = evt.cyTarget.id()
 		var data = dy.fetchEventData(parent)
 		data['nodeId'] = nodeId
-		var outData = {sceneId:sceneId, elementId:diagramId, eventType:'tap', eventData:data}
-		serverComms.send('IGuiNotification.notifyEventOccured', outData)
+		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, elementId:diagramId, eventType:'tap', eventData:data}
+		dyn.commsSend('IGuiNotification.notifyEventOccured', outData)
+	})
+}
+
+Dynamic.prototype.commsSend = function(name, data) {
+	this.serverComms.send(name,data)
+}
+
+Dynamic.prototype.initComms = function() {
+	var dyn = this
+	this.serverComms = new ServerComms(stageId+'/sockjs', function() {
+		console.log('server comms open')
+		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{sceneArgs:sceneArgs} }
+		dyn.commsSend('IGuiNotification.notifyEventOccured', outData)		
+	})
+	this.serverComms.registerHandler('Gui.setTitle', function(args) {
+		dynamic.setTitle(args.value)
+	})
+	this.serverComms.registerHandler('Gui.setText', function(args) {
+		dynamic.setText(args.id, args.value)
+	})
+	this.serverComms.registerHandler('Gui.addElement', function(args) {
+		dynamic.addElement(args.parentId, args.newElementId, args.type, args.attributes, args.content)
+	})
+	this.serverComms.registerHandler('Gui.clearElement', function(args) {
+		dynamic.clearElement(args.elementId)
+	})
+	this.serverComms.registerHandler('Gui.requestRecieveEvent', function(args) {
+		console.log("requestRecieveEvent "+JSON.stringify(args))
+		dynamic.requestRecieveEvent(args.elementId, args.eventType, 'IGuiNotification.notifyEventOccured')
+	})
+	this.serverComms.registerHandler('Gui.switchToScene', function(args) {
+		console.log("switchToScene "+JSON.stringify(args))
+		dynamic.switchToScene(args.stageId, args.sceneId)
+	})
+	//Charts
+	this.serverComms.registerHandler('Gui.addChart', function(args) {
+		console.log("addChart "+JSON.stringify(args))
+		dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
+	this.serverComms.registerHandler('Gui.addDiagram', function(args) {
+		console.log("addDiagram "+JSON.stringify(args))
+		dynamic.addDiagram(args.parentId, args.diagramId, args.data)
+	})
+	
+	//2d Canvas
+	this.serverComms.registerHandler('Canvas.addChild', function(args) { //probably do't need this, can use addElement from Gui
+		console.log("Canvas.addChild "+JSON.stringify(args))
+		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
+	this.serverComms.registerHandler('Canvas.relocate', function(args) {
+		console.log("Canvas.relocate "+JSON.stringify(args))
+		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
+	this.serverComms.registerHandler('Canvas.resize', function(args) {
+		console.log("Canvas.resize "+JSON.stringify(args))
+		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+	})
+	this.serverComms.registerHandler('Canvas.transform', function(args) {
+		console.log("Canvas.transform "+JSON.stringify(args))
+		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
 	})
 }

@@ -40,24 +40,36 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		super(objectId);
 	}
 
-//	@ConfiguredValue(defaultValue = "")
-//	String rootPath;
+	@ConfiguredValue(defaultValue = "")
+	String rootPath;
 	
 	@ConfiguredValue(defaultValue = "/test")
 	String testPath;
+	String getTestPath() {
+		return this.rootPath+this.testPath;
+	}
 	
 	@ConfiguredValue(defaultValue = "/download")
 	String downloadPath;
+	String getDownloadPath() {
+		return this.rootPath+this.downloadPath;
+	}
 	
 	@ConfiguredValue(defaultValue = "/upload")
 	String uploadPath;
+	String getUploadPath() {
+		return this.rootPath+this.uploadPath;
+	}
 	
 	@ConfiguredValue(defaultValue = "/js")
 	String jsPath;
+	String getJsPath() {
+		return this.rootPath+this.jsPath;
+	}
 	
-	@ConfiguredValue(defaultValue = "/sockjs")
-	String sockjsPath;
-	
+	String getSockjsPath() {
+		return "/sockjs"; //this value is hard coded in index-script.js, they must match
+	}
 	
 	@ConfiguredValue(defaultValue = "9999")
 	IpPort port;
@@ -100,12 +112,16 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	@Override
 	public void createStage(String stageId, boolean authenticated, URL contentRoot) {
 		try {
+			Map<String,String> variables = new HashMap<>();
+			variables.put("rootPath", this.rootPath);
+			variables.put("jsPath", this.getJsPath());
+			
 			String str = contentRoot.toString();
 			if (str.endsWith("/")) {
 				str = str.substring(0, str.length() - 1);
 			}
 			String webroot = str.substring(str.lastIndexOf('/') + 1);
-			String routePath = stageId + "/*";
+			String routePath = this.rootPath+stageId;
 			if (authenticated) {
 				this.verticle.addAuthenticatedRoute(routePath, (rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
@@ -113,7 +129,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 					String path = rc.normalisedPath();
 					System.out.println(path + " " + (null == u ? "null" : u.principal()));
 					rc.next();
-				}), webroot);
+				}), webroot, variables);
 			} else {
 				this.verticle.addRoute(routePath, (rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
@@ -121,19 +137,8 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 					String path = rc.normalisedPath();
 					System.out.println(path + " " + (null == u ? "null" : u.principal()));
 					rc.next();
-				}), webroot);
+				}), webroot, variables);
 			}
-			// this.verticle.comms.addSocksChannel("/sockjs"+routePath, (session, channelId, data) -> {
-			// if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-			// String sceneId = data.getString("sceneId");
-			// String eventType = data.getString("eventType");
-			// String elementId = data.getString("elementId");
-			// Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-			// this.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
-			// } else {
-			// //??
-			// }
-			// });
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -152,7 +157,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	@Override
 	public void switchTo(TechSession session, String stageId, String sceneId) {
 		JsonObject data = new JsonObject();
-		data.put("stageId", stageId);
+		data.put("stageId", this.rootPath+stageId);
 		data.put("sceneId", sceneId);
 
 		this.verticle.comms.send(session, "Gui.switchToScene", data);

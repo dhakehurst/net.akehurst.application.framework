@@ -35,6 +35,7 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.shiro.ShiroAuthOptions;
 import io.vertx.ext.auth.shiro.ShiroAuthRealmType;
 import io.vertx.ext.web.FileUpload;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
@@ -65,36 +66,50 @@ public class AVerticle implements Verticle {
 	int port;
 	VertxWebsite ws;
 
-	void addRoute(String routePath, Handler<RoutingContext> requestHandler, String webroot) {
+	void addRoute(String stagePath, Handler<RoutingContext> requestHandler, String webroot, Map<String,String> variables) {
+		String routePath =  stagePath + "/*";
+
+		String sockjsCommsPath = stagePath+ws.getSockjsPath()+"/*";
+		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
+			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
+				String stageId = data.getString("stageId");
+				String sceneId = data.getString("sceneId");
+				String eventType = data.getString("eventType");
+				String elementId = data.getString("elementId");
+				Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
+				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured(session, stageId, sceneId, elementId, eventType, eventData);
+			} else {
+				// ??
+			}
+		});
+		
 		router.route(routePath).handler(CookieHandler.create());
 		router.route(routePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
 		router.route(routePath).handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
 		router.route(routePath).handler(UserSessionHandler.create(authProvider));
 
 		router.route(routePath).handler(requestHandler);
-		// router.route(routePath).handler((c)->{
-		// if (c.normalisedPath().endsWith("/") {
-		// c.reroute(.....);
-		// }
-		// });
-		router.route(routePath).handler((context) -> {
-			this.comms.addSocksChannel(ws.sockjsPath + routePath, (session, channelId, data) -> {
-				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-					String sceneId = data.getString("sceneId");
-					String eventType = data.getString("eventType");
-					String elementId = data.getString("elementId");
-					Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-					this.ws.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
-				} else {
-					// ??
-				}
-			});
-			context.next();
-		});
-		router.route(routePath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot(webroot));
+		router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
+
 	}
 
-	void addAuthenticatedRoute(String routePath, Handler<RoutingContext> requestHandler, String webroot) {
+	void addAuthenticatedRoute(String stagePath, Handler<RoutingContext> requestHandler, String webroot, Map<String,String> variables) {
+		String routePath =  stagePath + "/*";
+		
+		String sockjsCommsPath = stagePath+ws.getSockjsPath()+"/*";
+		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
+			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
+				String stageId = data.getString("stageId");
+				String sceneId = data.getString("sceneId");
+				String eventType = data.getString("eventType");
+				String elementId = data.getString("elementId");
+				Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
+				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured(session, stageId, sceneId, elementId, eventType, eventData);
+			} else {
+				// ??
+			}
+		});
+		
 		router.route(routePath).handler(CookieHandler.create());
 		router.route(routePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
 		router.route(routePath).handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
@@ -102,21 +117,7 @@ public class AVerticle implements Verticle {
 
 		router.route(routePath).handler(this.authHandler);// BasicAuthHandler.create(authProvider, "Please Provide Valid Credentials" ));
 		router.route(routePath).handler(requestHandler);// ;
-		router.route(routePath).handler((context) -> {
-			this.comms.addSocksChannel(ws.sockjsPath + routePath, (session, channelId, data) -> {
-				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-					String sceneId = data.getString("sceneId");
-					String eventType = data.getString("eventType");
-					String elementId = data.getString("elementId");
-					Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-					this.ws.portGui().out(IGuiNotification.class).notifyEventOccured(session, sceneId, elementId, eventType, eventData);
-				} else {
-					// ??
-				}
-			});
-			context.next();
-		});
-		router.route(routePath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot(webroot));
+		router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
 	}
 
 	void addPostRoute(String routePath, Handler<RoutingContext> requestHandler) {
@@ -244,13 +245,13 @@ public class AVerticle implements Verticle {
 //
 //		this.comms.addInboundAddress("handleEvent");
 
-		router.route(ws.testPath).handler(rc -> {
+		router.route(ws.getTestPath()).handler(rc -> {
 			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
 		});
 
-		router.route(ws.jsPath+"/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
+		router.route(ws.getJsPath()+"/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
 
-		router.route(ws.downloadPath+"/:filename").handler(rc -> {
+		router.route(ws.getDownloadPath()+"/:filename").handler(rc -> {
 			String filename = rc.request().getParam("filename");
 			Buffer buffer = Buffer.buffer();
 			ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(createTechSession(rc.session()), filename, new IGuiCallback() {
@@ -271,7 +272,7 @@ public class AVerticle implements Verticle {
 			rc.response().putHeader("content-type", "download");
 		});
 
-		this.addPostRoute(ws.uploadPath, rc -> {
+		this.addPostRoute(ws.getUploadPath(), rc -> {
 			FileUpload fu = rc.fileUploads().iterator().next();
 
 			ws.portGui().out(IGuiNotification.class).notifyUpload(createTechSession(rc.session()), fu.uploadedFileName());
