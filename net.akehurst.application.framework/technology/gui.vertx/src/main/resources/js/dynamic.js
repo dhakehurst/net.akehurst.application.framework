@@ -73,7 +73,7 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 	var sceneId = this.sceneId
 	el.click(function() {
 		var data = dy.fetchEventData(el)
-		var outData = {sceneId:sceneId, elementId:this.id, eventType:eventType, eventData:data}
+		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, elementId:this.id, eventType:eventType, eventData:data}
 		dyn.commsSend(eventChannelId, outData)
 	})
 }
