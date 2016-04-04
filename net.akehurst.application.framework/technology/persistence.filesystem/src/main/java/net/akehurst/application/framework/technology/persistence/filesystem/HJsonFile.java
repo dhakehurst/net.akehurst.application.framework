@@ -23,7 +23,7 @@ import org.hjson.JsonObject;
 import org.hjson.JsonValue;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
-import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceFilesystem.FilesystemException;
@@ -52,7 +52,7 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	}
 
 	@ServiceReference
-	IOperatingSystem os;
+	IApplicationFramework os;
 
 	@ServiceReference
 	IFilesystem fs;

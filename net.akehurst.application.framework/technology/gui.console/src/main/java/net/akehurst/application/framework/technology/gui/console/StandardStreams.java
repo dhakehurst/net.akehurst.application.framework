@@ -3,7 +3,7 @@ package net.akehurst.application.framework.technology.gui.console;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.declaration.Component;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
-import net.akehurst.application.framework.os.AbstractComponent;
+import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.guiInterface.console.IConsoleNotification;
 import net.akehurst.application.framework.technology.guiInterface.console.IConsoleRequest;
 

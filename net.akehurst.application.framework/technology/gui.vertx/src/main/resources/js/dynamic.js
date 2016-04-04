@@ -98,7 +98,7 @@ Dynamic.prototype.setText = function(id, value) {
 
 Dynamic.prototype.addElement = function(parentId, newElementId, type, attributes, content) {
 	var child = document.createElement(type)
-	child.id = newElementId
+	if (null!=newElementId) { child.id = newElementId }
 	var parent = document.getElementById(parentId)
 	if (null == parent) {
 		console.log('Error: cannot find parent element with id ' + parentId)

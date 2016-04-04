@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.os;
+package net.akehurst.application.framework.realisation;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import net.akehurst.application.framework.common.IActiveObject;
 import net.akehurst.application.framework.common.IApplication;
 import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IIdentifiableObject;
-import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
 import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;

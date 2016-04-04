@@ -32,7 +32,7 @@ import javafx.stage.Stage;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
-import net.akehurst.application.framework.os.AbstractComponent;
+import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.TechSession;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;

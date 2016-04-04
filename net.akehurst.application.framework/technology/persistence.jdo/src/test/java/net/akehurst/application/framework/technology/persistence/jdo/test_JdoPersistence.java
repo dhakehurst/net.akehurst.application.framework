@@ -27,9 +27,9 @@ import javax.jdo.annotations.Persistent;
 import org.datanucleus.enhancement.Persistable;
 import org.junit.Test;
 
-import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.annotations.instance.ServiceInstance;
-import net.akehurst.application.framework.os.OperatingSystem;
+import net.akehurst.application.framework.realisation.ApplicationFramework;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
@@ -38,8 +38,8 @@ import net.akehurst.application.framework.technology.log4j.Log4JLogger;
 
 public class test_JdoPersistence {
 
-	IOperatingSystem os() {
-		return new OperatingSystem("os", "os");
+	IApplicationFramework os() {
+		return new ApplicationFramework("os", "os");
 	}
 	
 	@ServiceInstance
@@ -120,7 +120,7 @@ public class test_JdoPersistence {
 	@Test
 	public void store_Contacts2() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -153,7 +153,7 @@ public class test_JdoPersistence {
 	@Test
 	public void retrieve_Person() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -182,7 +182,7 @@ public class test_JdoPersistence {
 	@Test
 	public void retrieve_Contacts() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			JdoPersistence sut = os.createComponent(JdoPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();

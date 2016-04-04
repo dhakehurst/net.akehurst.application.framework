@@ -22,16 +22,16 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.annotations.instance.ServiceInstance;
-import net.akehurst.application.framework.os.OperatingSystem;
+import net.akehurst.application.framework.realisation.ApplicationFramework;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 
 public class test_ObjectDbDatabasePersistence {
-	IOperatingSystem os() {
-		return new OperatingSystem("os", "os");
+	IApplicationFramework os() {
+		return new ApplicationFramework("os", "os");
 	}
 	
 
@@ -39,7 +39,7 @@ public class test_ObjectDbDatabasePersistence {
 	@Test
 	public void connect() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			ObjectDbDatabasePersistence sut = os.createComponent(ObjectDbDatabasePersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -52,7 +52,7 @@ public class test_ObjectDbDatabasePersistence {
 	@Test
 	public void store_Person() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			ObjectDbDatabasePersistence sut = os.createComponent(ObjectDbDatabasePersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -72,7 +72,7 @@ public class test_ObjectDbDatabasePersistence {
 	@Test
 	public void store_Contacts() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			ObjectDbDatabasePersistence sut = os.createComponent(ObjectDbDatabasePersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -102,7 +102,7 @@ public class test_ObjectDbDatabasePersistence {
 	@Test
 	public void retrieve_Person() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			ObjectDbDatabasePersistence sut = os.createComponent(ObjectDbDatabasePersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -128,7 +128,7 @@ public class test_ObjectDbDatabasePersistence {
 	@Test
 	public void retrieveAll_Person() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			ObjectDbDatabasePersistence sut = os.createComponent(ObjectDbDatabasePersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -160,7 +160,7 @@ public class test_ObjectDbDatabasePersistence {
 	@Test
 	public void retrieve_Contacts() {
 		try {
-			IOperatingSystem os = os();
+			IApplicationFramework os = os();
 			ObjectDbDatabasePersistence sut = os.createComponent(ObjectDbDatabasePersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();

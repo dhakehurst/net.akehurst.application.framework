@@ -22,8 +22,8 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.akehurst.application.framework.common.IOperatingSystem;
-import net.akehurst.application.framework.os.OperatingSystem;
+import net.akehurst.application.framework.common.IApplicationFramework;
+import net.akehurst.application.framework.realisation.ApplicationFramework;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
@@ -35,7 +35,7 @@ public class test_JpaPersistence {
 	@Test
 	public void connect() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os","os");
+			IApplicationFramework os = new ApplicationFramework("os","os");
 			JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -52,7 +52,7 @@ public class test_JpaPersistence {
 	@Test
 	public void store_Person() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os","os");
+			IApplicationFramework os = new ApplicationFramework("os","os");
 			JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -85,7 +85,7 @@ public class test_JpaPersistence {
 	@Test
 	public void store_Contacts() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os","os");
+			IApplicationFramework os = new ApplicationFramework("os","os");
 			JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -115,7 +115,7 @@ public class test_JpaPersistence {
 	@Test
 	public void retrieve_Person() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os","os");
+			IApplicationFramework os = new ApplicationFramework("os","os");
 			JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -143,7 +143,7 @@ public class test_JpaPersistence {
 	@Test
 	public void modify_Person() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os","os");
+			IApplicationFramework os = new ApplicationFramework("os","os");
 			JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -180,7 +180,7 @@ public class test_JpaPersistence {
 	@Test
 	public void retrieveAll_Person() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os","os");
+			IApplicationFramework os = new ApplicationFramework("os","os");
 			JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();
@@ -212,7 +212,7 @@ public class test_JpaPersistence {
 	@Test
 	public void retrieve_Contacts() {
 		try {
-			IOperatingSystem os = new OperatingSystem("os","os");
+			IApplicationFramework os = new ApplicationFramework("os","os");
 			JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
 			Map<String, Object> props = new HashMap<>();

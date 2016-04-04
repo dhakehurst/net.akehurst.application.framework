@@ -22,7 +22,7 @@ import net.akehurst.application.framework.computational.interfaceAuthenticator.A
 import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorUserDetails;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorNotification;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
-import net.akehurst.application.framework.os.AbstractComponent;
+import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.authentication.TechSession;

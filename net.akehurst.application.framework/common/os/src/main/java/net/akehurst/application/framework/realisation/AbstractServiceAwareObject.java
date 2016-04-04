@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.os;
+package net.akehurst.application.framework.realisation;
 
 public class AbstractServiceAwareObject {
 

@@ -15,9 +15,9 @@
  */
 package net.akehurst.application.framework.common;
 
-public class OperatingSystemExcpetion extends Exception {
+public class ApplicationFrameworkException extends Exception {
 
-	public OperatingSystemExcpetion(String message, Throwable cause) {
+	public ApplicationFrameworkException(String message, Throwable cause) {
 		super(message, cause);
 	}
 	

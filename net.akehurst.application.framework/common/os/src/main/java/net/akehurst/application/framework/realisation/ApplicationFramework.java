@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.os;
+package net.akehurst.application.framework.realisation;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -39,10 +39,10 @@ import org.apache.commons.cli.Options;
 import net.akehurst.application.framework.common.IApplication;
 import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IIdentifiableObject;
-import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.IService;
-import net.akehurst.application.framework.common.OperatingSystemExcpetion;
+import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.annotations.declaration.ProvidesInterfaceForPort;
 import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
@@ -59,11 +59,11 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 import net.akehurst.holser.reflect.BetterMethodFinder;
 
-public class OperatingSystem implements IOperatingSystem, IService {
+public class ApplicationFramework implements IApplicationFramework, IService {
 
 	static final String DEFAULT_CONFIGURATION_SERVICE = "configuration";
 
-	public OperatingSystem(String id, String serviceName) {
+	public ApplicationFramework(String id, String serviceName) {
 		this.afId = id;
 		this.services = new HashMap<>();
 		this.services.put(serviceName, this);
@@ -179,7 +179,7 @@ public class OperatingSystem implements IOperatingSystem, IService {
 	}
 
 	@Override
-	public <T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws OperatingSystemExcpetion {
+	public <T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws ApplicationFrameworkException {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -188,7 +188,7 @@ public class OperatingSystem implements IOperatingSystem, IService {
 			this.injectIntoService(obj);
 			return obj;
 		} catch (Exception ex) {
-			throw new OperatingSystemExcpetion("Failed to create Service", ex);
+			throw new ApplicationFrameworkException("Failed to create Service", ex);
 		}
 	}
 
@@ -225,17 +225,17 @@ public class OperatingSystem implements IOperatingSystem, IService {
 		return (T) proxy;
 	}
 
-	public <T extends IIdentifiableObject> T injectIntoService(T obj) throws OperatingSystemExcpetion {
+	public <T extends IIdentifiableObject> T injectIntoService(T obj) throws ApplicationFrameworkException {
 		try {
 			this.injectServiceReferences(obj, obj.afId());
 			return obj;
 		} catch (Exception ex) {
-			throw new OperatingSystemExcpetion("Failed to create Service", ex);
+			throw new ApplicationFrameworkException("Failed to create Service", ex);
 		}
 	}
 
 	@Override
-	public <T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws OperatingSystemExcpetion {
+	public <T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws ApplicationFrameworkException {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class, String[].class);
@@ -256,12 +256,12 @@ public class OperatingSystem implements IOperatingSystem, IService {
 
 			return obj;
 		} catch (Exception ex) {
-			throw new OperatingSystemExcpetion("Failed to create Application", ex);
+			throw new ApplicationFrameworkException("Failed to create Application", ex);
 		}
 	}
 
 	@Override
-	public <T extends IComponent> T createComponent(Class<T> class_, String id) throws OperatingSystemExcpetion {
+	public <T extends IComponent> T createComponent(Class<T> class_, String id) throws ApplicationFrameworkException {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -276,11 +276,11 @@ public class OperatingSystem implements IOperatingSystem, IService {
 			obj.afConnectParts();
 			return obj;
 		} catch (Exception ex) {
-			throw new OperatingSystemExcpetion("Failed to create Basic Object", ex);
+			throw new ApplicationFrameworkException("Failed to create Basic Object", ex);
 		}
 	}
 
-	public <T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws OperatingSystemExcpetion {
+	public <T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws ApplicationFrameworkException {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -288,11 +288,11 @@ public class OperatingSystem implements IOperatingSystem, IService {
 			this.injectIntoActiveObject(obj);
 			return obj;
 		} catch (Exception ex) {
-			throw new OperatingSystemExcpetion("Failed to create Basic Object", ex);
+			throw new ApplicationFrameworkException("Failed to create Basic Object", ex);
 		}
 	}
 
-	public <T extends IIdentifiableObject> T injectIntoActiveObject(T obj) throws OperatingSystemExcpetion {
+	public <T extends IIdentifiableObject> T injectIntoActiveObject(T obj) throws ApplicationFrameworkException {
 		try {
 			this.injectServiceReferences(obj, obj.afId());
 			this.injectParts(obj, obj.afId());
@@ -302,19 +302,19 @@ public class OperatingSystem implements IOperatingSystem, IService {
 			// }
 			return obj;
 		} catch (Exception ex) {
-			throw new OperatingSystemExcpetion("Failed to create Service", ex);
+			throw new ApplicationFrameworkException("Failed to create Service", ex);
 		}
 	}
 
 	@Override
-	public <T> T createDatatype(Class<T> class_, Object... constructorArgs) throws OperatingSystemExcpetion {
+	public <T> T createDatatype(Class<T> class_, Object... constructorArgs) throws ApplicationFrameworkException {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(constructorArgs);
 			T obj = cons.newInstance(constructorArgs);
 			return obj;
 		} catch (Exception ex) {
-			throw new OperatingSystemExcpetion("Failed to create Datatype", ex);
+			throw new ApplicationFrameworkException("Failed to create Datatype", ex);
 		}
 	}
 
@@ -380,12 +380,12 @@ public class OperatingSystem implements IOperatingSystem, IService {
 	}
 
 	private void injectConfigurationValues(IIdentifiableObject obj, String id)
-			throws IllegalArgumentException, IllegalAccessException, OperatingSystemExcpetion, PersistentStoreException {
+			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
 		this.injectConfigurationValues(obj.getClass(), obj, id);
 	}
 
 	private void injectConfigurationValues(Class<?> class_, IIdentifiableObject obj, String id)
-			throws IllegalArgumentException, IllegalAccessException, OperatingSystemExcpetion, PersistentStoreException {
+			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
@@ -460,12 +460,12 @@ public class OperatingSystem implements IOperatingSystem, IService {
 		}
 	}
 
-	private void injectCommandLineArgs(IIdentifiableObject obj, String id) throws IllegalArgumentException, IllegalAccessException, OperatingSystemExcpetion {
+	private void injectCommandLineArgs(IIdentifiableObject obj, String id) throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
 		this.injectCommandLineArgs(obj.getClass(), obj, id);
 	}
 
 	private void injectCommandLineArgs(Class<?> class_, IIdentifiableObject obj, String id)
-			throws IllegalArgumentException, IllegalAccessException, OperatingSystemExcpetion {
+			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
@@ -524,12 +524,12 @@ public class OperatingSystem implements IOperatingSystem, IService {
 	}
 
 	private void injectParts(Object obj, String id) throws IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException,
-			NoSuchMethodException, OperatingSystemExcpetion {
+			NoSuchMethodException, ApplicationFrameworkException {
 		this.injectParts(obj.getClass(), obj, id);
 	}
 
 	private void injectParts(Class<?> class_, Object obj, String id) throws IllegalArgumentException, IllegalAccessException, InstantiationException,
-			InvocationTargetException, NoSuchMethodException, OperatingSystemExcpetion {
+			InvocationTargetException, NoSuchMethodException, ApplicationFrameworkException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
@@ -572,12 +572,12 @@ public class OperatingSystem implements IOperatingSystem, IService {
 	}
 
 	private void injectPorts(IComponent obj, String id) throws IllegalArgumentException, IllegalAccessException, InstantiationException,
-			InvocationTargetException, NoSuchMethodException, OperatingSystemExcpetion {
+			InvocationTargetException, NoSuchMethodException, ApplicationFrameworkException {
 		this.injectPorts(obj.getClass(), obj, id);
 	}
 
 	private void injectPorts(Class<?> class_, IComponent obj, String id) throws IllegalArgumentException, IllegalAccessException, InstantiationException,
-			InvocationTargetException, NoSuchMethodException, OperatingSystemExcpetion {
+			InvocationTargetException, NoSuchMethodException, ApplicationFrameworkException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
@@ -605,7 +605,7 @@ public class OperatingSystem implements IOperatingSystem, IService {
 		}
 	}
 
-	IPort createPort(Class<? extends IPort> class_, String id, IComponent component, Class<?>[] provides, Class<?>[] requires) throws OperatingSystemExcpetion {
+	IPort createPort(Class<? extends IPort> class_, String id, IComponent component, Class<?>[] provides, Class<?>[] requires) throws ApplicationFrameworkException {
 		try {
 			Port obj = new Port(id, component);
 			this.injectServiceReferences(obj, id);
@@ -621,12 +621,12 @@ public class OperatingSystem implements IOperatingSystem, IService {
 
 			return obj;
 		} catch (Exception ex) {
-			throw new OperatingSystemExcpetion("Failed to create Port " + id, ex);
+			throw new ApplicationFrameworkException("Failed to create Port " + id, ex);
 		}
 	}
 
 	<T> T findInternalProviderForPort(IComponent component, Class<T> interfaceType, String portId)
-			throws IllegalArgumentException, IllegalAccessException, OperatingSystemExcpetion {
+			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
 		ProvidesInterfaceForPort ann = null;
 		String shortPortId = portId.substring(portId.lastIndexOf('.') + 1);
 		for (Field f : component.getClass().getDeclaredFields()) {
@@ -639,7 +639,7 @@ public class OperatingSystem implements IOperatingSystem, IService {
 		if (interfaceType.isInstance(component)) {
 			return (T) component;
 		} else {
-			throw new OperatingSystemExcpetion("Failed find internal provider of " + interfaceType.getSimpleName() + " for component " + component.afId(),
+			throw new ApplicationFrameworkException("Failed find internal provider of " + interfaceType.getSimpleName() + " for component " + component.afId(),
 					null);
 		}
 	}

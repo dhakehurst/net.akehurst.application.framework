@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.os;
+package net.akehurst.application.framework.realisation;
 
 import net.akehurst.application.framework.common.IActiveObject;
-import net.akehurst.application.framework.common.IOperatingSystem;
+import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
@@ -25,7 +25,7 @@ abstract
 public class AbstractActiveObject implements IActiveObject {
 	
 	@ServiceReference
-	protected IOperatingSystem os;
+	protected IApplicationFramework os;
 	
 	@ServiceReference
 	protected ILogger logger;

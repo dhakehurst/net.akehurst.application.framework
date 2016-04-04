@@ -20,8 +20,8 @@ import java.nio.file.Paths;
 
 import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
-import net.akehurst.application.framework.os.AbstractComponent;
-import net.akehurst.application.framework.os.Port;
+import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.Port;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IDirectory;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesystem;
