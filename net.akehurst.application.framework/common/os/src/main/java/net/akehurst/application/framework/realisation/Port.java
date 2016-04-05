@@ -52,14 +52,23 @@ public class Port implements IPort {
 	}
 	
 	
-	Map<Class<?>, Object> provided;
+	Map<Class<?>, Set<Object>> provided;
 	
-	public <T> Port provides(Class<T> interfaceType, T provider) {
-		this.provided.put(interfaceType, provider);
-		return this;
+	public <T> void provideProvided(Class<T> interfaceType, T provider) {
+		Set<Object> set = this.provided.get(interfaceType);
+		if (null==set) {
+			set = new HashSet<>();
+			this.provided.put(interfaceType, set);
+		}
+		set.add(provider);
 	}
-	public <T> T getProvided(Class<T> interfaceType) {
-		return (T)this.provided.get(interfaceType);
+	public <T> Set<T> getProvided(Class<T> interfaceType) {
+		Set<T> res = (Set<T>)this.provided.get(interfaceType);
+		if (null==res) {
+			return new HashSet<>();
+		} else {
+			return res;
+		}
 	}
 	
 	
@@ -110,20 +119,16 @@ public class Port implements IPort {
 		
 		for(Class<?> req: this.getRequired()) {
 			Class<Object> t = (Class<Object>) req;
-			Object o = other.getProvided(req);
-			if (null==o) {
-				//
-			} else {
+			Set<Object> objs = (Set<Object>)other.getProvided(req);
+			for(Object o: objs) {
 				this.provideRequired(t, o);
 			}
 		}
 		
 		for(Class<?> req: other.getRequired()) {
 			Class<Object> t = (Class<Object>) req;
-			Object o = this.getProvided(req);
-			if (null==o) {
-				//
-			} else {
+			Set<Object> objs = (Set<Object>)this.getProvided(req);
+			for(Object o: objs) {
 				other.provideRequired(t, o);
 			}
 		}

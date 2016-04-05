@@ -128,7 +128,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 				return; // nothing to parse
 			} else {
 				for (Options opts : this.commandLineOptionGroups.values()) {
-					
+
 					this.commandLine = parser.parse(opts, args, true);
 					if (this.commandLine.getArgList().isEmpty()) {
 						// parse has succeeded
@@ -460,7 +460,8 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	private void injectCommandLineArgs(IIdentifiableObject obj, String id) throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
+	private void injectCommandLineArgs(IIdentifiableObject obj, String id)
+			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
 		this.injectCommandLineArgs(obj.getClass(), obj, id);
 	}
 
@@ -605,42 +606,54 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	IPort createPort(Class<? extends IPort> class_, String id, IComponent component, Class<?>[] provides, Class<?>[] requires) throws ApplicationFrameworkException {
+	IPort createPort(Class<? extends IPort> class_, String id, IComponent component, Class<?>[] provides, Class<?>[] requires)
+			throws ApplicationFrameworkException {
 		try {
-			Port obj = new Port(id, component);
-			this.injectServiceReferences(obj, id);
+			Port prt = new Port(id, component);
+			this.injectServiceReferences(prt, id);
 
 			for (Class<?> interfaceType : provides) {
-				Object provider = findInternalProviderForPort(component, interfaceType, id);
-				obj.provides((Class<Object>) interfaceType, provider);
+				List<Object> providers = (List<Object>) findInternalProviderForPort(component, interfaceType, id);
+				for (Object provider : providers) {
+					prt.provideProvided((Class<Object>) interfaceType, provider);
+				}
+
 			}
 
 			for (Class<?> interfaceType : requires) {
-				obj.requires(interfaceType);
+				prt.requires(interfaceType);
 			}
 
-			return obj;
+			return prt;
 		} catch (Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Port " + id, ex);
 		}
 	}
 
-	<T> T findInternalProviderForPort(IComponent component, Class<T> interfaceType, String portId)
+	<T> List<T> findInternalProviderForPort(IComponent component, Class<T> interfaceType, String portId)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
-		ProvidesInterfaceForPort ann = null;
 		String shortPortId = portId.substring(portId.lastIndexOf('.') + 1);
+		List<T> providers = new ArrayList<>();
 		for (Field f : component.getClass().getDeclaredFields()) {
-			ann = f.getAnnotation(ProvidesInterfaceForPort.class);
-			if (null != ann && interfaceType == ann.provides() && shortPortId.equals(ann.portId())) {
-				f.setAccessible(true);
-				return (T) f.get(component);
+			ProvidesInterfaceForPort[] anns = f.getAnnotationsByType(ProvidesInterfaceForPort.class);
+			if (null != anns && anns.length > 0) {
+				for (ProvidesInterfaceForPort ann : anns) {
+					if (interfaceType == ann.provides() && shortPortId.equals(ann.portId())) {
+						f.setAccessible(true);
+						providers.add((T) f.get(component));
+					}
+				}
 			}
 		}
-		if (interfaceType.isInstance(component)) {
-			return (T) component;
-		} else {
-			throw new ApplicationFrameworkException("Failed find internal provider of " + interfaceType.getSimpleName() + " for component " + component.afId(),
-					null);
+		if (providers.isEmpty()) {
+			//try the component itself
+			if (interfaceType.isInstance(component)) {
+				providers.add((T) component);
+			} else {
+				throw new ApplicationFrameworkException(
+						"Failed find internal provider of " + interfaceType.getSimpleName() + " for component " + component.afId(), null);
+			}
 		}
+		return providers;
 	}
 }

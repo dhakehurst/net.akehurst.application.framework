@@ -4,7 +4,12 @@ import java.util.Set;
 
 public interface IPort {
 
-	<T> T getProvided(Class<T> interfaceType);
+	/**
+	 * Set of objects internal to the component that provide the interface
+	 * @param interfaceType
+	 * @return
+	 */
+	<T> Set<T> getProvided(Class<T> interfaceType);
 
 	Set<Class<?>> getRequired();
 

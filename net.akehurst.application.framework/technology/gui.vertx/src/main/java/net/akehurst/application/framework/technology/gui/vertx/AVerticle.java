@@ -53,6 +53,8 @@ import net.akehurst.application.framework.technology.authentication.IAuthenticat
 import net.akehurst.application.framework.technology.authentication.IUser;
 import net.akehurst.application.framework.technology.authentication.TechSession;
 import net.akehurst.application.framework.technology.authentication.TechUserDetails;
+import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
+import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
 import net.akehurst.application.framework.technology.guiInterface.IGuiCallback;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 
@@ -77,7 +79,8 @@ public class AVerticle implements Verticle {
 				String eventType = data.getString("eventType");
 				String elementId = data.getString("elementId");
 				Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured(session, stageId, sceneId, elementId, eventType, eventData);
+				stageId = stageId.replace(this.ws.rootPath, "");
+				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured( new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
 			} else {
 				// ??
 			}
@@ -104,7 +107,8 @@ public class AVerticle implements Verticle {
 				String eventType = data.getString("eventType");
 				String elementId = data.getString("elementId");
 				Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured(session, stageId, sceneId, elementId, eventType, eventData);
+				stageId = stageId.replace(this.ws.rootPath, "");
+				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured( new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
 			} else {
 				// ??
 			}

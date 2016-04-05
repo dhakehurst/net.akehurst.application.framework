@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.guiInterface;
-
-import net.akehurst.application.framework.technology.authentication.TechSession;
-
-
-public interface IGuiNotification {
-
-	void notifyReady();
-		
-	void notifyEventOccured(GuiEvent event);
-	
-	void notifyDowloadRequest(TechSession session, String filename, IGuiCallback callback);
-
-	void notifyUpload(TechSession session, String filename);
+ 
+dependencies {
+	compile project(":${rootProject.name}.common.os")
+	compile project(":${rootProject.name}.technology.interfaceGui")
 }
