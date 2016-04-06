@@ -15,7 +15,7 @@
  */
 package net.akehurst.application.framework.common;
 
-public interface IApplication {
+public interface IApplication extends IActiveObject {
 
 	void defineArguments();
 	

@@ -25,7 +25,7 @@ abstract
 public class AbstractActiveObject implements IActiveObject {
 	
 	@ServiceReference
-	protected IApplicationFramework os;
+	protected IApplicationFramework af;
 	
 	@ServiceReference
 	protected ILogger logger;

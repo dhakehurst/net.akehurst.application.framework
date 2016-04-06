@@ -61,11 +61,11 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 	Boolean displayConfig;
 
 	public void parseArguments() {
-		this.os.setCommandLine(args);
+		this.af.setCommandLine(args);
 	}
 
 	public void afOutputCommandLineHelp() {
-		this.os.outputCommandLineHelp();
+		this.af.outputCommandLineHelp();
 	}
 
 	private JsonValue fetchJsonValue() {
@@ -154,7 +154,7 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 						boolean required = annCL.required();
 						boolean hasValue = annCL.hasValue();
 						String description = annCL.description();
-						this.os.defineCommandLineArgument(group, required, argumentName, hasValue, description);
+						this.af.defineCommandLineArgument(group, required, argumentName, hasValue, description);
 					}
 
 					ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);

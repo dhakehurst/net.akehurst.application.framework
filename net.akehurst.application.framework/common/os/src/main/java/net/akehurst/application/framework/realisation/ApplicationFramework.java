@@ -43,6 +43,7 @@ import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
+import net.akehurst.application.framework.common.IActiveObject;
 import net.akehurst.application.framework.common.annotations.declaration.ProvidesInterfaceForPort;
 import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
@@ -60,6 +61,17 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
 import net.akehurst.holser.reflect.BetterMethodFinder;
 
 public class ApplicationFramework implements IApplicationFramework, IService {
+
+	public static <T extends IApplication> void start(Class<T> applicationClass, String[] arguments) {
+		try {
+
+			IApplicationFramework af = new ApplicationFramework("af", "af");
+			IApplication app = af.createApplication(applicationClass, "application", arguments);
+			app.afStart();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
 
 	static final String DEFAULT_CONFIGURATION_SERVICE = "configuration";
 
@@ -243,8 +255,8 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			T obj = cons.newInstance(new Object[] { id, arguments });
 			this.injectServiceInstances(obj, id);
 
-			this.injectServiceReferences(obj, id);
 			this.injectParts(obj, id);
+			this.injectServiceReferences(obj, id);
 
 			obj.defineArguments();
 			obj.parseArguments();
@@ -280,7 +292,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	public <T extends IIdentifiableObject> T createActiveObject(Class<T> class_, String id) throws ApplicationFrameworkException {
+	public <T extends IActiveObject> T createActiveObject(Class<T> class_, String id) throws ApplicationFrameworkException {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -322,6 +334,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		this.injectServiceInstances(obj.getClass(), obj, id);
 	}
 
+	/**
+	 * Inject service instances, which should only exist in an 'Application' class
+	 * 
+	 */
 	private void injectServiceInstances(Class<?> class_, Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
@@ -350,10 +366,28 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
+	private void injectServiceReferences(IApplication appObj, String id) throws IllegalArgumentException, IllegalAccessException {
+
+		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+
+		walker.walkAndApply(appObj, (tObj, tObjId) -> {
+			try {
+				this.injectServiceReferences(tObj.getClass(), tObj, tObjId);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+
+	}
+
 	private void injectServiceReferences(Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
 		this.injectServiceReferences(obj.getClass(), obj, id);
 	}
-
+	
 	private void injectServiceReferences(Class<?> class_, Object obj, String id) throws IllegalArgumentException, IllegalAccessException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
@@ -524,6 +558,24 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
+	private void injectParts(IApplication appObj) {
+
+		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+
+		walker.build(appObj, (partKind, partClass, partId) -> {
+			switch (partKind) {
+				case COMPONENT: {
+					return this.createComponent((Class<? extends IComponent>)partClass, partId);
+				}
+				case ACTIVE_OBJECT: {
+					return this.createActiveObject((Class<? extends IActiveObject>)partClass, partId);
+				}
+			}
+			return null; //should never happen
+		});
+
+	}
+
 	private void injectParts(Object obj, String id) throws IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException,
 			NoSuchMethodException, ApplicationFrameworkException {
 		this.injectParts(obj.getClass(), obj, id);
@@ -563,7 +615,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 					} else {
 						// do nothing
 					}
-					Class<? extends IIdentifiableObject> fType = (Class<? extends IIdentifiableObject>) f.getType();
+					Class<? extends IActiveObject> fType = (Class<? extends IActiveObject>) f.getType();
 					Object value = this.createActiveObject(fType, id + "." + compId);
 					f.set(obj, value);
 				}
@@ -646,7 +698,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			}
 		}
 		if (providers.isEmpty()) {
-			//try the component itself
+			// try the component itself
 			if (interfaceType.isInstance(component)) {
 				providers.add((T) component);
 			} else {
