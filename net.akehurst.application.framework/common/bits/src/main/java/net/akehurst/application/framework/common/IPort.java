@@ -2,7 +2,7 @@ package net.akehurst.application.framework.common;
 
 import java.util.Set;
 
-public interface IPort {
+public interface IPort extends IIdentifiableObject {
 
 	/**
 	 * Set of objects internal to the component that provide the interface

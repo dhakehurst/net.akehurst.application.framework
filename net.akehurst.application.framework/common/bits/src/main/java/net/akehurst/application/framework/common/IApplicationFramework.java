@@ -22,18 +22,14 @@ public interface IApplicationFramework {
 	void setCommandLine(String[] args);
 	void outputCommandLineHelp();
 	
+	
 	<T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws ApplicationFrameworkException;
-
-	//<T> T fetchService(String serviceName) throws OperatingSystemExcpetion;
-
 	<T extends IComponent> T createComponent(Class<T> class_, String id) throws ApplicationFrameworkException;
-
 	<T extends IActiveObject> T createActiveObject(Class<T> class_, String id) throws ApplicationFrameworkException;
-
 	<T> T createDatatype(Class<T> class_, Object... constructorArgs) throws ApplicationFrameworkException;
 
-	<T extends IIdentifiableObject> T injectIntoActiveObject(T object) throws ApplicationFrameworkException;
-
-	<T extends IIdentifiableObject> T injectIntoService(T object) throws ApplicationFrameworkException;
+	
+	<T extends IService> T injectIntoService(T object) throws ApplicationFrameworkException;
+	<T extends IActiveObject> T injectIntoActiveObject(T object) throws ApplicationFrameworkException;
 
 }

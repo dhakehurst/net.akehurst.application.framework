@@ -52,7 +52,7 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	}
 
 	@ServiceReference
-	IApplicationFramework os;
+	IApplicationFramework af;
 
 	@ServiceReference
 	IFilesystem fs;
@@ -107,13 +107,13 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 			if (null == value) {
 				return null;
 			} else if (value.isString()){
-				T t = os.createDatatype(itemType, value.asString());
+				T t = af.createDatatype(itemType, value.asString());
 				return t;
 			} else if (value.isNumber()) {
-				T t = os.createDatatype(itemType, value.asDouble());
+				T t = af.createDatatype(itemType, value.asDouble());
 				return t;
 			} else if (value.isBoolean()) {
-				T t = os.createDatatype(itemType, value.asBoolean());
+				T t = af.createDatatype(itemType, value.asBoolean());
 				return t;
 			} else {
 				throw new PersistentStoreException("Unknown JSON type at " + location, null);

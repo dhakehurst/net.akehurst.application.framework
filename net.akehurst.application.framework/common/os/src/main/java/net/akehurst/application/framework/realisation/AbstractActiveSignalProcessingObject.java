@@ -42,7 +42,7 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 
 	@Override
 	public void afRun() {
-		logger.log(LogLevel.TRACE, "afRun");
+		logger.log(LogLevel.TRACE, "AbstractActiveSignalProcessingObject.afRun");
 		while (true) {
 			try {
 				NamedSignal ns = this.signals.take();

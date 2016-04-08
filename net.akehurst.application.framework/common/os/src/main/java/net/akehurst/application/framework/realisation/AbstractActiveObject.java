@@ -43,9 +43,8 @@ public class AbstractActiveObject implements IActiveObject {
 
 	@Override
 	public void afStart() {
-		logger.log(LogLevel.TRACE, "afStart");
-		this.thread = new Thread((() -> this.afRun()), this.getClass().getSimpleName());
-		this.thread.setName(this.afId());
+		logger.log(LogLevel.TRACE, "AbstractActiveObject.afStart");
+		this.thread = new Thread((() -> this.afRun()), this.afId());
 		this.thread.start();
 	}
 	

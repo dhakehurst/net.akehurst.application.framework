@@ -50,7 +50,7 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 	
 	@Override
 	public void afStart() {
-		logger.log(LogLevel.TRACE, "afStart");
+		logger.log(LogLevel.TRACE, "AbstractComponent.afStart");
 		for(IPort p: this.ports) {
 			for(Class<?>interfaceType : p.getRequired()) {
 				if (null==p.out(interfaceType)) {
@@ -66,7 +66,7 @@ public class AbstractComponent extends AbstractActiveObject implements IComponen
 	
 	@Override
 	public void afRun() {
-		logger.log(LogLevel.TRACE, "afRun");
+		logger.log(LogLevel.TRACE, "AbstractComponent.afRun");
 		try {
 			// TODO handle inheritance ?
 			List<IActiveObject> objects = new ArrayList<>();
