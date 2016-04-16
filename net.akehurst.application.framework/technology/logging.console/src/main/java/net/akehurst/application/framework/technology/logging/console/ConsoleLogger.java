@@ -13,48 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.log4j;
+package net.akehurst.application.framework.technology.logging.console;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class Log4JLogger implements ILogger, IService {
+public class ConsoleLogger implements ILogger, IService {
 
-	public Log4JLogger(String id) {
-		this.log4j = LogManager.getLogger(id);
+	public ConsoleLogger(String id) {
 		this.id = id;
 	}
+	
 	String id;
+	
 	@Override
 	public String afId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.id;
 	}
-	
-	Logger log4j;
-	
+
 	// --------- IService ---------
 	@Override
 	public Object createReference(String locationId) {
-		return new Log4JLogger(locationId);
+		return new ConsoleLogger(locationId);
 	}
 	
 	// --------- ILogger ---------
 	@Override
 	public void log(LogLevel level, String message) {
-		Level l4jlevel = Level.getLevel(level.getName());
-		this.log4j.log(l4jlevel , message);
+		String prefix = level.getName()+": "+"["+this.afId()+"] ";
+		if (level.getValue() > LogLevel.INFO.getValue()) {
+			System.err.println(prefix+message);
+		} else {
+			System.out.println(prefix+message);
+		}
 	}
 	
 	@Override
 	public void log(LogLevel level, String message, Throwable t) {
-		Level l4jlevel = Level.getLevel(level.getName());
-		this.log4j.log(l4jlevel , message,t);
+		String prefix = level.getName()+": "+"["+this.afId()+"] ";
+		if (level.getValue() > LogLevel.INFO.getValue()) {
+			System.err.println(prefix+message);
+			t.printStackTrace(System.err);
+		} else {
+			System.out.println(prefix+message);
+			t.printStackTrace(System.out);
+		}
 	}
+
 }

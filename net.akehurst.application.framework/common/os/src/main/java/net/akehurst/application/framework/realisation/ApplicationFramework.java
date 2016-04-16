@@ -58,19 +58,22 @@ import net.akehurst.application.framework.technology.interfacePersistence.IPersi
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
+import net.akehurst.application.framework.technology.logging.console.ConsoleLogger;
 import net.akehurst.holser.reflect.BetterMethodFinder;
 
 public class ApplicationFramework implements IApplicationFramework, IService {
 
-	public static <T extends IApplication> void start(Class<T> applicationClass, String[] arguments) {
+	public static <T extends IApplication> T start(Class<T> applicationClass, String[] arguments) {
 		try {
 
 			IApplicationFramework af = new ApplicationFramework("af", "af");
-			IApplication app = af.createApplication(applicationClass, "application", arguments);
+			T app = af.createApplication(applicationClass, "application", arguments);
 			app.afStart();
+			return app;
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+		return null;
 	}
 
 	static final String DEFAULT_CONFIGURATION_SERVICE = "configuration";
@@ -246,7 +249,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	}
 
 	ILogger logger() {
-		ILogger logger = this.createServiceReference("logger", "os.logger", ILogger.class);
+		if (null==this.fetchService("logger")) {
+			this.services.put("logger", new ConsoleLogger("logger"));
+		}
+		ILogger logger = this.createServiceReference("logger", "af.logger", ILogger.class);
 		return logger;
 	}
 
@@ -358,7 +364,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	 * Inject service instances, which should only exist in an 'Application' class
 	 * 
 	 */
-	private void injectServiceInstances(Class<?> class_, IIdentifiableObject obj) throws IllegalArgumentException, IllegalAccessException {
+	private <T extends IApplication> void injectServiceInstances(Class<?> class_, T obj) throws IllegalArgumentException, IllegalAccessException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {

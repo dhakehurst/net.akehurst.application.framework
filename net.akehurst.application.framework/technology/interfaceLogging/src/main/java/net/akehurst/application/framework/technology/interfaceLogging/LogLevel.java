@@ -19,22 +19,28 @@ import net.akehurst.application.framework.common.AbstractDataType;
 
 public class LogLevel extends AbstractDataType {
 
-	public static LogLevel OFF = new LogLevel("OFF");
-	public static LogLevel FATAL = new LogLevel("FATAL");
-	public static LogLevel ERROR = new LogLevel("ERROR");
-	public static LogLevel INFO = new LogLevel("INFO");
-	public static LogLevel WARN = new LogLevel("WARN");
-	public static LogLevel DEBUG = new LogLevel("DEBUG");
-	public static LogLevel TRACE = new LogLevel("TRACE");
-	public static LogLevel ALL = new LogLevel("ALL");
+	public static LogLevel OFF = new LogLevel("OFF",0);
+	public static LogLevel FATAL = new LogLevel("FATAL",100);
+	public static LogLevel ERROR = new LogLevel("ERROR",200);
+	public static LogLevel INFO = new LogLevel("INFO",300);
+	public static LogLevel WARN = new LogLevel("WARN",400);
+	public static LogLevel DEBUG = new LogLevel("DEBUG",500);
+	public static LogLevel TRACE = new LogLevel("TRACE",600);
+	public static LogLevel ALL = new LogLevel("ALL",1000);
 	
-	public LogLevel(String name) {
+	public LogLevel(String name, int value) {
 		super(name);
 		this.name = name;
+		this.value = value;
 	}
 	
 	String name;
 	public String getName() {
 		return this.name;
+	}
+	
+	int value;
+	public int getValue() {
+		return this.value;
 	}
 }
