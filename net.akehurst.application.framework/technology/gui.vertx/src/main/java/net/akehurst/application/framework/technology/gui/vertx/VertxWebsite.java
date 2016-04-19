@@ -19,6 +19,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hjson.JsonValue;
+
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
@@ -42,35 +44,39 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 
 	@ConfiguredValue(defaultValue = "")
 	String rootPath;
-	
+
 	@ConfiguredValue(defaultValue = "/test")
 	String testPath;
+
 	String getTestPath() {
-		return this.rootPath+this.testPath;
+		return this.rootPath + this.testPath;
 	}
-	
+
 	@ConfiguredValue(defaultValue = "/download")
 	String downloadPath;
+
 	String getDownloadPath() {
-		return this.rootPath+this.downloadPath;
+		return this.rootPath + this.downloadPath;
 	}
-	
+
 	@ConfiguredValue(defaultValue = "/upload")
 	String uploadPath;
+
 	String getUploadPath() {
-		return this.rootPath+this.uploadPath;
+		return this.rootPath + this.uploadPath;
 	}
-	
+
 	@ConfiguredValue(defaultValue = "/js")
 	String jsPath;
+
 	String getJsPath() {
-		return this.rootPath+this.jsPath;
+		return this.rootPath + this.jsPath;
 	}
-	
+
 	String getSockjsPath() {
-		return "/sockjs"; //this value is hard coded in index-script.js, they must match
+		return "/sockjs"; // this value is hard coded in index-script.js, they must match
 	}
-	
+
 	@ConfiguredValue(defaultValue = "9999")
 	IpPort port;
 
@@ -112,16 +118,16 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	@Override
 	public void createStage(String stageId, boolean authenticated, URL contentRoot) {
 		try {
-			Map<String,String> variables = new HashMap<>();
+			Map<String, String> variables = new HashMap<>();
 			variables.put("rootPath", this.rootPath);
 			variables.put("jsPath", this.getJsPath());
-			
+
 			String str = contentRoot.toString();
 			if (str.endsWith("/")) {
 				str = str.substring(0, str.length() - 1);
 			}
 			String webroot = str.substring(str.lastIndexOf('/') + 1);
-			String routePath = this.rootPath+stageId;
+			String routePath = this.rootPath + stageId;
 			if (authenticated) {
 				this.verticle.addAuthenticatedRoute(routePath, (rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
@@ -150,14 +156,10 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 
 	}
 
-	public void createScene(String sceneId, boolean authenticated, URL contentRoot) {
-
-	}
-
 	@Override
 	public void switchTo(TechSession session, String stageId, String sceneId) {
 		JsonObject data = new JsonObject();
-		data.put("stageId", this.rootPath+stageId);
+		data.put("stageId", this.rootPath + stageId);
 		data.put("sceneId", sceneId);
 
 		this.verticle.comms.send(session, "Gui.switchToScene", data);
@@ -221,12 +223,17 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		data.put("width", width);
 		data.put("height", height);
 		data.put("chartType", chartType);
-		data.put("chartData", new JsonObject(jsonChartData));
+
+		if (jsonChartData.startsWith("[")) {
+			data.put("chartData", new JsonArray(jsonChartData));
+		} else {
+			data.put("chartData", new JsonObject(jsonChartData));
+		}
 		data.put("chartOptions", new JsonObject(jsonChartOptions));
 
 		this.verticle.comms.send(session, "Gui.addChart", data);
 	}
-	
+
 	@Override
 	public void addDiagram(TechSession session, String sceneId, String parentId, String diagramId, String jsonDiagramData) {
 		JsonObject data = new JsonObject();
@@ -237,25 +244,25 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 
 		this.verticle.comms.send(session, "Gui.addDiagram", data);
 	}
-	
-	//TODO: deal with buttons
+
+	// TODO: deal with buttons
 	public void createModal(TechSession ts, String sceneId, String parentId, String modalId, String title, String modalContent) {
-		String content="";
-		content+="<div id='"+modalId+"' class='modal fade' role='dialog'>";
-		content+="  <div class='modal-dialog'>";
-		content+="    <fieldset class='modal-content'>";
-		content+="      <div class='modal-header'>";
-		content+="        <button type='button' class='close' data-dismiss='modal'>&times;</button>";
-		content+="        <h4 class='modal-title'>"+title+"</h4>";
-		content+="      </div>";
-		content+="      <div class='modal-body'>";
-		content+=modalContent;
-		content+="      </div>";
-		content+="      <div class='modal-footer'>";
-		content+="        <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
-		content+="      </div>";
-		content+="    </fieldset>";
-		content+="  </div>";
+		String content = "";
+		content += "<div id='" + modalId + "' class='modal fade' role='dialog'>";
+		content += "  <div class='modal-dialog'>";
+		content += "    <fieldset class='modal-content'>";
+		content += "      <div class='modal-header'>";
+		content += "        <button type='button' class='close' data-dismiss='modal'>&times;</button>";
+		content += "        <h4 class='modal-title'>" + title + "</h4>";
+		content += "      </div>";
+		content += "      <div class='modal-body'>";
+		content += modalContent;
+		content += "      </div>";
+		content += "      <div class='modal-footer'>";
+		content += "        <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+		content += "      </div>";
+		content += "    </fieldset>";
+		content += "  </div>";
 		this.addElement(ts, sceneId, parentId, modalId, "div", "{'class':'modal fade','role':'dialog'}", content);
 	}
 

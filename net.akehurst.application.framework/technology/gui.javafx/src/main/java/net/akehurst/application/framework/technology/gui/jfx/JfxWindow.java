@@ -17,6 +17,8 @@ package net.akehurst.application.framework.technology.gui.jfx;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -29,154 +31,154 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.TechSession;
+import net.akehurst.application.framework.technology.authentication.TechUserDetails;
+import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
+import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
-	
 	public JfxWindow(String objectId) {
 		super(objectId);
 	}
-	
-	@ConfiguredValue(defaultValue="")
-	String fxmlUrlStr;
-	
-	URL getFxmlUrl() {
-		if (this.fxmlUrlStr.isEmpty()) {
-			return null;
-		} else {
-			try {
-				return new URL(this.fxmlUrlStr);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-	}
-	
+
 	Stage primary;
-//	Canvas canvas;
-//	GraphicsContext gc;
-	
+	// Canvas canvas;
+	// GraphicsContext gc;
+
 	@Override
 	public void afConnectParts() {
 	}
-	
+
 	@Override
 	public void afRun() {
+		// ensure the Jfx library is initialised
 		new JFXPanel();
-		Platform.runLater(new Runnable() {
-			public void run() {
-				try {
-					primary = new Stage();
-					primary.setTitle("Jfx Gui");
 
-					URL url = getFxmlUrl();
-					Parent root = null;
-					if (null==url) {
-						root = new Group();
-					} else {
-						root = FXMLLoader.load(url);
-					}
-					Scene scene = new Scene(root);
-
-					primary.setScene(scene);
-					primary.sizeToScene();
-					primary.show();
-					portGui().out(IGuiNotification.class).notifyReady();
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		// This gui component is ready and started.
+		portGui().out(IGuiNotification.class).notifyReady();
 	}
-	
+
 	@Override
 	public void createStage(String stageId, boolean authenticated, URL content) {
-		// TODO Auto-generated method stub
-		
+		Platform.runLater(() -> {
+			primary = new Stage();
+			primary.setTitle(stageId);
+
+			TechSession session = new TechSession("desktopSession", new TechUserDetails(System.getProperty("user.name")));
+			GuiEventSignature signature = new GuiEventSignature(stageId, null, null,  "IGuiNotification.notifyStageCreated");
+			Map<String, Object> eventData = new HashMap<>();
+			GuiEvent event = new GuiEvent(session, signature, eventData);
+			portGui().out(IGuiNotification.class).notifyEventOccured(event);
+		});
 	}
+
 	@Override
 	public void createScene(String stageId, String sceneId, URL content) {
-		// TODO Auto-generated method stub
-		
+		Platform.runLater(() -> {
+			try {
+
+				Parent root = null;
+				if (null == content) {
+					root = new Group();
+				} else {
+					root = FXMLLoader.load(content);
+				}
+				Scene scene = new Scene(root);
+
+				primary.setScene(scene);
+				primary.sizeToScene();
+
+				primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev)->{
+					TechSession session = new TechSession("desktopSession", new TechUserDetails(System.getProperty("user.name")));
+					GuiEventSignature signature = new GuiEventSignature(stageId, null, null, "IGuiNotification.notifySceneLoaded");
+					Map<String, Object> eventData = new HashMap<>();
+					GuiEvent event = new GuiEvent(session, signature, eventData);
+					portGui().out(IGuiNotification.class).notifyEventOccured(event);	
+				});
+
+				
+				primary.show();
+			
+			} catch (Throwable t) {
+				logger.log(LogLevel.ERROR, "Failed to create Scene "+sceneId,t);
+			}
+		});
 	}
 
 	@Override
 	public void requestRecieveEvent(TechSession session, String sceneId, String elementId, String eventType) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type, String attributes, Object content) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void clearElement(TechSession session, String sceneId, String elementId) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void switchTo(TechSession session, String stageId, String sceneId) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
 
 	@Override
 	public void setText(TechSession session, String sceneId, String id, String text) {
-		Node n = this.primary.getScene().lookup("#"+id);
+		Node n = this.primary.getScene().lookup("#" + id);
 		if (n instanceof TextInputControl) {
-			((TextInputControl)n).setText(text);
+			((TextInputControl) n).setText(text);
 		} else if (n instanceof Text) {
-			((Text)n).setText(text);
+			((Text) n).setText(text);
 		}
 	}
 
 	@Override
 	public void setTitle(TechSession session, String sceneId, String text) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void addChart(TechSession session, String sceneId, String parentId, String chartId, Integer width, Integer height, String chartType,
 			String jsonChartData, String jsonChartOptions) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void addDiagram(TechSession session, String sceneId, String parentId, String diagramId, String jsonDiagramData) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	//--------- IGuiNotification ---------
 
+	// --------- IGuiNotification ---------
 
-
-
-	//--------- Ports ---------
-	@PortInstance(provides={IGuiRequest.class},requires={IGuiNotification.class})
+	// --------- Ports ---------
+	@PortInstance(provides = { IGuiRequest.class }, requires = { IGuiNotification.class })
 	IPort portGui;
+
 	public IPort portGui() {
 		return this.portGui;
 	}

@@ -16,8 +16,9 @@
 package net.akehurst.application.framework.realisation;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
 
 import net.akehurst.application.framework.common.ISignal;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
@@ -33,9 +34,11 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 		public NamedSignal(String name, ISignal signal) {
 			this.name = name;
 			this.signal = signal;
+			this.future = new FutureTask<Void>(()->signal.execute(), null);
 		}
 		String name;
 		ISignal signal;
+		FutureTask<Void> future;
 	}
 	
 	BlockingQueue<NamedSignal> signals;
@@ -47,7 +50,8 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 			try {
 				NamedSignal ns = this.signals.take();
 				logger.log(LogLevel.TRACE, ns.name);
-				ns.signal.execute();
+				ns.future.run();
+
 			} catch (Exception ex) {
 				ex.printStackTrace(); //TODO: make this log
 			}
@@ -55,8 +59,10 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 
 	}
 
-	protected void addToQueue(String name, ISignal signal) {
-		this.signals.add(new NamedSignal(name, signal));
+	protected Future<Void> submit(String name, ISignal signal) {
+		NamedSignal ns = new NamedSignal(name, signal);
+		this.signals.add(ns);
+		return ns.future;
 	}
 
 }
