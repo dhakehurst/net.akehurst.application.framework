@@ -33,6 +33,8 @@ import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.authentication.TechSession;
+import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
+import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
 
@@ -145,6 +147,12 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 					rc.next();
 				}), webroot, variables);
 			}
+			
+			GuiEventSignature signature = new GuiEventSignature(stageId, null, null, IGuiNotification.EVENT_STAGE_CREATED);
+			Map<String, Object> eventData = new HashMap<>();
+			GuiEvent event = new GuiEvent(null, signature, eventData );
+			portGui().out(IGuiNotification.class).notifyEventOccured(event );
+			
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

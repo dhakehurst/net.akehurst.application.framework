@@ -74,7 +74,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 			primary.setTitle(stageId);
 
 			TechSession session = new TechSession("desktopSession", new TechUserDetails(System.getProperty("user.name")));
-			GuiEventSignature signature = new GuiEventSignature(stageId, null, null,  "IGuiNotification.notifyStageCreated");
+			GuiEventSignature signature = new GuiEventSignature(stageId, null, null,  IGuiNotification.EVENT_STAGE_CREATED);
 			Map<String, Object> eventData = new HashMap<>();
 			GuiEvent event = new GuiEvent(session, signature, eventData);
 			portGui().out(IGuiNotification.class).notifyEventOccured(event);
@@ -99,7 +99,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 				primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev)->{
 					TechSession session = new TechSession("desktopSession", new TechUserDetails(System.getProperty("user.name")));
-					GuiEventSignature signature = new GuiEventSignature(stageId, null, null, "IGuiNotification.notifySceneLoaded");
+					GuiEventSignature signature = new GuiEventSignature(stageId, null, null, IGuiNotification.EVENT_SCENE_LOADED);
 					Map<String, Object> eventData = new HashMap<>();
 					GuiEvent event = new GuiEvent(session, signature, eventData);
 					portGui().out(IGuiNotification.class).notifyEventOccured(event);	
