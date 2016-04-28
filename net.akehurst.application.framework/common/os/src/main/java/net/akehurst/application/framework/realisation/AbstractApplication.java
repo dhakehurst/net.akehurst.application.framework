@@ -226,6 +226,15 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 					// TODO: support ordering of objects
 					objects.add(ao);
 				}
+				
+				ActiveObjectInstance ann2 = f.getAnnotation(ActiveObjectInstance.class);
+				if (null == ann2) {
+					// do nothing
+				} else {
+					IActiveObject ao = (IActiveObject) f.get(this);
+					// TODO: support ordering of objects
+					objects.add(ao);
+				}
 			}
 
 			for (IActiveObject ao : objects) {

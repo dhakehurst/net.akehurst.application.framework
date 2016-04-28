@@ -15,11 +15,13 @@
  */
 package net.akehurst.application.framework.technology.authentication;
 
+import net.akehurst.application.framework.common.UserSession;
+
 public interface IAuthenticatorNotification {
 
-	void notifyAuthenticationSuccess(TechSession session);
+	void notifyAuthenticationSuccess(UserSession session);
 	
-	void notifyAuthenticationFailure(TechSession session, String message);
+	void notifyAuthenticationFailure(UserSession session, String message);
 	
-	void notifyAuthenticationCleared(TechSession session);
+	void notifyAuthenticationCleared(UserSession session);
 }

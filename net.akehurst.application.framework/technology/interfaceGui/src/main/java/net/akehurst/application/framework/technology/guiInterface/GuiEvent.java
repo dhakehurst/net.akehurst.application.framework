@@ -2,18 +2,18 @@ package net.akehurst.application.framework.technology.guiInterface;
 
 import java.util.Map;
 
-import net.akehurst.application.framework.technology.authentication.TechSession;
+import net.akehurst.application.framework.common.UserSession;
 
 public class GuiEvent {
 
-	public GuiEvent(TechSession session, GuiEventSignature signature, Map<String, Object> eventData) {
+	public GuiEvent(UserSession session, GuiEventSignature signature, Map<String, Object> eventData) {
 		this.session = session;
 		this.signature = signature;
 		this.eventData = eventData;
 	}
 	
-	TechSession session;
-	public TechSession getTechSession() {
+	UserSession session;
+	public UserSession getSession() {
 		return session;
 	}
 	

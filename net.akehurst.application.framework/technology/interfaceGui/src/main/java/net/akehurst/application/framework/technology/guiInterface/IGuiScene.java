@@ -13,30 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.authentication;
+package net.akehurst.application.framework.technology.guiInterface;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+import net.akehurst.application.framework.common.IIdentifiableObject;
 
-public class TechSession extends AbstractDataType {
-	
-	public TechSession(String sessionId, TechUserDetails user) {
-		super(sessionId);
-		this.sessionId = sessionId;
-		this.user = user;
-	}
+public interface IGuiScene extends IIdentifiableObject {
 
-	String sessionId;
-	public String getId() {
-		return this.sessionId;
-	}
-	
-	TechUserDetails user;
-	public TechUserDetails getUser() {
-		return this.user;
-	}
-//	IUser getUser();
-//	
-//	<T> T get(String key);
-//	<T> T remove(String key);
-//	ISession put(String key, Object value);
+	void notifyEventOccured(GuiEvent event);
 }

@@ -18,7 +18,7 @@ package net.akehurst.application.framework.technology.gui.vertx;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.impl.UserHolder;
 import net.akehurst.application.framework.common.AbstractDataType;
-import net.akehurst.application.framework.technology.authentication.IUser;
+import net.akehurst.application.framework.common.IUser;
 
 public class UserData extends AbstractDataType implements IUser {
 

@@ -27,7 +27,7 @@ public interface IApplicationFramework {
 	<T extends IComponent> T createComponent(Class<T> class_, String id) throws ApplicationFrameworkException;
 	<T extends IActiveObject> T createActiveObject(Class<T> class_, String id) throws ApplicationFrameworkException;
 	<T> T createDatatype(Class<T> class_, Object... constructorArgs) throws ApplicationFrameworkException;
-
+	<T extends IIdentifiableObject> T createObject(Class<T> class_, String id) throws ApplicationFrameworkException;
 	
 	<T extends IService> T injectIntoService(T object) throws ApplicationFrameworkException;
 	<T extends IActiveObject> T injectIntoActiveObject(T object) throws ApplicationFrameworkException;

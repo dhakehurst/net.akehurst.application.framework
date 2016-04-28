@@ -40,8 +40,8 @@ import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 import io.vertx.ext.web.sstore.LocalSessionStore;
-import net.akehurst.application.framework.technology.authentication.TechSession;
-import net.akehurst.application.framework.technology.authentication.TechUserDetails;
+import net.akehurst.application.framework.common.UserDetails;
+import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 
 public class ClientServerComms {
@@ -70,17 +70,17 @@ public class ClientServerComms {
 
 	Map<String, Session> activeSessions;
 
-	TechSession createTechSession(Session session) {
+	UserSession createTechSession(Session session) {
 		this.activeSessions.put(session.id(), session);
-		TechUserDetails user = null;
+		UserDetails user = null;
 		UserHolder holder = session.get("__vertx.userHolder");
 		if (null != holder && null != holder.user) {
 			String n = holder.user.principal().getString("username");
-			user = new TechUserDetails(n);
+			user = new UserDetails(n);
 		} else {
 			// not authenticated, leave user as null
 		}
-		return new TechSession(session.id(), user);
+		return new UserSession(session.id(), user);
 	}
 
 	Session getSession(String sessionId) {
@@ -102,7 +102,7 @@ public class ClientServerComms {
 		void apply(T1 o1, T2 o2, T3 o3);
 	}
 
-	public void addSocksChannel(String socksRoutePath, F3<TechSession, String, JsonObject> handler) {
+	public void addSocksChannel(String socksRoutePath, F3<UserSession, String, JsonObject> handler) {
 		router.route(socksRoutePath).handler(CookieHandler.create());
 		router.route(socksRoutePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
 		router.route(socksRoutePath).handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
@@ -111,7 +111,7 @@ public class ClientServerComms {
 		router.route(socksRoutePath).handler(sockJSHandler);
 		sockJSHandler.socketHandler(ss -> {
 			this.socks.put(ss.webSession(), ss);
-			TechSession sess = this.createTechSession(ss.webSession());
+			UserSession sess = this.createTechSession(ss.webSession());
 			ss.handler(b -> {
 				String s = new String(b.getBytes());
 				System.out.println(s);
@@ -125,7 +125,7 @@ public class ClientServerComms {
 
 	Map<Session, SockJSSocket> socks;
 
-	public void send(TechSession session, String channelId, JsonObject data) {
+	public void send(UserSession session, String channelId, JsonObject data) {
 		JsonObject msg = new JsonObject();
 		msg.put("channelId", channelId);
 		msg.put("data", data);

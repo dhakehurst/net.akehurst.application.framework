@@ -15,28 +15,33 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hjson.JsonValue;
-
 import io.vertx.core.Vertx;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
-import net.akehurst.application.framework.technology.authentication.TechSession;
+import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiScene;
 import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
 import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
+import net.akehurst.application.framework.technology.guiInterface.IGuiScene;
+import net.akehurst.application.framework.technology.guiInterface.SceneIdentity;
+import net.akehurst.application.framework.technology.guiInterface.StageIdentity;
+import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 
 public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAuthenticatorRequest {
 
@@ -44,6 +49,9 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		super(objectId);
 	}
 
+	@ServiceReference
+	ILogger logger;
+	
 	@ConfiguredValue(defaultValue = "")
 	String rootPath;
 
@@ -83,6 +91,9 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	IpPort port;
 
 	AVerticle verticle;
+	
+	Map<SceneIdentity, IGuiScene> scenes;
+	
 
 	@Override
 	public void afConnectParts() {
@@ -97,19 +108,21 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 
 	// --------- IAuthenticatorRequest ---------
 	@Override
-	public void requestLogin(TechSession session, String username, String password) {
+	public void requestLogin(UserSession session, String username, String password) {
 		this.verticle.requestLogin(session, username, password);
 	}
 
 	@Override
-	public void requestLogout(TechSession session) {
+	public void requestLogout(UserSession session) {
 		this.verticle.requestLogout(session);
 	}
 
 	// --------- IGuiRequest ---------
 	@Override
-	public void requestRecieveEvent(TechSession session, String sceneId, String elementId, String eventType) {
+	public void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String eventType) {
 		JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 		data.put("elementId", elementId);
 		data.put("eventType", eventType);
 
@@ -118,7 +131,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
-	public void createStage(String stageId, boolean authenticated, URL contentRoot) {
+	public void createStage(StageIdentity stageId, boolean authenticated, URL contentRoot) {
 		try {
 			Map<String, String> variables = new HashMap<>();
 			variables.put("rootPath", this.rootPath);
@@ -129,7 +142,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 				str = str.substring(0, str.length() - 1);
 			}
 			String webroot = str.substring(str.lastIndexOf('/') + 1);
-			String routePath = this.rootPath + stageId;
+			String routePath = this.rootPath + stageId.asPrimitive();
 			if (authenticated) {
 				this.verticle.addAuthenticatedRoute(routePath, (rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
@@ -159,30 +172,45 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
-	public void createScene(String stageId, String sceneId, URL content) {
-		// TODO Auto-generated method stub
+	public <T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content) {
+		T sceneObj = createGuiScene(sceneClass, afId() + "." + sceneId.asPrimitive(), stageId, sceneId);
 
+		((VertxGuiScene)Proxy.getInvocationHandler(sceneObj)).setGuiRequest(this);
+		
+		return sceneObj;
+	}
+	
+	<T extends IGuiScene> T createGuiScene(Class<T> sceneClass, String afId,StageIdentity stageId, SceneIdentity sceneId) {
+		ClassLoader loader = this.getClass().getClassLoader();
+		Class<?>[] interfaces = new Class<?>[] { sceneClass };
+		InvocationHandler h = new VertxGuiScene(afId, stageId, sceneId);
+		Object proxy = Proxy.newProxyInstance(loader, interfaces, h);
+		return (T) proxy;
 	}
 
 	@Override
-	public void switchTo(TechSession session, String stageId, String sceneId) {
+	public void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId) {
 		JsonObject data = new JsonObject();
-		data.put("stageId", this.rootPath + stageId);
-		data.put("sceneId", sceneId);
+		data.put("stageId", this.rootPath + stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 
 		this.verticle.comms.send(session, "Gui.switchToScene", data);
 	}
 
 	@Override
-	public void setTitle(TechSession session, String sceneId, String value) {
+	public void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String value) {
 		JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 		data.put("value", value);
 		this.verticle.comms.send(session, "Gui.setTitle", data);
 	}
 
 	@Override
-	public void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type) {
+	public void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type) {
 		JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 		data.put("parentId", parentId);
 		data.put("newElementId", newElementId);
 		data.put("type", type);
@@ -192,8 +220,10 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	};
 
 	@Override
-	public void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type, String attributes, Object content) {
+	public void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type, String attributes, Object content) {
 		JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 		data.put("parentId", parentId);
 		data.put("newElementId", newElementId);
 		data.put("type", type);
@@ -206,16 +236,20 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
-	public void clearElement(TechSession session, String sceneId, String elementId) {
+	public void clearElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId) {
 		JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 		data.put("elementId", elementId);
 
 		this.verticle.comms.send(session, "Gui.clearElement", data);
 	}
 
 	@Override
-	public void setText(TechSession session, String sceneId, String id, String value) {
+	public void setText(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String value) {
 		JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 		data.put("id", id);
 		data.put("value", value);
 
@@ -223,9 +257,11 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
-	public void addChart(TechSession session, String sceneId, String parentId, String chartId, Integer width, Integer height, String chartType,
+	public void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, Integer width, Integer height, String chartType,
 			String jsonChartData, String jsonChartOptions) {
 		JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 		data.put("parentId", parentId);
 		data.put("chartId", chartId);
 		data.put("width", width);
@@ -243,8 +279,10 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
-	public void addDiagram(TechSession session, String sceneId, String parentId, String diagramId, String jsonDiagramData) {
+	public void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String diagramId, String jsonDiagramData) {
 		JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
 		data.put("parentId", parentId);
 		data.put("diagramId", diagramId);
 		JsonObject ddata = new JsonObject(jsonDiagramData);
@@ -254,7 +292,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	// TODO: deal with buttons
-	public void createModal(TechSession ts, String sceneId, String parentId, String modalId, String title, String modalContent) {
+	public void createModal(UserSession ts, StageIdentity stageId, SceneIdentity sceneId, String parentId, String modalId, String title, String modalContent) {
 		String content = "";
 		content += "<div id='" + modalId + "' class='modal fade' role='dialog'>";
 		content += "  <div class='modal-dialog'>";
@@ -271,7 +309,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		content += "      </div>";
 		content += "    </fieldset>";
 		content += "  </div>";
-		this.addElement(ts, sceneId, parentId, modalId, "div", "{'class':'modal fade','role':'dialog'}", content);
+		this.addElement(ts, stageId, sceneId, parentId, modalId, "div", "{'class':'modal fade','role':'dialog'}", content);
 	}
 
 	// --------- Ports ---------

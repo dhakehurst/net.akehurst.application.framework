@@ -17,6 +17,7 @@ package net.akehurst.application.framework.engineering.authenticator2Gui;
 
 
 import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorSession;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorUserDetails;
@@ -25,7 +26,7 @@ import net.akehurst.application.framework.computational.interfaceAuthenticator.I
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
-import net.akehurst.application.framework.technology.authentication.TechSession;
+
 
 public class AuthenticatorToGui extends AbstractComponent implements ICAuthenticatorRequest, IAuthenticatorNotification {
 
@@ -44,31 +45,31 @@ public class AuthenticatorToGui extends AbstractComponent implements ICAuthentic
 	// --------- ICAuthenticatorRequest ---------
 	@Override
 	public void requestLogin(AuthenticatorSession session, String username, String password) {
-		TechSession ts = new TechSession(session.getId(), null);
+		UserSession ts = new UserSession(session.getId(), null);
 		portGui().out(IAuthenticatorRequest.class).requestLogin(ts, username, password);
 	}
 	
 	@Override
 	public void requestLogout(AuthenticatorSession session) {
-		TechSession ts = new TechSession(session.getId(), null);
+		UserSession ts = new UserSession(session.getId(), null);
 		portGui().out(IAuthenticatorRequest.class).requestLogout(ts);
 	}
 	
 	// --------- IAuthenticatorNotification ---------
 	@Override
-	public void notifyAuthenticationFailure(TechSession session, String message) {
+	public void notifyAuthenticationFailure(UserSession session, String message) {
 		AuthenticatorSession as = new AuthenticatorSession(session.getId(), null);
 		portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationFailure(as, message);
 	}
 	
 	@Override
-	public void notifyAuthenticationSuccess(TechSession session) {
+	public void notifyAuthenticationSuccess(UserSession session) {
 		AuthenticatorSession as = new AuthenticatorSession(session.getId(), new AuthenticatorUserDetails(session.getUser().getName()));
 		portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationSuccess(as);
 	}
 	
 	@Override
-	public void notifyAuthenticationCleared(TechSession session) {
+	public void notifyAuthenticationCleared(UserSession session) {
 		AuthenticatorSession as = new AuthenticatorSession(session.getId(), null);
 		portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationCleared(as);
 	}

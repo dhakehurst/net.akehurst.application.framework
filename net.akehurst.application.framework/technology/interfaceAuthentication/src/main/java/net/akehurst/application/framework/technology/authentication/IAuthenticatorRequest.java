@@ -15,11 +15,13 @@
  */
 package net.akehurst.application.framework.technology.authentication;
 
+import net.akehurst.application.framework.common.UserSession;
+
 public interface IAuthenticatorRequest {
 
-	void requestLogin(TechSession session, String username, String password);
+	void requestLogin(UserSession session, String username, String password);
 	
-	void requestLogout(TechSession session);
+	void requestLogout(UserSession session);
 	
 
 }

@@ -49,14 +49,17 @@ import io.vertx.ext.web.handler.impl.UserHolder;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 import io.vertx.ext.web.sstore.LocalSessionStore;
+import net.akehurst.application.framework.common.IUser;
+import net.akehurst.application.framework.common.UserDetails;
+import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
-import net.akehurst.application.framework.technology.authentication.IUser;
-import net.akehurst.application.framework.technology.authentication.TechSession;
-import net.akehurst.application.framework.technology.authentication.TechUserDetails;
 import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
 import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
 import net.akehurst.application.framework.technology.guiInterface.IGuiCallback;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
+import net.akehurst.application.framework.technology.guiInterface.SceneIdentity;
+import net.akehurst.application.framework.technology.guiInterface.StageIdentity;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class AVerticle implements Verticle {
 
@@ -74,12 +77,14 @@ public class AVerticle implements Verticle {
 		String sockjsCommsPath = stagePath+ws.getSockjsPath()+"/*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
 			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-				String stageId = data.getString("stageId");
-				String sceneId = data.getString("sceneId");
+				String stageIdStr = data.getString("stageId");
+				stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
+				StageIdentity stageId = new StageIdentity( stageIdStr );
+				SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId") );
 				String eventType = data.getString("eventType");
 				String elementId = data.getString("elementId");
 				Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-				stageId = stageId.replace(this.ws.rootPath, "");
+				
 				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured( new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
 			} else {
 				// ??
@@ -94,6 +99,7 @@ public class AVerticle implements Verticle {
 		router.route(routePath).handler(requestHandler);
 		router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
 
+		ws.logger.log(LogLevel.INFO, "Public path:  "+"http://localhost:"+this.port+stagePath);
 	}
 
 	void addAuthenticatedRoute(String stagePath, Handler<RoutingContext> requestHandler, String webroot, Map<String,String> variables) {
@@ -102,12 +108,13 @@ public class AVerticle implements Verticle {
 		String sockjsCommsPath = stagePath+ws.getSockjsPath()+"/*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
 			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-				String stageId = data.getString("stageId");
-				String sceneId = data.getString("sceneId");
+				String stageIdStr = data.getString("stageId");
+				stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
+				StageIdentity stageId = new StageIdentity( stageIdStr );
+				SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId") );
 				String eventType = data.getString("eventType");
 				String elementId = data.getString("elementId");
 				Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-				stageId = stageId.replace(this.ws.rootPath, "");
 				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured( new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
 			} else {
 				// ??
@@ -122,6 +129,8 @@ public class AVerticle implements Verticle {
 		router.route(routePath).handler(this.authHandler);// BasicAuthHandler.create(authProvider, "Please Provide Valid Credentials" ));
 		router.route(routePath).handler(requestHandler);// ;
 		router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
+
+		ws.logger.log(LogLevel.INFO, "Protected path:  "+"http://localhost:"+this.port+stagePath);
 	}
 
 	void addPostRoute(String routePath, Handler<RoutingContext> requestHandler) {
@@ -148,15 +157,15 @@ public class AVerticle implements Verticle {
 		}
 	}
 
-	TechSession createTechSession(Session webSession) {
-		TechSession unknown = new TechSession("none", new TechUserDetails("<unknown>"));
+	UserSession createTechSession(Session webSession) {
+		UserSession unknown = new UserSession("none", new UserDetails("<unknown>"));
 		if (null == webSession) {
 			return unknown;
 		} else {
 			UserHolder holder = webSession.get("__vertx.userHolder");
 			if (holder != null && holder.user !=null) {
 				String username = holder.user.principal().getString("username");
-				TechSession ts = new TechSession(webSession.id(), new TechUserDetails(username));
+				UserSession ts = new UserSession(webSession.id(), new UserDetails(username));
 				return ts;
 			} else {
 				return unknown;
@@ -166,7 +175,7 @@ public class AVerticle implements Verticle {
 	}
 
 	// should maybe move the authentication into its own ?Authenticator class
-	public void requestLogin(TechSession techSession, String username, String password) {
+	public void requestLogin(UserSession techSession, String username, String password) {
 		Session session = this.getSession(techSession.getId());
 		JsonObject authInfo = new JsonObject();
 		authInfo.put("username", username);
@@ -184,7 +193,7 @@ public class AVerticle implements Verticle {
 					holder.user = u;
 					session.put("__vertx.userHolder", holder);
 				}
-				TechSession newTs = new TechSession(techSession.getId(), new TechUserDetails(u.principal().getString("username")));
+				UserSession newTs = new UserSession(techSession.getId(), new UserDetails(u.principal().getString("username")));
 				this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationSuccess(newTs);
 			} else {
 				this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationFailure(techSession, "Authentication Failed");
@@ -192,7 +201,7 @@ public class AVerticle implements Verticle {
 		});
 	}
 
-	public void requestLogout(TechSession techSession) {
+	public void requestLogout(UserSession techSession) {
 		Session session = this.getSession(techSession.getId());
 		session.put("__vertx.userHolder", null);
 		this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationCleared(techSession);
@@ -252,6 +261,7 @@ public class AVerticle implements Verticle {
 		router.route(ws.getTestPath()).handler(rc -> {
 			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
 		});
+		ws.logger.log(LogLevel.INFO, "Test path:  "+"http://localhost:"+this.port+ws.getTestPath());
 
 		router.route(ws.getJsPath()+"/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
 
@@ -275,14 +285,17 @@ public class AVerticle implements Verticle {
 
 			rc.response().putHeader("content-type", "download");
 		});
-
+		ws.logger.log(LogLevel.INFO, "Download path:  "+"http://localhost:"+this.port+ws.getDownloadPath());
+		
 		this.addPostRoute(ws.getUploadPath(), rc -> {
 			FileUpload fu = rc.fileUploads().iterator().next();
 
 			ws.portGui().out(IGuiNotification.class).notifyUpload(createTechSession(rc.session()), fu.uploadedFileName());
 
 		});
-
+		ws.logger.log(LogLevel.INFO, "Upload path:  "+"http://localhost:"+this.port+ws.getUploadPath());
+		
+		
 		HttpServer server = vertx.createHttpServer();
 		server.requestHandler(router::accept).listen(this.port);
 

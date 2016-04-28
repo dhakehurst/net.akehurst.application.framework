@@ -15,6 +15,8 @@
  */
 package net.akehurst.application.framework.computational.interfaceUser.authentication;
 
+import net.akehurst.application.framework.common.UserSession;
+
 public interface IUserAuthenticationRequest {
 
 	void requestLogin(UserSession session, String username, String password);

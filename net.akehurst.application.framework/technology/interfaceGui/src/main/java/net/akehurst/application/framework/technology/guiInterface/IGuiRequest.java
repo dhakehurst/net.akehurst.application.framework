@@ -17,37 +17,41 @@ package net.akehurst.application.framework.technology.guiInterface;
 
 import java.net.URL;
 
-import net.akehurst.application.framework.technology.authentication.TechSession;
+import net.akehurst.application.framework.common.IIdentifiableObject;
+import net.akehurst.application.framework.common.UserSession;
 
 public interface IGuiRequest {
 
-	void createStage(String stageId, boolean authenticated, URL content);
-	
-	void createScene(String stageId, String sceneId, URL content);
-	
+	void createStage(StageIdentity stageId, boolean authenticated, URL content);
+
+	<T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content);
+
 	// per user
-	void switchTo(TechSession session, String stageId, String sceneId);
-	
-	void requestRecieveEvent(TechSession session, String sceneId, String elementId, String eventType);
-	
-	void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type);
-	
+	void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId);
+
+	void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String eventType);
+
+	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type);
+
 	/**
 	 * 
 	 * @param parentId
 	 * @param newElementId
 	 * @param type
-	 * @param attributes as a JSON string, using single quotes, e.g. "{ 'xxx':2, 'aa':'bb' }"
+	 * @param attributes
+	 *            as a JSON string, using single quotes, e.g. "{ 'xxx':2, 'aa':'bb' }"
 	 * @param content
 	 */
-	void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type, String attributes, Object content);
-	
-	void clearElement(TechSession session, String sceneId, String elementId);
-	
-	void setTitle(TechSession session, String sceneId, String text);
-	void setText(TechSession session, String sceneId, String id, String text);
-		
-	void addChart(TechSession session, String sceneId, String parentId, String chartId, Integer width, Integer height, String chartType, String jsonChartData, String jsonChartOptions);
+	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type, String attributes, Object content);
 
-	void addDiagram(TechSession session, String sceneId, String parentId, String diagramId, String jsonDiagramData);
+	void clearElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
+
+	void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String text);
+
+	void setText(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
+
+	void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, Integer width, Integer height, String chartType, String jsonChartData,
+			String jsonChartOptions);
+
+	void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String diagramId, String jsonDiagramData);
 }

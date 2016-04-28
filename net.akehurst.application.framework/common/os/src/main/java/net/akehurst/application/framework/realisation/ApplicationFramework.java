@@ -108,7 +108,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	// --------- IApplicationFramework ---------
 
-	<T extends IIdentifiableObject> T createObject(Class<T> class_, String id) throws ApplicationFrameworkException {
+	public <T extends IIdentifiableObject> T createObject(Class<T> class_, String id) throws ApplicationFrameworkException {
 		try {
 			BetterMethodFinder bmf = new BetterMethodFinder(class_);
 			Constructor<T> cons = bmf.findConstructor(String.class);
@@ -302,18 +302,18 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	}
 
 	Object getOptionValue(String argumentName) {
-		int i = argumentName.indexOf('.');
-		if (i > 0) {
-			argumentName = argumentName.substring(i + 1);
-		}
+//		int i = argumentName.indexOf('.');
+//		if (i > 0) {
+//			argumentName = argumentName.substring(i + 1);
+//		}
 		return this.commandLine.getOptionValue(argumentName);
 	}
 
 	boolean hasOption(String argumentName) {
-		int i = argumentName.indexOf('.');
-		if (i > 0) {
-			argumentName = argumentName.substring(i + 1);
-		}
+//		int i = argumentName.indexOf('.');
+//		if (i > 0) {
+//			argumentName = argumentName.substring(i + 1);
+//		}
 		return this.commandLine.hasOption(argumentName);
 	}
 
@@ -522,7 +522,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 					//remove the 'application.' first bit of the path
 					idPath = idPath.substring(idPath.indexOf('.')+1);
 					
-					Object argValue = this.getOptionValue(name); //
+					Object argValue = this.getOptionValue(idPath); //
 					if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
 						argValue = this.hasOption(name);
 					}

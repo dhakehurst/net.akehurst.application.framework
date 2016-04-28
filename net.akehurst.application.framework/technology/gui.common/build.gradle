@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.guiInterface;
-
-public interface IScene {
-
-	String getId();
+ 
+dependencies {
+	compile project(":${rootProject.name}.common.os")
 	
+	compile project(':net.akehurst.application.framework.technology.interfaceGui')
+
 }

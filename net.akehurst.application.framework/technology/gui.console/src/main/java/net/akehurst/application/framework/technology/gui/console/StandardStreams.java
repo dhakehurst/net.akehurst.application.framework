@@ -1,6 +1,8 @@
 package net.akehurst.application.framework.technology.gui.console;
 
 import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.UserDetails;
+import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.common.annotations.declaration.Component;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.realisation.AbstractComponent;
@@ -16,7 +18,8 @@ public class StandardStreams extends AbstractComponent implements IConsoleReques
 
 	@Override
 	public void afRun() {
-		portOutput().out(IConsoleNotification.class).notifyReady();
+		UserSession session = new UserSession(null, new UserDetails(System.getProperty("user.name")));
+		portOutput().out(IConsoleNotification.class).notifyReady(session);
 	}
 	
 	@Override

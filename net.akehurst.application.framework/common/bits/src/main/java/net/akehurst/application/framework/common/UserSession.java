@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.computational.interfaceUser.authentication;
-
-import net.akehurst.application.framework.common.AbstractDataType;
+package net.akehurst.application.framework.common;
 
 public class UserSession extends AbstractDataType {
 

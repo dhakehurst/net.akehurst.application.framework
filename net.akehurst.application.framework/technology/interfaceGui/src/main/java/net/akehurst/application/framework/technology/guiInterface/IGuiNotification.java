@@ -15,8 +15,7 @@
  */
 package net.akehurst.application.framework.technology.guiInterface;
 
-import net.akehurst.application.framework.technology.authentication.TechSession;
-
+import net.akehurst.application.framework.common.UserSession;
 
 public interface IGuiNotification {
 
@@ -27,7 +26,7 @@ public interface IGuiNotification {
 		
 	void notifyEventOccured(GuiEvent event);
 	
-	void notifyDowloadRequest(TechSession session, String filename, IGuiCallback callback);
+	void notifyDowloadRequest(UserSession session, String filename, IGuiCallback callback);
 
-	void notifyUpload(TechSession session, String filename);
+	void notifyUpload(UserSession session, String filename);
 }

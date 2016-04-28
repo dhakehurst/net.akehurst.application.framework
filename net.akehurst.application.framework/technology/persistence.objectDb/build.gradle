@@ -24,6 +24,6 @@ dependencies {
 	compile project(":${rootProject.name}.technology.interfacePersistence")
 //	compile 'javax.persistence:persistence-api:1.0.2'
 	compile 'org.eclipse.persistence:javax.persistence:2.1.0'
-	compile 'com.objectdb:objectdb:2.6.6_08'
+	compile 'com.objectdb:objectdb:2.6.6'
 	compile 'javax.transaction:jta:1.1'
 }

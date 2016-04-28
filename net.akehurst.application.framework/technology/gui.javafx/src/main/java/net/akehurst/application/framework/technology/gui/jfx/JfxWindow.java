@@ -15,6 +15,9 @@
  */
 package net.akehurst.application.framework.technology.gui.jfx;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -22,6 +25,7 @@ import java.util.Map;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -32,27 +36,38 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import net.akehurst.application.framework.common.ApplicationFrameworkException;
+import net.akehurst.application.framework.common.IApplicationFramework;
+import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.UserDetails;
+import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.realisation.AbstractComponent;
-import net.akehurst.application.framework.technology.authentication.TechSession;
-import net.akehurst.application.framework.technology.authentication.TechUserDetails;
+import net.akehurst.application.framework.realisation.ApplicationFramework;
+import net.akehurst.application.framework.technology.gui.jfx.elements.JfxGuiScene;
 import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
 import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
 import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
+import net.akehurst.application.framework.technology.guiInterface.IGuiScene;
+import net.akehurst.application.framework.technology.guiInterface.SceneIdentity;
+import net.akehurst.application.framework.technology.guiInterface.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	public JfxWindow(String objectId) {
 		super(objectId);
+		this.stages = new HashMap<>();
 	}
 
-	Stage primary;
-	// Canvas canvas;
-	// GraphicsContext gc;
+	@ServiceReference
+	IApplicationFramework af;
+
+	Map<StageIdentity,Stage> stages;
 
 	@Override
 	public void afConnectParts() {
@@ -68,13 +83,14 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void createStage(String stageId, boolean authenticated, URL content) {
+	public void createStage(StageIdentity stageId, boolean authenticated, URL content) {
 		Platform.runLater(() -> {
-			primary = new Stage();
-			primary.setTitle(stageId);
-
-			TechSession session = new TechSession("desktopSession", new TechUserDetails(System.getProperty("user.name")));
-			GuiEventSignature signature = new GuiEventSignature(stageId, null, null,  IGuiNotification.EVENT_STAGE_CREATED);
+			Stage primary = new Stage();
+			primary.setTitle(stageId.asPrimitive());
+			this.stages.put(stageId, primary);
+			
+			UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")));
+			GuiEventSignature signature = new GuiEventSignature(stageId, null, null, IGuiNotification.EVENT_STAGE_CREATED);
 			Map<String, Object> eventData = new HashMap<>();
 			GuiEvent event = new GuiEvent(session, signature, eventData);
 			portGui().out(IGuiNotification.class).notifyEventOccured(event);
@@ -82,71 +98,105 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void createScene(String stageId, String sceneId, URL content) {
+	public <T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content) {
+		// try {
+		// T sceneObj = af.createObject(sceneClass, afId() + "." + sceneId);
+		T sceneObj = createGuiScene(sceneClass, afId() + "." + sceneId.asPrimitive());
+		Parent root = null;
+		try {
+			
+			if (null == content) {
+				root = new Group();
+			} else {
+
+				FXMLLoader fxmlLoader = new FXMLLoader(content);
+				// fxmlLoader.setRoot(sceneObj);
+				fxmlLoader.setController(sceneObj);
+				fxmlLoader.load();
+				root = fxmlLoader.getRoot();
+			}
+		} catch (Throwable t) {
+			logger.log(LogLevel.ERROR, "Failed to create Scene " + sceneId.asPrimitive(), t);
+		}
+		((JfxGuiScene)Proxy.getInvocationHandler(sceneObj)).setRoot(root);
+		
+		
+		Parent finalRoot = root;
 		Platform.runLater(() -> {
 			try {
-
-				Parent root = null;
-				if (null == content) {
-					root = new Group();
-				} else {
-					root = FXMLLoader.load(content);
-				}
-				Scene scene = new Scene(root);
-
+				Scene scene = new Scene(finalRoot);
+				Stage primary = this.stages.get(stageId);
 				primary.setScene(scene);
 				primary.sizeToScene();
 
-				primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev)->{
-					TechSession session = new TechSession("desktopSession", new TechUserDetails(System.getProperty("user.name")));
-					GuiEventSignature signature = new GuiEventSignature(stageId, null, null, IGuiNotification.EVENT_SCENE_LOADED);
+				primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev) -> {
+					UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")));
+					GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, IGuiNotification.EVENT_SCENE_LOADED);
 					Map<String, Object> eventData = new HashMap<>();
 					GuiEvent event = new GuiEvent(session, signature, eventData);
-					portGui().out(IGuiNotification.class).notifyEventOccured(event);	
+					portGui().out(IGuiNotification.class).notifyEventOccured(event);
 				});
 
-				
 				primary.show();
-			
+
 			} catch (Throwable t) {
-				logger.log(LogLevel.ERROR, "Failed to create Scene "+sceneId,t);
+				logger.log(LogLevel.ERROR, "Failed to create Scene " + sceneId.asPrimitive(), t);
 			}
 		});
+		return sceneObj;
+	}
+
+	<T extends IGuiScene> T createGuiScene(Class<T> sceneClass, String afId) {
+		ClassLoader loader = this.getClass().getClassLoader();
+		Class<?>[] interfaces = new Class<?>[] { sceneClass };
+		InvocationHandler h = new JfxGuiScene(afId);
+		Object proxy = Proxy.newProxyInstance(loader, interfaces, h);
+		return (T) proxy;
 	}
 
 	@Override
-	public void requestRecieveEvent(TechSession session, String sceneId, String elementId, String eventType) {
+	public void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String eventType) {
+		// Platform.runLater(() -> {
+		// Node n = this.primary.getScene().lookup("#" + elementId);
+		// EventType<Event> eventType;
+		// n.addEventHandler(eventType, (ev)->{
+		// GuiEventSignature signature = new GuiEventSignature(stageId, null, null, IGuiNotification.EVENT_SCENE_LOADED);
+		// Map<String, Object> eventData = new HashMap<>();
+		// GuiEvent event = new GuiEvent(session, signature, eventData);
+		// portGui().out(IGuiNotification.class).notifyEventOccured(event);
+		// });
+		// });
+
+	}
+
+	@Override
+	public void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type) {
+	public void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type, String attributes, Object content) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void addElement(TechSession session, String sceneId, String parentId, String newElementId, String type, String attributes, Object content) {
+	public void clearElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId) {
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	@Override
-	public void clearElement(TechSession session, String sceneId, String elementId) {
+	public void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
-	public void switchTo(TechSession session, String stageId, String sceneId) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setText(TechSession session, String sceneId, String id, String text) {
-		Node n = this.primary.getScene().lookup("#" + id);
+	public void setText(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text) {
+		Stage primary = this.stages.get(stageId);
+		Node n = primary.getScene().lookup("#" + id);
 		if (n instanceof TextInputControl) {
 			((TextInputControl) n).setText(text);
 		} else if (n instanceof Text) {
@@ -155,20 +205,20 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void setTitle(TechSession session, String sceneId, String text) {
+	public void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String text) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void addChart(TechSession session, String sceneId, String parentId, String chartId, Integer width, Integer height, String chartType,
+	public void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, Integer width, Integer height, String chartType,
 			String jsonChartData, String jsonChartOptions) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void addDiagram(TechSession session, String sceneId, String parentId, String diagramId, String jsonDiagramData) {
+	public void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String diagramId, String jsonDiagramData) {
 		// TODO Auto-generated method stub
 
 	}

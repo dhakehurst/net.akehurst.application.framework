@@ -34,7 +34,13 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 		public NamedSignal(String name, ISignal signal) {
 			this.name = name;
 			this.signal = signal;
-			this.future = new FutureTask<Void>(()->signal.execute(), null);
+			this.future = new FutureTask<Void>(()->{
+				try {
+					signal.execute();
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}, null);
 		}
 		String name;
 		ISignal signal;
@@ -52,7 +58,7 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 				logger.log(LogLevel.TRACE, ns.name);
 				ns.future.run();
 
-			} catch (Exception ex) {
+			} catch (Throwable ex) {
 				ex.printStackTrace(); //TODO: make this log
 			}
 		}

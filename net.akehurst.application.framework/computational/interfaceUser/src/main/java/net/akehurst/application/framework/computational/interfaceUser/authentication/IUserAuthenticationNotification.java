@@ -15,6 +15,8 @@
  */
 package net.akehurst.application.framework.computational.interfaceUser.authentication;
 
+import net.akehurst.application.framework.common.UserSession;
+
 public interface IUserAuthenticationNotification {
 	void notifyAuthenticationSuccess(UserSession session);
 	

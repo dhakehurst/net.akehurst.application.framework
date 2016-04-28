@@ -30,7 +30,10 @@ subprojects {
 
 
 	group 'net.akehurst.application.framework'
-	version '1.0.alpha.11'
+	version '1.0.alpha.12'
+
+	sourceCompatibility = '1.8'
+	targetCompatibility = '1.8'
 
 	task sourceJar(type: Jar) {
 	    from sourceSets.main.allJava

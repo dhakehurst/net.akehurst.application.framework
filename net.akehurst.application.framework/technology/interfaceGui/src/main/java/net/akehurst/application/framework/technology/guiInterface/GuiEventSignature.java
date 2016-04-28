@@ -4,7 +4,7 @@ import net.akehurst.application.framework.common.AbstractDataType;
 
 public class GuiEventSignature extends AbstractDataType {
 
-	public GuiEventSignature(String stageId, String sceneId, String elementId, String eventType) {
+	public GuiEventSignature(StageIdentity stageId, SceneIdentity sceneId, String elementId, String eventType) {
 		super(stageId, sceneId, elementId, eventType);
 		this.stageId = stageId;
 		this.sceneId = sceneId;
@@ -12,13 +12,13 @@ public class GuiEventSignature extends AbstractDataType {
 		this.eventType = eventType;
 	}
 
-	String stageId;
-	public String getStageId() {
+	StageIdentity stageId;
+	public StageIdentity getStageId() {
 		return this.stageId;
 	}
 	
-	String sceneId;
-	public String getSceneId() {
+	SceneIdentity sceneId;
+	public SceneIdentity getSceneId() {
 		return this.sceneId;
 	}
 	
