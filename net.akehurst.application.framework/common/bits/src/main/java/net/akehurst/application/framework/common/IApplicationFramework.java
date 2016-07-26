@@ -18,8 +18,8 @@ package net.akehurst.application.framework.common;
 public interface IApplicationFramework {
 
 	<T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws ApplicationFrameworkException;
-	void defineCommandLineArgument(String groupName, boolean required, String argumentName, boolean hasValue, String description);
-	void setCommandLine(String[] args);
+//	void defineCommandLineArgument(String[] groupNames, boolean required, String argumentName, boolean hasValue, String description);
+//	void setCommandLine(String[] args);
 	void outputCommandLineHelp();
 	
 	

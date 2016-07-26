@@ -58,7 +58,7 @@ import net.akehurst.application.framework.technology.interfacePersistence.IPersi
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
-import sun.misc.IOUtils;
+//import sun.misc.IOUtils;
 
 public class JdoPersistence extends AbstractComponent implements IPersistentStore {
 
@@ -104,41 +104,41 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	DynClassloader cl;
 
 	<T> Class<? extends Persistable> fetchEnhanced(Class<T> class_) {
-		String enhancedName = class_.getName(); // has to match for transform to work
-		try {
-			Class<?> enhCls = null;
-			try {
-				enhCls = new DynClassloader(cl).loadClass(enhancedName);
-			} catch (ClassNotFoundException e) {
-			}
-			if (null != enhCls && Persistable.class.isAssignableFrom(enhCls)) {
-				return (Class<? extends Persistable>) enhCls;
-			} else {
-
-				DataNucleusClassFileTransformer t = new DataNucleusClassFileTransformer("-api=JDO", null);
-				ProtectionDomain protectionDomain = class_.getProtectionDomain();
-				InputStream is = class_.getClassLoader().getResourceAsStream(class_.getName().replace(".", "/") + ".class");
-				byte[] classfileBuffer = IOUtils.readFully(is, -1, true);
-
-				byte[] bytes = t.transform(new DynClassloader(cl), class_.getName(), null, protectionDomain, classfileBuffer);
-				Class<? extends Persistable> res = (Class<? extends Persistable>) cl.defineClass(enhancedName, bytes);
-
-				for (Field f : class_.getFields()) {
-					if (null != f.getAnnotation(Persistent.class)) {
-						if (null != f.getType().getAnnotation(PersistenceCapable.class)) {
-							fetchEnhanced(f.getType());
-						}
-					} else if (null != f.getAnnotation(Join.class)) {
-
-					}
-				}
-
-				return (Class<? extends Persistable>) new DynClassloader(cl).loadClass(enhancedName);
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		String enhancedName = class_.getName(); // has to match for transform to work
+//		try {
+//			Class<?> enhCls = null;
+//			try {
+//				enhCls = new DynClassloader(cl).loadClass(enhancedName);
+//			} catch (ClassNotFoundException e) {
+//			}
+//			if (null != enhCls && Persistable.class.isAssignableFrom(enhCls)) {
+//				return (Class<? extends Persistable>) enhCls;
+//			} else {
+//
+//				DataNucleusClassFileTransformer t = new DataNucleusClassFileTransformer("-api=JDO", null);
+//				ProtectionDomain protectionDomain = class_.getProtectionDomain();
+//				InputStream is = class_.getClassLoader().getResourceAsStream(class_.getName().replace(".", "/") + ".class");
+//				byte[] classfileBuffer = IOUtils.readFully(is, -1, true);
+//
+//				byte[] bytes = t.transform(new DynClassloader(cl), class_.getName(), null, protectionDomain, classfileBuffer);
+//				Class<? extends Persistable> res = (Class<? extends Persistable>) cl.defineClass(enhancedName, bytes);
+//
+//				for (Field f : class_.getFields()) {
+//					if (null != f.getAnnotation(Persistent.class)) {
+//						if (null != f.getType().getAnnotation(PersistenceCapable.class)) {
+//							fetchEnhanced(f.getType());
+//						}
+//					} else if (null != f.getAnnotation(Join.class)) {
+//
+//					}
+//				}
+//
+//				return (Class<? extends Persistable>) new DynClassloader(cl).loadClass(enhancedName);
+//			}
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		return null;
 	}
 

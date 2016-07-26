@@ -47,6 +47,8 @@ import net.akehurst.application.framework.common.IActiveObject;
 import net.akehurst.application.framework.common.annotations.declaration.ProvidesInterfaceForPort;
 import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
+import net.akehurst.application.framework.common.annotations.instance.CommandLineGroup;
+import net.akehurst.application.framework.common.annotations.instance.CommandLineGroupContainer;
 import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
@@ -89,9 +91,12 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		this.afId = id;
 		this.services = new HashMap<>();
 		this.services.put(serviceName, this);
-		this.commandLineOptionGroups = new HashMap<>();
+		this.commandLineHandler = new CommandLineHandler();
+//		this.commandLineOptionGroups = new HashMap<>();
 	}
 
+	ICommandLineHandler commandLineHandler;
+	
 	// --------- IIdentifiable ---------
 	String afId;
 
@@ -132,8 +137,11 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			this.injectServiceReferences(appObj.getClass(), appObj);
 			this.injectParts(appObj);
 
-			appObj.defineArguments();
-			appObj.parseArguments();
+			this.defineCommandLine(appObj);
+			
+//			appObj.defineArguments();
+			this.commandLineHandler.parse(arguments);
+//			appObj.parseArguments();
 			this.injectConfigurationValues(appObj);
 			this.injectCommandLineArgs(appObj);
 
@@ -224,28 +232,68 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	@Override
-	public void defineCommandLineArgument(String groupName, boolean required, String argumentName, boolean hasValue, String description) {
-		// remove applicationName from start
-		int i = argumentName.indexOf('.');
-		if (i > 0) {
-			argumentName = argumentName.substring(i + 1);
-		}
-		Options group = this.commandLineOptionGroups.get(groupName);
-		if (null == group) {
-			group = new Options();
-			this.commandLineOptionGroups.put(groupName, group);
-		}
-
-		Option opt = Option.builder().longOpt(argumentName).desc(description).required(required).hasArg(hasValue).build();
-		group.addOption(opt);
+	private void defineCommandLine(IApplication applicationObject) {
+		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(logger());
+		
+		// Define groups
+		walker.walkAllAndApply(applicationObject, (obj, objId) -> {
+			try {
+				AnnotationNavigator an = new AnnotationNavigator(obj);
+				for(AnnotationDetailsList<CommandLineGroup> ad: an.getList(CommandLineGroupContainer.class, CommandLineGroup.class)) {
+					for(CommandLineGroup a: ad.getAnnotations())
+					this.commandLineHandler.defineGroup(a.name());
+				}
+			} catch (Throwable t) {
+				logError("Failed to check for command line groups in " + objId, t);
+			}
+		});
+		
+		// Define arguments
+		walker.walkAllAndApply(applicationObject, (obj, objId) -> {
+			try {
+				AnnotationNavigator an = new AnnotationNavigator(obj);
+				for(AnnotationDetails<CommandLineArgument> ad: an.get(CommandLineArgument.class)) {
+					String group = ad.getAnnotation().group();
+					String name = ad.getAnnotation().name();
+					if(name.isEmpty()) {
+						name = ad.getField().getName();
+					} else {
+						//use value from annotation
+					}
+					boolean required = ad.getAnnotation().required();
+					boolean hasValue = ad.getAnnotation().hasValue();
+					Object defaultValue = ad.getValue();
+					this.commandLineHandler.defineArgument(group, name, required, hasValue, defaultValue);
+				}
+			} catch (Throwable t) {
+				logError("Failed to check for command line groups in " + objId, t);
+			}
+		});
+		
 	}
+	
+//	@Override
+//	public void defineCommandLineArgument(String[] groupNames, boolean required, String argumentName, boolean hasValue, String description) {
+//		// remove applicationName from start
+//		int i = argumentName.indexOf('.');
+//		if (i > 0) {
+//			argumentName = argumentName.substring(i + 1);
+//		}
+//		Options group = this.commandLineOptionGroups.get(groupNames);
+//		if (null == group) {
+//			group = new Options();
+//			this.commandLineOptionGroups.put(groupNames, group);
+//		}
+//
+//		Option opt = Option.builder().longOpt(argumentName).desc(description).required(required).hasArg(hasValue).build();
+//		group.addOption(opt);
+//	}
 
 	public void outputCommandLineHelp() {
 		HelpFormatter formatter = new HelpFormatter();
-		for (Options opts : this.commandLineOptionGroups.values()) {
-			formatter.printHelp(100, "<application>", "", opts, "", true);
-		}
+//		for (Options opts : this.commandLineHandler.getGoups()) {
+//			formatter.printHelp(100, "<application>", "", opts, "", true);
+//		}
 	}
 
 	ILogger logger() {
@@ -268,54 +316,54 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	Map<String, Options> commandLineOptionGroups;
+//	Map<String, Options> commandLineOptionGroups;
 
-	CommandLine commandLine;
+//	CommandLine commandLine;
 
-	public void setCommandLine(String[] args) {
-		try {
-			CommandLineParser parser = new DefaultParser();
-			if (args.length < 1) {
-				this.commandLine = parser.parse(new Options(), args, true);
-				return; // nothing to parse
-			} else {
-				for (Options opts : this.commandLineOptionGroups.values()) {
-
-					this.commandLine = parser.parse(opts, args, true);
-					if (this.commandLine.getArgList().isEmpty()) {
-						// parse has succeeded
-						return;
-					} else {
-						// try next OptionGroup
-					}
-				}
-				// all OptionGroups failed to parse
-				this.outputCommandLineHelp();
-				System.exit(1);
-			}
-		} catch (MissingOptionException ex) {
-			this.outputCommandLineHelp();
-			System.exit(1);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	Object getOptionValue(String argumentName) {
-//		int i = argumentName.indexOf('.');
-//		if (i > 0) {
-//			argumentName = argumentName.substring(i + 1);
+//	public void setCommandLine(String[] args) {
+//		try {
+//			CommandLineParser parser = new DefaultParser();
+//			if (args.length < 1) {
+//				this.commandLine = parser.parse(new Options(), args, true);
+//				return; // nothing to parse
+//			} else {
+//				for (Options opts : this.commandLineOptionGroups.values()) {
+//
+//					this.commandLine = parser.parse(opts, args, true);
+//					if (this.commandLine.getArgList().isEmpty()) {
+//						// parse has succeeded
+//						return;
+//					} else {
+//						// try next OptionGroup
+//					}
+//				}
+//				// all OptionGroups failed to parse
+//				this.outputCommandLineHelp();
+//				System.exit(1);
+//			}
+//		} catch (MissingOptionException ex) {
+//			this.outputCommandLineHelp();
+//			System.exit(1);
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
 //		}
-		return this.commandLine.getOptionValue(argumentName);
-	}
+//	}
 
-	boolean hasOption(String argumentName) {
-//		int i = argumentName.indexOf('.');
-//		if (i > 0) {
-//			argumentName = argumentName.substring(i + 1);
-//		}
-		return this.commandLine.hasOption(argumentName);
-	}
+//	Object getOptionValue(String argumentName) {
+////		int i = argumentName.indexOf('.');
+////		if (i > 0) {
+////			argumentName = argumentName.substring(i + 1);
+////		}
+//		return this.commandLine.getOptionValue(argumentName);
+//	}
+//
+//	boolean hasOption(String argumentName) {
+////		int i = argumentName.indexOf('.');
+////		if (i > 0) {
+////			argumentName = argumentName.substring(i + 1);
+////		}
+//		return this.commandLine.hasOption(argumentName);
+//	}
 
 	Map<String, IService> services;
 
@@ -522,9 +570,9 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 					//remove the 'application.' first bit of the path
 					idPath = idPath.substring(idPath.indexOf('.')+1);
 					
-					Object argValue = this.getOptionValue(idPath); //
+					Object argValue = this.commandLineHandler.getArgumentValue(ann.group(), idPath); //
 					if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
-						argValue = this.hasOption(name);
+						argValue = this.commandLineHandler.hasArgument(ann.group(),name);
 					}
 					if (null != argValue) {
 						Object value = this.createDatatype(f.getType(), argValue);
@@ -589,6 +637,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			case ACTIVE_OBJECT: {
 				return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
 			}
+				case PASSIVE_OBJECT:
+					break;
+				default:
+					break;
 			}
 			return null; // should never happen
 		});
@@ -607,6 +659,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			case ACTIVE_OBJECT: {
 				return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
 			}
+				case PASSIVE_OBJECT:
+					break;
+				default:
+					break;
 			}
 			return null; // should never happen
 		});
@@ -621,10 +677,14 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			switch (partKind) {
 			case COMPONENT: {
 				logError("A component may not be a part of an Active Object", null);
-			}
+			} break;
 			case ACTIVE_OBJECT: {
 				return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
 			}
+				case PASSIVE_OBJECT:
+					break;
+				default:
+					break;
 			}
 			return null; // should never happen
 		});

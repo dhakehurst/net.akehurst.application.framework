@@ -41,7 +41,7 @@ public class ApplicationCompositionTreeWalker {
 
 	ILogger logger;
 
-	class PartInfo extends AbstractDataType {
+	static public class PartInfo extends AbstractDataType {
 		public PartInfo(Field field, PartKind kind, Class<? extends IIdentifiableObject> class_, String id) {
 			super(field, kind, class_, id);
 			this.field = field;
@@ -115,12 +115,12 @@ public class ApplicationCompositionTreeWalker {
 
 	}
 
-	private Set<PartInfo> findPartInfo(String idPrefix, Class<?> class_) {
+	static public Set<PartInfo> findPartInfo(String idPrefix, Class<?> class_) {
 		Set<PartInfo> result = new HashSet<>();
 
 		if (null == class_.getSuperclass()) {
 		} else {
-			Set<PartInfo> sp = this.findPartInfo(idPrefix, class_.getSuperclass());
+			Set<PartInfo> sp = findPartInfo(idPrefix, class_.getSuperclass());
 			result.addAll( sp );
 		}
 		for (Field f : class_.getDeclaredFields()) {
@@ -135,7 +135,7 @@ public class ApplicationCompositionTreeWalker {
 		return result;
 	}
 
-	private PartInfo findPartInfo(String idPrefix, Field f) {
+	static private PartInfo findPartInfo(String idPrefix, Field f) {
 		f.setAccessible(true);
 		PartInfo pi = null;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.common.annotations.declaration;
+package net.akehurst.application.framework.common.annotations.instance;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -21,10 +21,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Repeatable(ProvidesInterfaceForPortContainer.class)
+@Repeatable(CommandLineGroupContainer.class)
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ProvidesInterfaceForPort {
-	Class<?> provides();
-	String portId();
+public @interface CommandLineGroup {
+	String name();
+	String description();
 }

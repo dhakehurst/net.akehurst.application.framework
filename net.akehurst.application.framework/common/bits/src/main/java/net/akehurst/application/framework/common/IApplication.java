@@ -17,9 +17,9 @@ package net.akehurst.application.framework.common;
 
 public interface IApplication extends IActiveObject {
 
-	void defineArguments();
-	
-	void parseArguments();
+//	void defineArguments();
+//	
+//	void parseArguments();
 	
 	void connectComputationalToEngineering();
 	

@@ -60,9 +60,9 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 	@CommandLineArgument(group="help", name = "configuration", hasValue=false, description="Display the current configuration of this application.")
 	Boolean displayConfig;
 
-	public void parseArguments() {
-		this.af.setCommandLine(args);
-	}
+//	public void parseArguments() {
+//		this.af.setCommandLine(args);
+//	}
 
 	public void afOutputCommandLineHelp() {
 		this.af.outputCommandLineHelp();
@@ -128,61 +128,61 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 		return json;
 	}
 
-	private void defineCommandLineArgumentsFor(IIdentifiableObject obj) {
-		this.defineCommandLineArgumentsFor(obj.getClass(), obj);
-	}
+//	private void defineCommandLineArgumentsFor(IIdentifiableObject obj) {
+//		this.defineCommandLineArgumentsFor(obj.getClass(), obj);
+//	}
 
-	private void defineCommandLineArgumentsFor(Class<?> class_, IIdentifiableObject obj) {
-		if (null == class_.getSuperclass()) {
-			return; // Object.class will have a null superclass, no need to inject anything for Object.class
-		} else {
-			this.defineCommandLineArgumentsFor(class_.getSuperclass(), obj);
-			for (Field f : class_.getDeclaredFields()) {
-				f.setAccessible(true);
-				try {
-					CommandLineArgument annCL = f.getAnnotation(CommandLineArgument.class);
-					if (null == annCL) {
-						// donothing
-					} else {
-						String argumentName = annCL.name();
-						if (argumentName.isEmpty()) {
-							argumentName = obj.afId() + '.' + f.getName();
-						} else {
-							// do nothing
-						}
-						String group = annCL.group();
-						boolean required = annCL.required();
-						boolean hasValue = annCL.hasValue();
-						String description = annCL.description();
-						this.af.defineCommandLineArgument(group, required, argumentName, hasValue, description);
-					}
-
-					ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);
-					if (null == annCI) {
-						// do nothing
-					} else {
-						Object part = f.get(obj);
-						if (part instanceof IIdentifiableObject) {
-							this.defineCommandLineArgumentsFor((IIdentifiableObject) part);
-						}
-					}
-
-					ActiveObjectInstance annAI = f.getAnnotation(ActiveObjectInstance.class);
-					if (null == annAI) {
-						// do nothing
-					} else {
-						Object part = f.get(obj);
-						if (part instanceof IIdentifiableObject) {
-							this.defineCommandLineArgumentsFor((IIdentifiableObject) part);
-						}
-					}
-
-				} catch (Exception ex) {
-					logger.log(LogLevel.ERROR, "Failed in defineCommandLineArgumentsFor", ex);
-				}
-			}
-		}
-	}
+//	private void defineCommandLineArgumentsFor(Class<?> class_, IIdentifiableObject obj) {
+//		if (null == class_.getSuperclass()) {
+//			return; // Object.class will have a null superclass, no need to inject anything for Object.class
+//		} else {
+//			this.defineCommandLineArgumentsFor(class_.getSuperclass(), obj);
+//			for (Field f : class_.getDeclaredFields()) {
+//				f.setAccessible(true);
+//				try {
+//					CommandLineArgument annCL = f.getAnnotation(CommandLineArgument.class);
+//					if (null == annCL) {
+//						// donothing
+//					} else {
+//						String argumentName = annCL.name();
+//						if (argumentName.isEmpty()) {
+//							argumentName = obj.afId() + '.' + f.getName();
+//						} else {
+//							// do nothing
+//						}
+//						String[] groups = annCL.groups();
+//						boolean required = annCL.required();
+//						boolean hasValue = annCL.hasValue();
+//						String description = annCL.description();
+//						this.af.defineCommandLineArgument(groups, required, argumentName, hasValue, description);
+//					}
+//
+//					ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);
+//					if (null == annCI) {
+//						// do nothing
+//					} else {
+//						Object part = f.get(obj);
+//						if (part instanceof IIdentifiableObject) {
+//							this.defineCommandLineArgumentsFor((IIdentifiableObject) part);
+//						}
+//					}
+//
+//					ActiveObjectInstance annAI = f.getAnnotation(ActiveObjectInstance.class);
+//					if (null == annAI) {
+//						// do nothing
+//					} else {
+//						Object part = f.get(obj);
+//						if (part instanceof IIdentifiableObject) {
+//							this.defineCommandLineArgumentsFor((IIdentifiableObject) part);
+//						}
+//					}
+//
+//				} catch (Exception ex) {
+//					logger.log(LogLevel.ERROR, "Failed in defineCommandLineArgumentsFor", ex);
+//				}
+//			}
+//		}
+//	}
 
 	public void afOutputConfiguration() {
 		JsonObject app = this.fetchConfigFor(this);
@@ -191,9 +191,9 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 		System.out.println(config.toString(Stringify.HJSON));
 	}
 
-	public void defineArguments() {
-		this.defineCommandLineArgumentsFor(this);
-	}
+//	public void defineArguments() {
+//		this.defineCommandLineArgumentsFor(this);
+//	}
 
 	public void connectComputationalToEngineering() {
 	}
