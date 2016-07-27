@@ -16,39 +16,60 @@ public class CommandLineHandler implements ICommandLineHandler {
 		String value;
 	}
 	
-	public CommandLineHandler() {
-		this.definedGroups = new ArrayList<>();
+	public CommandLineHandler(String groupRegEx, String argumentStart) {
+		this.groupRegEx = groupRegEx;
+		this.argumentStart = argumentStart;
+		this.definedArgs = new HashMap<>();
+		this.defineGroup("");
 		this.groupArgs = new HashMap<>();
 		// add default group
 		this.groupArgs.put("", new HashMap<>());
 	}
 	
-	List<String> definedGroups;
+	String groupRegEx;
+	String argumentStart;
+	Map<String,List<ArgumentDefinition>> definedArgs;
+	
 	Map<String, Map<String,String>> groupArgs;
 	
 	@Override
 	public void defineGroup(String groupName) {
-		this.definedGroups.add(groupName);
+		this.definedArgs.put(groupName, new ArrayList<>());
 	}
 
 	@Override
-	public void defineArgument(String group, String name, boolean required, boolean hasValue, Object defaultValue) {
-		// TODO Auto-generated method stub
-
+	public void defineArgument(String group, String name, Class<?> type, boolean required, boolean hasValue, Object defaultValue, String description) {
+		List<ArgumentDefinition> args = this.definedArgs.get(group);
+		args.add(new ArgumentDefinition(group, name, type, required, hasValue, defaultValue, description));
 	}
 
+	@Override
+	public String getHelp() {
+		String result = "";
+		for(String grp:this.definedArgs.keySet()) {
+			result += (grp.isEmpty() ? "<default>": grp) + System.lineSeparator();
+			List<ArgumentDefinition> da = this.definedArgs.get(grp);
+			for(ArgumentDefinition ad:da) {
+				result += "  " + ad.getName() + " : " + ad.getType().getSimpleName() + (ad.getRequired() ? " [1] " : " [?] ") + "(" + (null==ad.getDefaultValue()?"":ad.getDefaultValue()) + ") - " + ad.getDescription();
+				result += System.lineSeparator();
+			}
+			result += System.lineSeparator();
+		}
+		return result;
+	}
 	
 	@Override
 	public void parse(String[] args) {
 		//default group if nothing else parsed
 		String currentGroup = ""; 
 		for(String arg: args) {
-			if (arg.startsWith("-")) {
-				this.parseArgument(currentGroup, arg.substring(1));
-			} else {
-				//TODO: maybe check format of group name ? should it be constrained?
+			if (arg.startsWith(this.argumentStart)) {
+				this.parseArgument(currentGroup, arg.substring(argumentStart.length()));
+			} else if (arg.matches(this.groupRegEx)){
 				currentGroup = arg;
 				groupArgs.put(currentGroup, new HashMap<>());
+			} else {
+				throw new RuntimeException("Command line argument doesn't match expected pattern "+arg);
 			}
 		}
 	}
@@ -68,6 +89,11 @@ public class CommandLineHandler implements ICommandLineHandler {
 				groupArgs.put(split[0], null);
 			}
 		}
+	}
+	
+	@Override
+	public boolean hasGroup(String group) {
+		return this.groupArgs.containsKey(group);
 	}
 	
 	@Override

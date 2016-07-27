@@ -91,7 +91,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		this.afId = id;
 		this.services = new HashMap<>();
 		this.services.put(serviceName, this);
-		this.commandLineHandler = new CommandLineHandler();
+		this.commandLineHandler = new CommandLineHandler("[a-zA-Z0-9_-]+","--");
 //		this.commandLineOptionGroups = new HashMap<>();
 	}
 
@@ -263,7 +263,9 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 					boolean required = ad.getAnnotation().required();
 					boolean hasValue = ad.getAnnotation().hasValue();
 					Object defaultValue = ad.getValue();
-					this.commandLineHandler.defineArgument(group, name, required, hasValue, defaultValue);
+					String description = ad.getAnnotation().description();
+					Class<?> type = ad.getField().getType();
+					this.commandLineHandler.defineArgument(group, name, type, required, hasValue, defaultValue, description);
 				}
 			} catch (Throwable t) {
 				logError("Failed to check for command line groups in " + objId, t);
@@ -290,10 +292,12 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 //	}
 
 	public void outputCommandLineHelp() {
-		HelpFormatter formatter = new HelpFormatter();
+		String help = this.commandLineHandler.getHelp();
+//		HelpFormatter formatter = new HelpFormatter();
 //		for (Options opts : this.commandLineHandler.getGoups()) {
 //			formatter.printHelp(100, "<application>", "", opts, "", true);
 //		}
+		logger().log(LogLevel.INFO, System.lineSeparator() + help);
 	}
 
 	ILogger logger() {
@@ -547,69 +551,42 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	}
 
-	private void injectCommandLineArgs(Class<?> class_, IIdentifiableObject obj)
-			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
-		if (null == class_.getSuperclass()) {
-			return; // Object.class will have a null superclass, no need to inject anything for Object.class
-		} else {
-			this.injectCommandLineArgs(class_.getSuperclass(), obj);
-			for (Field f : class_.getDeclaredFields()) {
-				f.setAccessible(true);
-				CommandLineArgument ann = f.getAnnotation(CommandLineArgument.class);
-				if (null == ann) {
-					// do nothing
-				} else {
-					String name = ann.name();
-					if (name.isEmpty()) {
-						name = f.getName();
-					} else {
-						// do nothing
-					}
-					
-					String idPath = obj.afId() + "." +name;
-					//remove the 'application.' first bit of the path
-					idPath = idPath.substring(idPath.indexOf('.')+1);
-					
-					Object argValue = this.commandLineHandler.getArgumentValue(ann.group(), idPath); //
-					if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
-						argValue = this.commandLineHandler.hasArgument(ann.group(),name);
-					}
-					if (null != argValue) {
-						Object value = this.createDatatype(f.getType(), argValue);
-
-						f.set(obj, value);
-					}
-				}
-				// ComponentInstance annCI = f.getAnnotation(ComponentInstance.class);
-				// if (null == annCI) {
-				// // do nothing
-				// } else {
-				// String partId = annCI.id();
-				// if (partId.isEmpty()) {
-				// partId = f.getName();
-				// } else {
-				// // do nothing
-				// }
-				// Object part = f.get(obj);
-				// this.injectCommandLineArgs((IIdentifiableObject) part, id + "." + partId);
-				// }
-				//
-				// ActiveObjectInstance annAI = f.getAnnotation(ActiveObjectInstance.class);
-				// if (null == annAI) {
-				// // do nothing
-				// } else {
-				// String partId = annAI.id();
-				// if (partId.isEmpty()) {
-				// partId = f.getName();
-				// } else {
-				// // do nothing
-				// }
-				// Object part = f.get(obj);
-				// this.injectCommandLineArgs((IIdentifiableObject) part, id + "." + partId);
-				// }
-			}
-		}
-	}
+//	private void injectCommandLineArgs(Class<?> class_, IIdentifiableObject obj)
+//			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
+//		if (null == class_.getSuperclass()) {
+//			return; // Object.class will have a null superclass, no need to inject anything for Object.class
+//		} else {
+//			this.injectCommandLineArgs(class_.getSuperclass(), obj);
+//			for (Field f : class_.getDeclaredFields()) {
+//				f.setAccessible(true);
+//				CommandLineArgument ann = f.getAnnotation(CommandLineArgument.class);
+//				if (null == ann) {
+//					// do nothing
+//				} else {
+//					String name = ann.name();
+//					if (name.isEmpty()) {
+//						name = f.getName();
+//					} else {
+//						// do nothing
+//					}
+//					
+//					String idPath = obj.afId() + "." +name;
+//					//remove the 'application.' first bit of the path
+//					idPath = idPath.substring(idPath.indexOf('.')+1);
+//					
+//					Object argValue = this.commandLineHandler.getArgumentValue(ann.group(), idPath); //
+//					if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
+//						argValue = this.commandLineHandler.hasArgument(ann.group(),name);
+//					}
+//					if (null != argValue) {
+//						Object value = this.createDatatype(f.getType(), argValue);
+//
+//						f.set(obj, value);
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	private void injectCommandLineArgs(IApplication applicationObject)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
@@ -617,7 +594,44 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(logger());
 		walker.walkAllAndApply(applicationObject, (obj, objId) -> {
 			try {
-				this.injectCommandLineArgs(obj.getClass(), obj);
+				AnnotationNavigator an = new AnnotationNavigator(obj);
+				
+				for(AnnotationDetailsList<CommandLineGroup> ad: an.getList(CommandLineGroupContainer.class,CommandLineGroup.class)) {
+					if (ad.getField().getType().isAssignableFrom(List.class)) {
+						List<String> list = new ArrayList<>();
+						for(CommandLineGroup clg:ad.getAnnotations()) {
+							if (this.commandLineHandler.hasGroup(clg.name())) {
+								list.add(clg.name());
+							}
+						}
+						ad.getField().set(obj, list );
+					}
+				}
+				
+				for(AnnotationDetails<CommandLineArgument> ad: an.get(CommandLineArgument.class)) {
+					String argName = obj.afId() + ".";
+					//remove the 'application.' first bit of the path
+					argName = argName.substring(argName.indexOf('.')+1);
+					
+					String name = ad.getAnnotation().name();
+					if (name.isEmpty()) {
+						name = ad.getField().getName();
+						argName += name;
+					} else {
+						argName = name;
+					}
+					
+					Object argValue = this.commandLineHandler.getArgumentValue(ad.getAnnotation().group(), argName); //
+					if (null == argValue && Boolean.class.isAssignableFrom(ad.getField().getType())) {
+						argValue = this.commandLineHandler.hasArgument(ad.getAnnotation().group(),name);
+					}
+					if (null != argValue) {
+						Object value = this.createDatatype(ad.getField().getType(), argValue);
+						ad.getField().set(obj, value);
+					}
+				}
+				
+//				this.injectCommandLineArgs(obj.getClass(), obj);
 			} catch (Throwable t) {
 				logError("Failed to inject Configuratioon Values into " + objId, t);
 			}

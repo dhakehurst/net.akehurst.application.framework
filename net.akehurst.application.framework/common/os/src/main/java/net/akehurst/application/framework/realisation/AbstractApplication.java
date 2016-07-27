@@ -54,10 +54,10 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 
 	String[] args;
 
-	@CommandLineArgument(group="help", name = "help", hasValue=false, description="Display the command line options for this application.")
+	@CommandLineArgument(group="", name = "help", hasValue=false, description="Display the command line options for this application.")
 	Boolean displayHelp;
 
-	@CommandLineArgument(group="help", name = "configuration", hasValue=false, description="Display the current configuration of this application.")
+	@CommandLineArgument(group="", name = "configuration", hasValue=false, description="Display the current configuration of this application.")
 	Boolean displayConfig;
 
 //	public void parseArguments() {
