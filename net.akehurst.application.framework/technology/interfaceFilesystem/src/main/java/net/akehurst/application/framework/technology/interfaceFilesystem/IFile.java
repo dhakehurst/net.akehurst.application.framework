@@ -17,10 +17,8 @@ package net.akehurst.application.framework.technology.interfaceFilesystem;
 
 import java.io.Reader;
 
-public interface IFile {
-
-	boolean exists();
+public interface IFile extends IDirectoryEntry {
 
 	Reader reader() throws FilesystemException;
-	
+
 }

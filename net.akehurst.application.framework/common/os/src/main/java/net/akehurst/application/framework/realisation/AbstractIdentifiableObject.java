@@ -15,14 +15,17 @@
  */
 package net.akehurst.application.framework.realisation;
 
-public class AbstractIdentifiableObject {
+import net.akehurst.application.framework.common.IIdentifiableObject;
 
-	public AbstractIdentifiableObject(String id) {
+public class AbstractIdentifiableObject implements IIdentifiableObject {
+
+	public AbstractIdentifiableObject(final String id) {
 		this.id = id;
 	}
 
 	String id;
 
+	@Override
 	public String afId() {
 		return this.id;
 	}

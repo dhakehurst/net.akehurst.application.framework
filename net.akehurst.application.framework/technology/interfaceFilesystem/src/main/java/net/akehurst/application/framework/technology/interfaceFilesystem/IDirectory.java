@@ -15,6 +15,13 @@
  */
 package net.akehurst.application.framework.technology.interfaceFilesystem;
 
-public interface IDirectory {
+import java.util.List;
 
+public interface IDirectory extends IDirectoryEntry {
+
+	List<IDirectoryEntry> getEntries() throws FilesystemException;
+
+	IFile createFile();
+
+	IDirectory createDirectory();
 }

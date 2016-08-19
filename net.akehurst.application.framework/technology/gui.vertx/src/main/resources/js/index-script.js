@@ -15,8 +15,21 @@
  */
 "use strict"
 
-var sceneId = window.location.pathname
-sceneId = sceneId.substring(stageId.length);
+if (typeof stageId === 'undefined' || null===stageId || stageId.length === 0) {
+	alert("stageId must be given a value")
+}
+
+var expectedStart = rootPath+"/"+stageId
+if (rootPath === 'undefined' || null===rootPath || rootPath === '/' || rootPath.length === 0) {
+  expectedStart = stageId
+}
+var path = window.location.pathname
+
+if (!path.startsWith(expectedStart)) {
+	alert("'rootPath +'/'+stageId' must have a value that matches the start of the url path, currently expectedStart = '"+expectedStart+"'")
+}
+
+var sceneId = path.substring(expectedStart.length);
 var sceneArgs = window.location.search
 //var end = sceneId.lastIndexOf('/')
 //var sceneIdRoot = sceneId.substring(0,end)

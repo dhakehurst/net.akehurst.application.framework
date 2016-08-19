@@ -1,10 +1,10 @@
 package net.akehurst.application.framework.technology.guiInterface.elements;
 
-public interface IChartDataSeries<X,Y> {
+public interface IGuiChartDataSeries<X,Y> {
 
 	String getName();
 	void setName(String value);
 	
-	IChartData<X,Y> getData();
+	IGuiChartData<X,Y> getData();
 	
 }

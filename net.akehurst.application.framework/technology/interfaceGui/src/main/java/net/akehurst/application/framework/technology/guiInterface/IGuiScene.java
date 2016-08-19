@@ -16,8 +16,32 @@
 package net.akehurst.application.framework.technology.guiInterface;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
+import net.akehurst.application.framework.common.UserSession;
 
 public interface IGuiScene extends IIdentifiableObject {
 
+	StageIdentity getStageId();
+
+	SceneIdentity getSceneId();
+
+	/**
+	 * called by the framework to indicate that an event has occured
+	 *
+	 * @param event
+	 */
 	void notifyEventOccured(GuiEvent event);
+
+	public interface OnEventHandler {
+		void execute(GuiEvent event);
+	}
+
+	/**
+	 * Register an event handler for an event.
+	 *
+	 * @param session
+	 * @param eventSignature
+	 * @param handler
+	 */
+	void onEvent(UserSession session, GuiEventSignature eventSignature, OnEventHandler handler);
+
 }

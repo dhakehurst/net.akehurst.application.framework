@@ -28,43 +28,43 @@ import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesy
 
 public class StandardFilesystem extends AbstractComponent implements IFilesystem, IService {
 
-	public StandardFilesystem(String id) {
+	public StandardFilesystem(final String id) {
 		super(id);
 	}
-	
+
 	@Override
-	public void afConnectParts() {
-	}
-	
+	public void afConnectParts() {}
+
 	@Override
 	public void afRun() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
-	public Object createReference(String locationId) {
+	public Object createReference(final String locationId) {
 		return this;
 	}
-	
+
 	// ---------- IFilesystem ---------
 	@Override
-	public IFile file(String pathName) {
-		Path path = Paths.get(pathName);
-		return new File(path);
+	public IFile file(final String pathName) {
+		final Path path = Paths.get(pathName);
+		return new File(this, path);
 	}
-	
+
 	@Override
-	public IDirectory directory(String pathNme) {
-		// TODO Auto-generated method stub
-		return null;
+	public IDirectory directory(final String pathName) {
+		final Path path = Paths.get(pathName);
+		return new Directory(this, path);
 	}
-	
+
 	// ---------- Ports ---------
-	@PortInstance(provides={IFilesystem.class},requires={})
+	@PortInstance(provides = { IFilesystem.class }, requires = {})
 	Port portFs;
+
 	public Port portFs() {
 		return this.portFs;
 	}
-	
+
 }

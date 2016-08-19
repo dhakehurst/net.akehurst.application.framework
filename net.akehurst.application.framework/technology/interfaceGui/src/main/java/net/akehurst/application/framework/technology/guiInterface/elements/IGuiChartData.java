@@ -2,8 +2,8 @@ package net.akehurst.application.framework.technology.guiInterface.elements;
 
 import java.util.List;
 
-public interface IChartData<X,Y> {
+public interface IGuiChartData<X,Y> {
 
-	List<IChartDataItem<X,Y>> getItems();
+	List<IGuiChartDataItem<X,Y>> getItems();
 	
 }

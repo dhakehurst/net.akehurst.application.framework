@@ -15,7 +15,6 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import io.vertx.core.Context;
@@ -24,32 +23,23 @@ import io.vertx.core.Handler;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.streams.Pump;
-import io.vertx.core.streams.ReadStream;
 import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.shiro.ShiroAuthOptions;
 import io.vertx.ext.auth.shiro.ShiroAuthRealmType;
 import io.vertx.ext.web.FileUpload;
-import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
-import io.vertx.ext.web.handler.BasicAuthHandler;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CookieHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.handler.impl.UserHolder;
-import io.vertx.ext.web.handler.sockjs.SockJSHandler;
-import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 import io.vertx.ext.web.sstore.LocalSessionStore;
-import net.akehurst.application.framework.common.IUser;
 import net.akehurst.application.framework.common.UserDetails;
 import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
@@ -63,7 +53,7 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class AVerticle implements Verticle {
 
-	public AVerticle(VertxWebsite ws, int port) {
+	public AVerticle(final VertxWebsite ws, final int port) {
 		this.port = port;
 		this.ws = ws;
 	}
@@ -71,80 +61,87 @@ public class AVerticle implements Verticle {
 	int port;
 	VertxWebsite ws;
 
-	void addRoute(String stagePath, Handler<RoutingContext> requestHandler, String webroot, Map<String,String> variables) {
-		String routePath =  stagePath + "/*";
+	void addRoute(final String stagePath, final Handler<RoutingContext> requestHandler, final String webroot, final Map<String, String> variables) {
+		final String routePath = stagePath + "/*";
 
-		String sockjsCommsPath = stagePath+ws.getSockjsPath()+"/*";
+		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "/*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
 			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
 				String stageIdStr = data.getString("stageId");
 				stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
-				StageIdentity stageId = new StageIdentity( stageIdStr );
-				SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId") );
-				String eventType = data.getString("eventType");
-				String elementId = data.getString("elementId");
-				Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-				
-				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured( new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
+				final StageIdentity stageId = new StageIdentity(stageIdStr);
+				final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
+				final String eventType = data.getString("eventType");
+				final String elementId = data.getString("elementId");
+				final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
+
+				this.ws.portGui().out(IGuiNotification.class)
+						.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
 			} else {
 				// ??
 			}
 		});
-		
-		router.route(routePath).handler(CookieHandler.create());
-		router.route(routePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
-		router.route(routePath).handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-		router.route(routePath).handler(UserSessionHandler.create(authProvider));
 
-		router.route(routePath).handler(requestHandler);
-		router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
+		this.router.route(routePath).handler(CookieHandler.create());
+		this.router.route(routePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+		this.router.route(routePath)
+				.handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
+		this.router.route(routePath).handler(UserSessionHandler.create(this.authProvider));
 
-		ws.logger.log(LogLevel.INFO, "Public path:  "+"http://localhost:"+this.port+stagePath);
+		this.router.route(routePath).handler(requestHandler);
+		this.router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
+		// this.router.route(routePath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot(webroot));
+
+		this.ws.logger.log(LogLevel.INFO, "Public path:  " + "http://localhost:" + this.port + stagePath);
 	}
 
-	void addAuthenticatedRoute(String stagePath, Handler<RoutingContext> requestHandler, String webroot, Map<String,String> variables) {
-		String routePath =  stagePath + "/*";
-		
-		String sockjsCommsPath = stagePath+ws.getSockjsPath()+"/*";
+	void addAuthenticatedRoute(final String stagePath, final Handler<RoutingContext> requestHandler, final String webroot,
+			final Map<String, String> variables) {
+		final String routePath = stagePath + "/*";
+
+		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "/*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
 			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
 				String stageIdStr = data.getString("stageId");
 				stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
-				StageIdentity stageId = new StageIdentity( stageIdStr );
-				SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId") );
-				String eventType = data.getString("eventType");
-				String elementId = data.getString("elementId");
-				Map<String, Object> eventData = (Map<String, Object>) data.getJsonObject("eventData").getMap();
-				this.ws.portGui().out(IGuiNotification.class).notifyEventOccured( new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
+				final StageIdentity stageId = new StageIdentity(stageIdStr);
+				final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
+				final String eventType = data.getString("eventType");
+				final String elementId = data.getString("elementId");
+				final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
+				this.ws.portGui().out(IGuiNotification.class)
+						.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
 			} else {
 				// ??
 			}
 		});
-		
-		router.route(routePath).handler(CookieHandler.create());
-		router.route(routePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
-		router.route(routePath).handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-		router.route(routePath).handler(UserSessionHandler.create(authProvider));
 
-		router.route(routePath).handler(this.authHandler);// BasicAuthHandler.create(authProvider, "Please Provide Valid Credentials" ));
-		router.route(routePath).handler(requestHandler);// ;
-		router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
+		this.router.route(routePath).handler(CookieHandler.create());
+		this.router.route(routePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+		this.router.route(routePath)
+				.handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
+		this.router.route(routePath).handler(UserSessionHandler.create(this.authProvider));
 
-		ws.logger.log(LogLevel.INFO, "Protected path:  "+"http://localhost:"+this.port+stagePath);
+		this.router.route(routePath).handler(this.authHandler);// BasicAuthHandler.create(authProvider, "Please Provide Valid Credentials" ));
+		this.router.route(routePath).handler(requestHandler);// ;
+		this.router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
+
+		this.ws.logger.log(LogLevel.INFO, "Protected path:  " + "http://localhost:" + this.port + stagePath);
 	}
 
-	void addPostRoute(String routePath, Handler<RoutingContext> requestHandler) {
-		router.route(routePath).handler(CookieHandler.create());
-		router.route(routePath).handler(BodyHandler.create().setBodyLimit(Integer.MAX_VALUE));
-		router.route(routePath).handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-		router.route(routePath).handler(UserSessionHandler.create(authProvider));
+	void addPostRoute(final String routePath, final Handler<RoutingContext> requestHandler) {
+		this.router.route(routePath).handler(CookieHandler.create());
+		this.router.route(routePath).handler(BodyHandler.create().setBodyLimit(Integer.MAX_VALUE));
+		this.router.route(routePath)
+				.handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
+		this.router.route(routePath).handler(UserSessionHandler.create(this.authProvider));
 
-		//router.post(routePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
-		router.post(routePath).handler(requestHandler);
+		// router.post(routePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+		this.router.post(routePath).handler(requestHandler);
 	}
 
-	Session getSession(String sessionId) {
-		Session session = this.comms.activeSessions.get(sessionId);
+	Session getSession(final String sessionId) {
+		final Session session = this.comms.activeSessions.get(sessionId);
 		if (null == session) {
 			return null;
 		} else {
@@ -157,15 +154,15 @@ public class AVerticle implements Verticle {
 		}
 	}
 
-	UserSession createTechSession(Session webSession) {
-		UserSession unknown = new UserSession("none", new UserDetails("<unknown>"));
+	UserSession createTechSession(final Session webSession) {
+		final UserSession unknown = new UserSession("none", new UserDetails("<unknown>"));
 		if (null == webSession) {
 			return unknown;
 		} else {
-			UserHolder holder = webSession.get("__vertx.userHolder");
-			if (holder != null && holder.user !=null) {
-				String username = holder.user.principal().getString("username");
-				UserSession ts = new UserSession(webSession.id(), new UserDetails(username));
+			final UserHolder holder = webSession.get("__vertx.userHolder");
+			if (holder != null && holder.user != null) {
+				final String username = holder.user.principal().getString("username");
+				final UserSession ts = new UserSession(webSession.id(), new UserDetails(username));
 				return ts;
 			} else {
 				return unknown;
@@ -175,14 +172,14 @@ public class AVerticle implements Verticle {
 	}
 
 	// should maybe move the authentication into its own ?Authenticator class
-	public void requestLogin(UserSession techSession, String username, String password) {
-		Session session = this.getSession(techSession.getId());
-		JsonObject authInfo = new JsonObject();
+	public void requestLogin(final UserSession techSession, final String username, final String password) {
+		final Session session = this.getSession(techSession.getId());
+		final JsonObject authInfo = new JsonObject();
 		authInfo.put("username", username);
 		authInfo.put("password", password);
 		this.authProvider.authenticate(authInfo, res -> {
 			if (res.succeeded()) {
-				User u = res.result();
+				final User u = res.result();
 				UserHolder holder = session.get("__vertx.userHolder");
 				if (holder != null) {
 					holder.context.setUser(u);
@@ -193,7 +190,7 @@ public class AVerticle implements Verticle {
 					holder.user = u;
 					session.put("__vertx.userHolder", holder);
 				}
-				UserSession newTs = new UserSession(techSession.getId(), new UserDetails(u.principal().getString("username")));
+				final UserSession newTs = new UserSession(techSession.getId(), new UserDetails(u.principal().getString("username")));
 				this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationSuccess(newTs);
 			} else {
 				this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationFailure(techSession, "Authentication Failed");
@@ -201,8 +198,8 @@ public class AVerticle implements Verticle {
 		});
 	}
 
-	public void requestLogout(UserSession techSession) {
-		Session session = this.getSession(techSession.getId());
+	public void requestLogout(final UserSession techSession) {
+		final Session session = this.getSession(techSession.getId());
 		session.put("__vertx.userHolder", null);
 		this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationCleared(techSession);
 	}
@@ -220,84 +217,83 @@ public class AVerticle implements Verticle {
 	}
 
 	@Override
-	public void init(Vertx vertx, Context context) {
+	public void init(final Vertx vertx, final Context context) {
 		this.vertx = vertx;
 	}
 
 	@Override
-	public void start(Future<Void> startFuture) throws Exception {
+	public void start(final Future<Void> startFuture) throws Exception {
 
-		router = Router.router(vertx);
-		router.route().handler(CookieHandler.create());
-		router.route().handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
-		router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-		router.route().handler(UserSessionHandler.create(authProvider));
+		this.router = Router.router(this.vertx);
+		this.router.route().handler(CookieHandler.create());
+		this.router.route().handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+		this.router.route().handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
+		this.router.route().handler(UserSessionHandler.create(this.authProvider));
 
-		ShiroAuthOptions authOpts = new ShiroAuthOptions();
-		JsonObject config = new JsonObject();
+		final ShiroAuthOptions authOpts = new ShiroAuthOptions();
+		final JsonObject config = new JsonObject();
 		config.put("properties_path", "classpath:auth.properties");
 		authOpts.setConfig(config);
 		authOpts.setType(ShiroAuthRealmType.PROPERTIES);
-		this.authProvider = authOpts.createProvider(vertx);
-		this.authHandler = new MyAuthHandler(authProvider);
+		this.authProvider = authOpts.createProvider(this.vertx);
+		this.authHandler = new MyAuthHandler(this.authProvider);
 
-		this.comms = new ClientServerComms(vertx, this.router, this.authProvider, "/eventbus");
-//		this.comms.addOutboundAddress("Gui.setTitle");
-//		this.comms.addOutboundAddress("Gui.switchToScene");
-//		this.comms.addOutboundAddress("Gui.addElement");
-//		this.comms.addOutboundAddress("Gui.requestRecieveEvent");
-//		this.comms.addOutboundAddress("Gui.setText");
-//
-//		this.comms.addOutboundAddress("Canvas.addChild");
-//		this.comms.addOutboundAddress("Canvas.addChildToParent");
-//		this.comms.addOutboundAddress("Canvas.relocate");
-//		this.comms.addOutboundAddress("Canvas.resize");
-//		this.comms.addOutboundAddress("Canvas.transform");
-//		this.comms.addOutboundAddress("Canvas.setStartAnchor");
-//		this.comms.addOutboundAddress("Canvas.setEndAnchor");
-//
-//		this.comms.addInboundAddress("handleEvent");
+		this.comms = new ClientServerComms(this.vertx, this.router, this.authProvider, "/eventbus");
+		// this.comms.addOutboundAddress("Gui.setTitle");
+		// this.comms.addOutboundAddress("Gui.switchToScene");
+		// this.comms.addOutboundAddress("Gui.addElement");
+		// this.comms.addOutboundAddress("Gui.requestRecieveEvent");
+		// this.comms.addOutboundAddress("Gui.setText");
+		//
+		// this.comms.addOutboundAddress("Canvas.addChild");
+		// this.comms.addOutboundAddress("Canvas.addChildToParent");
+		// this.comms.addOutboundAddress("Canvas.relocate");
+		// this.comms.addOutboundAddress("Canvas.resize");
+		// this.comms.addOutboundAddress("Canvas.transform");
+		// this.comms.addOutboundAddress("Canvas.setStartAnchor");
+		// this.comms.addOutboundAddress("Canvas.setEndAnchor");
+		//
+		// this.comms.addInboundAddress("handleEvent");
 
-		router.route(ws.getTestPath()).handler(rc -> {
+		this.router.route(this.ws.getTestPath()).handler(rc -> {
 			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
 		});
-		ws.logger.log(LogLevel.INFO, "Test path:  "+"http://localhost:"+this.port+ws.getTestPath());
+		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + this.ws.getTestPath());
 
-		router.route(ws.getJsPath()+"/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
+		this.router.route(this.ws.getJsPath() + "/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
 
-		router.route(ws.getDownloadPath()+"/:filename").handler(rc -> {
-			String filename = rc.request().getParam("filename");
-			Buffer buffer = Buffer.buffer();
-			ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(createTechSession(rc.session()), filename, new IGuiCallback() {
+		this.router.route(this.ws.getDownloadPath() + "/:filename").handler(rc -> {
+			final String filename = rc.request().getParam("filename");
+			final Buffer buffer = Buffer.buffer();
+			this.ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(this.createTechSession(rc.session()), filename, new IGuiCallback() {
 
 				@Override
-				public void success(Object result) {
-					byte[] bytes = (byte[]) result;
+				public void success(final Object result) {
+					final byte[] bytes = (byte[]) result;
 					buffer.appendBytes(bytes);
 					rc.response().end(buffer);
 				}
 
 				@Override
-				public void error(Exception ex) {
+				public void error(final Exception ex) {
 					rc.response().end(ex.getMessage());
 				}
 			});
 
 			rc.response().putHeader("content-type", "download");
 		});
-		ws.logger.log(LogLevel.INFO, "Download path:  "+"http://localhost:"+this.port+ws.getDownloadPath());
-		
-		this.addPostRoute(ws.getUploadPath(), rc -> {
-			FileUpload fu = rc.fileUploads().iterator().next();
+		this.ws.logger.log(LogLevel.INFO, "Download path:  " + "http://localhost:" + this.port + this.ws.getDownloadPath());
 
-			ws.portGui().out(IGuiNotification.class).notifyUpload(createTechSession(rc.session()), fu.uploadedFileName());
+		this.addPostRoute(this.ws.getUploadPath(), rc -> {
+			final FileUpload fu = rc.fileUploads().iterator().next();
+
+			this.ws.portGui().out(IGuiNotification.class).notifyUpload(this.createTechSession(rc.session()), fu.uploadedFileName());
 
 		});
-		ws.logger.log(LogLevel.INFO, "Upload path:  "+"http://localhost:"+this.port+ws.getUploadPath());
-		
-		
-		HttpServer server = vertx.createHttpServer();
-		server.requestHandler(router::accept).listen(this.port);
+		this.ws.logger.log(LogLevel.INFO, "Upload path:  " + "http://localhost:" + this.port + this.ws.getUploadPath());
+
+		final HttpServer server = this.vertx.createHttpServer();
+		server.requestHandler(this.router::accept).listen(this.port);
 
 		this.ws.portGui().out(IGuiNotification.class).notifyReady();
 
@@ -305,7 +301,7 @@ public class AVerticle implements Verticle {
 	}
 
 	@Override
-	public void stop(Future<Void> stopFuture) throws Exception {
+	public void stop(final Future<Void> stopFuture) throws Exception {
 		stopFuture.complete();
 	}
 

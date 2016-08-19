@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+	    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+	    <meta name="description" content="Sign in page">
+	    <meta name="author" content="Dr. David H. Akehurst">
+	    <link rel="icon" href="../../favicon.ico">
+	
+	    <title>Sign In</title>
+	
+	    <link href="${rootPath}/js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	    <link href="index.css" rel="stylesheet">
+
+	</head>
+	<body>
+
+		<div class="root">
+		
+		  <fieldset class="form-signin">
+		    <h2 class="form-signin-heading">Please sign in</h2>
+		    <label for="inputEmail" class="sr-only">Email address</label>
+		    <input id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="" type="email">
+		    <label for="inputPassword" class="sr-only">Password</label>
+		    <input id="inputPassword" class="form-control" placeholder="Password" required="" type="password">
+		    <div class="checkbox">
+		      <label>
+		        <input value="remember-me" type="checkbox"> Remember me
+		      </label>
+		    </div>
+		    <button id="actionSignIn" class="btn btn-lg btn-primary btn-block" type="button">Sign in</button>
+		  </fieldset>
+		
+		</div>
+
+		<script>
+		  var rootPath = '${rootPath}'
+          var stageId = '${stageId}'
+        </script>
+	    <script src="${rootPath}/js/jquery.js"></script>
+ 		<script src="${rootPath}/js/sockjs.js"></script>
+		<script src="${rootPath}/js/dynamic.js"></script>
+		<script src="${rootPath}/js/ServerComms.js"></script>
+		<script src="${rootPath}/js/index-script.js"></script>
+	</body>
+</html>

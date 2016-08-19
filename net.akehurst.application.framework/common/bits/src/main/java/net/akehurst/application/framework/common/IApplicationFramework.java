@@ -18,18 +18,23 @@ package net.akehurst.application.framework.common;
 public interface IApplicationFramework {
 
 	<T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws ApplicationFrameworkException;
-//	void defineCommandLineArgument(String[] groupNames, boolean required, String argumentName, boolean hasValue, String description);
-//	void setCommandLine(String[] args);
+
+	// void defineCommandLineArgument(String[] groupNames, boolean required, String argumentName, boolean hasValue, String description);
+	// void setCommandLine(String[] args);
 	void outputCommandLineHelp();
-	
-	
+
 	<T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws ApplicationFrameworkException;
+
 	<T extends IComponent> T createComponent(Class<T> class_, String id) throws ApplicationFrameworkException;
+
 	<T extends IActiveObject> T createActiveObject(Class<T> class_, String id) throws ApplicationFrameworkException;
+
 	<T> T createDatatype(Class<T> class_, Object... constructorArgs) throws ApplicationFrameworkException;
-	<T extends IIdentifiableObject> T createObject(Class<T> class_, String id) throws ApplicationFrameworkException;
-	
+
+	<T extends IIdentifiableObject> T createObject(Class<T> class_, Object... constructorArgs) throws ApplicationFrameworkException;
+
 	<T extends IService> T injectIntoService(T object) throws ApplicationFrameworkException;
+
 	<T extends IActiveObject> T injectIntoActiveObject(T object) throws ApplicationFrameworkException;
 
 }

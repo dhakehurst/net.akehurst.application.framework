@@ -1,35 +1,40 @@
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
 import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
 import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
-import net.akehurst.application.framework.technology.guiInterface.SceneIdentity;
-import net.akehurst.application.framework.technology.guiInterface.StageIdentity;
+import net.akehurst.application.framework.technology.guiInterface.IGuiScene;
+import net.akehurst.application.framework.technology.guiInterface.IGuiScene.OnEventHandler;
 import net.akehurst.application.framework.technology.guiInterface.elements.IGuiElement;
 
 public class VertxGuiElement implements IGuiElement {
 
-	public VertxGuiElement(IGuiRequest guiRequest, StageIdentity stageId, SceneIdentity sceneId, String elementName) {
+	public VertxGuiElement(final IGuiRequest guiRequest, final IGuiScene scene, final String elementName) {
 		this.guiRequest = guiRequest;
-		this.stageId = stageId;
-		this.sceneId = sceneId;
+		this.scene = scene;
 		this.elementName = elementName;
 	}
-	
+
 	IGuiRequest guiRequest;
-	StageIdentity stageId;
-	SceneIdentity sceneId;
+	IGuiScene scene;
 	String elementName;
-	
-	
+
 	@Override
-	public Object get(UserSession session, String propertyName) {
-		//this.guiRequest.getValue();
+	public Object get(final UserSession session, final String propertyName) {
+		// this.guiRequest.getValue();
 		return null;
 	}
 
 	@Override
-	public void set(UserSession session, String propertyName, Object value) {
-		//this.guiRequest.set
+	public void set(final UserSession session, final String propertyName, final Object value) {
+		// this.guiRequest.set
+	}
+
+	@Override
+	public void onEvent(final UserSession session, final String eventType, final OnEventHandler handler) {
+		this.guiRequest.requestRecieveEvent(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, eventType);
+		final GuiEventSignature sig = new GuiEventSignature(this.scene.getStageId(), this.scene.getSceneId(), this.elementName, eventType);
+		this.scene.onEvent(session, sig, handler);
 	}
 
 }

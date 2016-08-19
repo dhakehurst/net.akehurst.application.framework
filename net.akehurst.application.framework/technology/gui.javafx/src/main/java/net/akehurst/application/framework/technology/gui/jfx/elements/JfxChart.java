@@ -9,12 +9,12 @@ import javafx.collections.ObservableList;
 import javafx.scene.chart.Chart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
-import net.akehurst.application.framework.technology.guiInterface.elements.IChart;
-import net.akehurst.application.framework.technology.guiInterface.elements.IChartData;
-import net.akehurst.application.framework.technology.guiInterface.elements.IChartDataItem;
-import net.akehurst.application.framework.technology.guiInterface.elements.IChartDataSeries;
+import net.akehurst.application.framework.technology.guiInterface.elements.IGuiChart;
+import net.akehurst.application.framework.technology.guiInterface.elements.IGuiChartData;
+import net.akehurst.application.framework.technology.guiInterface.elements.IGuiChartDataItem;
+import net.akehurst.application.framework.technology.guiInterface.elements.IGuiChartDataSeries;
 
-public class JfxChart implements IChart {
+public class JfxChart implements IGuiChart {
 
 	public JfxChart(Chart jfx) {
 		this.jfx = jfx;
@@ -22,21 +22,21 @@ public class JfxChart implements IChart {
 
 	Chart jfx;
 
-	<X, Y> IChartData<X, Y> createChartData(List<XYChart.Data<X, Y>> jfxDataList) {
-		return new IChartData<X, Y>() {
+	<X, Y> IGuiChartData<X, Y> createChartData(List<XYChart.Data<X, Y>> jfxDataList) {
+		return new IGuiChartData<X, Y>() {
 
 			@Override
-			public List<IChartDataItem<X, Y>> getItems() {
-				return new AbstractList<IChartDataItem<X, Y>>() {
+			public List<IGuiChartDataItem<X, Y>> getItems() {
+				return new AbstractList<IGuiChartDataItem<X, Y>>() {
 					@Override
 					public int size() {
 						return jfxDataList.size();
 					}
 
 					@Override
-					public IChartDataItem<X, Y> get(int index) {
+					public IGuiChartDataItem<X, Y> get(int index) {
 						XYChart.Data<X, Y> jfxDataItem = jfxDataList.get(index);
-						return new IChartDataItem<X, Y>() {
+						return new IGuiChartDataItem<X, Y>() {
 							@Override
 							public X getX() {
 								return jfxDataItem.getXValue();
@@ -55,7 +55,7 @@ public class JfxChart implements IChart {
 					}
 
 					@Override
-					public void add(int index, IChartDataItem<X, Y> element) {
+					public void add(int index, IGuiChartDataItem<X, Y> element) {
 						XYChart.Data<X, Y> jfxData = new XYChart.Data<X, Y>();
 						jfxData.setXValue(element.getX());
 						jfxData.setYValue(element.getY());
@@ -67,8 +67,8 @@ public class JfxChart implements IChart {
 		};
 	}
 
-	<X, Y> IChartDataSeries<X, Y> createSeries(XYChart.Series<X, Y> jfxSeries) {
-		return new IChartDataSeries<X, Y>() {
+	<X, Y> IGuiChartDataSeries<X, Y> createSeries(XYChart.Series<X, Y> jfxSeries) {
+		return new IGuiChartDataSeries<X, Y>() {
 
 			@Override
 			public String getName() {
@@ -81,7 +81,7 @@ public class JfxChart implements IChart {
 			}
 
 			@Override
-			public IChartData<X, Y> getData() {
+			public IGuiChartData<X, Y> getData() {
 				ObservableList<XYChart.Data<X, Y>> jfxDataList = jfxSeries.getData();
 				return createChartData(jfxDataList);
 			}
@@ -89,19 +89,19 @@ public class JfxChart implements IChart {
 	}
 
 	@Override
-	public <X, Y> List<IChartDataSeries<X, Y>> getSeries() {
+	public <X, Y> List<IGuiChartDataSeries<X, Y>> getSeries() {
 		if (this.jfx instanceof XYChart<?, ?>) {
 			XYChart<X, Y> jfxChart = (XYChart<X, Y>) jfx;
 			ObservableList<XYChart.Series<X, Y>> jfxSeriesList = jfxChart.getData();
 
-			return new AbstractList<IChartDataSeries<X, Y>>() {
+			return new AbstractList<IGuiChartDataSeries<X, Y>>() {
 				@Override
 				public int size() {
 					return jfxSeriesList.size();
 				}
 
 				@Override
-				public IChartDataSeries<X, Y> get(int index) {
+				public IGuiChartDataSeries<X, Y> get(int index) {
 					XYChart.Series<X, Y> jfxSeries = jfxSeriesList.get(index);
 					return createSeries(jfxSeries);
 				}
@@ -113,7 +113,7 @@ public class JfxChart implements IChart {
 	}
 
 	@Override
-	public <X, Y> IChartDataSeries<X, Y> getSeries(String name) {
+	public <X, Y> IGuiChartDataSeries<X, Y> getSeries(String name) {
 		if (this.jfx instanceof XYChart<?, ?>) {
 			XYChart<X, Y> jfxChart = (XYChart<X, Y>) jfx;
 			Optional<XYChart.Series<X, Y>> jfxSeriesOpt = jfxChart.getData().stream().filter((s) -> s.getName().equals(name)).findFirst();
@@ -130,7 +130,7 @@ public class JfxChart implements IChart {
 	}
 
 	@Override
-	public <X, Y> IChartDataSeries<X, Y> addSeries(String name) {
+	public <X, Y> IGuiChartDataSeries<X, Y> addSeries(String name) {
 		if (this.jfx instanceof XYChart<?, ?>) {
 			XYChart<X, Y> jfxChart = (XYChart<X, Y>) jfx;
 			XYChart.Series<X, Y> s = new XYChart.Series<X, Y>();

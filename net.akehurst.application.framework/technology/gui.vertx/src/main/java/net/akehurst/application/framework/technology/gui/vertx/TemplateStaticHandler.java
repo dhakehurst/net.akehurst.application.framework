@@ -13,16 +13,16 @@ import io.vertx.ext.web.RoutingContext;
 public class TemplateStaticHandler extends StaticHandlerImpl {
 
 	public TemplateStaticHandler() {
-		this.values = new HashMap<String, String>();
+		this.values = new HashMap<>();
 	}
 
 	Map<String, String> values;
 
 	@Override
-	protected void sendFile(RoutingContext context, String path, FileProps fileProps) {
+	protected void sendFile(final RoutingContext context, final String path, final FileProps fileProps) {
 		if (path.endsWith(".html")) {
-			//TODO maybe need to wrapInTCCLSwitch
-			String content = getFileContent(path, context);
+			// TODO maybe need to wrapInTCCLSwitch
+			final String content = this.getFileContent(path, context);
 			context.response().end(content);
 		} else {
 			super.sendFile(context, path, fileProps);
@@ -30,12 +30,12 @@ public class TemplateStaticHandler extends StaticHandlerImpl {
 
 	}
 
-	protected String getFileContent(String path, RoutingContext context) {
-		Buffer b = Vertx.vertx().fileSystem().readFileBlocking(path);
-		byte[] bytes = b.getBytes();
+	protected String getFileContent(final String path, final RoutingContext context) {
+		final Buffer b = Vertx.vertx().fileSystem().readFileBlocking(path);
+		final byte[] bytes = b.getBytes();
 		String fileContent = new String(bytes);
 
-		StrSubstitutor subs = new StrSubstitutor(this.values);
+		final StrSubstitutor subs = new StrSubstitutor(this.values);
 		fileContent = subs.replace(fileContent);
 
 		return fileContent;
@@ -45,12 +45,12 @@ public class TemplateStaticHandler extends StaticHandlerImpl {
 		return new TemplateStaticHandler();
 	}
 
-	public TemplateStaticHandler addVariable(String name, String value) {
+	public TemplateStaticHandler addVariable(final String name, final String value) {
 		this.values.put(name, value);
 		return this;
 	}
 
-	public TemplateStaticHandler addVariables(Map<String, String> values) {
+	public TemplateStaticHandler addVariables(final Map<String, String> values) {
 		this.values.putAll(values);
 		return this;
 	}

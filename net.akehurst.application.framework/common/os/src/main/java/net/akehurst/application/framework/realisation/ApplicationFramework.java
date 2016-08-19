@@ -25,31 +25,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionGroup;
-import org.apache.commons.cli.Options;
-
-import net.akehurst.application.framework.common.IApplication;
-import net.akehurst.application.framework.common.IComponent;
-import net.akehurst.application.framework.common.IIdentifiableObject;
-import net.akehurst.application.framework.common.IApplicationFramework;
-import net.akehurst.application.framework.common.IPort;
-import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.IApplication;
+import net.akehurst.application.framework.common.IApplicationFramework;
+import net.akehurst.application.framework.common.IComponent;
+import net.akehurst.application.framework.common.IIdentifiableObject;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.common.annotations.declaration.ProvidesInterfaceForPort;
-import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineGroup;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineGroupContainer;
-import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceInstance;
@@ -65,14 +53,14 @@ import net.akehurst.holser.reflect.BetterMethodFinder;
 
 public class ApplicationFramework implements IApplicationFramework, IService {
 
-	public static <T extends IApplication> T start(Class<T> applicationClass, String[] arguments) {
+	public static <T extends IApplication> T start(final Class<T> applicationClass, final String[] arguments) {
 		try {
 
-			IApplicationFramework af = new ApplicationFramework("af", "af");
-			T app = af.createApplication(applicationClass, "application", arguments);
+			final IApplicationFramework af = new ApplicationFramework("af", "af");
+			final T app = af.createApplication(applicationClass, "application", arguments);
 			app.afStart();
 			return app;
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			t.printStackTrace();
 		}
 		return null;
@@ -81,22 +69,21 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	static final String DEFAULT_CONFIGURATION_SERVICE = "configuration";
 
 	/**
-	 * Other parts of the FW expect the ApplicationFramework to have a serviceName == 'af.
-	 * e.g. ...persistence.filesystem.HJsonFile
-	 * 
+	 * Other parts of the FW expect the ApplicationFramework to have a serviceName == 'af. e.g. ...persistence.filesystem.HJsonFile
+	 *
 	 * @param id
 	 * @param serviceName
 	 */
-	public ApplicationFramework(String id, String serviceName) {
+	public ApplicationFramework(final String id, final String serviceName) {
 		this.afId = id;
 		this.services = new HashMap<>();
 		this.services.put(serviceName, this);
-		this.commandLineHandler = new CommandLineHandler("[a-zA-Z0-9_-]+","--");
-//		this.commandLineOptionGroups = new HashMap<>();
+		this.commandLineHandler = new CommandLineHandler("[a-zA-Z0-9_-]+", "--");
+		// this.commandLineOptionGroups = new HashMap<>();
 	}
 
 	ICommandLineHandler commandLineHandler;
-	
+
 	// --------- IIdentifiable ---------
 	String afId;
 
@@ -107,73 +94,77 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	// --------- IService ---------
 	@Override
-	public Object createReference(String locationId) {
+	public Object createReference(final String locationId) {
 		return this;
 	}
 
 	// --------- IApplicationFramework ---------
 
-	public <T extends IIdentifiableObject> T createObject(Class<T> class_, String id) throws ApplicationFrameworkException {
+	@Override
+	public <T extends IIdentifiableObject> T createObject(final Class<T> class_, final Object... constructorArgs) throws ApplicationFrameworkException {
 		try {
-			BetterMethodFinder bmf = new BetterMethodFinder(class_);
-			Constructor<T> cons = bmf.findConstructor(String.class);
+			final BetterMethodFinder bmf = new BetterMethodFinder(class_);
+			final Constructor<T> cons = bmf.findConstructor(constructorArgs);
 			cons.setAccessible(true);
-			T obj = cons.newInstance(new Object[] { id });
+			final T obj = cons.newInstance(constructorArgs);
+
+			this.injectServiceReferences(obj.getClass(), obj);
+			this.injectParts(obj);
+
 			return obj;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("cannot create object with class " + class_, ex);
 		}
 	}
 
 	@Override
-	public <T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws ApplicationFrameworkException {
+	public <T extends IApplication> T createApplication(final Class<T> class_, final String id, final String[] arguments) throws ApplicationFrameworkException {
 		try {
-			BetterMethodFinder bmf = new BetterMethodFinder(class_);
-			Constructor<T> cons = bmf.findConstructor(String.class, String[].class);
+			final BetterMethodFinder bmf = new BetterMethodFinder(class_);
+			final Constructor<T> cons = bmf.findConstructor(String.class);
 			cons.setAccessible(true);
-			T appObj = cons.newInstance(new Object[] { id, arguments });
+			final T appObj = cons.newInstance(new Object[] { id });
 
 			this.injectServiceInstances(class_, appObj);
 			this.injectServiceReferences(appObj.getClass(), appObj);
 			this.injectParts(appObj);
 
 			this.defineCommandLine(appObj);
-			
-//			appObj.defineArguments();
+
+			// appObj.defineArguments();
 			this.commandLineHandler.parse(arguments);
-//			appObj.parseArguments();
+			// appObj.parseArguments();
 			this.injectConfigurationValues(appObj);
 			this.injectCommandLineArgs(appObj);
 
-			appObj.connectComputationalToEngineering();
-			appObj.connectEngineeringToTechnology();
+			appObj.afConnectParts();
 
 			return appObj;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Application", ex);
 		}
 	}
 
 	@Override
-	public <T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws ApplicationFrameworkException {
+	public <T extends IService> T createServiceInstance(final String serviceName, final Class<T> class_, final String id) throws ApplicationFrameworkException {
 		try {
-			BetterMethodFinder bmf = new BetterMethodFinder(class_);
-			Constructor<T> cons = bmf.findConstructor(String.class);
-			T obj = cons.newInstance(id);
+			final BetterMethodFinder bmf = new BetterMethodFinder(class_);
+			final Constructor<T> cons = bmf.findConstructor(String.class);
+			final T obj = cons.newInstance(id);
 			this.services.put(serviceName, obj);
 			this.injectIntoService(obj);
 			return obj;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Service", ex);
 		}
 	}
 
 	@Override
-	public <T extends IComponent> T createComponent(Class<T> class_, String id) throws ApplicationFrameworkException {
+	public <T extends IComponent> T createComponent(final Class<T> class_, final String id) throws ApplicationFrameworkException {
 		try {
-			BetterMethodFinder bmf = new BetterMethodFinder(class_);
-			Constructor<T> cons = bmf.findConstructor(String.class);
-			T obj = cons.newInstance(id);
+			final BetterMethodFinder bmf = new BetterMethodFinder(class_);
+			final Constructor<T> cons = bmf.findConstructor(String.class);
+			final T obj = cons.newInstance(id);
 			this.injectServiceReferences(obj.getClass(), obj);
 			this.injectParts(obj);
 			this.injectPorts(obj.getClass(), obj);
@@ -181,45 +172,48 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			// this.injectCommandLineArgs(obj);
 			obj.afConnectParts();
 			return obj;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Component " + id, ex);
 		}
 	}
 
-	public <T extends IActiveObject> T createActiveObject(Class<T> class_, String id) throws ApplicationFrameworkException {
+	@Override
+	public <T extends IActiveObject> T createActiveObject(final Class<T> class_, final String id) throws ApplicationFrameworkException {
 		try {
-			BetterMethodFinder bmf = new BetterMethodFinder(class_);
-			Constructor<T> cons = bmf.findConstructor(String.class);
-			T obj = cons.newInstance(id);
+			final BetterMethodFinder bmf = new BetterMethodFinder(class_);
+			final Constructor<T> cons = bmf.findConstructor(String.class);
+			final T obj = cons.newInstance(id);
 			this.injectIntoActiveObject(obj);
 			return obj;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Basic Object", ex);
 		}
 	}
 
 	@Override
-	public <T> T createDatatype(Class<T> class_, Object... constructorArgs) throws ApplicationFrameworkException {
+	public <T> T createDatatype(final Class<T> class_, final Object... constructorArgs) throws ApplicationFrameworkException {
 		try {
-			BetterMethodFinder bmf = new BetterMethodFinder(class_);
-			Constructor<T> cons = bmf.findConstructor(constructorArgs);
-			T obj = cons.newInstance(constructorArgs);
+			final BetterMethodFinder bmf = new BetterMethodFinder(class_);
+			final Constructor<T> cons = bmf.findConstructor(constructorArgs);
+			final T obj = cons.newInstance(constructorArgs);
 			return obj;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Datatype", ex);
 		}
 	}
 
-	public <T extends IService> T injectIntoService(T obj) throws ApplicationFrameworkException {
+	@Override
+	public <T extends IService> T injectIntoService(final T obj) throws ApplicationFrameworkException {
 		try {
 			this.injectServiceReferences(obj.getClass(), obj);
 			return obj;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Service", ex);
 		}
 	}
 
-	public <T extends IActiveObject> T injectIntoActiveObject(T obj) throws ApplicationFrameworkException {
+	@Override
+	public <T extends IActiveObject> T injectIntoActiveObject(final T obj) throws ApplicationFrameworkException {
 		try {
 			this.injectServiceReferences(obj.getClass(), obj);
 			this.injectParts(obj);
@@ -227,89 +221,91 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			// this.injectCommandLineArgs(obj.getClass(), obj);
 
 			return obj;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Service", ex);
 		}
 	}
 
-	private void defineCommandLine(IApplication applicationObject) {
-		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(logger());
-		
+	private void defineCommandLine(final IApplication applicationObject) {
+		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+
 		// Define groups
 		walker.walkAllAndApply(applicationObject, (obj, objId) -> {
 			try {
-				AnnotationNavigator an = new AnnotationNavigator(obj);
-				for(AnnotationDetailsList<CommandLineGroup> ad: an.getList(CommandLineGroupContainer.class, CommandLineGroup.class)) {
-					for(CommandLineGroup a: ad.getAnnotations())
-					this.commandLineHandler.defineGroup(a.name());
+				final AnnotationNavigator an = new AnnotationNavigator(obj);
+				for (final AnnotationDetailsList<CommandLineGroup> ad : an.getList(CommandLineGroupContainer.class, CommandLineGroup.class)) {
+					for (final CommandLineGroup a : ad.getAnnotations()) {
+						this.commandLineHandler.defineGroup(a.name());
+					}
 				}
-			} catch (Throwable t) {
-				logError("Failed to check for command line groups in " + objId, t);
+			} catch (final Throwable t) {
+				this.logError("Failed to check for command line groups in " + objId, t);
 			}
 		});
-		
+
 		// Define arguments
 		walker.walkAllAndApply(applicationObject, (obj, objId) -> {
 			try {
-				AnnotationNavigator an = new AnnotationNavigator(obj);
-				for(AnnotationDetails<CommandLineArgument> ad: an.get(CommandLineArgument.class)) {
-					String group = ad.getAnnotation().group();
+				final AnnotationNavigator an = new AnnotationNavigator(obj);
+				for (final AnnotationDetails<CommandLineArgument> ad : an.get(CommandLineArgument.class)) {
+					final String group = ad.getAnnotation().group();
 					String name = ad.getAnnotation().name();
-					if(name.isEmpty()) {
+					if (name.isEmpty()) {
 						name = ad.getField().getName();
 					} else {
-						//use value from annotation
+						// use value from annotation
 					}
-					boolean required = ad.getAnnotation().required();
-					boolean hasValue = ad.getAnnotation().hasValue();
-					Object defaultValue = ad.getValue();
-					String description = ad.getAnnotation().description();
-					Class<?> type = ad.getField().getType();
+					final boolean required = ad.getAnnotation().required();
+					final boolean hasValue = ad.getAnnotation().hasValue();
+					final Object defaultValue = ad.getValue();
+					final String description = ad.getAnnotation().description();
+					final Class<?> type = ad.getField().getType();
 					this.commandLineHandler.defineArgument(group, name, type, required, hasValue, defaultValue, description);
 				}
-			} catch (Throwable t) {
-				logError("Failed to check for command line groups in " + objId, t);
+			} catch (final Throwable t) {
+				this.logError("Failed to check for command line groups in " + objId, t);
 			}
 		});
-		
-	}
-	
-//	@Override
-//	public void defineCommandLineArgument(String[] groupNames, boolean required, String argumentName, boolean hasValue, String description) {
-//		// remove applicationName from start
-//		int i = argumentName.indexOf('.');
-//		if (i > 0) {
-//			argumentName = argumentName.substring(i + 1);
-//		}
-//		Options group = this.commandLineOptionGroups.get(groupNames);
-//		if (null == group) {
-//			group = new Options();
-//			this.commandLineOptionGroups.put(groupNames, group);
-//		}
-//
-//		Option opt = Option.builder().longOpt(argumentName).desc(description).required(required).hasArg(hasValue).build();
-//		group.addOption(opt);
-//	}
 
+	}
+
+	// @Override
+	// public void defineCommandLineArgument(String[] groupNames, boolean required, String argumentName, boolean hasValue, String description) {
+	// // remove applicationName from start
+	// int i = argumentName.indexOf('.');
+	// if (i > 0) {
+	// argumentName = argumentName.substring(i + 1);
+	// }
+	// Options group = this.commandLineOptionGroups.get(groupNames);
+	// if (null == group) {
+	// group = new Options();
+	// this.commandLineOptionGroups.put(groupNames, group);
+	// }
+	//
+	// Option opt = Option.builder().longOpt(argumentName).desc(description).required(required).hasArg(hasValue).build();
+	// group.addOption(opt);
+	// }
+
+	@Override
 	public void outputCommandLineHelp() {
-		String help = this.commandLineHandler.getHelp();
-//		HelpFormatter formatter = new HelpFormatter();
-//		for (Options opts : this.commandLineHandler.getGoups()) {
-//			formatter.printHelp(100, "<application>", "", opts, "", true);
-//		}
-		logger().log(LogLevel.INFO, System.lineSeparator() + help);
+		final String help = this.commandLineHandler.getHelp();
+		// HelpFormatter formatter = new HelpFormatter();
+		// for (Options opts : this.commandLineHandler.getGoups()) {
+		// formatter.printHelp(100, "<application>", "", opts, "", true);
+		// }
+		this.logger().log(LogLevel.INFO, System.lineSeparator() + help);
 	}
 
 	ILogger logger() {
-		if (null==this.fetchService("logger")) {
+		if (null == this.fetchService("logger")) {
 			this.services.put("logger", new ConsoleLogger("logger"));
 		}
-		ILogger logger = this.createServiceReference("logger", "af.logger", ILogger.class);
+		final ILogger logger = this.createServiceReference("logger", "af.logger", ILogger.class);
 		return logger;
 	}
 
-	void logError(String message, Throwable t) {
-		ILogger logger = logger();
+	void logError(final String message, final Throwable t) {
+		final ILogger logger = this.logger();
 		if (null == logger) {
 			System.err.println(message);
 			if (null != t) {
@@ -320,71 +316,71 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-//	Map<String, Options> commandLineOptionGroups;
+	// Map<String, Options> commandLineOptionGroups;
 
-//	CommandLine commandLine;
+	// CommandLine commandLine;
 
-//	public void setCommandLine(String[] args) {
-//		try {
-//			CommandLineParser parser = new DefaultParser();
-//			if (args.length < 1) {
-//				this.commandLine = parser.parse(new Options(), args, true);
-//				return; // nothing to parse
-//			} else {
-//				for (Options opts : this.commandLineOptionGroups.values()) {
-//
-//					this.commandLine = parser.parse(opts, args, true);
-//					if (this.commandLine.getArgList().isEmpty()) {
-//						// parse has succeeded
-//						return;
-//					} else {
-//						// try next OptionGroup
-//					}
-//				}
-//				// all OptionGroups failed to parse
-//				this.outputCommandLineHelp();
-//				System.exit(1);
-//			}
-//		} catch (MissingOptionException ex) {
-//			this.outputCommandLineHelp();
-//			System.exit(1);
-//		} catch (Exception ex) {
-//			ex.printStackTrace();
-//		}
-//	}
+	// public void setCommandLine(String[] args) {
+	// try {
+	// CommandLineParser parser = new DefaultParser();
+	// if (args.length < 1) {
+	// this.commandLine = parser.parse(new Options(), args, true);
+	// return; // nothing to parse
+	// } else {
+	// for (Options opts : this.commandLineOptionGroups.values()) {
+	//
+	// this.commandLine = parser.parse(opts, args, true);
+	// if (this.commandLine.getArgList().isEmpty()) {
+	// // parse has succeeded
+	// return;
+	// } else {
+	// // try next OptionGroup
+	// }
+	// }
+	// // all OptionGroups failed to parse
+	// this.outputCommandLineHelp();
+	// System.exit(1);
+	// }
+	// } catch (MissingOptionException ex) {
+	// this.outputCommandLineHelp();
+	// System.exit(1);
+	// } catch (Exception ex) {
+	// ex.printStackTrace();
+	// }
+	// }
 
-//	Object getOptionValue(String argumentName) {
-////		int i = argumentName.indexOf('.');
-////		if (i > 0) {
-////			argumentName = argumentName.substring(i + 1);
-////		}
-//		return this.commandLine.getOptionValue(argumentName);
-//	}
-//
-//	boolean hasOption(String argumentName) {
-////		int i = argumentName.indexOf('.');
-////		if (i > 0) {
-////			argumentName = argumentName.substring(i + 1);
-////		}
-//		return this.commandLine.hasOption(argumentName);
-//	}
+	// Object getOptionValue(String argumentName) {
+	//// int i = argumentName.indexOf('.');
+	//// if (i > 0) {
+	//// argumentName = argumentName.substring(i + 1);
+	//// }
+	// return this.commandLine.getOptionValue(argumentName);
+	// }
+	//
+	// boolean hasOption(String argumentName) {
+	//// int i = argumentName.indexOf('.');
+	//// if (i > 0) {
+	//// argumentName = argumentName.substring(i + 1);
+	//// }
+	// return this.commandLine.hasOption(argumentName);
+	// }
 
 	Map<String, IService> services;
 
-	IService fetchService(String name) {
+	IService fetchService(final String name) {
 		return this.services.get(name);
 	}
 
-	<T> T createServiceReference(String serviceName, String locationId, Class<T> serviceReferenceType) {
+	<T> T createServiceReference(final String serviceName, final String locationId, final Class<T> serviceReferenceType) {
 
-		InvocationHandler h = new InvocationHandler() {
+		final InvocationHandler h = new InvocationHandler() {
 			T serviceReference;
 
 			T getServiceReference() {
 				if (null == this.serviceReference) {
-					IService service = fetchService(serviceName);
+					final IService service = ApplicationFramework.this.fetchService(serviceName);
 					if (null == service) {
-						logError("Cannot find service with name " + serviceName, null);
+						ApplicationFramework.this.logError("Cannot find service with name " + serviceName, null);
 					} else {
 						this.serviceReference = (T) service.createReference(locationId);
 					}
@@ -393,38 +389,38 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			}
 
 			@Override
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
 				try {
-					T sr = this.getServiceReference();
+					final T sr = this.getServiceReference();
 					if (null == sr) {
-						logError("Cannot find service named " + serviceName, null);
+						ApplicationFramework.this.logError("Cannot find service named " + serviceName, null);
 					} else {
-						Object result = method.invoke(sr, args);
+						final Object result = method.invoke(sr, args);
 						return result;
 					}
-				} catch (InvocationTargetException ex) {
+				} catch (final InvocationTargetException ex) {
 					throw ex.getCause();
 				}
 				return null;
 			}
 		};
-		Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { serviceReferenceType }, h);
+		final Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { serviceReferenceType }, h);
 		return (T) proxy;
 	}
 
 	/**
 	 * Inject service instances, which should only exist in an 'Application' class
-	 * 
+	 *
 	 */
-	private <T extends IApplication> void injectServiceInstances(Class<?> class_, T obj) throws IllegalArgumentException, IllegalAccessException {
+	private <T extends IApplication> void injectServiceInstances(final Class<?> class_, final T obj) throws IllegalArgumentException, IllegalAccessException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
 			this.injectServiceInstances(class_.getSuperclass(), obj);
-			for (Field f : class_.getDeclaredFields()) {
+			for (final Field f : class_.getDeclaredFields()) {
 				try {
 					f.setAccessible(true);
-					ServiceInstance ann = f.getAnnotation(ServiceInstance.class);
+					final ServiceInstance ann = f.getAnnotation(ServiceInstance.class);
 					if (null == ann) {
 						// do nothing
 					} else {
@@ -434,11 +430,11 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 						} else {
 							// do nothing
 						}
-						IService service = this.createServiceInstance(serviceId, (Class<IService>) f.getType(), obj.afId() + "." + serviceId);
+						final IService service = this.createServiceInstance(serviceId, (Class<IService>) f.getType(), obj.afId() + "." + serviceId);
 						f.set(obj, service);
 					}
-				} catch (Exception ex) {
-					logError(ex.getMessage(), ex);
+				} catch (final Exception ex) {
+					this.logError(ex.getMessage(), ex);
 				}
 			}
 		}
@@ -462,14 +458,14 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	//
 	// }
 
-	private void injectServiceReferences(Class<?> class_, IIdentifiableObject obj) throws IllegalArgumentException, IllegalAccessException {
+	private void injectServiceReferences(final Class<?> class_, final IIdentifiableObject obj) throws IllegalArgumentException, IllegalAccessException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
 			this.injectServiceReferences(class_.getSuperclass(), obj);
-			for (Field f : class_.getDeclaredFields()) {
+			for (final Field f : class_.getDeclaredFields()) {
 				f.setAccessible(true);
-				ServiceReference ann = f.getAnnotation(ServiceReference.class);
+				final ServiceReference ann = f.getAnnotation(ServiceReference.class);
 				if (null == ann) {
 					// do nothing
 				} else {
@@ -480,51 +476,51 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 						// do nothing
 					}
 
-					Object value = this.createServiceReference(serviceName, obj.afId(), f.getType());
+					final Object value = this.createServiceReference(serviceName, obj.afId(), f.getType());
 					f.set(obj, value);
 				}
 			}
 		}
 	}
 
-	private void injectConfigurationValues(Class<?> class_, IIdentifiableObject obj)
+	private void injectConfigurationValues(final Class<?> class_, final IIdentifiableObject obj)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
 			this.injectConfigurationValues(class_.getSuperclass(), obj);
-			for (Field f : class_.getDeclaredFields()) {
+			for (final Field f : class_.getDeclaredFields()) {
 				f.setAccessible(true);
-				ConfiguredValue ann = f.getAnnotation(ConfiguredValue.class);
+				final ConfiguredValue ann = f.getAnnotation(ConfiguredValue.class);
 				if (null == ann) {
 					// do nothing
 				} else {
 					String itemId = ann.id();
 					if (itemId.isEmpty()) {
-						itemId =  f.getName();
+						itemId = f.getName();
 					} else {
 						// do nothing
 					}
 
 					String serviceName = ann.service();
 					if (serviceName.isEmpty()) {
-						serviceName = DEFAULT_CONFIGURATION_SERVICE;
+						serviceName = ApplicationFramework.DEFAULT_CONFIGURATION_SERVICE;
 					} else {
 						// do nothing
 					}
 
-					IPersistentStore config = (IPersistentStore) this.services.get(serviceName);
+					final IPersistentStore config = (IPersistentStore) this.services.get(serviceName);
 					if (null == config) {
-						logError("no configuration service found", null);
-						Object value = this.createDatatype(f.getType(), ann.defaultValue());
+						this.logError("no configuration service found", null);
+						final Object value = this.createDatatype(f.getType(), ann.defaultValue());
 						f.set(obj, value);
 					} else {
-						IPersistenceTransaction trans = config.startTransaction();
-						Class<? extends Object> itemType = (Class<? extends Object>) f.getType();
-						String idPath = obj.afId() + "." +itemId;
-						//remove the 'application.' first bit of the path
-						idPath = idPath.substring(idPath.indexOf('.')+1);
-						PersistentItemLocation pid = new PersistentItemLocation(idPath);
+						final IPersistenceTransaction trans = config.startTransaction();
+						final Class<? extends Object> itemType = f.getType();
+						String idPath = obj.afId() + "." + itemId;
+						// remove the 'application.' first bit of the path
+						idPath = idPath.substring(idPath.indexOf('.') + 1);
+						final PersistentItemLocation pid = new PersistentItemLocation(idPath);
 						Object value = config.retrieve(trans, pid, itemType);
 						if (null == value) {
 							value = this.createDatatype(f.getType(), ann.defaultValue());
@@ -537,82 +533,82 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	private void injectConfigurationValues(IApplication applicationObject)
+	private void injectConfigurationValues(final IApplication applicationObject)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
 
-		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(logger());
+		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 		walker.walkAllAndApply(applicationObject, (obj, objId) -> {
 			try {
 				this.injectConfigurationValues(obj.getClass(), obj);
-			} catch (Throwable t) {
-				logError("Failed to inject Configuratioon Values into " + objId, t);
+			} catch (final Throwable t) {
+				this.logError("Failed to inject Configuratioon Values into " + objId, t);
 			}
 		});
 
 	}
 
-//	private void injectCommandLineArgs(Class<?> class_, IIdentifiableObject obj)
-//			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
-//		if (null == class_.getSuperclass()) {
-//			return; // Object.class will have a null superclass, no need to inject anything for Object.class
-//		} else {
-//			this.injectCommandLineArgs(class_.getSuperclass(), obj);
-//			for (Field f : class_.getDeclaredFields()) {
-//				f.setAccessible(true);
-//				CommandLineArgument ann = f.getAnnotation(CommandLineArgument.class);
-//				if (null == ann) {
-//					// do nothing
-//				} else {
-//					String name = ann.name();
-//					if (name.isEmpty()) {
-//						name = f.getName();
-//					} else {
-//						// do nothing
-//					}
-//					
-//					String idPath = obj.afId() + "." +name;
-//					//remove the 'application.' first bit of the path
-//					idPath = idPath.substring(idPath.indexOf('.')+1);
-//					
-//					Object argValue = this.commandLineHandler.getArgumentValue(ann.group(), idPath); //
-//					if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
-//						argValue = this.commandLineHandler.hasArgument(ann.group(),name);
-//					}
-//					if (null != argValue) {
-//						Object value = this.createDatatype(f.getType(), argValue);
-//
-//						f.set(obj, value);
-//					}
-//				}
-//			}
-//		}
-//	}
+	// private void injectCommandLineArgs(Class<?> class_, IIdentifiableObject obj)
+	// throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
+	// if (null == class_.getSuperclass()) {
+	// return; // Object.class will have a null superclass, no need to inject anything for Object.class
+	// } else {
+	// this.injectCommandLineArgs(class_.getSuperclass(), obj);
+	// for (Field f : class_.getDeclaredFields()) {
+	// f.setAccessible(true);
+	// CommandLineArgument ann = f.getAnnotation(CommandLineArgument.class);
+	// if (null == ann) {
+	// // do nothing
+	// } else {
+	// String name = ann.name();
+	// if (name.isEmpty()) {
+	// name = f.getName();
+	// } else {
+	// // do nothing
+	// }
+	//
+	// String idPath = obj.afId() + "." +name;
+	// //remove the 'application.' first bit of the path
+	// idPath = idPath.substring(idPath.indexOf('.')+1);
+	//
+	// Object argValue = this.commandLineHandler.getArgumentValue(ann.group(), idPath); //
+	// if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
+	// argValue = this.commandLineHandler.hasArgument(ann.group(),name);
+	// }
+	// if (null != argValue) {
+	// Object value = this.createDatatype(f.getType(), argValue);
+	//
+	// f.set(obj, value);
+	// }
+	// }
+	// }
+	// }
+	// }
 
-	private void injectCommandLineArgs(IApplication applicationObject)
+	private void injectCommandLineArgs(final IApplication applicationObject)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
 
-		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(logger());
+		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 		walker.walkAllAndApply(applicationObject, (obj, objId) -> {
 			try {
-				AnnotationNavigator an = new AnnotationNavigator(obj);
-				
-				for(AnnotationDetailsList<CommandLineGroup> ad: an.getList(CommandLineGroupContainer.class,CommandLineGroup.class)) {
+				final AnnotationNavigator an = new AnnotationNavigator(obj);
+
+				for (final AnnotationDetailsList<CommandLineGroup> ad : an.getList(CommandLineGroupContainer.class, CommandLineGroup.class)) {
 					if (ad.getField().getType().isAssignableFrom(List.class)) {
-						List<String> list = new ArrayList<>();
-						for(CommandLineGroup clg:ad.getAnnotations()) {
+						final List<String> list = new ArrayList<>();
+						for (final CommandLineGroup clg : ad.getAnnotations()) {
 							if (this.commandLineHandler.hasGroup(clg.name())) {
 								list.add(clg.name());
 							}
 						}
-						ad.getField().set(obj, list );
+						ad.getField().set(obj, list);
 					}
 				}
-				
-				for(AnnotationDetails<CommandLineArgument> ad: an.get(CommandLineArgument.class)) {
+
+				for (final AnnotationDetails<CommandLineArgument> ad : an.get(CommandLineArgument.class)) {
 					String argName = obj.afId() + ".";
-					//remove the 'application.' first bit of the path
-					argName = argName.substring(argName.indexOf('.')+1);
-					
+					// remove the 'application.' first bit of the path
+					argName = argName.substring(argName.indexOf('.') + 1);
+
 					String name = ad.getAnnotation().name();
 					if (name.isEmpty()) {
 						name = ad.getField().getName();
@@ -620,101 +616,126 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 					} else {
 						argName = name;
 					}
-					
+
 					Object argValue = this.commandLineHandler.getArgumentValue(ad.getAnnotation().group(), argName); //
 					if (null == argValue && Boolean.class.isAssignableFrom(ad.getField().getType())) {
-						argValue = this.commandLineHandler.hasArgument(ad.getAnnotation().group(),name);
+						argValue = this.commandLineHandler.hasArgument(ad.getAnnotation().group(), name);
 					}
 					if (null != argValue) {
-						Object value = this.createDatatype(ad.getField().getType(), argValue);
+						final Object value = this.createDatatype(ad.getField().getType(), argValue);
 						ad.getField().set(obj, value);
 					}
 				}
-				
-//				this.injectCommandLineArgs(obj.getClass(), obj);
-			} catch (Throwable t) {
-				logError("Failed to inject Configuratioon Values into " + objId, t);
+
+				// this.injectCommandLineArgs(obj.getClass(), obj);
+			} catch (final Throwable t) {
+				this.logError("Failed to inject Configuratioon Values into " + objId, t);
 			}
 		});
 
 	}
 
-	private void injectParts(IApplication appObj) {
+	private void injectParts(final IApplication appObj) {
 
-		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
 		walker.build(appObj, (partKind, partClass, partId) -> {
 			switch (partKind) {
-			case COMPONENT: {
-				return this.createComponent((Class<? extends IComponent>) partClass, partId);
-			}
-			case ACTIVE_OBJECT: {
-				return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
-			}
+				case COMPONENT: {
+					return this.createComponent((Class<? extends IComponent>) partClass, partId);
+				}
+				case ACTIVE_OBJECT: {
+					return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+				}
 				case PASSIVE_OBJECT:
-					break;
+					return this.createObject((Class<? extends IActiveObject>) partClass, partId);
 				default:
-					break;
+				break;
 			}
 			return null; // should never happen
 		});
 
 	}
 
-	private void injectParts(IComponent compObj) {
+	private void injectParts(final IComponent compObj) {
 
-		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
 		walker.build(compObj, (partKind, partClass, partId) -> {
 			switch (partKind) {
-			case COMPONENT: {
-				return this.createComponent((Class<? extends IComponent>) partClass, partId);
-			}
-			case ACTIVE_OBJECT: {
-				return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
-			}
+				case COMPONENT: {
+					return this.createComponent((Class<? extends IComponent>) partClass, partId);
+				}
+				case ACTIVE_OBJECT: {
+					return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+				}
 				case PASSIVE_OBJECT:
-					break;
+					return this.createObject((Class<? extends IActiveObject>) partClass, partId);
 				default:
-					break;
+				break;
 			}
 			return null; // should never happen
 		});
 
 	}
 
-	private void injectParts(IActiveObject obj) {
+	private void injectParts(final IActiveObject obj) {
 
-		ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
 		walker.build(obj, (partKind, partClass, partId) -> {
 			switch (partKind) {
-			case COMPONENT: {
-				logError("A component may not be a part of an Active Object", null);
-			} break;
-			case ACTIVE_OBJECT: {
-				return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
-			}
+				case COMPONENT: {
+					this.logError("A component may not be a part of an Active Object", null);
+				}
+				break;
+				case ACTIVE_OBJECT: {
+					return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+				}
 				case PASSIVE_OBJECT:
-					break;
+					return this.createObject((Class<? extends IActiveObject>) partClass, partId);
 				default:
-					break;
+				break;
 			}
 			return null; // should never happen
 		});
 
 	}
 
-	private void injectPorts(Class<?> class_, IComponent obj) throws IllegalArgumentException, IllegalAccessException, InstantiationException,
+	private void injectParts(final IIdentifiableObject obj) {
+
+		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+
+		walker.build(obj, (partKind, partClass, partId) -> {
+			switch (partKind) {
+				case COMPONENT: {
+					this.logError("A component may not be a part of an Simple Object", null);
+				}
+				break;
+				case ACTIVE_OBJECT: {
+					this.logError("An Active Object may not be a part of an Simple Object", null);
+				}
+				break;
+				case PASSIVE_OBJECT:
+					return this.createObject((Class<? extends IIdentifiableObject>) partClass, partId);
+				default:
+				break;
+			}
+			return null; // should never happen
+		});
+
+	}
+
+	private void injectPorts(final Class<?> class_, final IComponent obj) throws IllegalArgumentException, IllegalAccessException, InstantiationException,
 			InvocationTargetException, NoSuchMethodException, ApplicationFrameworkException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
 			this.injectPorts(class_.getSuperclass(), obj);
-			for (Field f : class_.getDeclaredFields()) {
+			for (final Field f : class_.getDeclaredFields()) {
 				f.setAccessible(true);
 
-				PortInstance ann = f.getAnnotation(PortInstance.class);
+				final PortInstance ann = f.getAnnotation(PortInstance.class);
 				if (null == ann) {
 					// do nothing
 				} else {
@@ -726,7 +747,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 					}
 
 					// Class<? extends Port> fType = (Class<? extends Port>) f.getType();
-					Object value = this.createPort(Port.class, obj.afId() + "." + portId, obj, ann.provides(), ann.requires());
+					final Object value = this.createPort(Port.class, obj.afId() + "." + portId, obj, ann.provides(), ann.requires());
 					f.set(obj, value);
 				}
 
@@ -734,38 +755,38 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	IPort createPort(Class<? extends IPort> class_, String id, IComponent component, Class<?>[] provides, Class<?>[] requires)
+	IPort createPort(final Class<? extends IPort> class_, final String id, final IComponent component, final Class<?>[] provides, final Class<?>[] requires)
 			throws ApplicationFrameworkException {
 		try {
-			Port prt = new Port(id, component);
+			final Port prt = new Port(id, component);
 			this.injectServiceReferences(class_, prt);
 
-			for (Class<?> interfaceType : provides) {
-				List<Object> providers = (List<Object>) findInternalProviderForPort(component, interfaceType, id);
-				for (Object provider : providers) {
+			for (final Class<?> interfaceType : provides) {
+				final List<Object> providers = (List<Object>) this.findInternalProviderForPort(component, interfaceType, id);
+				for (final Object provider : providers) {
 					prt.provideProvided((Class<Object>) interfaceType, provider);
 				}
 
 			}
 
-			for (Class<?> interfaceType : requires) {
+			for (final Class<?> interfaceType : requires) {
 				prt.requires(interfaceType);
 			}
 
 			return prt;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Port " + id, ex);
 		}
 	}
 
-	<T> List<T> findInternalProviderForPort(IComponent component, Class<T> interfaceType, String portId)
+	<T> List<T> findInternalProviderForPort(final IComponent component, final Class<T> interfaceType, final String portId)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
-		String shortPortId = portId.substring(portId.lastIndexOf('.') + 1);
-		List<T> providers = new ArrayList<>();
-		for (Field f : component.getClass().getDeclaredFields()) {
-			ProvidesInterfaceForPort[] anns = f.getAnnotationsByType(ProvidesInterfaceForPort.class);
+		final String shortPortId = portId.substring(portId.lastIndexOf('.') + 1);
+		final List<T> providers = new ArrayList<>();
+		for (final Field f : component.getClass().getDeclaredFields()) {
+			final ProvidesInterfaceForPort[] anns = f.getAnnotationsByType(ProvidesInterfaceForPort.class);
 			if (null != anns && anns.length > 0) {
-				for (ProvidesInterfaceForPort ann : anns) {
+				for (final ProvidesInterfaceForPort ann : anns) {
 					if (interfaceType == ann.provides() && shortPortId.equals(ann.portId())) {
 						f.setAccessible(true);
 						providers.add((T) f.get(component));
