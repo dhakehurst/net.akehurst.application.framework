@@ -42,7 +42,7 @@ import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import net.akehurst.application.framework.common.UserDetails;
 import net.akehurst.application.framework.common.UserSession;
-import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
 
 public class ClientServerComms {
 

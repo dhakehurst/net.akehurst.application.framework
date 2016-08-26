@@ -96,6 +96,11 @@ Dynamic.prototype.setText = function(id, value) {
 	}
 }
 
+Dynamic.prototype.set = function(id, property, value) {
+	var el = $('#'+id)
+	el.attr(property, value)
+}
+
 Dynamic.prototype.addElement = function(parentId, newElementId, type, attributes, content) {
 	var child = document.createElement(type)
 	if (null!=newElementId) { child.id = newElementId }
@@ -169,6 +174,9 @@ Dynamic.prototype.initComms = function() {
 		console.log('server comms open')
 		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{sceneArgs:sceneArgs} }
 		dyn.commsSend('IGuiNotification.notifyEventOccured', outData)		
+	})
+	this.serverComms.registerHandler('Gui.set', function(args) {
+		dynamic.set(args.id, args.property, args.value)
 	})
 	this.serverComms.registerHandler('Gui.setTitle', function(args) {
 		dynamic.setTitle(args.value)

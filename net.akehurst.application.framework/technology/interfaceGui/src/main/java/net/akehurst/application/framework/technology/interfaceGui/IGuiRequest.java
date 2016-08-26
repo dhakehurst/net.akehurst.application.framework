@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.guiInterface;
+package net.akehurst.application.framework.technology.interfaceGui;
 
 import java.net.URL;
 
-import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.UserSession;
 
 public interface IGuiRequest {
@@ -34,7 +33,7 @@ public interface IGuiRequest {
 	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type);
 
 	/**
-	 * 
+	 *
 	 * @param parentId
 	 * @param newElementId
 	 * @param type
@@ -42,7 +41,8 @@ public interface IGuiRequest {
 	 *            as a JSON string, using single quotes, e.g. "{ 'xxx':2, 'aa':'bb' }"
 	 * @param content
 	 */
-	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type, String attributes, Object content);
+	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type, String attributes,
+			Object content);
 
 	void clearElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
 
@@ -50,8 +50,10 @@ public interface IGuiRequest {
 
 	void setText(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
 
-	void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, Integer width, Integer height, String chartType, String jsonChartData,
-			String jsonChartOptions);
+	void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, Integer width, Integer height,
+			String chartType, String jsonChartData, String jsonChartOptions);
 
 	void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String diagramId, String jsonDiagramData);
+
+	void set(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
 }

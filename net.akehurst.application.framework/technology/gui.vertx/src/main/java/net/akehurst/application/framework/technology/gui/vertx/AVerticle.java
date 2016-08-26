@@ -42,13 +42,13 @@ import io.vertx.ext.web.handler.impl.UserHolder;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import net.akehurst.application.framework.common.UserDetails;
 import net.akehurst.application.framework.common.UserSession;
-import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
-import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
-import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
-import net.akehurst.application.framework.technology.guiInterface.IGuiCallback;
-import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
-import net.akehurst.application.framework.technology.guiInterface.SceneIdentity;
-import net.akehurst.application.framework.technology.guiInterface.StageIdentity;
+import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiCallback;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
+import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
+import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class AVerticle implements Verticle {

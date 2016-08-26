@@ -32,16 +32,16 @@ import net.akehurst.application.framework.common.annotations.instance.Configured
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.realisation.AbstractComponent;
-import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
-import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiScene;
-import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
-import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
-import net.akehurst.application.framework.technology.guiInterface.IGuiNotification;
-import net.akehurst.application.framework.technology.guiInterface.IGuiRequest;
-import net.akehurst.application.framework.technology.guiInterface.IGuiScene;
-import net.akehurst.application.framework.technology.guiInterface.SceneIdentity;
-import net.akehurst.application.framework.technology.guiInterface.StageIdentity;
+import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
+import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
+import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
+import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
@@ -255,6 +255,19 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		data.put("elementId", elementId);
 
 		this.verticle.comms.send(session, "Gui.clearElement", data);
+	}
+
+	@Override
+	public void set(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId, final String propertyName,
+			final Object value) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("id", elementId);
+		data.put("property", propertyName);
+		data.put("value", value);
+
+		this.verticle.comms.send(session, "Gui.set", data);
 	}
 
 	@Override

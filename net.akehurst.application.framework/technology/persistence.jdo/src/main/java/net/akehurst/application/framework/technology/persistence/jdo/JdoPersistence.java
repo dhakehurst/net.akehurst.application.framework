@@ -52,6 +52,14 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 //import sun.misc.IOUtils;
 
+/**
+ *
+ * Must ensure that compatible versions are in use for javax.jdo, datanucleus-api-jdo, datanucleus-core, and the datanucleus-* make sure to use
+ * org.datanucleus:javax.jdo, rather than javax.jdo:jdo-api
+ *
+ * @author akehurst
+ *
+ */
 public class JdoPersistence extends AbstractComponent implements IPersistentStore {
 
 	static class DynClassloader extends ClassLoader {
@@ -314,7 +322,8 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 
 	@Override
 	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
-		final Query query = this.manager.newQuery(itemType);
+		final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
+		final Query<? extends Persistable> query = this.manager.newQuery(enhancedType);
 		final Collection<T> res = (Collection<T>) query.execute();
 		return new HashSet<>(res);
 	}

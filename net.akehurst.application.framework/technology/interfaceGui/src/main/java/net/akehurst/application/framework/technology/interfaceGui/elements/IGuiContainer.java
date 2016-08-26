@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.interfaceGui.console;
+package net.akehurst.application.framework.technology.interfaceGui.elements;
 
-import net.akehurst.application.framework.common.annotations.declaration.Signal;
+public interface IGuiContainer {
 
-public interface IConsoleRequest {
+	public void addElement();
 
-	@Signal
-	void requestOutput(String str);
-
-	@Signal
-	void requestError(String str);
 }

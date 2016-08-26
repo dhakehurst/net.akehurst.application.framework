@@ -13,32 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.gui.jfx.elements;
+package net.akehurst.application.framework.technology.gui.vertx.elements;
 
-import javafx.scene.Node;
 import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
-public class JfxText extends JfxGuiElement implements IGuiText {
+public class VertxGuiContainer extends VertxGuiElement implements IGuiText {
 
-	public JfxText(final Node n) {
-		super(n);
+	public VertxGuiContainer(final IGuiRequest guiRequest, final IGuiScene scene, final String elementName) {
+		super(guiRequest, scene, elementName);
 	}
-
-	// @Override
-	// public String getText(UserSession session) {
-	// return (String)super.get(session, "text");
-	// }
 
 	@Override
 	public void setText(final UserSession session, final String value) {
-		super.set(session, "text", value);
+		this.guiRequest.setText(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, value);
 	}
 
 	@Override
 	public void onTextChange(final UserSession session, final EventTextChange event) {
-		// TODO Auto-generated method stub
-
+		super.onEvent(session, "oninput", (e) -> event.execute());
 	}
 
 }

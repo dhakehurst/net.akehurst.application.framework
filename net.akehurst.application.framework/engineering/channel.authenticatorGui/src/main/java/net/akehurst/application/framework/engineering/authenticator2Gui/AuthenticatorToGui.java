@@ -24,8 +24,8 @@ import net.akehurst.application.framework.computational.interfaceAuthenticator.A
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorNotification;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
 import net.akehurst.application.framework.realisation.AbstractComponent;
-import net.akehurst.application.framework.technology.authentication.IAuthenticatorNotification;
-import net.akehurst.application.framework.technology.authentication.IAuthenticatorRequest;
+import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
+import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 
 
 public class AuthenticatorToGui extends AbstractComponent implements ICAuthenticatorRequest, IAuthenticatorNotification {

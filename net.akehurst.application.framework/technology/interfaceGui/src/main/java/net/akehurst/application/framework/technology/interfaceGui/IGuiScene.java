@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.guiInterface;
+package net.akehurst.application.framework.technology.interfaceGui;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.UserSession;

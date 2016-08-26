@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2016 Dr. David H. Akehurst (http://dr.david.h.akehurst.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.akehurst.application.framework.technology.gui.jfx.elements;
 
 import java.lang.reflect.InvocationHandler;
@@ -19,15 +34,15 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeView;
 import net.akehurst.application.framework.common.UserSession;
-import net.akehurst.application.framework.technology.guiInterface.GuiEvent;
-import net.akehurst.application.framework.technology.guiInterface.GuiEventSignature;
-import net.akehurst.application.framework.technology.guiInterface.IGuiScene;
-import net.akehurst.application.framework.technology.guiInterface.SceneIdentity;
-import net.akehurst.application.framework.technology.guiInterface.StageIdentity;
-import net.akehurst.application.framework.technology.guiInterface.data.tree.IGuiTreeView;
-import net.akehurst.application.framework.technology.guiInterface.elements.IGuiChart;
-import net.akehurst.application.framework.technology.guiInterface.elements.IGuiMenuItem;
-import net.akehurst.application.framework.technology.guiInterface.elements.IGuiText;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
+import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
+import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
+import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
+import net.akehurst.application.framework.technology.interfaceGui.data.tree.IGuiTreeView;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiMenuItem;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
 public class JfxGuiScene implements IGuiScene, InvocationHandler {
 

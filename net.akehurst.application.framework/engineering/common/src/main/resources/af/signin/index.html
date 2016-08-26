@@ -32,8 +32,12 @@
 		      </label>
 		    </div>
 		    <button id="actionSignIn" class="btn btn-lg btn-primary btn-block" type="button">Sign in</button>
+			<div id='messageBox' class='alert alert-danger' hidden='true'>
+			  <button class="close" data-dismiss="alert" aria-label="close">&times;</button>
+			  <p id='messageText'></p>
+			</div>
 		  </fieldset>
-		
+
 		</div>
 
 		<script>
@@ -41,6 +45,7 @@
           var stageId = '${stageId}'
         </script>
 	    <script src="${rootPath}/js/jquery.js"></script>
+	    <script src="${rootPath}/js/bootstrap/js/bootstrap.min.js"></script>
  		<script src="${rootPath}/js/sockjs.js"></script>
 		<script src="${rootPath}/js/dynamic.js"></script>
 		<script src="${rootPath}/js/ServerComms.js"></script>
