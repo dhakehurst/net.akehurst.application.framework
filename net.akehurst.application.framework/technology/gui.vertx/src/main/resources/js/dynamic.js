@@ -80,7 +80,15 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 
 Dynamic.prototype.switchToScene = function(stageId, sceneId) {
 	var myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-	window.location.href = myLocation + stageId+sceneId
+	var pstageId = stageId + '/';
+	if (stageId.length==0) {
+	   pstageId = ''
+	}
+	var psceneId = sceneId + '/';
+	if (stageId.length==0) {
+	   psceneId = ''
+	}
+	window.location.href = myLocation + '/' + pstageId + psceneId 
 }
 
 Dynamic.prototype.setTitle = function(value) {
@@ -170,7 +178,11 @@ Dynamic.prototype.commsSend = function(name, data) {
 
 Dynamic.prototype.initComms = function() {
 	var dyn = this
-	this.serverComms = new ServerComms(stageId+'/sockjs', function() {
+	var prefix = '/'
+	if (stageId.length == 0) { //special case
+		prefix = ''
+	}
+	this.serverComms = new ServerComms(prefix+stageId+'/sockjs', function() {
 		console.log('server comms open')
 		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{sceneArgs:sceneArgs} }
 		dyn.commsSend('IGuiNotification.notifyEventOccured', outData)		

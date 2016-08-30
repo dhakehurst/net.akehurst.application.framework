@@ -19,7 +19,13 @@ import java.util.List;
 
 public interface IGuiTableData<C, R> {
 
-	void getCellData(C column, R row);
+	List<C> getColumnIndices();
+
+	int getNumberOfRows();
+
+	R getRowIndex(int index);
+
+	IGuiTableCell<C, R> getCellData(C column, R row);
 
 	List<IGuiTableRow<C, R>> getRows();
 

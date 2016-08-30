@@ -18,8 +18,8 @@ package net.akehurst.application.framework.technology.gui.vertx.elements;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.common.annotations.instance.IdentifiableObjectInstance;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.gui.common.GuiEventHandler;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;

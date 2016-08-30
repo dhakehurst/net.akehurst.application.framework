@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.common;
+ 
+ dependencies {
+ 	compile project(':net.akehurst.application.framework.common.bits')
+ 	compile project(':net.akehurst.application.framework.common.os')
+ 	compile project(':net.akehurst.application.framework.computational.interfaceAuthenticator')
+ 	compile project(':net.akehurst.application.framework.computational.interfaceUser')
 
-public class UserSession extends AbstractDataType {
+ }
 
-	public UserSession(String sessionId, UserDetails user) {
-		this.sessionId = sessionId;
-		this.user = user;
-	}
-	String sessionId;
-	public String getId() {
-		return this.sessionId;
-	}
-	
-	UserDetails user;
-	
-	public UserDetails getUser() {
-		return this.user;
-	}
-}
+

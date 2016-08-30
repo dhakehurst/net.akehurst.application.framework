@@ -16,7 +16,7 @@
 package net.akehurst.application.framework.technology.interfaceGui;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiScene extends IIdentifiableObject {
 

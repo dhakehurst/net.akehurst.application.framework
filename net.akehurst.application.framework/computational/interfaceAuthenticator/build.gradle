@@ -16,4 +16,5 @@
  
  dependencies {
  	compile project(':net.akehurst.application.framework.common.bits')
+ 	compile project(':net.akehurst.application.framework.common.interfaceUser')
  }

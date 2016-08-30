@@ -16,10 +16,10 @@
 package net.akehurst.application.framework.technology.gui.console;
 
 import net.akehurst.application.framework.common.IPort;
-import net.akehurst.application.framework.common.UserDetails;
-import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.common.annotations.declaration.Component;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
+import net.akehurst.application.framework.common.interfaceUser.UserDetails;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.interfaceGui.console.IConsoleNotification;
 import net.akehurst.application.framework.technology.interfaceGui.console.IConsoleRequest;

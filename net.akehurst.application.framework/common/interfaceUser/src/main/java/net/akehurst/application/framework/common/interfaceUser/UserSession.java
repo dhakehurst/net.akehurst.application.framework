@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.common;
+package net.akehurst.application.framework.common.interfaceUser;
 
-public class UserDetails extends AbstractDataType {
+import net.akehurst.application.framework.common.AbstractDataType;
 
-	public UserDetails(String name) {
-		super(name);
-		this.name = name;
+public class UserSession extends AbstractDataType {
+
+	public UserSession(final String sessionId, final UserDetails user) {
+		this.sessionId = sessionId;
+		this.user = user;
 	}
-	
-	String name;
-	public String getName() {
-		return this.name;
+
+	String sessionId;
+
+	public String getId() {
+		return this.sessionId;
+	}
+
+	UserDetails user;
+
+	public UserDetails getUser() {
+		return this.user;
 	}
 }

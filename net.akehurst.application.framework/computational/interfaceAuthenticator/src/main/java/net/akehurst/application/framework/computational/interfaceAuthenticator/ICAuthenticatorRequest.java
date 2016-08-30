@@ -15,10 +15,11 @@
  */
 package net.akehurst.application.framework.computational.interfaceAuthenticator;
 
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface ICAuthenticatorRequest {
 
-	void requestLogin(AuthenticatorSession session, String username, String password);
-	
-	void requestLogout(AuthenticatorSession session);
+	void requestLogin(UserSession session, String username, String password);
+
+	void requestLogout(UserSession session);
 }

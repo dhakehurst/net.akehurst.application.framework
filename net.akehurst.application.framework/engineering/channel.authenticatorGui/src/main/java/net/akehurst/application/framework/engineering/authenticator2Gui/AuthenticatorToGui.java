@@ -15,74 +15,59 @@
  */
 package net.akehurst.application.framework.engineering.authenticator2Gui;
 
-
 import net.akehurst.application.framework.common.IPort;
-import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
-import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorSession;
-import net.akehurst.application.framework.computational.interfaceAuthenticator.AuthenticatorUserDetails;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorNotification;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 
-
 public class AuthenticatorToGui extends AbstractComponent implements ICAuthenticatorRequest, IAuthenticatorNotification {
 
-	public AuthenticatorToGui(String id) {
+	public AuthenticatorToGui(final String id) {
 		super(id);
 	}
-	
-	@Override
-	public void afConnectParts() {
-	}
-	
-	@Override
-	public void afRun() {
-	}
-	
+
 	// --------- ICAuthenticatorRequest ---------
 	@Override
-	public void requestLogin(AuthenticatorSession session, String username, String password) {
-		UserSession ts = new UserSession(session.getId(), null);
-		portGui().out(IAuthenticatorRequest.class).requestLogin(ts, username, password);
+	public void requestLogin(final UserSession session, final String username, final String password) {
+		this.portGui().out(IAuthenticatorRequest.class).requestLogin(session, username, password);
 	}
-	
+
 	@Override
-	public void requestLogout(AuthenticatorSession session) {
-		UserSession ts = new UserSession(session.getId(), null);
-		portGui().out(IAuthenticatorRequest.class).requestLogout(ts);
+	public void requestLogout(final UserSession session) {
+		this.portGui().out(IAuthenticatorRequest.class).requestLogout(session);
 	}
-	
+
 	// --------- IAuthenticatorNotification ---------
 	@Override
-	public void notifyAuthenticationFailure(UserSession session, String message) {
-		AuthenticatorSession as = new AuthenticatorSession(session.getId(), null);
-		portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationFailure(as, message);
+	public void notifyAuthenticationFailure(final UserSession session, final String message) {
+		this.portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationFailure(session, message);
 	}
-	
+
 	@Override
-	public void notifyAuthenticationSuccess(UserSession session) {
-		AuthenticatorSession as = new AuthenticatorSession(session.getId(), new AuthenticatorUserDetails(session.getUser().getName()));
-		portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationSuccess(as);
+	public void notifyAuthenticationSuccess(final UserSession session) {
+		this.portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationSuccess(session);
 	}
-	
+
 	@Override
-	public void notifyAuthenticationCleared(UserSession session) {
-		AuthenticatorSession as = new AuthenticatorSession(session.getId(), null);
-		portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationCleared(as);
+	public void notifyAuthenticationCleared(final UserSession session) {
+		this.portAuth().out(ICAuthenticatorNotification.class).notifyAuthenticationCleared(session);
 	}
-	
+
 	// --------- Ports ---------
-	@PortInstance(provides={ICAuthenticatorRequest.class},requires={ICAuthenticatorNotification.class})
+	@PortInstance(provides = { ICAuthenticatorRequest.class }, requires = { ICAuthenticatorNotification.class })
 	IPort portAuth;
+
 	public IPort portAuth() {
 		return this.portAuth;
 	}
-	
-	@PortInstance(provides={IAuthenticatorNotification.class},requires={IAuthenticatorRequest.class})
+
+	@PortInstance(provides = { IAuthenticatorNotification.class }, requires = { IAuthenticatorRequest.class })
 	IPort portGui;
+
 	public IPort portGui() {
 		return this.portGui;
 	}

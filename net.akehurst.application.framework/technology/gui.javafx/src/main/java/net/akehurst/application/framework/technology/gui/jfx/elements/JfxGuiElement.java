@@ -18,7 +18,7 @@ package net.akehurst.application.framework.technology.gui.jfx.elements;
 import java.lang.reflect.Method;
 
 import javafx.scene.Node;
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 import net.akehurst.holser.reflect.BetterMethodFinder;

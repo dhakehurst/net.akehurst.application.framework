@@ -33,7 +33,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeView;
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;

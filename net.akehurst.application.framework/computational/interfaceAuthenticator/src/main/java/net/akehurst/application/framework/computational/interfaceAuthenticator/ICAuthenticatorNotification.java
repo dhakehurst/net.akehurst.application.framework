@@ -15,12 +15,13 @@
  */
 package net.akehurst.application.framework.computational.interfaceAuthenticator;
 
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface ICAuthenticatorNotification {
-	
-	void notifyAuthenticationSuccess(AuthenticatorSession session);
-	
-	void notifyAuthenticationFailure(AuthenticatorSession session, String message);
 
-	void notifyAuthenticationCleared(AuthenticatorSession session);
+	void notifyAuthenticationSuccess(UserSession session);
+
+	void notifyAuthenticationFailure(UserSession session, String message);
+
+	void notifyAuthenticationCleared(UserSession session);
 }

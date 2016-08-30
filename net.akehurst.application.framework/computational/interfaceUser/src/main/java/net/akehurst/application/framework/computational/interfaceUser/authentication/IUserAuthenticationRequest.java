@@ -15,11 +15,11 @@
  */
 package net.akehurst.application.framework.computational.interfaceUser.authentication;
 
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IUserAuthenticationRequest {
 
 	void requestLogin(UserSession session, String username, String password);
-	
+
 	void requestLogout(UserSession session);
 }

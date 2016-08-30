@@ -27,10 +27,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IPort;
-import net.akehurst.application.framework.common.UserSession;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiScene;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
@@ -142,12 +142,14 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 			variables.put("jsPath", this.getJsPath());
 			variables.put("stageId", stageId.asPrimitive());
 
+			final String stagePath = stageId.asPrimitive().isEmpty() ? "" : "/" + stageId.asPrimitive();
+
 			String str = contentRoot.toString();
 			if (str.endsWith("/")) {
 				str = str.substring(0, str.length() - 1);
 			}
 			final String webroot = str.substring(str.lastIndexOf('/') + 1);
-			final String routePath = this.rootPath + stageId.asPrimitive();
+			final String routePath = this.rootPath + stagePath;
 			if (authenticated) {
 				this.verticle.addAuthenticatedRoute(routePath, rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());

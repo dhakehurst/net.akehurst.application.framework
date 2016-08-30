@@ -15,7 +15,7 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;

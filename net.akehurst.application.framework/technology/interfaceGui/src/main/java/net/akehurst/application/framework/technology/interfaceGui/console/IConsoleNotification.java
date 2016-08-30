@@ -15,7 +15,7 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui.console;
 
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IConsoleNotification {
 

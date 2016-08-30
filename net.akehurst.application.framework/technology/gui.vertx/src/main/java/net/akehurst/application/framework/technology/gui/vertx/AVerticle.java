@@ -40,8 +40,8 @@ import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.handler.impl.UserHolder;
 import io.vertx.ext.web.sstore.LocalSessionStore;
-import net.akehurst.application.framework.common.UserDetails;
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserDetails;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
@@ -225,10 +225,14 @@ public class AVerticle implements Verticle {
 	public void start(final Future<Void> startFuture) throws Exception {
 
 		this.router = Router.router(this.vertx);
-		this.router.route().handler(CookieHandler.create());
-		this.router.route().handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
-		this.router.route().handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-		this.router.route().handler(UserSessionHandler.create(this.authProvider));
+		// this.router.route(this.ws.getTestPath()).handler(CookieHandler.create());
+		// this.router.route(this.ws.getTestPath()).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+		// this.router.route(this.ws.getTestPath()).handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
+		// this.router.route(this.ws.getTestPath()).handler(UserSessionHandler.create(this.authProvider));
+		this.router.route(this.ws.getTestPath()).handler(rc -> {
+			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
+		});
+		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + this.ws.getTestPath());
 
 		final ShiroAuthOptions authOpts = new ShiroAuthOptions();
 		final JsonObject config = new JsonObject();
@@ -239,26 +243,6 @@ public class AVerticle implements Verticle {
 		this.authHandler = new MyAuthHandler(this.authProvider);
 
 		this.comms = new ClientServerComms(this.vertx, this.router, this.authProvider, "/eventbus");
-		// this.comms.addOutboundAddress("Gui.setTitle");
-		// this.comms.addOutboundAddress("Gui.switchToScene");
-		// this.comms.addOutboundAddress("Gui.addElement");
-		// this.comms.addOutboundAddress("Gui.requestRecieveEvent");
-		// this.comms.addOutboundAddress("Gui.setText");
-		//
-		// this.comms.addOutboundAddress("Canvas.addChild");
-		// this.comms.addOutboundAddress("Canvas.addChildToParent");
-		// this.comms.addOutboundAddress("Canvas.relocate");
-		// this.comms.addOutboundAddress("Canvas.resize");
-		// this.comms.addOutboundAddress("Canvas.transform");
-		// this.comms.addOutboundAddress("Canvas.setStartAnchor");
-		// this.comms.addOutboundAddress("Canvas.setEndAnchor");
-		//
-		// this.comms.addInboundAddress("handleEvent");
-
-		this.router.route(this.ws.getTestPath()).handler(rc -> {
-			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
-		});
-		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + this.ws.getTestPath());
 
 		this.router.route(this.ws.getJsPath() + "/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
 

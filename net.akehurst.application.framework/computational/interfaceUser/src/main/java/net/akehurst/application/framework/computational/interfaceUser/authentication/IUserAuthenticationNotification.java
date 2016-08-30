@@ -15,11 +15,11 @@
  */
 package net.akehurst.application.framework.computational.interfaceUser.authentication;
 
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IUserAuthenticationNotification {
 	void notifyAuthenticationSuccess(UserSession session);
-	
+
 	void notifyAuthenticationFailure(UserSession session, String message);
 
 	void notifyAuthenticationCleared(UserSession session);

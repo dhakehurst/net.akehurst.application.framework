@@ -15,7 +15,7 @@
  */
 package net.akehurst.application.framework.technology.gui.common;
 
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractActiveSignalProcessingObject;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiCallback;

@@ -13,24 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.computational.interfaceAuthenticator;
+ 
+ dependencies {
+ 	compile project(':net.akehurst.application.framework.common.bits')
 
-import net.akehurst.application.framework.common.AbstractDataType;
+ }
 
-public class AuthenticatorSession extends AbstractDataType {
 
-	public AuthenticatorSession(String sessionId, AuthenticatorUserDetails user) {
-		this.sessionId = sessionId;
-		this.user = user;
-	}
-	String sessionId;
-	public String getId() {
-		return this.sessionId;
-	}
-	
-	AuthenticatorUserDetails user;
-	
-	public AuthenticatorUserDetails getUser() {
-		return this.user;
-	}
-}

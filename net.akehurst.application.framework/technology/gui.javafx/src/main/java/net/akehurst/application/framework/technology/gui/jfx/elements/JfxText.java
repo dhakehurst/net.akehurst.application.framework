@@ -16,7 +16,7 @@
 package net.akehurst.application.framework.technology.gui.jfx.elements;
 
 import javafx.scene.Node;
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
 public class JfxText extends JfxGuiElement implements IGuiText {

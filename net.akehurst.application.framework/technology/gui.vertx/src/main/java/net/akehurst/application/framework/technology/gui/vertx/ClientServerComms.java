@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -27,7 +26,6 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.AuthProvider;
-import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -40,13 +38,12 @@ import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 import io.vertx.ext.web.sstore.LocalSessionStore;
-import net.akehurst.application.framework.common.UserDetails;
-import net.akehurst.application.framework.common.UserSession;
-import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
+import net.akehurst.application.framework.common.interfaceUser.UserDetails;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public class ClientServerComms {
 
-	public ClientServerComms(Vertx vertx, Router router, AuthProvider authProvider, String busPath) {
+	public ClientServerComms(final Vertx vertx, final Router router, final AuthProvider authProvider, final String busPath) {
 		this.vertx = vertx;
 		this.router = router;
 		this.authProvider = authProvider;
@@ -70,12 +67,12 @@ public class ClientServerComms {
 
 	Map<String, Session> activeSessions;
 
-	UserSession createTechSession(Session session) {
+	UserSession createTechSession(final Session session) {
 		this.activeSessions.put(session.id(), session);
 		UserDetails user = null;
-		UserHolder holder = session.get("__vertx.userHolder");
+		final UserHolder holder = session.get("__vertx.userHolder");
 		if (null != holder && null != holder.user) {
-			String n = holder.user.principal().getString("username");
+			final String n = holder.user.principal().getString("username");
 			user = new UserDetails(n);
 		} else {
 			// not authenticated, leave user as null
@@ -83,8 +80,8 @@ public class ClientServerComms {
 		return new UserSession(session.id(), user);
 	}
 
-	Session getSession(String sessionId) {
-		Session session = this.activeSessions.get(sessionId);
+	Session getSession(final String sessionId) {
+		final Session session = this.activeSessions.get(sessionId);
 		if (null == session) {
 			return null;
 		} else {
@@ -102,22 +99,23 @@ public class ClientServerComms {
 		void apply(T1 o1, T2 o2, T3 o3);
 	}
 
-	public void addSocksChannel(String socksRoutePath, F3<UserSession, String, JsonObject> handler) {
-		router.route(socksRoutePath).handler(CookieHandler.create());
-		router.route(socksRoutePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
-		router.route(socksRoutePath).handler(SessionHandler.create(LocalSessionStore.create(vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-		router.route(socksRoutePath).handler(UserSessionHandler.create(authProvider));
-		SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
-		router.route(socksRoutePath).handler(sockJSHandler);
+	public void addSocksChannel(final String socksRoutePath, final F3<UserSession, String, JsonObject> handler) {
+		this.router.route(socksRoutePath).handler(CookieHandler.create());
+		this.router.route(socksRoutePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+		this.router.route(socksRoutePath)
+				.handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
+		this.router.route(socksRoutePath).handler(UserSessionHandler.create(this.authProvider));
+		final SockJSHandler sockJSHandler = SockJSHandler.create(this.vertx);
+		this.router.route(socksRoutePath).handler(sockJSHandler);
 		sockJSHandler.socketHandler(ss -> {
 			this.socks.put(ss.webSession(), ss);
-			UserSession sess = this.createTechSession(ss.webSession());
+			final UserSession sess = this.createTechSession(ss.webSession());
 			ss.handler(b -> {
-				String s = new String(b.getBytes());
+				final String s = new String(b.getBytes());
 				System.out.println(s);
-				JsonObject json = new JsonObject(s);
-				String channelId = json.getString("channelId");
-				JsonObject data = json.getJsonObject("data");
+				final JsonObject json = new JsonObject(s);
+				final String channelId = json.getString("channelId");
+				final JsonObject data = json.getJsonObject("data");
 				handler.apply(sess, channelId, data);
 			});
 		});
@@ -125,24 +123,24 @@ public class ClientServerComms {
 
 	Map<Session, SockJSSocket> socks;
 
-	public void send(UserSession session, String channelId, JsonObject data) {
-		JsonObject msg = new JsonObject();
+	public void send(final UserSession session, final String channelId, final JsonObject data) {
+		final JsonObject msg = new JsonObject();
 		msg.put("channelId", channelId);
 		msg.put("data", data);
-		Session sess = this.getSession(session.getId());
-		SockJSSocket ss = this.socks.get(sess);
+		final Session sess = this.getSession(session.getId());
+		final SockJSSocket ss = this.socks.get(sess);
 		ss.write(Buffer.factory.buffer(msg.encode()));
 	}
 
 	List<String> outbound;
 	List<String> inbound;
 
-	void addOutboundAddress(String address) {
+	void addOutboundAddress(final String address) {
 		this.outbound.add(address);
 		this.refreshEventBus();
 	}
 
-	void addInboundAddress(String address) {
+	void addInboundAddress(final String address) {
 		this.inbound.add(address);
 		this.refreshEventBus();
 	}
@@ -151,25 +149,25 @@ public class ClientServerComms {
 		if (null == this.router) {
 
 		} else {
-			BridgeOptions options = new BridgeOptions();
-			for (String a : this.outbound) {
+			final BridgeOptions options = new BridgeOptions();
+			for (final String a : this.outbound) {
 				options.addOutboundPermitted(new PermittedOptions().setAddress(a));
 			}
-			for (String a : this.inbound) {
+			for (final String a : this.inbound) {
 				options.addInboundPermitted(new PermittedOptions().setAddress(a));
 			}
-			router.clear();
-			router.route(this.busPath + "/*").handler(SockJSHandler.create(vertx).bridge(options));
+			this.router.clear();
+			this.router.route(this.busPath + "/*").handler(SockJSHandler.create(this.vertx).bridge(options));
 		}
 	}
 
-	void send(String user, String address, JsonObject data) {
-		DeliveryOptions options = new DeliveryOptions();
+	void send(final String user, final String address, final JsonObject data) {
+		final DeliveryOptions options = new DeliveryOptions();
 		options.addHeader("user", user);
 		this.eventbus.publish(address, data, options);
 	}
 
-	void publish(String address, JsonObject data) {
+	void publish(final String address, final JsonObject data) {
 		this.eventbus.publish(address, data);
 	}
 }

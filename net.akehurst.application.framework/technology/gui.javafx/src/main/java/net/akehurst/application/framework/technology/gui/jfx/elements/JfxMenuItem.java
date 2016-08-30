@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import net.akehurst.application.framework.common.UserSession;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiMenuItem;
 import net.akehurst.holser.reflect.BetterMethodFinder;
