@@ -35,7 +35,7 @@ import net.akehurst.application.framework.common.annotations.instance.PortInstan
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 
 public class DerbyDatabasePersistence extends AbstractComponent implements IPersistentStore {
 
@@ -243,11 +243,11 @@ public class DerbyDatabasePersistence extends AbstractComponent implements IPers
 		return result;
 	}
 
-	public void putString(PersistentItemLocation id, String item) {
+	public void putString(PersistentItemQuery id, String item) {
 
 	}
 
-	public String fetchString(PersistentItemLocation id) {
+	public String fetchString(PersistentItemQuery id) {
 		return null;
 	}
 
@@ -260,19 +260,19 @@ public class DerbyDatabasePersistence extends AbstractComponent implements IPers
 	}
 	
 	@Override
-	public <T> void store(IPersistenceTransaction transaction, PersistentItemLocation location, T item, Class<T> itemType) {
+	public <T> void store(IPersistenceTransaction transaction, PersistentItemQuery location, T item, Class<T> itemType) {
 		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
-	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType) {
+	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType, Map<String, Object> filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}

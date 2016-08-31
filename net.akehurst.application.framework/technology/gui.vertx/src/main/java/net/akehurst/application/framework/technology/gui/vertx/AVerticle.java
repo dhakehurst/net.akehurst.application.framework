@@ -154,7 +154,7 @@ public class AVerticle implements Verticle {
 		}
 	}
 
-	UserSession createTechSession(final Session webSession) {
+	UserSession createUserSession(final Session webSession) {
 		final UserSession unknown = new UserSession("none", new UserDetails("<unknown>"));
 		if (null == webSession) {
 			return unknown;
@@ -172,28 +172,28 @@ public class AVerticle implements Verticle {
 	}
 
 	// should maybe move the authentication into its own ?Authenticator class
-	public void requestLogin(final UserSession techSession, final String username, final String password) {
-		final Session session = this.getSession(techSession.getId());
+	public void requestLogin(final UserSession session, final String username, final String password) {
+		final Session sess = this.getSession(session.getId());
 		final JsonObject authInfo = new JsonObject();
 		authInfo.put("username", username);
 		authInfo.put("password", password);
 		this.authProvider.authenticate(authInfo, res -> {
 			if (res.succeeded()) {
 				final User u = res.result();
-				UserHolder holder = session.get("__vertx.userHolder");
+				UserHolder holder = sess.get("__vertx.userHolder");
 				if (holder != null) {
 					holder.context.setUser(u);
 					holder.user = u;
-					session.put("__vertx.userHolder", holder);
+					sess.put("__vertx.userHolder", holder);
 				} else {
 					holder = new UserHolder(null);
 					holder.user = u;
-					session.put("__vertx.userHolder", holder);
+					sess.put("__vertx.userHolder", holder);
 				}
-				final UserSession newTs = new UserSession(techSession.getId(), new UserDetails(u.principal().getString("username")));
+				final UserSession newTs = new UserSession(session.getId(), new UserDetails(u.principal().getString("username")));
 				this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationSuccess(newTs);
 			} else {
-				this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationFailure(techSession, "Authentication Failed");
+				this.ws.portGui().out(IAuthenticatorNotification.class).notifyAuthenticationFailure(session, "Authentication Failed");
 			}
 		});
 	}
@@ -249,7 +249,7 @@ public class AVerticle implements Verticle {
 		this.router.route(this.ws.getDownloadPath() + "/:filename").handler(rc -> {
 			final String filename = rc.request().getParam("filename");
 			final Buffer buffer = Buffer.buffer();
-			this.ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(this.createTechSession(rc.session()), filename, new IGuiCallback() {
+			this.ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(this.createUserSession(rc.session()), filename, new IGuiCallback() {
 
 				@Override
 				public void success(final Object result) {
@@ -271,7 +271,7 @@ public class AVerticle implements Verticle {
 		this.addPostRoute(this.ws.getUploadPath(), rc -> {
 			final FileUpload fu = rc.fileUploads().iterator().next();
 
-			this.ws.portGui().out(IGuiNotification.class).notifyUpload(this.createTechSession(rc.session()), fu.uploadedFileName());
+			this.ws.portGui().out(IGuiNotification.class).notifyUpload(this.createUserSession(rc.session()), fu.uploadedFileName());
 
 		});
 		this.ws.logger.log(LogLevel.INFO, "Upload path:  " + "http://localhost:" + this.port + this.ws.getUploadPath());

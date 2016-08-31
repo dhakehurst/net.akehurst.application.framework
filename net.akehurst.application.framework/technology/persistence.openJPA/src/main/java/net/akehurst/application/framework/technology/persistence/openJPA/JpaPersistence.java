@@ -33,7 +33,7 @@ import net.akehurst.application.framework.common.annotations.instance.PortInstan
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 /**
  * 
@@ -68,7 +68,7 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	};
 
 	@Override
-	public <T> void store(IPersistenceTransaction transaction, PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException {
+	public <T> void store(IPersistenceTransaction transaction, PersistentItemQuery location, T item, Class<T> itemType) throws PersistentStoreException {
 		try {
 			JpaPersistenceTransaction trans = (JpaPersistenceTransaction)transaction;
 			trans.em.persist(item);
@@ -94,7 +94,7 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 	
 	@Override
-	public <T> T retrieve(IPersistenceTransaction transaction, PersistentItemLocation location, Class<T> itemType) {
+	public <T> T retrieve(IPersistenceTransaction transaction, PersistentItemQuery location, Class<T> itemType) {
 		try {
 			JpaPersistenceTransaction trans = (JpaPersistenceTransaction)transaction;
 			T t = trans.em.find(itemType, location.asPrimitive());
@@ -106,7 +106,7 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieve(IPersistenceTransaction transaction, PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction, PersistentItemQuery location, Class<T> itemType, Map<String, Object> filter) {
 		String qs = "SELECT item FROM " + itemType.getSimpleName()+" item";
 		if (filter.isEmpty()) {
 			//do nothing, return all

@@ -17,9 +17,9 @@ package net.akehurst.application.framework.technology.interfacePersistence;
 
 import net.akehurst.application.framework.common.AbstractDataType;
 
-public class PersistentItemLocation extends AbstractDataType {
+public class PersistentItemQuery extends AbstractDataType {
 
-	public PersistentItemLocation(String value) {
+	public PersistentItemQuery(String value) {
 		super(value);
 		this.value = value;
 	}

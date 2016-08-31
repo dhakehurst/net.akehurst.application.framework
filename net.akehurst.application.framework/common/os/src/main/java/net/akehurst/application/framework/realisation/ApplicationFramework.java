@@ -46,7 +46,7 @@ import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 import net.akehurst.application.framework.technology.logging.console.ConsoleLogger;
 import net.akehurst.holser.reflect.BetterMethodFinder;
@@ -520,7 +520,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 						String idPath = obj.afId() + "." + itemId;
 						// remove the 'application.' first bit of the path
 						idPath = idPath.substring(idPath.indexOf('.') + 1);
-						final PersistentItemLocation pid = new PersistentItemLocation(idPath);
+						final PersistentItemQuery pid = new PersistentItemQuery(idPath);
 						Object value = config.retrieve(trans, pid, itemType);
 						if (null == value) {
 							value = this.createDatatype(f.getType(), ann.defaultValue());
@@ -789,7 +789,14 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 				for (final ProvidesInterfaceForPort ann : anns) {
 					if (interfaceType == ann.provides() && shortPortId.equals(ann.portId())) {
 						f.setAccessible(true);
-						providers.add((T) f.get(component));
+						final T comp = (T) f.get(component);
+						if (null == comp) {
+							throw new ApplicationFrameworkException(
+									component.afId() + "." + f.getName() + " cannot be internal provider of " + interfaceType.getSimpleName() + " it is null",
+									null);
+						} else {
+							providers.add(comp);
+						}
 					}
 				}
 			}

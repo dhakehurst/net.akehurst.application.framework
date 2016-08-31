@@ -13,29 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.common.interfaceUser;
 
-import java.util.List;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+dependencies {
 
-public class UserDetails extends AbstractDataType {
-
-	public UserDetails(final String name) {
-		super(name);
-		this.name = name;
-	}
-
-	String name;
-
-	public String getName() {
-		return this.name;
-	}
-
-	List<String> groups;
-
-	public List<String> getGroups() {
-		return this.groups;
-	}
+	compile project(":${rootProject.name}.common.bits")
+	compile project(":${rootProject.name}.common.interfaceUser")
 
 }

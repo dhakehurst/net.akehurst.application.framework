@@ -16,28 +16,35 @@
 package net.akehurst.application.framework.common;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 abstract public class AbstractDataType {
 
-	public AbstractDataType(Object... objects) {
-		this.objects = objects;
-		this.hashCode_cache = Objects.hash(this.objects);
+	public AbstractDataType(final Object... identityValues) {
+		this.identityValues = identityValues;
+		this.hashCode_cache = Objects.hash(this.identityValues);
 	}
 
-	Object[] objects;
-	
+	private final Object[] identityValues;
+
+	protected List<Object> getIdentityValues() {
+		return Collections.unmodifiableList(Arrays.asList(this.identityValues));
+	}
+
 	int hashCode_cache;
+
 	@Override
 	public int hashCode() {
 		return this.hashCode_cache;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this.getClass().isInstance(obj)) {
-			AbstractDataType other = (AbstractDataType)obj;
-			return Arrays.equals(this.objects, other.objects);
+			final AbstractDataType other = (AbstractDataType) obj;
+			return Arrays.equals(this.identityValues, other.identityValues);
 		} else {
 			return false;
 		}
@@ -45,7 +52,7 @@ abstract public class AbstractDataType {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + Arrays.asList(this.objects);
+		return this.getClass().getSimpleName() + Arrays.asList(this.identityValues);
 	}
 
 }

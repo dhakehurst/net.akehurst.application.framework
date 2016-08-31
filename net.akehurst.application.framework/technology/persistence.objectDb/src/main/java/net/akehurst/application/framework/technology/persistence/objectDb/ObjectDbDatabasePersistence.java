@@ -33,7 +33,7 @@ import net.akehurst.application.framework.common.annotations.instance.PortInstan
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 
 @Component
 public class ObjectDbDatabasePersistence extends AbstractComponent implements IPersistentStore {
@@ -68,7 +68,7 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	};
 
 	@Override
-	public <T> void store(IPersistenceTransaction transaction,PersistentItemLocation location, T item, Class<T> itemType) {
+	public <T> void store(IPersistenceTransaction transaction,PersistentItemQuery location, T item, Class<T> itemType) {
 		try {
 			this.entityManager.getTransaction().begin();
 			this.entityManager.persist(item);
@@ -79,7 +79,7 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	@Override
-	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType) {
+	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType) {
 		try {
 			T t = this.entityManager.find(itemType, location.asPrimitive());
 			return t;
@@ -90,7 +90,7 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	@Override
-	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType, Map<String, Object> filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}

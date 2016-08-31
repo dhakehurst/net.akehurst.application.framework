@@ -26,73 +26,70 @@ import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
-import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
-import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-abstract
-public class AbstractComponent extends AbstractActiveObject implements IComponent {
+abstract public class AbstractComponent extends AbstractActiveObject implements IComponent {
 
-	public AbstractComponent(String id) {
-		super(id);
+	public AbstractComponent(final String afId) {
+		super(afId);
 		this.ports = new HashSet<>();
 	}
-	
+
 	Set<IPort> ports;
+
 	@Override
-	public void afAddPort(IPort value) {
+	public void afAddPort(final IPort value) {
 		this.ports.add(value);
 	}
-	
+
 	@Override
-	public void afConnectParts() {
-	}
-	
+	public void afConnectParts() {}
+
 	@Override
 	public void afStart() {
-		logger.log(LogLevel.TRACE, "AbstractComponent.afStart");
-		for(IPort p: this.ports) {
-			for(Class<?>interfaceType : p.getRequired()) {
-				if (null==p.out(interfaceType)) {
-					System.out.println("Warn: Port "+p+" has not been provided with "+interfaceType);
+		this.logger.log(LogLevel.TRACE, "AbstractComponent.afStart");
+		for (final IPort p : this.ports) {
+			for (final Class<?> interfaceType : p.getRequired()) {
+				if (null == p.out(interfaceType)) {
+					System.out.println("Warn: Port " + p + " has not been provided with " + interfaceType);
 				} else {
 					// ok
 				}
 			}
 		}
-		
+
 		super.afStart();
 	}
-	
+
 	@Override
 	public void afRun() {
-		logger.log(LogLevel.TRACE, "AbstractComponent.afRun");
+		this.logger.log(LogLevel.TRACE, "AbstractComponent.afRun");
 		try {
 			// TODO handle inheritance ?
-			List<IActiveObject> objects = new ArrayList<>();
-			for (Field f : this.getClass().getDeclaredFields()) {
+			final List<IActiveObject> objects = new ArrayList<>();
+			for (final Field f : this.getClass().getDeclaredFields()) {
 				f.setAccessible(true);
-				ComponentInstance annC = f.getAnnotation(ComponentInstance.class);
-				ActiveObjectInstance annAO = f.getAnnotation(ActiveObjectInstance.class);
-				if (null == annC && null==annAO) {
+				final ComponentInstance annC = f.getAnnotation(ComponentInstance.class);
+				final ActiveObjectInstance annAO = f.getAnnotation(ActiveObjectInstance.class);
+				if (null == annC && null == annAO) {
 					// do nothing
 				} else {
-					IActiveObject ao = (IActiveObject) f.get(this);
-					//TODO: support ordering of objects
+					final IActiveObject ao = (IActiveObject) f.get(this);
+					// TODO: support ordering of objects
 					objects.add(ao);
 				}
 			}
-			
-			for(IActiveObject ao: objects) {
+
+			for (final IActiveObject ao : objects) {
 				ao.afStart();
 			}
-			
-			for(IActiveObject ao: objects) {
+
+			for (final IActiveObject ao : objects) {
 				ao.afJoin();
 			}
-			
-		} catch (Exception ex) {
-			logger.log(LogLevel.ERROR, "Failed to run component "+this.afId(), ex);
+
+		} catch (final Exception ex) {
+			this.logger.log(LogLevel.ERROR, "Failed to run component " + this.afId(), ex);
 		}
 	}
 }

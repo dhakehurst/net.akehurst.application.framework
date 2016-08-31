@@ -33,7 +33,7 @@ public interface IPersistentStore {
 	 * @param item  the item to store, must be a DataType
 	 * @param itemType (optional) class that defines the datatype of the item 
 	 */
-	<T> void store(IPersistenceTransaction transaction, PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException;
+	<T> void store(IPersistenceTransaction transaction, PersistentItemQuery location, T item, Class<T> itemType) throws PersistentStoreException;
 
 	
 	/**
@@ -43,7 +43,7 @@ public interface IPersistentStore {
 	 * @return
 	 * @throws PersistentStoreException 
 	 */
-	<T> T retrieve(IPersistenceTransaction transaction, PersistentItemLocation location, Class<T> itemType) throws PersistentStoreException;
+	<T> T retrieve(IPersistenceTransaction transaction, PersistentItemQuery location, Class<T> itemType) throws PersistentStoreException;
 	
 	/**
 	 * 
@@ -52,7 +52,7 @@ public interface IPersistentStore {
 	 * @param filter filters out objects with the give property-value pairs
 	 * @return
 	 */
-	<T> Set<T> retrieve(IPersistenceTransaction transaction, PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
+	<T> Set<T> retrieve(IPersistenceTransaction transaction, PersistentItemQuery location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
 	
 	
 	<T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType);

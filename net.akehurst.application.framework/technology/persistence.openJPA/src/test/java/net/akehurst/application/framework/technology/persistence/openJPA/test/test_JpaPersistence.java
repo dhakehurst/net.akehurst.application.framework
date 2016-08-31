@@ -26,7 +26,7 @@ import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.realisation.ApplicationFramework;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.persistence.openJPA.JpaPersistence;
 import net.akehurst.application.framework.technology.persistence.openJPA.test.jpa.Contacts;
 import net.akehurst.application.framework.technology.persistence.openJPA.test.jpa.Person;
@@ -66,7 +66,7 @@ public class test_JpaPersistence {
 //			props.put("openjpa.DynamicEnhancementAgent", true);
 			//sut.portPersist().getProvided(IPersistentStore.class).connect(props);
 			
-			PersistentItemLocation location = new PersistentItemLocation("");
+			PersistentItemQuery location = new PersistentItemQuery("");
 			Person item = new Person();
 			item.setName("Test");
 
@@ -91,7 +91,7 @@ public class test_JpaPersistence {
 			Map<String, Object> props = new HashMap<>();
 			//sut.portPersist().getProvided(IPersistentStore.class).connect(props);
 			
-			PersistentItemLocation location = new PersistentItemLocation("");
+			PersistentItemQuery location = new PersistentItemQuery("");
 			
 			Person p = new Person();
 			p.setName("Owner");
@@ -122,7 +122,7 @@ public class test_JpaPersistence {
 			props.put("persistenceUnitName", "openjpa");
 			//sut.portPersist().getProvided(IPersistentStore.class).connect(props);
 			
-			PersistentItemLocation location = new PersistentItemLocation("Test");
+			PersistentItemQuery location = new PersistentItemQuery("Test");
 			Person item = new Person();
 			item.setName("Test");
 			//IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
@@ -150,7 +150,7 @@ public class test_JpaPersistence {
 			props.put("persistenceUnitName", "openjpa");
 			//sut.portPersist().getProvided(IPersistentStore.class).connect(props);
 			
-			PersistentItemLocation location = new PersistentItemLocation("Test");
+			PersistentItemQuery location = new PersistentItemQuery("Test");
 			Person item = new Person();
 			item.setName("Test");
 			item.setHairColour("black");

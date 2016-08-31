@@ -25,48 +25,49 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract public class AbstractActiveSignalProcessingObject extends AbstractActiveObject {
 
-	public AbstractActiveSignalProcessingObject(String id) {
-		super(id);
+	public AbstractActiveSignalProcessingObject(final String afId) {
+		super(afId);
 		this.signals = new LinkedBlockingQueue<>();
 	}
 
 	static class NamedSignal {
-		public NamedSignal(String name, ISignal signal) {
+		public NamedSignal(final String name, final ISignal signal) {
 			this.name = name;
 			this.signal = signal;
-			this.future = new FutureTask<Void>(()->{
+			this.future = new FutureTask<>(() -> {
 				try {
 					signal.execute();
-				} catch (Throwable t) {
+				} catch (final Throwable t) {
 					t.printStackTrace();
 				}
 			}, null);
 		}
+
 		String name;
 		ISignal signal;
 		FutureTask<Void> future;
 	}
-	
+
 	BlockingQueue<NamedSignal> signals;
 
 	@Override
 	public void afRun() {
-		logger.log(LogLevel.TRACE, "AbstractActiveSignalProcessingObject.afRun");
+		this.logger.log(LogLevel.TRACE, "AbstractActiveSignalProcessingObject.afRun");
 		while (true) {
 			try {
-				NamedSignal ns = this.signals.take();
-				logger.log(LogLevel.TRACE, ns.name);
+				final NamedSignal ns = this.signals.take();
+				this.logger.log(LogLevel.TRACE, ns.name);
 				ns.future.run();
 
-			} catch (Throwable ex) {
-				ex.printStackTrace(); //TODO: make this log
+			} catch (final Throwable ex) {
+				ex.printStackTrace(); // TODO: make this log
 			}
 		}
 
 	}
 
-	protected Future<Void> submit(String name, ISignal signal) {
-		NamedSignal ns = new NamedSignal(name, signal);
+	protected Future<Void> submit(final String name, final ISignal signal) {
+		final NamedSignal ns = new NamedSignal(name, signal);
 		this.signals.add(ns);
 		return ns.future;
 	}

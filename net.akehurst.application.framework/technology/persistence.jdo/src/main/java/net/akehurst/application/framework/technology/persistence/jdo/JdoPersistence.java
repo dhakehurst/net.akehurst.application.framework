@@ -48,7 +48,7 @@ import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 //import sun.misc.IOUtils;
 
@@ -261,7 +261,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemLocation location, final T item, final Class<T> itemType)
+	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery query, final T item, final Class<T> itemType)
 			throws PersistentStoreException {
 		final Transaction tx = this.manager.currentTransaction();
 		try {
@@ -290,12 +290,11 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemLocation location, final Class<T> itemType)
-			throws PersistentStoreException {
+	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType) throws PersistentStoreException {
 		try {
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-			final Query<? extends Persistable> query = this.manager.newQuery(enhancedType, location.asPrimitive());
-			final Collection<T> res = (Collection<T>) query.execute();
+			final Query<? extends Persistable> jdoquery = this.manager.newQuery(enhancedType, query.asPrimitive());
+			final Collection<T> res = (Collection<T>) jdoquery.execute();
 			if (res.isEmpty()) {
 				return null;
 			} else {
@@ -314,7 +313,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemLocation location, final Class<T> itemType,
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType,
 			final Map<String, Object> filter) throws PersistentStoreException {
 		// TODO Auto-generated method stub
 		return null;

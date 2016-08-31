@@ -31,7 +31,7 @@ import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesystem;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 
 public class HJsonFile implements IService, IIdentifiableObject, IPersistentStore {
@@ -96,12 +96,12 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	
 	
 	@Override
-	public <T> void store(IPersistenceTransaction transaction,PersistentItemLocation location, T item, Class<T> itemType) throws PersistentStoreException {
+	public <T> void store(IPersistenceTransaction transaction,PersistentItemQuery location, T item, Class<T> itemType) throws PersistentStoreException {
 
 	}
 
 	@Override
-	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType) throws PersistentStoreException {
+	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType) throws PersistentStoreException {
 		try {
 			JsonValue value = this.fetchJson(this.getJson(), location.asPrimitive());
 			if (null == value) {
@@ -124,7 +124,7 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemLocation location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException {
+	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}

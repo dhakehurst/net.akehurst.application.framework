@@ -27,7 +27,7 @@ import net.akehurst.application.framework.common.annotations.instance.ServiceIns
 import net.akehurst.application.framework.realisation.ApplicationFramework;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemLocation;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 
 public class test_ObjectDbDatabasePersistence {
 	IApplicationFramework os() {

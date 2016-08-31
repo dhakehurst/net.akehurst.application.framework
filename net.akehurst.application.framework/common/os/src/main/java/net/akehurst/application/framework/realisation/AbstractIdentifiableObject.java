@@ -19,14 +19,14 @@ import net.akehurst.application.framework.common.IIdentifiableObject;
 
 public class AbstractIdentifiableObject implements IIdentifiableObject {
 
-	public AbstractIdentifiableObject(final String id) {
-		this.id = id;
+	public AbstractIdentifiableObject(final String afId) {
+		this.afId = afId;
 	}
 
-	String id;
+	String afId;
 
 	@Override
 	public String afId() {
-		return this.id;
+		return this.afId;
 	}
 }

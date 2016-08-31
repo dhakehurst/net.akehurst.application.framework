@@ -49,7 +49,7 @@ public class Port implements IPort {
 
 	@Override
 	public String afId() {
-		return this.owner.afId() + "." + this.id;
+		return this.id;
 	}
 
 	Map<Class<?>, Set<Object>> provided;
@@ -109,7 +109,12 @@ public class Port implements IPort {
 							"Port " + Port.this.afId() + " requires interface " + interfaceType + " and it has not been provided", null);
 				}
 				for (final Object provider : set) {
-					result = method.invoke(provider, args);
+					if (null == provider) {
+						throw new ApplicationFrameworkException(
+								"Port " + Port.this.afId() + " requires interface " + interfaceType + " and it has not been provided", null);
+					} else {
+						result = method.invoke(provider, args);
+					}
 				}
 				return result;
 			} catch (final InvocationTargetException ex) {

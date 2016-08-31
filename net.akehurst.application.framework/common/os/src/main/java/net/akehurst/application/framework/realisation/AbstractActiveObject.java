@@ -21,57 +21,57 @@ import net.akehurst.application.framework.common.annotations.instance.ServiceRef
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-abstract
-public class AbstractActiveObject implements IActiveObject {
-	
+abstract public class AbstractActiveObject implements IActiveObject {
+
 	@ServiceReference
 	protected IApplicationFramework af;
-	
+
 	@ServiceReference
 	protected ILogger logger;
-	
-	public AbstractActiveObject(String id) {
-		this.id = id;
+
+	public AbstractActiveObject(final String afId) {
+		this.afId = afId;
 	}
-	
-	String id;
+
+	String afId;
+
+	@Override
 	public String afId() {
-		return this.id;
+		return this.afId;
 	}
-	
+
 	Thread thread;
 
 	@Override
 	public void afStart() {
-		logger.log(LogLevel.TRACE, "AbstractActiveObject.afStart");
-		this.thread = new Thread((() -> this.afRun()), this.afId());
+		this.logger.log(LogLevel.TRACE, "AbstractActiveObject.afStart");
+		this.thread = new Thread(() -> this.afRun(), this.afId());
 		this.thread.start();
 	}
-	
+
 	@Override
 	public void afJoin() throws InterruptedException {
 		this.thread.join();
 	}
-	
-	
+
 	@Override
 	public int hashCode() {
 		return this.afId().hashCode();
 	}
-	
+
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj instanceof IActiveObject) {
-			IActiveObject other = (IActiveObject)obj;
+			final IActiveObject other = (IActiveObject) obj;
 			return this.afId().equals(other.afId());
 		} else {
 			return false;
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.afId();
 	}
-	
+
 }
