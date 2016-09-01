@@ -16,7 +16,7 @@
  
  dependencies {
  	compile project(':net.akehurst.application.framework.common.bits')
- 	compile project(':net.akehurst.application.framework.common.os')
+ 	compile project(':net.akehurst.application.framework.common.realisation')
  	compile project(':net.akehurst.application.framework.computational.interfaceAuthenticator')
  	compile project(':net.akehurst.application.framework.computational.interfaceUser')
 

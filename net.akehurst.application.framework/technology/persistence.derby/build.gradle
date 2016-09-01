@@ -16,7 +16,7 @@
 
 
 dependencies {
-	compile project(":${rootProject.name}.common.os")
+	compile project(":${rootProject.name}.common.realisation")
 	
 	compile project(':net.akehurst.application.framework.technology.interfacePersistence')
 	compile 'org.apache.derby:derby:10.12.1.1'

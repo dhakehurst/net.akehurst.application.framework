@@ -16,7 +16,7 @@
 
 
 dependencies {
-	compile project(":${rootProject.name}.common.os")
+	compile project(":${rootProject.name}.common.realisation")
 
 	compile project(":${rootProject.name}.technology.interfaceGui")
 }

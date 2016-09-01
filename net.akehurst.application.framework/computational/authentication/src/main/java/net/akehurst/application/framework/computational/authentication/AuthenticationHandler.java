@@ -5,13 +5,16 @@ import net.akehurst.application.framework.computational.interfaceAuthenticator.I
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
 import net.akehurst.application.framework.computational.interfaceUser.authentication.IUserAuthenticationNotification;
 import net.akehurst.application.framework.computational.interfaceUser.authentication.IUserAuthenticationRequest;
-import net.akehurst.application.framework.realisation.AbstractActiveSignalProcessingObject;
+import net.akehurst.application.framework.realisation.AbstractActiveObject;
 
-public class AuthenticationHandler extends AbstractActiveSignalProcessingObject implements IUserAuthenticationRequest, ICAuthenticatorNotification {
+public class AuthenticationHandler extends AbstractActiveObject implements IUserAuthenticationRequest, ICAuthenticatorNotification {
 
 	public AuthenticationHandler(final String afId) {
 		super(afId);
 	}
+
+	@Override
+	public void afRun() {}
 
 	ICAuthenticatorRequest authRequest;
 
@@ -28,38 +31,28 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 	// --- IUserAuthenticationRequest ---
 	@Override
 	public void requestLogin(final UserSession session, final String username, final String password) {
-		super.submit("requestLogin", () -> {
-			this.authRequest.requestLogin(session, username, password);
-		});
+		this.authRequest.requestLogin(session, username, password);
 	}
 
 	@Override
 	public void requestLogout(final UserSession session) {
-		super.submit("requestLogout", () -> {
-			this.authRequest.requestLogout(session);
-		});
+		this.authRequest.requestLogout(session);
 	}
 
 	// --- ICAuthenticatorNotification ---
 	@Override
 	public void notifyAuthenticationSuccess(final UserSession session) {
-		super.submit("notifyAuthenticationSuccess", () -> {
-			this.userAuthNotification.notifyAuthenticationSuccess(session);
-		});
+		this.userAuthNotification.notifyAuthenticationSuccess(session);
 	};
 
 	@Override
 	public void notifyAuthenticationFailure(final UserSession session, final String message) {
-		super.submit("notifyAuthenticationFailure", () -> {
-			this.userAuthNotification.notifyAuthenticationFailure(session, message);
-		});
+		this.userAuthNotification.notifyAuthenticationFailure(session, message);
 	}
 
 	@Override
 	public void notifyAuthenticationCleared(final UserSession session) {
-		super.submit("notifyAuthenticationCleared", () -> {
-			this.userAuthNotification.notifyAuthenticationCleared(session);
-		});
+		this.userAuthNotification.notifyAuthenticationCleared(session);
 	}
 
 }

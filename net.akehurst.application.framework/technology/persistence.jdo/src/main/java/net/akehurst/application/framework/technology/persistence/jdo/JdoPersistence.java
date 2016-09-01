@@ -17,15 +17,17 @@ package net.akehurst.application.framework.technology.persistence.jdo;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.security.ProtectionDomain;
 import java.util.AbstractList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -133,6 +135,16 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 					}
 				}
 
+				for (final Method a : class_.getMethods()) {
+					if (null != a.getAnnotation(Persistent.class)) {
+						if (null != a.getReturnType().getAnnotation(PersistenceCapable.class)) {
+							this.fetchEnhanced(a.getReturnType());
+						}
+					} else if (null != a.getAnnotation(Join.class)) {
+
+					}
+				}
+
 				return (Class<? extends Persistable>) new DynClassloader(this.cl).loadClass(enhancedName);
 			}
 		} catch (final Exception e) {
@@ -150,9 +162,11 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	 *            the Persistable Object
 	 * @param tgtType
 	 * @param tgt
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
 	 */
-	void copyOutOf(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt)
-			throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException {
+	void copyOutOf(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt) throws IllegalArgumentException, IllegalAccessException,
+			NoSuchFieldException, SecurityException, InstantiationException, NoSuchMethodException, InvocationTargetException {
 		for (final Field f : srcType.getFields()) {
 			if (null != f.getAnnotation(Persistent.class)) {
 				final Field tgtField = tgtType.getField(f.getName());
@@ -169,7 +183,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 							try {
 								final Object srcCollObj = srcColl.get(index);
 								final Object tgtCollObj = tgtCollObjType.newInstance();
-								JdoPersistence.this.copyInto(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
+								JdoPersistence.this.copyOutOf(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
 								return tgtCollObj;
 							} catch (final Exception ex) {
 								ex.printStackTrace();
@@ -185,6 +199,43 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 					tgtField.set(tgt, tgtColl);
 				} else {
 					tgtField.set(tgt, f.get(src));
+				}
+			} else {
+			}
+		}
+		for (final Method m : srcType.getMethods()) {
+			if (null != m.getAnnotation(Persistent.class)) {
+				final Method tgtGetter = tgtType.getMethod(m.getName());
+				final Method tgtMeth = tgtType.getMethod(m.getName().replace("get", "set"), tgtGetter.getReturnType());
+				if (Persistable.class.isAssignableFrom(m.getReturnType())) {
+					final Object v = tgtMeth.getReturnType().newInstance();
+					this.copyOutOf(m.getReturnType(), m.invoke(src), tgtMeth.getReturnType(), v);
+					tgtMeth.invoke(tgt, v);
+				} else if (List.class.isAssignableFrom(m.getReturnType()) && this.isPersistentCollection(m.getGenericReturnType())) {
+					final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) m.getGenericReturnType()).getActualTypeArguments()[0];
+					final List<?> srcColl = (List<?>) m.invoke(src);
+					final List<?> tgtColl = new AbstractList<Object>() {
+						@Override
+						public Object get(final int index) {
+							try {
+								final Object srcCollObj = srcColl.get(index);
+								final Object tgtCollObj = tgtCollObjType.newInstance();
+								JdoPersistence.this.copyOutOf(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
+								return tgtCollObj;
+							} catch (final Exception ex) {
+								ex.printStackTrace();
+								return null;
+							}
+						}
+
+						@Override
+						public int size() {
+							return srcColl.size();
+						}
+					};
+					tgtMeth.invoke(tgt, tgtColl);
+				} else {
+					tgtMeth.invoke(tgt, m.invoke(src));
 				}
 			} else {
 			}
@@ -200,46 +251,46 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	 * @param tgt
 	 *            the Persistable object
 	 */
-	void copyInto(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt)
-			throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException {
-		for (final Field f : srcType.getFields()) {
-			if (null != f.getAnnotation(Persistent.class)) {
-				final Field tgtField = tgtType.getField(f.getName());
-				if (Persistable.class.isAssignableFrom(tgtField.getType())) {
-					final Object v = tgtField.getType().newInstance();
-					this.copyInto(f.getType(), f.get(src), tgtField.getType(), v);
-					tgtField.set(tgt, v);
-				} else if (List.class.isAssignableFrom(tgtField.getType()) && this.isPersistentCollection(tgtField.getGenericType())) {
-					final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtField.getGenericType()).getActualTypeArguments()[0];
-					final List<?> srcColl = (List<?>) f.get(src);
-					final List<?> tgtColl = new AbstractList<Object>() {
-						@Override
-						public Object get(final int index) {
-							try {
-								final Object srcCollObj = srcColl.get(index);
-								final Object tgtCollObj = tgtCollObjType.newInstance();
-								JdoPersistence.this.copyInto(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
-								return tgtCollObj;
-							} catch (final Exception ex) {
-								ex.printStackTrace();
-								return null;
-							}
-						}
-
-						@Override
-						public int size() {
-							return srcColl.size();
-						}
-					};
-					tgtField.set(tgt, tgtColl);
-				} else {
-					tgtField.set(tgt, f.get(src));
-				}
-			} else {
-				// don't store
-			}
-		}
-	}
+	// void copyInto(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt)
+	// throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException {
+	// for (final Field f : srcType.getDeclaredFields()) {
+	// if (null != f.getAnnotation(Persistent.class)) {
+	// final Field tgtField = tgtType.getField(f.getName());
+	// if (Persistable.class.isAssignableFrom(tgtField.getType())) {
+	// final Object v = tgtField.getType().newInstance();
+	// this.copyInto(f.getType(), f.get(src), tgtField.getType(), v);
+	// tgtField.set(tgt, v);
+	// } else if (List.class.isAssignableFrom(tgtField.getType()) && this.isPersistentCollection(tgtField.getGenericType())) {
+	// final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtField.getGenericType()).getActualTypeArguments()[0];
+	// final List<?> srcColl = (List<?>) f.get(src);
+	// final List<?> tgtColl = new AbstractList<Object>() {
+	// @Override
+	// public Object get(final int index) {
+	// try {
+	// final Object srcCollObj = srcColl.get(index);
+	// final Object tgtCollObj = tgtCollObjType.newInstance();
+	// JdoPersistence.this.copyInto(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
+	// return tgtCollObj;
+	// } catch (final Exception ex) {
+	// ex.printStackTrace();
+	// return null;
+	// }
+	// }
+	//
+	// @Override
+	// public int size() {
+	// return srcColl.size();
+	// }
+	// };
+	// tgtField.set(tgt, tgtColl);
+	// } else {
+	// tgtField.set(tgt, f.get(src));
+	// }
+	// } else {
+	// // don't store
+	// }
+	// }
+	// }
 
 	boolean isPersistentCollection(final Type type) {
 		final ParameterizedType pt = (ParameterizedType) type;
@@ -271,7 +322,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			} else {
 				final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
 				final Persistable enhancedObj = enhancedType.newInstance();
-				this.copyInto(itemType, item, enhancedType, enhancedObj);
+				this.copyOutOf(itemType, item, enhancedType, enhancedObj);
 				toPersist = enhancedObj;
 			}
 
@@ -324,7 +375,16 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 		final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
 		final Query<? extends Persistable> query = this.manager.newQuery(enhancedType);
 		final Collection<T> res = (Collection<T>) query.execute();
-		return new HashSet<>(res);
+		final Set<T> result = res.stream().map((el) -> {
+			try {
+				final T item = itemType.newInstance();
+				this.copyOutOf(enhancedType, el, itemType, item);
+				return item;
+			} catch (final Exception ex) {
+				throw new RuntimeException("Error mapping JDO enhanced object to un-enhanced", ex);
+			}
+		}).collect(Collectors.toSet());
+		return result;
 	}
 
 	// ---------- Ports ---------

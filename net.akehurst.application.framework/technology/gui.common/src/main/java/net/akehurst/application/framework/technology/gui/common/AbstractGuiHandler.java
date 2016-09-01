@@ -15,6 +15,10 @@
  */
 package net.akehurst.application.framework.technology.gui.common;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractActiveSignalProcessingObject;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
@@ -24,11 +28,13 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiNotificati
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
+import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 
 abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingObject implements IGuiHandler, IGuiNotification {
 
 	public AbstractGuiHandler(final String id) {
 		super(id);
+		this.scenes = new HashMap<>();
 	}
 
 	protected IGuiRequest guiRequest;
@@ -45,7 +51,17 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 
 	abstract protected void onSceneLoaded(GuiEvent event);
 
-	abstract protected IGuiScene getScene(SceneIdentity sceneId);
+	Map<SceneIdentity, IGuiScene> scenes;
+
+	IGuiScene getScene(final SceneIdentity sceneId) {
+		return this.scenes.get(sceneId);
+	}
+
+	protected <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content) {
+		final T scene = this.getGuiRequest().createScene(stageId, sceneId, sceneClass, content);
+		this.scenes.put(sceneId, scene);
+		return scene;
+	}
 
 	// --------- IGuiNotification ---------
 

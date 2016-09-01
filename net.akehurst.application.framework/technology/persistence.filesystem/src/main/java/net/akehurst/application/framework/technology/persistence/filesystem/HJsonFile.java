@@ -16,14 +16,18 @@
 package net.akehurst.application.framework.technology.persistence.filesystem;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hjson.JsonObject;
 import org.hjson.JsonValue;
 
-import net.akehurst.application.framework.common.IIdentifiableObject;
+import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.IApplicationFramework;
+import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceFilesystem.FilesystemException;
@@ -37,18 +41,19 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
 public class HJsonFile implements IService, IIdentifiableObject, IPersistentStore {
 
 	@Override
-	public Object createReference(String locationId) {
+	public Object createReference(final String locationId) {
 		return this;
 	}
-	
-	public HJsonFile(String id) {
-		this.id = id;
+
+	public HJsonFile(final String afId) {
+		this.afId = afId;
 	}
 
-	String id;
+	String afId;
 
+	@Override
 	public String afId() {
-		return id;
+		return this.afId;
 	}
 
 	@ServiceReference
@@ -61,7 +66,7 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 
 	JsonValue getJson() throws IOException, FilesystemException {
 		if (null == this.json_cache) {
-			IFile file = fs.file(this.afId() + ".hjson");
+			final IFile file = this.fs.file(this.afId() + ".hjson");
 			if (file.exists()) {
 				this.json_cache = JsonValue.readHjson(file.reader());
 			} else {
@@ -71,15 +76,15 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 		return this.json_cache;
 	}
 
-	JsonValue fetchJson(JsonValue json, String path) {
+	JsonValue fetchJson(final JsonValue json, final String path) {
 		if (json instanceof JsonObject) {
-			JsonObject jo = (JsonObject) json;
-			int ix = path.indexOf(".");
+			final JsonObject jo = (JsonObject) json;
+			final int ix = path.indexOf(".");
 			if (-1 == ix) {
 				return jo.get(path);
 			} else {
-				String hd = path.substring(0, ix);
-				String tl = path.substring(ix + 1);
+				final String hd = path.substring(0, ix);
+				final String tl = path.substring(ix + 1);
 				return this.fetchJson(jo.get(hd), tl);
 			}
 
@@ -90,47 +95,109 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 
 	// --------- IPersistentStore ---------
 	@Override
-	public void connect(Map<String,Object> properties) {
-		
+	public void connect(final Map<String, Object> properties) {
+
 	};
-	
-	
+
 	@Override
-	public <T> void store(IPersistenceTransaction transaction,PersistentItemQuery location, T item, Class<T> itemType) throws PersistentStoreException {
+	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery location, final T item, final Class<T> itemType)
+			throws PersistentStoreException {
 
 	}
 
 	@Override
-	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType) throws PersistentStoreException {
+	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType)
+			throws PersistentStoreException {
 		try {
-			JsonValue value = this.fetchJson(this.getJson(), location.asPrimitive());
-			if (null == value) {
-				return null;
-			} else if (value.isString()){
-				T t = af.createDatatype(itemType, value.asString());
-				return t;
-			} else if (value.isNumber()) {
-				T t = af.createDatatype(itemType, value.asDouble());
-				return t;
-			} else if (value.isBoolean()) {
-				T t = af.createDatatype(itemType, value.asBoolean());
-				return t;
-			} else {
-				throw new PersistentStoreException("Unknown JSON type at " + location, null);
-			}
-		} catch (Exception ex) {
+			final JsonValue value = this.fetchJson(this.getJson(), location.asPrimitive());
+			return this.convertJsonTo(value, itemType);
+		} catch (final Exception ex) {
 			throw new PersistentStoreException("Failed to retrieve item from location " + location, ex);
 		}
 	}
 
+	<T> T convertJsonTo(final JsonValue value, final Class<T> itemType) throws PersistentStoreException {
+		try {
+			if (null == value) {
+				return null;
+			} else if (value.isString()) {
+				final T t = this.af.createDatatype(itemType, value.asString());
+				return t;
+			} else if (value.isNumber()) {
+				final T t = this.af.createDatatype(itemType, value.asDouble());
+				return t;
+			} else if (value.isBoolean()) {
+				final T t = this.af.createDatatype(itemType, value.asBoolean());
+				return t;
+			} else if (value.isArray()) {
+				if (List.class.isAssignableFrom(itemType)) {
+					final List list = new ArrayList<>();
+					for (final JsonValue av : value.asArray()) {
+						final Object o = this.convertJsonToJava(av);
+						list.add(o);
+					}
+					return (T) list;
+				} else {
+					throw new PersistentStoreException("Cannot convert JSON Array to List.", null);
+				}
+			} else if (value.isObject()) {
+				if (Map.class.isAssignableFrom(itemType)) {
+					final Map<String, Object> map = new HashMap<>();
+					for (final String k : value.asObject().names()) {
+						final JsonValue jv = value.asObject().get(k);
+						final Object v = this.convertJsonToJava(jv);
+						map.put(k, v);
+					}
+					return (T) map;
+				} else {
+					throw new PersistentStoreException("Cannot convert JSON Object to Map.", null);
+				}
+			} else {
+				throw new PersistentStoreException("Unknown JSON type.", null);
+			}
+		} catch (final ApplicationFrameworkException e) {
+			throw new PersistentStoreException(e.getMessage(), e);
+		}
+	}
+
+	Object convertJsonToJava(final JsonValue value) throws PersistentStoreException {
+		if (null == value) {
+			return null;
+		} else if (value.isString()) {
+			return value.asString();
+		} else if (value.isNumber()) {
+			return value.asDouble();
+		} else if (value.isBoolean()) {
+			return value.asBoolean();
+		} else if (value.isArray()) {
+			final List<Object> list = new ArrayList<>();
+			for (final JsonValue av : value.asArray()) {
+				final Object o = this.convertJsonToJava(av);
+				list.add(o);
+			}
+			return list;
+		} else if (value.isObject()) {
+			final Map<String, Object> map = new HashMap<>();
+			for (final String k : value.asObject().names()) {
+				final JsonValue jv = value.asObject().get(k);
+				final Object v = this.convertJsonToJava(jv);
+				map.put(k, v);
+			}
+			return map;
+		} else {
+			throw new PersistentStoreException("Unknown JSON type.", null);
+		}
+	}
+
 	@Override
-	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException {
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType,
+			final Map<String, Object> filter) throws PersistentStoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(IPersistenceTransaction transaction,Class<T> itemType) {
+	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -141,8 +208,8 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	}
 
 	@Override
-	public void commitTransaction(IPersistenceTransaction transaction) {
+	public void commitTransaction(final IPersistenceTransaction transaction) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

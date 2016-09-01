@@ -206,6 +206,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	public <T extends IService> T injectIntoService(final T obj) throws ApplicationFrameworkException {
 		try {
 			this.injectServiceReferences(obj.getClass(), obj);
+			this.injectParts(obj);
 			return obj;
 		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Service", ex);
@@ -640,6 +641,28 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
 		walker.build(appObj, (partKind, partClass, partId) -> {
+			switch (partKind) {
+				case COMPONENT: {
+					return this.createComponent((Class<? extends IComponent>) partClass, partId);
+				}
+				case ACTIVE_OBJECT: {
+					return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+				}
+				case PASSIVE_OBJECT:
+					return this.createObject((Class<? extends IActiveObject>) partClass, partId);
+				default:
+				break;
+			}
+			return null; // should never happen
+		});
+
+	}
+
+	private void injectParts(final IService service) {
+
+		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+
+		walker.build(service, (partKind, partClass, partId) -> {
 			switch (partKind) {
 				case COMPONENT: {
 					return this.createComponent((Class<? extends IComponent>) partClass, partId);
