@@ -16,6 +16,7 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.table;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IGuiTableData<C, R> {
 
@@ -23,10 +24,9 @@ public interface IGuiTableData<C, R> {
 
 	int getNumberOfRows();
 
-	R getRowIndex(int index);
-
-	IGuiTableCell<C, R> getCellData(C column, R row);
+	// IGuiTableCell<C, R> getCellData(C column, R row);
 
 	List<IGuiTableRow<C, R>> getRows();
 
+	Map<String, Object> getRowData(int index);
 }

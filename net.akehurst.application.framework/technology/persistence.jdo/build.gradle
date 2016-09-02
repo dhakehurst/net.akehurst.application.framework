@@ -31,6 +31,6 @@ dependencies {
 	
 	
 	testCompile project(":${rootProject.name}.technology.logging.log4j")
-	testRuntime 'org.datanucleus:datanucleus-rdbms:${jdoVersion}'
+	//testRuntime 'org.datanucleus:datanucleus-rdbms:${jdoVersion}'
 	testRuntime 'org.apache.derby:derby:10.12.1.1'
 }

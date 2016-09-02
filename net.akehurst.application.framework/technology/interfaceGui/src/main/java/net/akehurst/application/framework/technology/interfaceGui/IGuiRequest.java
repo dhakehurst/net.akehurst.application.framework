@@ -16,6 +16,7 @@
 package net.akehurst.application.framework.technology.interfaceGui;
 
 import java.net.URL;
+import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
@@ -56,4 +57,6 @@ public interface IGuiRequest {
 	void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String diagramId, String jsonDiagramData);
 
 	void set(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
+
+	void tableAppendRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, Map<String, Object> rowData);
 }

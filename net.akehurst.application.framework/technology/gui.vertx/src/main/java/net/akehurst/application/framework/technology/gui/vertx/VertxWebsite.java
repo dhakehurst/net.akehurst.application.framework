@@ -284,6 +284,18 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
+	public void tableAppendRow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId,
+			final Map<String, Object> rowData) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("tableId", tableId);
+		data.put("rowData", new JsonObject(rowData));
+
+		this.verticle.comms.send(session, "Table.appendRow", data);
+	}
+
+	@Override
 	public void addChart(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
 			final Integer width, final Integer height, final String chartType, final String jsonChartData, final String jsonChartOptions) {
 		final JsonObject data = new JsonObject();

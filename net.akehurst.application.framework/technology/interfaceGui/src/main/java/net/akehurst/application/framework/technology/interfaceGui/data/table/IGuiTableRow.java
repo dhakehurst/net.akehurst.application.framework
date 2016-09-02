@@ -15,12 +15,12 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui.data.table;
 
-import java.util.List;
+import java.util.Map;
 
 public interface IGuiTableRow<C, R> {
 
-	R getRow();
-
-	List<IGuiTableCell<C, R>> getCells();
-
+	// R getRow();
+	//
+	// List<IGuiTableCell<C, R>> getCells();
+	Map<String, Object> getData();
 }

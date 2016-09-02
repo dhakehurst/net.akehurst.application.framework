@@ -15,11 +15,12 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
+import java.util.Map;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTable;
-import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTableCell;
 import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTableData;
 import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTableRow;
 
@@ -31,17 +32,28 @@ public class VertxGuiTable extends VertxGuiElement implements IGuiTable {
 
 	@Override
 	public <C, R> void setData(final UserSession session, final IGuiTableData<C, R> data) {
-		String tableData = "";
+		// String tableData = "";
+		// for (final IGuiTableRow<C, R> row : data.getRows()) {
+		// final String rowId = this.elementName + "-" + row.getRow();
+		// tableData += "<tr id='" + rowId + "' >";
+		// for (final IGuiTableCell<C, R> cell : row.getCells()) {
+		// final String cellId = rowId + "-" + cell.getColumn();
+		// tableData += "<td id='" + cellId + "' >" + cell.getValue() + "</td>";
+		// }
+		// tableData += "</tr>";
+		// }
+		// final String newElementId = this.elementName + "_tbody";
+		// this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, newElementId, "tbody", "{}", tableData);
+
 		for (final IGuiTableRow<C, R> row : data.getRows()) {
-			final String rowId = this.elementName + "-" + row.getRow();
-			tableData += "<tr id='" + rowId + "' >";
-			for (final IGuiTableCell<C, R> cell : row.getCells()) {
-				final String cellId = rowId + "-" + cell.getColumn();
-				tableData += "<td id='" + cellId + "' >" + cell.getValue() + "</td>";
-			}
-			tableData += "</tr>";
+			final Map<String, Object> rowData = row.getData();
+			this.appendRow(session, rowData);
 		}
-		final String newElementId = this.elementName + "_tbody";
-		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, newElementId, "tbody", "{}", tableData);
+
+	}
+
+	@Override
+	public void appendRow(final UserSession session, final Map<String, Object> rowData) {
+		this.guiRequest.tableAppendRow(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, rowData);
 	}
 }

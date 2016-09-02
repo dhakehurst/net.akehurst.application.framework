@@ -15,10 +15,13 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui.data.table;
 
+import java.util.Map;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiTable {
 
 	<C, R> void setData(UserSession session, IGuiTableData<C, R> data);
 
+	void appendRow(UserSession session, Map<String, Object> rowData);
 }

@@ -143,6 +143,27 @@ Dynamic.prototype.clearElement = function(elementId) {
 	}
 }
 
+
+
+Dynamic.prototype.tableAppendRow = function(tableId, rowData) {
+	var table = $('#'+tableId)
+	if (table.length == 0) {
+		console.log('Error: cannot find table element with id ' + tableId)
+	} else {
+		var rowTemplate = $(table).find('tr.table-row-template')[0].outerHTML
+		if (rowTemplate.length ==0) {
+			console.log('Error: table does not define a table-row-template' + tableId)
+		} else {
+			var row = rowData
+			let tpl = eval('`'+rowTemplate+'`');
+			var tbody = $(table).find('tbody')
+			var tr = $(tpl)
+			$(tr).removeClass('table-row-template')
+			$(tbody).append(tr);
+		}
+	}
+}
+
 Dynamic.prototype.addChart = function(parentId, chartId, width, height, chartType, chartData, chartOptions) {
 	//currently uses Chart.js
 	var parent = document.getElementById(parentId)
@@ -210,6 +231,13 @@ Dynamic.prototype.initComms = function() {
 		console.log("switchToScene "+JSON.stringify(args))
 		dynamic.switchToScene(args.stageId, args.sceneId)
 	})
+
+	//Tables
+	this.serverComms.registerHandler('Table.appendRow', function(args) {
+		console.log("Table.appendRow "+JSON.stringify(args))
+		dynamic.tableAppendRow(args.tableId, args.rowData)
+	})
+
 	//Charts
 	this.serverComms.registerHandler('Gui.addChart', function(args) {
 		console.log("addChart "+JSON.stringify(args))
