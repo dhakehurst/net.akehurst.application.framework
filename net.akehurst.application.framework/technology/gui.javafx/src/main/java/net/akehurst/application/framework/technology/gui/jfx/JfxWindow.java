@@ -42,6 +42,7 @@ import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.gui.jfx.elements.JfxGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
@@ -145,6 +146,20 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final String modalId,
+			final String title, final String dialogContent) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String dialogId,
+			final String dialogContent) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void requestRecieveEvent(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
 			final String eventType) {
 		// Platform.runLater(() -> {
@@ -175,13 +190,19 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void removeElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String dialogId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void clearElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId) {
+	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
 		// TODO Auto-generated method stub
 
 	}

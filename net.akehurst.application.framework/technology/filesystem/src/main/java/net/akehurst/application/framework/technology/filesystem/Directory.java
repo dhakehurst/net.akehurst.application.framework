@@ -43,7 +43,7 @@ public class Directory extends DirectoryEntry implements IDirectory {
 		if (this.exists()) {
 			try {
 				final ArrayList<IDirectoryEntry> result = new ArrayList<>();
-				final PathMatcher matcher = this.path.getFileSystem().getPathMatcher("glob:" + this.fullName().get() + "/" + "*");
+				final PathMatcher matcher = this.path.getFileSystem().getPathMatcher("glob:" + this.getFullName() + "/" + "*");
 				final SimpleFileVisitor<Path> v = new SimpleFileVisitor<Path>() {
 					@Override
 					public FileVisitResult preVisitDirectory(final Path path, final BasicFileAttributes attrs) throws IOException {

@@ -16,11 +16,15 @@
 package net.akehurst.application.framework.realisation;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.akehurst.application.framework.common.ISignal;
+import net.akehurst.application.framework.common.ISignalR;
+import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract public class AbstractActiveSignalProcessingObject extends AbstractActiveObject {
@@ -30,34 +34,43 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 		this.signals = new LinkedBlockingQueue<>();
 	}
 
-	static class NamedSignal {
-		public NamedSignal(final String name, final ISignal signal) {
+	@ConfiguredValue(defaultValue = "1")
+	Integer numThreads;
+
+	ExecutorService executor;
+
+	static class NamedSignal<R> {
+		public NamedSignal(final String name, final ISignalR<R> signal) {
 			this.name = name;
 			this.signal = signal;
 			this.future = new FutureTask<>(() -> {
 				try {
-					signal.execute();
+					return signal.execute();
 				} catch (final Throwable t) {
 					t.printStackTrace();
 				}
-			}, null);
+				return null;
+			});
 		}
 
 		String name;
-		ISignal signal;
-		FutureTask<Void> future;
+		ISignalR<R> signal;
+		FutureTask<R> future;
 	}
 
-	BlockingQueue<NamedSignal> signals;
+	BlockingQueue<NamedSignal<?>> signals;
 
 	@Override
 	public void afRun() {
 		this.logger.log(LogLevel.TRACE, "AbstractActiveSignalProcessingObject.afRun");
+		this.executor = Executors.newFixedThreadPool(this.numThreads);
 		while (true) {
 			try {
-				final NamedSignal ns = this.signals.take();
-				this.logger.log(LogLevel.TRACE, ns.name);
-				ns.future.run();
+				final NamedSignal<?> ns = this.signals.take();
+				this.executor.submit(() -> {
+					this.logger.log(LogLevel.TRACE, ns.name);
+					ns.future.run();
+				});
 
 			} catch (final Throwable ex) {
 				ex.printStackTrace(); // TODO: make this log
@@ -67,9 +80,17 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 	}
 
 	protected Future<Void> submit(final String name, final ISignal signal) {
-		final NamedSignal ns = new NamedSignal(name, signal);
+		final NamedSignal<Void> ns = new NamedSignal<>(name, () -> {
+			signal.execute();
+			return null;
+		});
 		this.signals.add(ns);
 		return ns.future;
 	}
 
+	protected <T> Future<T> submit(final String name, final Class<T> returnType, final ISignalR<T> signal) {
+		final NamedSignal<T> ns = new NamedSignal<>(name, signal);
+		this.signals.add(ns);
+		return ns.future;
+	}
 }

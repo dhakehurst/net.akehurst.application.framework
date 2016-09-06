@@ -165,14 +165,14 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	 * @throws NoSuchMethodException
 	 * @throws InvocationTargetException
 	 */
-	void copyOutOf(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt) throws IllegalArgumentException, IllegalAccessException,
-			NoSuchFieldException, SecurityException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+	void convertToFromEnhanced(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt) throws IllegalArgumentException,
+			IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException, NoSuchMethodException, InvocationTargetException {
 		for (final Field f : srcType.getFields()) {
 			if (null != f.getAnnotation(Persistent.class)) {
 				final Field tgtField = tgtType.getField(f.getName());
 				if (Persistable.class.isAssignableFrom(f.getType())) {
 					final Object v = tgtField.getType().newInstance();
-					this.copyOutOf(f.getType(), f.get(src), tgtField.getType(), v);
+					this.convertToFromEnhanced(f.getType(), f.get(src), tgtField.getType(), v);
 					tgtField.set(tgt, v);
 				} else if (List.class.isAssignableFrom(f.getType()) && this.isPersistentCollection(f.getGenericType())) {
 					final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
@@ -183,7 +183,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 							try {
 								final Object srcCollObj = srcColl.get(index);
 								final Object tgtCollObj = tgtCollObjType.newInstance();
-								JdoPersistence.this.copyOutOf(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
+								JdoPersistence.this.convertToFromEnhanced(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
 								return tgtCollObj;
 							} catch (final Exception ex) {
 								ex.printStackTrace();
@@ -209,7 +209,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 				final Method tgtMeth = tgtType.getMethod(m.getName().replace("get", "set"), tgtGetter.getReturnType());
 				if (Persistable.class.isAssignableFrom(m.getReturnType())) {
 					final Object v = tgtMeth.getReturnType().newInstance();
-					this.copyOutOf(m.getReturnType(), m.invoke(src), tgtMeth.getReturnType(), v);
+					this.convertToFromEnhanced(m.getReturnType(), m.invoke(src), tgtMeth.getReturnType(), v);
 					tgtMeth.invoke(tgt, v);
 				} else if (List.class.isAssignableFrom(m.getReturnType()) && this.isPersistentCollection(m.getGenericReturnType())) {
 					final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) m.getGenericReturnType()).getActualTypeArguments()[0];
@@ -220,7 +220,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 							try {
 								final Object srcCollObj = srcColl.get(index);
 								final Object tgtCollObj = tgtCollObjType.newInstance();
-								JdoPersistence.this.copyOutOf(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
+								JdoPersistence.this.convertToFromEnhanced(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
 								return tgtCollObj;
 							} catch (final Exception ex) {
 								ex.printStackTrace();
@@ -241,56 +241,6 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			}
 		}
 	}
-
-	/**
-	 *
-	 * @param srcType
-	 * @param src
-	 * @param tgtType
-	 *            the Persistable type
-	 * @param tgt
-	 *            the Persistable object
-	 */
-	// void copyInto(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt)
-	// throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException {
-	// for (final Field f : srcType.getDeclaredFields()) {
-	// if (null != f.getAnnotation(Persistent.class)) {
-	// final Field tgtField = tgtType.getField(f.getName());
-	// if (Persistable.class.isAssignableFrom(tgtField.getType())) {
-	// final Object v = tgtField.getType().newInstance();
-	// this.copyInto(f.getType(), f.get(src), tgtField.getType(), v);
-	// tgtField.set(tgt, v);
-	// } else if (List.class.isAssignableFrom(tgtField.getType()) && this.isPersistentCollection(tgtField.getGenericType())) {
-	// final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtField.getGenericType()).getActualTypeArguments()[0];
-	// final List<?> srcColl = (List<?>) f.get(src);
-	// final List<?> tgtColl = new AbstractList<Object>() {
-	// @Override
-	// public Object get(final int index) {
-	// try {
-	// final Object srcCollObj = srcColl.get(index);
-	// final Object tgtCollObj = tgtCollObjType.newInstance();
-	// JdoPersistence.this.copyInto(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
-	// return tgtCollObj;
-	// } catch (final Exception ex) {
-	// ex.printStackTrace();
-	// return null;
-	// }
-	// }
-	//
-	// @Override
-	// public int size() {
-	// return srcColl.size();
-	// }
-	// };
-	// tgtField.set(tgt, tgtColl);
-	// } else {
-	// tgtField.set(tgt, f.get(src));
-	// }
-	// } else {
-	// // don't store
-	// }
-	// }
-	// }
 
 	boolean isPersistentCollection(final Type type) {
 		final ParameterizedType pt = (ParameterizedType) type;
@@ -322,7 +272,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			} else {
 				final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
 				final Persistable enhancedObj = enhancedType.newInstance();
-				this.copyOutOf(itemType, item, enhancedType, enhancedObj);
+				this.convertToFromEnhanced(itemType, item, enhancedType, enhancedObj);
 				toPersist = enhancedObj;
 			}
 
@@ -333,6 +283,33 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			tx.commit();
 		} catch (final Throwable ex) {
 			this.logger.log(LogLevel.ERROR, "Failed to store persistent item", ex);
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+	}
+
+	@Override
+	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
+			throws PersistentStoreException {
+		final Transaction tx = this.manager.currentTransaction();
+		try {
+			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
+
+			tx.begin();
+
+			final Query<? extends Persistable> jdoQuery = this.manager.newQuery(enhancedType, query.asPrimitive());
+			jdoQuery.compile();
+			final Collection<? extends Persistable> res = (Collection<? extends Persistable>) jdoQuery.execute();
+			for (final Persistable jdoObj : res) {
+				this.manager.deletePersistent(jdoObj);
+			}
+
+			tx.commit();
+
+		} catch (final Throwable ex) {
+			this.logger.log(LogLevel.ERROR, "Failed to remove persistent item", ex);
 		} finally {
 			if (tx.isActive()) {
 				tx.rollback();
@@ -354,7 +331,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 					return (T) o;
 				} else {
 					final T item = itemType.newInstance();
-					this.copyOutOf(enhancedType, o, itemType, item);
+					this.convertToFromEnhanced(enhancedType, o, itemType, item);
 					return item;
 				}
 			}
@@ -378,7 +355,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 		final Set<T> result = res.stream().map((el) -> {
 			try {
 				final T item = itemType.newInstance();
-				this.copyOutOf(enhancedType, el, itemType, item);
+				this.convertToFromEnhanced(enhancedType, el, itemType, item);
 				return item;
 			} catch (final Exception ex) {
 				throw new RuntimeException("Error mapping JDO enhanced object to un-enhanced", ex);

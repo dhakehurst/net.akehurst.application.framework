@@ -20,41 +20,49 @@ import java.util.Set;
 
 public interface IPersistentStore {
 
-	void connect(Map<String,Object> properties);
-	
+	void connect(Map<String, Object> properties);
 
 	IPersistenceTransaction startTransaction();
-	
-	void commitTransaction(IPersistenceTransaction transaction);
-	
-	/**
-	 * 
-	 * @param location  location of the item to store
-	 * @param item  the item to store, must be a DataType
-	 * @param itemType (optional) class that defines the datatype of the item 
-	 */
-	<T> void store(IPersistenceTransaction transaction, PersistentItemQuery location, T item, Class<T> itemType) throws PersistentStoreException;
 
-	
+	void commitTransaction(IPersistenceTransaction transaction);
+
 	/**
-	 * 
-	 * @param location  location of the item to retrieve
-	 * @param itemType  (optional) class that defines the datatype of the item 
-	 * @return
-	 * @throws PersistentStoreException 
+	 *
+	 * @param query
+	 *            location of the item to store
+	 * @param item
+	 *            the item to store, must be a DataType
+	 * @param itemType
+	 *            (optional) class that defines the datatype of the item
 	 */
-	<T> T retrieve(IPersistenceTransaction transaction, PersistentItemQuery location, Class<T> itemType) throws PersistentStoreException;
-	
+	<T> void store(IPersistenceTransaction transaction, PersistentItemQuery query, T item, Class<T> itemType) throws PersistentStoreException;
+
+	<T> void remove(IPersistenceTransaction transaction, PersistentItemQuery query, Class<T> itemType) throws PersistentStoreException;
+
 	/**
-	 * 
-	 * @param location  location of the items to retrieve
-	 * @param itemType  (optional) class that defines the datatype of the item 
-	 * @param filter filters out objects with the give property-value pairs
+	 *
+	 * @param query
+	 *            location of the item to retrieve
+	 * @param itemType
+	 *            (optional) class that defines the datatype of the item
+	 * @return
+	 * @throws PersistentStoreException
+	 */
+	<T> T retrieve(IPersistenceTransaction transaction, PersistentItemQuery query, Class<T> itemType) throws PersistentStoreException;
+
+	/**
+	 *
+	 * @param query
+	 *            location of the items to retrieve
+	 * @param itemType
+	 *            (optional) class that defines the datatype of the item
+	 * @param filter
+	 *            filters out objects with the give property-value pairs
 	 * @return
 	 */
-	<T> Set<T> retrieve(IPersistenceTransaction transaction, PersistentItemQuery location, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
-	
-	
+	<T> Set<T> retrieve(IPersistenceTransaction transaction, PersistentItemQuery query, Class<T> itemType, Map<String, Object> filter)
+			throws PersistentStoreException;
+
 	<T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType);
 
 }

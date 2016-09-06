@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import net.akehurst.application.framework.common.property.Property;
 import net.akehurst.application.framework.technology.interfaceFilesystem.FilesystemException;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IDirectory;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IDirectoryEntry;
@@ -30,43 +29,25 @@ abstract public class DirectoryEntry implements IDirectoryEntry {
 	public DirectoryEntry(final IFilesystem fs, final Path path) {
 		this.fs = fs;
 		this.path = path;
-		this.name().set(path.getFileName().toString());
-		this.fullName().set(path.toString().replaceAll("\\\\", "/"));
 	}
 
 	IFilesystem fs;
 
 	Path path;
 
-	Property<String> nameProperty;
-
 	@Override
-	public Property<String> name() {
-		if (null == this.nameProperty) {
-			this.nameProperty = new Property<>();
-		}
-		return this.nameProperty;
+	public String getName() {
+		return this.path.getFileName().toString();
 	}
 
-	Property<String> fullNameProperty;
-
 	@Override
-	public Property<String> fullName() {
-		if (null == this.fullNameProperty) {
-			this.fullNameProperty = new Property<>();
-		}
-		return this.fullNameProperty;
+	public String getFullName() {
+		return this.path.toString().replaceAll("\\\\", "/");
 	}
 
-	Property<IDirectory> parentProperty;
-
 	@Override
-	public Property<IDirectory> parent() {
-		if (null == this.parentProperty) {
-			this.parentProperty = new Property<>();
-			this.parentProperty.set(new Directory(this.fs, this.path.getParent()));
-		}
-		return this.parentProperty;
+	public IDirectory getParent() {
+		return new Directory(this.fs, this.path.getParent());
 	}
 
 	@Override
@@ -99,7 +80,7 @@ abstract public class DirectoryEntry implements IDirectoryEntry {
 
 	@Override
 	public String toString() {
-		return this.name().get();
+		return this.getName();
 	}
 
 }

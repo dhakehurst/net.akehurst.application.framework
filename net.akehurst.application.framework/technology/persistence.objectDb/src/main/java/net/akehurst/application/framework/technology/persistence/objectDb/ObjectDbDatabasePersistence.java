@@ -15,7 +15,6 @@
  */
 package net.akehurst.application.framework.technology.persistence.objectDb;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +33,12 @@ import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
+import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 
 @Component
 public class ObjectDbDatabasePersistence extends AbstractComponent implements IPersistentStore {
 
-	public ObjectDbDatabasePersistence(String id) {
+	public ObjectDbDatabasePersistence(final String id) {
 		super(id);
 	}
 
@@ -55,52 +55,60 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	// --------- IPersistentStore ---------
 
 	@Override
-	public void connect(Map<String, Object> properties) {
+	public void connect(final Map<String, Object> properties) {
 		try {
-			System.setProperty("objectdb.conf", databaseFilePath+".conf");
-			
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory(this.databaseFilePath);
+			System.setProperty("objectdb.conf", this.databaseFilePath + ".conf");
+
+			final EntityManagerFactory emf = Persistence.createEntityManagerFactory(this.databaseFilePath);
 			this.entityManager = emf.createEntityManager();
 
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 	};
 
 	@Override
-	public <T> void store(IPersistenceTransaction transaction,PersistentItemQuery location, T item, Class<T> itemType) {
+	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
+			throws PersistentStoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery location, final T item, final Class<T> itemType) {
 		try {
 			this.entityManager.getTransaction().begin();
 			this.entityManager.persist(item);
 			this.entityManager.getTransaction().commit();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			System.err.println(ex.getMessage());
 		}
 	}
 
 	@Override
-	public <T> T retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType) {
+	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType) {
 		try {
-			T t = this.entityManager.find(itemType, location.asPrimitive());
+			final T t = this.entityManager.find(itemType, location.asPrimitive());
 			return t;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			System.err.println(ex.getMessage());
 		}
 		return null;
 	}
 
 	@Override
-	public <T> Set<T> retrieve(IPersistenceTransaction transaction,PersistentItemQuery location, Class<T> itemType, Map<String, Object> filter) {
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType,
+			final Map<String, Object> filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(IPersistenceTransaction transaction,Class<T> itemType) {
-		String qs = "SELECT x FROM " + itemType.getSimpleName()+" x";
-		TypedQuery<T> q = this.entityManager.createQuery(qs, itemType);
-		List<T> res = q.getResultList();
-		return new HashSet<>((Collection<T>) res);
+	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
+		final String qs = "SELECT x FROM " + itemType.getSimpleName() + " x";
+		final TypedQuery<T> q = this.entityManager.createQuery(qs, itemType);
+		final List<T> res = q.getResultList();
+		return new HashSet<>(res);
 	}
 
 	// ---------- Ports ---------
@@ -112,14 +120,14 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	@Override
-	public IPersistenceTransaction  startTransaction() {
+	public IPersistenceTransaction startTransaction() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void commitTransaction(IPersistenceTransaction transaction) {
+	public void commitTransaction(final IPersistenceTransaction transaction) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

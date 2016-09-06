@@ -1,5 +1,6 @@
 package net.akehurst.application.framework.service.authorisation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -7,12 +8,15 @@ import java.util.stream.Collectors;
 
 import net.akehurst.application.framework.common.AbstractService;
 import net.akehurst.application.framework.common.annotations.instance.IdentifiableObjectInstance;
+import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationActivity;
 import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationException;
 import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationSubject;
 import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationTarget;
 import net.akehurst.application.framework.service.interfaceAccessControl.IAuthorisationService;
+import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
@@ -23,6 +27,9 @@ public class ConfigFileAuthorisationService extends AbstractService implements I
 	public ConfigFileAuthorisationService(final String afId) {
 		super(afId);
 	}
+
+	@ServiceReference
+	ILogger logger;
 
 	@IdentifiableObjectInstance
 	HJsonFile file;
@@ -35,7 +42,13 @@ public class ConfigFileAuthorisationService extends AbstractService implements I
 				final IPersistenceTransaction transaction = this.file.startTransaction();
 				final PersistentItemQuery query = new PersistentItemQuery("activities");
 				final List<String> activities = this.file.retrieve(transaction, query, List.class);
-				this.activities_cache = activities.stream().map(el -> new AuthorisationActivity(el)).collect(Collectors.toList());
+				if (null == activities) {
+					this.logger.log(LogLevel.ERROR, "No Activities defined in " + this.file.getFile().getName());
+					this.activities_cache = new ArrayList<>();
+				} else {
+					this.activities_cache = activities.stream().map(el -> new AuthorisationActivity(el)).collect(Collectors.toList());
+
+				}
 				this.file.commitTransaction(transaction);
 			} catch (final PersistentStoreException e) {
 				e.printStackTrace();

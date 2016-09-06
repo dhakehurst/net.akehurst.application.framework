@@ -68,17 +68,26 @@ Dynamic.prototype.fetchEventData = function(el) {
 
 Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChannelId) {
 	var dyn = this
+	//first try element identity
 	var el = $('#'+elementId)
+	//if not found, try a class name
+	if (el.length == 0) {
+		el = $('.'+elementId)
+	}
+	//if still not found then error
+	if (el.length == 0) {
+		console.log('Error: cannot find element with id or class ' + elementId)
+	}
 	var dy = this
 	var sceneId = this.sceneId
-	el.click(function() {
+	$(el).bind(eventType, function() {
 		var data = dy.fetchEventData(el)
-		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, elementId:this.id, eventType:eventType, eventData:data}
+		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, elementId:elementId, eventType:eventType, eventData:data}
 		dyn.commsSend(eventChannelId, outData)
 	})
 }
 
-Dynamic.prototype.switchToScene = function(stageId, sceneId) {
+Dynamic.prototype.switchToScene = function(stageId, sceneId,sceneArguments) {
 	var myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
 	var pstageId = stageId + '/';
 	if (stageId.length==0) {
@@ -88,7 +97,17 @@ Dynamic.prototype.switchToScene = function(stageId, sceneId) {
 	if (stageId.length==0) {
 	   psceneId = ''
 	}
-	window.location.href = myLocation + '/' + pstageId + psceneId 
+	var newRef = myLocation + '/' + pstageId + psceneId
+	var refArgs = ''
+		if (null!=sceneArguments && !jQuery.isEmptyObject(sceneArguments)) {
+			refArgs ='?'
+			jQuery.each(sceneArguments, function(key,val) {
+				refArgs += key + '=' + val +'&'
+			});
+			//remove the last '&'
+			refArgs = refArgs.substr(0,refArgs.length-1)
+		}
+	window.location.href = newRef + refArgs
 }
 
 Dynamic.prototype.setTitle = function(value) {
@@ -109,8 +128,27 @@ Dynamic.prototype.set = function(id, property, value) {
 	el.attr(property, value)
 }
 
+Dynamic.prototype.showDialog = function(parentId, dialogId, content) {
+	var dialog = document.createElement('dialog')
+	if (null!=dialogId) {
+		dialog.id = dialogId
+	}
+	var parent = document.getElementById(parentId)
+	if (null == parent) {
+		console.log('Error: cannot find parent element with id ' + parentId)
+	} else {
+		parent.appendChild(dialog)
+		if (null != content) {
+			dialog.insertAdjacentHTML('beforeend', content)
+		}
+		
+		
+	}
+}
+
 Dynamic.prototype.addElement = function(parentId, newElementId, type, attributes, content) {
 	var child = document.createElement(type)
+	
 	if (null!=newElementId) { child.id = newElementId }
 	var parent = document.getElementById(parentId)
 	if (null == parent) {
@@ -136,13 +174,22 @@ Dynamic.prototype.addElement = function(parentId, newElementId, type, attributes
 Dynamic.prototype.clearElement = function(elementId) {
 	var el = $('#'+elementId)
 	if (el.length == 0) {
-		console.log('Error: cannot find parent element with id ' + elementId)
+		console.log('Error: cannot find element with id ' + elementId)
 	} else {
 		el.empty()
 		return 'ok'
 	}
 }
 
+Dynamic.prototype.removeElement = function(elementId) {
+	var el = $('#'+elementId)
+	if (el.length == 0) {
+		console.log('Error: cannot find element with id ' + elementId)
+	} else {
+		el.remove()
+		return 'ok'
+	}
+}
 
 
 Dynamic.prototype.tableAppendRow = function(tableId, rowData) {
@@ -205,6 +252,10 @@ Dynamic.prototype.initComms = function() {
 	}
 	this.serverComms = new ServerComms(prefix+stageId+'/sockjs', function() {
 		console.log('server comms open')
+		var sceneArgs = {}
+		window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str,key,value) {
+		    sceneArgs[key] = value;
+		})
 		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{sceneArgs:sceneArgs} }
 		dyn.commsSend('IGuiNotification.notifyEventOccured', outData)		
 	})
@@ -220,6 +271,9 @@ Dynamic.prototype.initComms = function() {
 	this.serverComms.registerHandler('Gui.addElement', function(args) {
 		dynamic.addElement(args.parentId, args.newElementId, args.type, args.attributes, args.content)
 	})
+	this.serverComms.registerHandler('Gui.removeElement', function(args) {
+		dynamic.removeElement(args.elementId)
+	})
 	this.serverComms.registerHandler('Gui.clearElement', function(args) {
 		dynamic.clearElement(args.elementId)
 	})
@@ -229,9 +283,13 @@ Dynamic.prototype.initComms = function() {
 	})
 	this.serverComms.registerHandler('Gui.switchToScene', function(args) {
 		console.log("switchToScene "+JSON.stringify(args))
-		dynamic.switchToScene(args.stageId, args.sceneId)
+		dynamic.switchToScene(args.stageId, args.sceneId, args.sceneArguments)
 	})
-
+	this.serverComms.registerHandler('Gui.showDialog', function(args) {
+		console.log("showDialog "+JSON.stringify(args))
+		dynamic.showDialog(args.parentId, args.dialogId, args.content)
+	})
+	
 	//Tables
 	this.serverComms.registerHandler('Table.appendRow', function(args) {
 		console.log("Table.appendRow "+JSON.stringify(args))

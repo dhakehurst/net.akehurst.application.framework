@@ -15,6 +15,8 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui;
 
+import java.util.Map;
+
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
@@ -31,6 +33,10 @@ public interface IGuiScene extends IIdentifiableObject {
 	 */
 	void notifyEventOccured(GuiEvent event);
 
+	void switchTo(UserSession session);
+
+	void switchTo(UserSession session, Map<String, String> sceneArguments);
+
 	public interface OnEventHandler {
 		void execute(GuiEvent event);
 	}
@@ -43,5 +49,7 @@ public interface IGuiScene extends IIdentifiableObject {
 	 * @param handler
 	 */
 	void onEvent(UserSession session, GuiEventSignature eventSignature, OnEventHandler handler);
+
+	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, String modalId, String title, String dialogContent);
 
 }

@@ -36,6 +36,7 @@ import javafx.scene.control.TreeView;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
@@ -193,8 +194,27 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 	}
 
 	@Override
+	public void switchTo(final UserSession session) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void switchTo(final UserSession session, final Map<String, String> sceneArguments) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void onEvent(final UserSession session, final GuiEventSignature eventSignature, final OnEventHandler handler) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final String modalId, final String title,
+			final String dialogContent) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

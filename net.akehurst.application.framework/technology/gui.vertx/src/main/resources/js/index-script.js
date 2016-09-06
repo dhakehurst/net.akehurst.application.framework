@@ -33,7 +33,7 @@ var sceneId = path.substring(expectedStart.length+1, path.length-1); //pick scen
 if (path == '/') {
   sceneId = "" //handle special case
 }
-var sceneArgs = window.location.search
+
 //var end = sceneId.lastIndexOf('/')
 //var sceneIdRoot = sceneId.substring(0,end)
 //var stageId = sceneIdRoot

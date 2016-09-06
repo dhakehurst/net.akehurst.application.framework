@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.akehurst.application.framework.common;
 
+public interface ISignalR<R> {
 
-dependencies {
-	compile project(":${rootProject.name}.common.realisation")
-	
-	compile project(':net.akehurst.application.framework.technology.interfacePersistence')
-	compile 'org.apache.derby:derby:10.12.1.1'
+	R execute();
+
 }

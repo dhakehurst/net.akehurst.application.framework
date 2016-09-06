@@ -15,15 +15,13 @@
  */
 package net.akehurst.application.framework.technology.interfaceFilesystem;
 
-import net.akehurst.application.framework.common.property.Property;
-
 public interface IDirectoryEntry {
 
-	Property<String> name();
+	String getName();
 
-	Property<String> fullName();
+	String getFullName();
 
-	Property<IDirectory> parent();
+	IDirectory getParent();
 
 	boolean exists();
 

@@ -64,9 +64,14 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 
 	JsonValue json_cache;
 
+	public IFile getFile() {
+		final IFile file = this.fs.file(this.afId() + ".hjson");
+		return file;
+	}
+
 	JsonValue getJson() throws IOException, FilesystemException {
 		if (null == this.json_cache) {
-			final IFile file = this.fs.file(this.afId() + ".hjson");
+			final IFile file = this.getFile();
 			if (file.exists()) {
 				this.json_cache = JsonValue.readHjson(file.reader());
 			} else {
@@ -187,6 +192,13 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 		} else {
 			throw new PersistentStoreException("Unknown JSON type.", null);
 		}
+	}
+
+	@Override
+	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
+			throws PersistentStoreException {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override

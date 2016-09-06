@@ -26,10 +26,11 @@ public interface IGuiRequest {
 
 	<T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content);
 
-	// per user
-	void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId);
+	void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId, Map<String, String> sceneArguments);
 
 	void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String eventType);
+
+	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, IGuiScene scene, String modalId, String title, String dialogContent);
 
 	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type);
 
@@ -45,6 +46,24 @@ public interface IGuiRequest {
 	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type, String attributes,
 			Object content);
 
+	/**
+	 * remove an element from the scene
+	 *
+	 * @param session
+	 * @param stageId
+	 * @param sceneId
+	 * @param dialogId
+	 */
+	void removeElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String dialogId);
+
+	/**
+	 * clean the content of an element, but leave it present
+	 *
+	 * @param session
+	 * @param stageId
+	 * @param sceneId
+	 * @param elementId
+	 */
 	void clearElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
 
 	void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String text);
@@ -59,4 +78,7 @@ public interface IGuiRequest {
 	void set(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
 
 	void tableAppendRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, Map<String, Object> rowData);
+
+	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String dialogId, String dialogContent);
+
 }

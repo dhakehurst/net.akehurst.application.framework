@@ -32,11 +32,13 @@ import net.akehurst.application.framework.common.annotations.instance.PortInstan
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractComponent;
-import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiScene;
+import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiDialogProxy;
+import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiSceneProxy;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
@@ -181,9 +183,6 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	@Override
 	public <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content) {
 		final T sceneObj = this.createGuiScene(sceneClass, this.afId() + "." + sceneId.asPrimitive(), stageId, sceneId);
-
-		((VertxGuiScene) Proxy.getInvocationHandler(sceneObj)).setGuiRequest(this);
-
 		return sceneObj;
 	}
 
@@ -191,7 +190,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		try {
 			final ClassLoader loader = this.getClass().getClassLoader();
 			final Class<?>[] interfaces = new Class<?>[] { sceneClass };
-			final InvocationHandler h = this.af.createObject(VertxGuiScene.class, afId, stageId, sceneId);
+			final InvocationHandler h = this.af.createObject(VertxGuiSceneProxy.class, afId, this, stageId, sceneId);
 			final Object proxy = Proxy.newProxyInstance(loader, interfaces, h);
 			return (T) proxy;
 		} catch (final Exception ex) {
@@ -201,12 +200,23 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
-	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId) {
+	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", this.rootPath + stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
-
+		data.put("sceneArguments", new JsonObject(new HashMap<String, Object>(sceneArguments)));
 		this.verticle.comms.send(session, "Gui.switchToScene", data);
+	}
+
+	@Override
+	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String dialogId, final String content) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", this.rootPath + stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("parentId", "dialogs");
+		data.put("dialogId", dialogId);
+		data.put("content", content);
+		this.verticle.comms.send(session, "Gui.showDialog", data);
 	}
 
 	@Override
@@ -247,6 +257,16 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		data.put("attributes", atts);
 
 		this.verticle.comms.send(session, "Gui.addElement", data);
+	}
+
+	@Override
+	public void removeElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("elementId", elementId);
+
+		this.verticle.comms.send(session, "Gui.removeElement", data);
 	}
 
 	@Override
@@ -332,25 +352,39 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	// TODO: deal with buttons
-	public void createModal(final UserSession ts, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String modalId,
-			final String title, final String modalContent) {
-		String content = "";
-		content += "<div id='" + modalId + "' class='modal fade' role='dialog'>";
-		content += "  <div class='modal-dialog'>";
-		content += "    <fieldset class='modal-content'>";
-		content += "      <div class='modal-header'>";
-		content += "        <button type='button' class='close' data-dismiss='modal'>&times;</button>";
-		content += "        <h4 class='modal-title'>" + title + "</h4>";
-		content += "      </div>";
-		content += "      <div class='modal-body'>";
-		content += modalContent;
-		content += "      </div>";
-		content += "      <div class='modal-footer'>";
-		content += "        <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
-		content += "      </div>";
-		content += "    </fieldset>";
-		content += "  </div>";
-		this.addElement(ts, stageId, sceneId, parentId, modalId, "div", "{'class':'modal fade','role':'dialog'}", content);
+	@Override
+	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final String dialogId,
+			final String title, final String dialogContent) {
+
+		try {
+			final ClassLoader loader = this.getClass().getClassLoader();
+			final Class<?>[] interfaces = new Class<?>[] { dialogClass };
+			final InvocationHandler h = this.af.createObject(VertxGuiDialogProxy.class, dialogId, this, scene, dialogId, dialogContent);
+			final Object proxy = Proxy.newProxyInstance(loader, interfaces, h);
+
+			return (T) proxy;
+		} catch (final Exception ex) {
+			this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
+			return null;
+		}
+
+		// String content = "";
+		// content += "<div id='" + modalId + "' class='modal fade' role='dialog'>";
+		// content += " <div class='modal-dialog'>";
+		// content += " <fieldset class='modal-content'>";
+		// content += " <div class='modal-header'>";
+		// content += " <button type='button' class='close' data-dismiss='modal'>&times;</button>";
+		// content += " <h4 class='modal-title'>" + title + "</h4>";
+		// content += " </div>";
+		// content += " <div class='modal-body'>";
+		// content += modalContent;
+		// content += " </div>";
+		// content += " <div class='modal-footer'>";
+		// content += " <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+		// content += " </div>";
+		// content += " </fieldset>";
+		// content += " </div>";
+		// this.addElement(ts, stageId, sceneId, parentId, modalId, "div", "{'class':'modal fade','role':'dialog'}", content);
 	}
 
 	// --------- Ports ---------
