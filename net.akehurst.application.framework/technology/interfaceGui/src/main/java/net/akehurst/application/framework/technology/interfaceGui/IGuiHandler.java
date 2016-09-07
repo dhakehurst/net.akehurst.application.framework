@@ -15,6 +15,13 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui;
 
+import java.net.URL;
+
 public interface IGuiHandler {
 
+	IGuiScene getScene(final SceneIdentity sceneId);
+
+	<T extends IGuiScene> T getScene(final SceneIdentity sceneId, final Class<T> sceneType);
+
+	<T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content);
 }

@@ -56,4 +56,9 @@ public class VertxGuiTable extends VertxGuiElement implements IGuiTable {
 	public void appendRow(final UserSession session, final Map<String, Object> rowData) {
 		this.guiRequest.tableAppendRow(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, rowData);
 	}
+
+	@Override
+	public void removeRow(final UserSession session, final String rowId) {
+		this.guiRequest.tableRemoveRow(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, rowId);
+	}
 }

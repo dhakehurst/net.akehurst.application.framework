@@ -787,7 +787,11 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			for (final Class<?> interfaceType : provides) {
 				final List<Object> providers = (List<Object>) this.findInternalProviderForPort(component, interfaceType, id);
 				for (final Object provider : providers) {
-					prt.provideProvided((Class<Object>) interfaceType, provider);
+					if (provider instanceof Class) {
+						prt.provideProvided((Class<Object>) interfaceType, null);
+					} else {
+						prt.provideProvided((Class<Object>) interfaceType, provider);
+					}
 				}
 
 			}
@@ -802,10 +806,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	<T> List<T> findInternalProviderForPort(final IComponent component, final Class<T> interfaceType, final String portId)
+	<T> List<?> findInternalProviderForPort(final IComponent component, final Class<T> interfaceType, final String portId)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
 		final String shortPortId = portId.substring(portId.lastIndexOf('.') + 1);
-		final List<T> providers = new ArrayList<>();
+		final List<Object> providers = new ArrayList<>();
 		for (final Field f : component.getClass().getDeclaredFields()) {
 			final ProvidesInterfaceForPort[] anns = f.getAnnotationsByType(ProvidesInterfaceForPort.class);
 			if (null != anns && anns.length > 0) {
@@ -827,10 +831,12 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		if (providers.isEmpty()) {
 			// try the component itself
 			if (interfaceType.isInstance(component)) {
-				providers.add((T) component);
+				providers.add(component);
 			} else {
-				throw new ApplicationFrameworkException(
-						"Failed find internal provider of " + interfaceType.getSimpleName() + " for component " + component.afId(), null);
+				// hope it gets connected later
+				providers.add(interfaceType);
+				// throw new ApplicationFrameworkException(
+				// "Failed find internal provider of " + interfaceType.getSimpleName() + " for component " + component.afId(), null);
 			}
 		}
 		return providers;

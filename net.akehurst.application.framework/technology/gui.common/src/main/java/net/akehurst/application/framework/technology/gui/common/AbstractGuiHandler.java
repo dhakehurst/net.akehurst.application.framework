@@ -53,11 +53,15 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 
 	Map<SceneIdentity, IGuiScene> scenes;
 
-	IGuiScene getScene(final SceneIdentity sceneId) {
+	public IGuiScene getScene(final SceneIdentity sceneId) {
 		return this.scenes.get(sceneId);
 	}
 
-	protected <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content) {
+	public <T extends IGuiScene> T getScene(final SceneIdentity sceneId, final Class<T> sceneType) {
+		return (T) this.getScene(sceneId);
+	}
+
+	public <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content) {
 		final T scene = this.getGuiRequest().createScene(stageId, sceneId, sceneClass, content);
 		this.scenes.put(sceneId, scene);
 		return scene;

@@ -24,4 +24,6 @@ public interface IGuiTable {
 	<C, R> void setData(UserSession session, IGuiTableData<C, R> data);
 
 	void appendRow(UserSession session, Map<String, Object> rowData);
+
+	void removeRow(UserSession session, String rowId);
 }

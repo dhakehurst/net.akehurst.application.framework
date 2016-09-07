@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 "use strict"
 
 if (typeof stageId === 'undefined' || null===stageId) { //may have an empty ("") stage id
@@ -45,61 +46,28 @@ var dynamic = null
 
 $(document).ready(function() {
 	dynamic = new Dynamic(stageId, sceneId)
-
-	//eventbus = new EventBus(myLocation + '/eventbus')
-//	eventbus = new EventBus('http://localhost:9998' + '/eventbus')
-//
-//	eventbus.onopen = function() {
-//
-//		
-//		eventbus.registerHandler('Canvas.addChild', function(x, packet) {
-//			console.log("addChild "+JSON.stringify(packet))
-//			var args = packet.body
-//			diagram.addChild( args.child )
-//		});
-//		
-//		eventbus.registerHandler('Canvas.addChildToParent', function(x, packet) {
-//			console.log("addChildToParent "+JSON.stringify(packet))
-//			var args = packet.body
-//			diagram.addChildToParent( args.parentId, args.child )
-//		});
-//		
-//		eventbus.registerHandler('Canvas.relocate', function(x, packet) {
-//			console.log("relocate "+JSON.stringify(packet))
-//			var args = packet.body
-//			diagram.relocate( args.id, args.x, args.y )
-//		});
-//		
-//		eventbus.registerHandler('Canvas.resize', function(x, packet) {
-//			console.log("resize "+JSON.stringify(packet))
-//			var args = packet.body
-//			diagram.resize( args.id, args.width, args.height )
-//		});
-//		
-//		eventbus.registerHandler('Canvas.transform', function(x, packet) {
-//			console.log("transform "+JSON.stringify(packet))
-//			var args = packet.body
-//			diagram.transform( args.id, args.matrix )
-//		});
-//	
-//		eventbus.registerHandler('Canvas.setStartAnchor', function(x, packet) {
-//			console.log("setStartAnchor "+JSON.stringify(packet))
-//			var args = packet.body
-//			diagram.setStartAnchor( args.id, args.anchorId )
-//		});
-//		
-//		eventbus.registerHandler('Canvas.setEndAnchor', function(x, packet) {
-//			console.log("setEndAnchor "+JSON.stringify(packet))
-//			var args = packet.body
-//			diagram.setEndAnchor( args.id, args.anchorId )
-//		});
-//		// voi addEdge(JsonObject edge)
-//	//	eventbus.registerHandler('addEdge', function(x, packet) {
-//	//		var edge = packet.body;
-//	
-//	//	});
-//
-//
-//	}
-
 })
+
+	Element.prototype.cloneEventsTo = function(clone) {
+
+			let events = jQuery._data(this,'events')
+			for(let type in events) {
+				$.each(events[type], function(ix, h) {
+					jQuery.event.add(clone, type, h.handler, h.data)
+				})
+			}
+
+		let origEls = this.getElementsByTagName('*')
+		let cloneEls = clone.getElementsByTagName('*')
+		
+		for(let i=0; i<origEls.length; i++) {
+			let o = origEls[i]
+			let c = cloneEls[i]
+			let events = jQuery._data(o,'events')
+			for(let type in events) {
+				$.each(events[type], function(ix, h) {
+					jQuery.event.add(c, type, h.handler, h.data)
+				})
+			}
+		} //for
+	}

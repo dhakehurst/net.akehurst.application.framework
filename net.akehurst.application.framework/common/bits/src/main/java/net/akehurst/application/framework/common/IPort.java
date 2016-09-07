@@ -21,6 +21,7 @@ public interface IPort extends IIdentifiableObject {
 
 	/**
 	 * Set of objects internal to the component that provide the interface
+	 * 
 	 * @param interfaceType
 	 * @return
 	 */
@@ -33,11 +34,14 @@ public interface IPort extends IIdentifiableObject {
 	/**
 	 * returns an object that implements the required interfaceType normally a 'connection' to something outside the component probably something 'provided' by
 	 * a different Component.Port
-	 * 
+	 *
 	 * @param interfaceType
 	 * @return
 	 */
 	<T> T out(Class<T> interfaceType);
 
 	void connect(IPort other);
+
+	void connect(IIdentifiableObject other);
+
 }

@@ -79,6 +79,8 @@ public interface IGuiRequest {
 
 	void tableAppendRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, Map<String, Object> rowData);
 
+	void tableRemoveRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, String rowId);
+
 	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String dialogId, String dialogContent);
 
 }

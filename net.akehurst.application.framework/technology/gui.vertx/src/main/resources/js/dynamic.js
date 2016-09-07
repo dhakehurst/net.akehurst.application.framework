@@ -80,8 +80,8 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 	}
 	var dy = this
 	var sceneId = this.sceneId
-	$(el).bind(eventType, function() {
-		var data = dy.fetchEventData(el)
+	$(el).on(eventType, function() {
+		var data = dy.fetchEventData(this)
 		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, elementId:elementId, eventType:eventType, eventData:data}
 		dyn.commsSend(eventChannelId, outData)
 	})
@@ -133,7 +133,7 @@ Dynamic.prototype.showDialog = function(parentId, dialogId, content) {
 	if (null!=dialogId) {
 		dialog.id = dialogId
 	}
-	var parent = document.getElementById(parentId)
+	var parent = document.body
 	if (null == parent) {
 		console.log('Error: cannot find parent element with id ' + parentId)
 	} else {
@@ -197,17 +197,29 @@ Dynamic.prototype.tableAppendRow = function(tableId, rowData) {
 	if (table.length == 0) {
 		console.log('Error: cannot find table element with id ' + tableId)
 	} else {
-		var rowTemplate = $(table).find('tr.table-row-template')[0].outerHTML
+		var rowTemplate = $(table).find('tr.table-row-template')
 		if (rowTemplate.length ==0) {
 			console.log('Error: table does not define a table-row-template' + tableId)
 		} else {
-			var row = rowData
-			let tpl = eval('`'+rowTemplate+'`');
-			var tbody = $(table).find('tbody')
-			var tr = $(tpl)
+			let rowTemplateHtml = $(rowTemplate)[0].outerHTML
+			let row = rowData
+			let tpl = eval('`'+rowTemplateHtml+'`');
+			let tbody = $(table).find('tbody')
+			let tr = $(tpl)
 			$(tr).removeClass('table-row-template')
-			$(tbody).append(tr);
+			$(tbody).append(tr)
+			rowTemplate[0].cloneEventsTo(tr[0])
 		}
+	}
+}
+
+
+Dynamic.prototype.tableRemoveRow = function(tableId, rowId) {
+	var table = $('#'+tableId)
+	if (table.length == 0) {
+		console.log('Error: cannot find table element with id ' + tableId)
+	} else {
+		$(table).find('#'+rowId).remove()
 	}
 }
 
@@ -295,7 +307,11 @@ Dynamic.prototype.initComms = function() {
 		console.log("Table.appendRow "+JSON.stringify(args))
 		dynamic.tableAppendRow(args.tableId, args.rowData)
 	})
-
+	this.serverComms.registerHandler('Table.removeRow', function(args) {
+		console.log("Table.removeRow "+JSON.stringify(args))
+		dynamic.tableRemoveRow(args.tableId, args.rowId)
+	})
+	
 	//Charts
 	this.serverComms.registerHandler('Gui.addChart', function(args) {
 		console.log("addChart "+JSON.stringify(args))
@@ -324,3 +340,4 @@ Dynamic.prototype.initComms = function() {
 		//dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
 	})
 }
+

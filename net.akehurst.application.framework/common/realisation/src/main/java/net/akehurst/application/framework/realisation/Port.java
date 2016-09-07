@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.realisation;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
@@ -25,6 +26,7 @@ import java.util.Set;
 
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.IComponent;
+import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
@@ -60,7 +62,9 @@ public class Port implements IPort {
 			set = new HashSet<>();
 			this.provided.put(interfaceType, set);
 		}
-		set.add(provider);
+		if (null != provider) {
+			set.add(provider);
+		}
 	}
 
 	@Override
@@ -71,6 +75,10 @@ public class Port implements IPort {
 		} else {
 			return res;
 		}
+	}
+
+	public Set<Class<?>> getProvided() {
+		return this.provided.keySet();
 	}
 
 	Map<Class<?>, Set<Object>> required;
@@ -144,6 +152,29 @@ public class Port implements IPort {
 			}
 		}
 
+	}
+
+	@Override
+	public void connect(final IIdentifiableObject internalProvider) {
+		for (final Class<?> req : this.getRequired()) {
+			try {
+				for (final Field f : internalProvider.getClass().getFields()) {
+					if (f.getType().isAssignableFrom(req)) {
+						final Class<Object> t = (Class<Object>) req;
+						final Object o = this.out(req);
+						f.set(internalProvider, o);
+					}
+				}
+			} catch (final Exception ex) {
+			}
+		}
+
+		for (final Class<?> prov : this.getProvided()) {
+			final Class<Object> t = (Class<Object>) prov;
+			if (t.isAssignableFrom(internalProvider.getClass())) {
+				this.provideProvided(t, internalProvider);
+			}
+		}
 	}
 
 	@Override

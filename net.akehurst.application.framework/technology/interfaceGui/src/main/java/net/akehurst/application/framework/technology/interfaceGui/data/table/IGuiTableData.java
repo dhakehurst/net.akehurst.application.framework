@@ -20,11 +20,7 @@ import java.util.Map;
 
 public interface IGuiTableData<C, R> {
 
-	List<C> getColumnIndices();
-
 	int getNumberOfRows();
-
-	// IGuiTableCell<C, R> getCellData(C column, R row);
 
 	List<IGuiTableRow<C, R>> getRows();
 
