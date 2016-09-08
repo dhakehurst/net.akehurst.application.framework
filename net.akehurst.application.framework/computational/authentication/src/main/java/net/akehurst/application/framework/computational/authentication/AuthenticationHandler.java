@@ -5,24 +5,20 @@ import net.akehurst.application.framework.computational.interfaceAuthenticator.I
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
 import net.akehurst.application.framework.computational.interfaceUser.authentication.IUserAuthenticationNotification;
 import net.akehurst.application.framework.computational.interfaceUser.authentication.IUserAuthenticationRequest;
-import net.akehurst.application.framework.realisation.AbstractActiveObject;
+import net.akehurst.application.framework.realisation.AbstractIdentifiableObject;
 
-public class AuthenticationHandler extends AbstractActiveObject implements IUserAuthenticationRequest, ICAuthenticatorNotification {
+public class AuthenticationHandler extends AbstractIdentifiableObject implements IUserAuthenticationRequest, ICAuthenticatorNotification {
 
 	public AuthenticationHandler(final String afId) {
 		super(afId);
 	}
 
-	@Override
-	public void afRun() {}
-
-	ICAuthenticatorRequest authRequest;
+	public ICAuthenticatorRequest authRequest;
+	public IUserAuthenticationNotification userAuthNotification;
 
 	public void setAuthRequest(final ICAuthenticatorRequest value) {
 		this.authRequest = value;
 	}
-
-	IUserAuthenticationNotification userAuthNotification;
 
 	public void setUserAuthNotification(final IUserAuthenticationNotification value) {
 		this.userAuthNotification = value;

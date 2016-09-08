@@ -21,7 +21,7 @@ function Dynamic(stageId, sceneId) {
 
 Dynamic.prototype.fetchEventData = function(el) {
 	var data = {}
-	var p = el.closest('fieldset')
+	var p = el.closest('fieldset,tr')
 	if (null!=this.form) {
 		for(i=0; i< this.form.length; i++) {
 			var id = this.form[i].id
@@ -83,6 +83,7 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 	$(el).on(eventType, function() {
 		var data = dy.fetchEventData(this)
 		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, elementId:elementId, eventType:eventType, eventData:data}
+		console.log("event: "+outData)
 		dyn.commsSend(eventChannelId, outData)
 	})
 }
