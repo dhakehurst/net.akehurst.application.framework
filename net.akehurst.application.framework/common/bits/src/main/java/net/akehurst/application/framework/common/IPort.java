@@ -21,7 +21,7 @@ public interface IPort extends IIdentifiableObject {
 
 	/**
 	 * Set of objects internal to the component that provide the interface
-	 * 
+	 *
 	 * @param interfaceType
 	 * @return
 	 */
@@ -42,6 +42,8 @@ public interface IPort extends IIdentifiableObject {
 
 	void connect(IPort other);
 
-	void connect(IIdentifiableObject other);
+	void connectInternal(IPort other);
+
+	void connectInternal(IIdentifiableObject other);
 
 }

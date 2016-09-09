@@ -6,15 +6,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import net.akehurst.application.framework.common.AbstractService;
+import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.declaration.Component;
 import net.akehurst.application.framework.common.annotations.instance.IdentifiableObjectInstance;
+import net.akehurst.application.framework.common.annotations.instance.PortContract;
+import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
+import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationActivity;
 import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationException;
 import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationSubject;
 import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationTarget;
-import net.akehurst.application.framework.service.interfaceAccessControl.IAuthorisationService;
+import net.akehurst.application.framework.service.interfaceAccessControl.IAuthorisationRequest;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
@@ -22,9 +26,10 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 import net.akehurst.application.framework.technology.persistence.filesystem.HJsonFile;
 
-public class ConfigFileAuthorisationService extends AbstractService implements IAuthorisationService {
+@Component
+public class ConfigFileAuthorisationHandler extends AbstractComponent implements IAuthorisationRequest {
 
-	public ConfigFileAuthorisationService(final String afId) {
+	public ConfigFileAuthorisationHandler(final String afId) {
 		super(afId);
 	}
 
@@ -138,5 +143,13 @@ public class ConfigFileAuthorisationService extends AbstractService implements I
 	@Override
 	public void grantAuthorisation(final AuthorisationSubject subject, final AuthorisationActivity permission, final AuthorisationTarget target) {
 		throw new RuntimeException("Authorisations are granted by editing the file");
+	}
+
+	@PortInstance
+	@PortContract(provides = IAuthorisationRequest.class)
+	IPort portClient;
+
+	public IPort portClient() {
+		return this.portClient;
 	}
 }

@@ -34,6 +34,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
@@ -261,7 +262,8 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	// --------- IGuiNotification ---------
 
 	// --------- Ports ---------
-	@PortInstance(provides = { IGuiRequest.class }, requires = { IGuiNotification.class })
+	@PortInstance
+	@PortContract(provides = IGuiRequest.class, requires = IGuiNotification.class)
 	IPort portGui;
 
 	public IPort portGui() {

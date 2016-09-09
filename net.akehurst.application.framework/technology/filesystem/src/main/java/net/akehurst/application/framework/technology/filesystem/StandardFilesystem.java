@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.akehurst.application.framework.common.IService;
+import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.realisation.Port;
@@ -60,7 +61,8 @@ public class StandardFilesystem extends AbstractComponent implements IFilesystem
 	}
 
 	// ---------- Ports ---------
-	@PortInstance(provides = { IFilesystem.class }, requires = {})
+	@PortInstance
+	@PortContract(provides = IFilesystem.class)
 	Port portFs;
 
 	public Port portFs() {

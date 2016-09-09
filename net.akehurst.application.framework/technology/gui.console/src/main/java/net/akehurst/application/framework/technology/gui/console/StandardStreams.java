@@ -17,6 +17,7 @@ package net.akehurst.application.framework.technology.gui.console;
 
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.declaration.Component;
+import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
@@ -47,7 +48,8 @@ public class StandardStreams extends AbstractComponent implements IConsoleReques
 		System.err.println(str);
 	}
 
-	@PortInstance(provides = { IConsoleRequest.class }, requires = { IConsoleNotification.class })
+	@PortInstance
+	@PortContract(provides = IConsoleRequest.class, requires = IConsoleNotification.class)
 	IPort portOutput;
 
 	public IPort portOutput() {

@@ -18,7 +18,9 @@ package net.akehurst.application.framework.realisation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -103,23 +105,40 @@ public class Port implements IPort {
 		set.add(provider);
 	}
 
-	@Override
-	public <T> T out(final Class<T> interfaceType) {
+	static class PortOut<T> implements InvocationHandler {
 
-		final InvocationHandler h = (proxy, method, args) -> {
+		public PortOut(final Port port, final Class<T> interfaceType) {
+			this.port = port;
+			this.interfaceType = interfaceType;
+		}
+
+		Port port;
+		Class<T> interfaceType;
+
+		@Override
+		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+			if (Arrays.asList(Object.class.getMethods()).contains(method)) {
+				return method.invoke(this, args);
+			} else {
+				return this.invokeProxy(proxy, method, args);
+			}
+
+		}
+
+		private Object invokeProxy(final Object proxy, final Method method, final Object[] args) throws Throwable {
 			try {
-				Port.this.logger.log(LogLevel.TRACE, method.getName());
+				this.port.logger.log(LogLevel.TRACE, method.getName());
 				Object result = null;
 				// get these here to delay resolving the object until moment of call
-				final Set<Object> set = Port.this.required.get(interfaceType);
+				final Set<Object> set = this.port.required.get(this.interfaceType);
 				if (null == set) {
 					throw new ApplicationFrameworkException(
-							"Port " + Port.this.afId() + " requires interface " + interfaceType + " and it has not been provided", null);
+							"Port " + this.port.afId() + " requires interface " + this.interfaceType + " and it has not been provided", null);
 				}
 				for (final Object provider : set) {
 					if (null == provider) {
 						throw new ApplicationFrameworkException(
-								"Port " + Port.this.afId() + " requires interface " + interfaceType + " and it has not been provided", null);
+								"Port " + this.port.afId() + " requires interface " + this.interfaceType + " and it has not been provided", null);
 					} else {
 						result = method.invoke(provider, args);
 					}
@@ -128,7 +147,29 @@ public class Port implements IPort {
 			} catch (final InvocationTargetException ex) {
 				throw ex.getCause();
 			}
-		};
+		}
+
+		@Override
+		public int hashCode() {
+			return this.toString().hashCode();
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			return this == other;
+		}
+
+		@Override
+		public String toString() {
+			return this.port.toString() + ".out(" + this.interfaceType.getName() + ")";
+		}
+	}
+
+	@Override
+	public <T> T out(final Class<T> interfaceType) {
+
+		final InvocationHandler h = new PortOut<>(this, interfaceType);
+
 		final Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { interfaceType }, h);
 		return (T) proxy;
 	}
@@ -155,7 +196,25 @@ public class Port implements IPort {
 	}
 
 	@Override
-	public void connect(final IIdentifiableObject internalProvider) {
+	public void connectInternal(final IPort internalPort) {
+		for (final Class<?> intf : this.getProvided()) {
+			final Set<Object> providers = (Set<Object>) internalPort.getProvided(intf);
+			for (final Object provider : providers) {
+				final Class<Object> t = (Class<Object>) intf;
+				this.provideProvided(t, provider);
+			}
+		}
+
+		for (final Class<?> intf : internalPort.getRequired()) {
+			final Class<Object> t = (Class<Object>) intf;
+			final Object provider = this.out(intf);
+			internalPort.provideRequired(t, provider);
+		}
+
+	}
+
+	@Override
+	public void connectInternal(final IIdentifiableObject internalProvider) {
 		for (final Class<?> req : this.getRequired()) {
 			try {
 				for (final Field f : internalProvider.getClass().getFields()) {

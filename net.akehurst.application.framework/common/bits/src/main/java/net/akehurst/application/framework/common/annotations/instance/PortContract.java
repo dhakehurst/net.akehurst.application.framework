@@ -16,13 +16,22 @@
 package net.akehurst.application.framework.common.annotations.instance;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * use Void.class to indicate that provided or required does not have a value (this is the default value).
+ *
+ */
+@Repeatable(PortContractContainer.class)
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PortInstance {
-	String id() default "";
+public @interface PortContract {
+
+	Class<?> provides() default Void.class;
+
+	Class<?> requires() default Void.class;
 
 }

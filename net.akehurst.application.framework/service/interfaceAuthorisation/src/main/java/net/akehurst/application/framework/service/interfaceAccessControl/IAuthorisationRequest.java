@@ -2,7 +2,7 @@ package net.akehurst.application.framework.service.interfaceAccessControl;
 
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 
-public interface IAuthorisationService {
+public interface IAuthorisationRequest {
 
 	/**
 	 * Does 'user' have 'permission' to do something with 'target'

@@ -28,6 +28,7 @@ import javax.persistence.TypedQuery;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.declaration.Component;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
+import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
@@ -112,7 +113,8 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	// ---------- Ports ---------
-	@PortInstance(provides = { IPersistentStore.class }, requires = {})
+	@PortInstance
+	@PortContract(provides = IPersistentStore.class)
 	IPort portPersist;
 
 	public IPort portPersist() {

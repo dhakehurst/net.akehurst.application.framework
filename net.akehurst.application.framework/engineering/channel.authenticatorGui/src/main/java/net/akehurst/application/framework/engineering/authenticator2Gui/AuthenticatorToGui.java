@@ -16,6 +16,7 @@
 package net.akehurst.application.framework.engineering.authenticator2Gui;
 
 import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorNotification;
@@ -58,14 +59,16 @@ public class AuthenticatorToGui extends AbstractComponent implements ICAuthentic
 	}
 
 	// --------- Ports ---------
-	@PortInstance(provides = { ICAuthenticatorRequest.class }, requires = { ICAuthenticatorNotification.class })
+	@PortInstance
+	@PortContract(provides = ICAuthenticatorRequest.class, requires = ICAuthenticatorNotification.class)
 	IPort portAuth;
 
 	public IPort portAuth() {
 		return this.portAuth;
 	}
 
-	@PortInstance(provides = { IAuthenticatorNotification.class }, requires = { IAuthenticatorRequest.class })
+	@PortInstance
+	@PortContract(provides = IAuthenticatorNotification.class, requires = IAuthenticatorRequest.class)
 	IPort portGui;
 
 	public IPort portGui() {

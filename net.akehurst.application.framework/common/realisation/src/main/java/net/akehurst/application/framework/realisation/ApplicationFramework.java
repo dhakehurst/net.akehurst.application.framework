@@ -39,6 +39,7 @@ import net.akehurst.application.framework.common.annotations.instance.CommandLin
 import net.akehurst.application.framework.common.annotations.instance.CommandLineGroup;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineGroupContainer;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
+import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
@@ -769,8 +770,9 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 						// do nothing
 					}
 
+					final PortContract contracts[] = f.getAnnotationsByType(PortContract.class);
 					// Class<? extends Port> fType = (Class<? extends Port>) f.getType();
-					final Object value = this.createPort(Port.class, obj.afId() + "." + portId, obj, ann.provides(), ann.requires());
+					final Object value = this.createPort(Port.class, obj.afId() + "." + portId, obj, contracts);
 					f.set(obj, value);
 				}
 
@@ -778,26 +780,33 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	IPort createPort(final Class<? extends IPort> class_, final String id, final IComponent component, final Class<?>[] provides, final Class<?>[] requires)
+	IPort createPort(final Class<? extends IPort> class_, final String id, final IComponent component, final PortContract[] contracts) // final Class<?>[]
+																																		// provides, final
+																																		// Class<?>[] requires)
 			throws ApplicationFrameworkException {
 		try {
 			final Port prt = new Port(id, component);
 			this.injectServiceReferences(class_, prt);
 
-			for (final Class<?> interfaceType : provides) {
-				final List<Object> providers = (List<Object>) this.findInternalProviderForPort(component, interfaceType, id);
-				for (final Object provider : providers) {
-					if (provider instanceof Class) {
-						prt.provideProvided((Class<Object>) interfaceType, null);
-					} else {
-						prt.provideProvided((Class<Object>) interfaceType, provider);
+			for (final PortContract contract : contracts) {
+				final Class<?> interfaceType = contract.provides();
+				if (Void.class != interfaceType) {
+					final List<Object> providers = (List<Object>) this.findInternalProviderForPort(component, interfaceType, id);
+					for (final Object provider : providers) {
+						if (provider instanceof Class) {
+							prt.provideProvided((Class<Object>) interfaceType, null);
+						} else {
+							prt.provideProvided((Class<Object>) interfaceType, provider);
+						}
 					}
 				}
-
 			}
 
-			for (final Class<?> interfaceType : requires) {
-				prt.requires(interfaceType);
+			for (final PortContract contract : contracts) {
+				final Class<?> interfaceType = contract.requires();
+				if (Void.class != interfaceType) {
+					prt.requires(interfaceType);
+				}
 			}
 
 			return prt;
