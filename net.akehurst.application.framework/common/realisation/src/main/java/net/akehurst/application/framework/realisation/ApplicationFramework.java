@@ -525,7 +525,13 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 						final PersistentItemQuery pid = new PersistentItemQuery(idPath);
 						Object value = config.retrieve(trans, pid, itemType);
 						if (null == value) {
-							value = this.createDatatype(f.getType(), ann.defaultValue());
+							if (itemType.isAssignableFrom(ArrayList.class)) {
+								value = new ArrayList<>();
+							} else if (itemType.isAssignableFrom(HashMap.class)) {
+								value = new HashMap<>();
+							} else {
+								value = this.createDatatype(f.getType(), ann.defaultValue());
+							}
 						}
 						f.set(obj, value);
 						config.commitTransaction(trans);

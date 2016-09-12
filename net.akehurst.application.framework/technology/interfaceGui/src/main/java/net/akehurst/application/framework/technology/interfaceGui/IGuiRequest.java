@@ -83,4 +83,5 @@ public interface IGuiRequest {
 
 	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String dialogId, String dialogContent);
 
+	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
 }

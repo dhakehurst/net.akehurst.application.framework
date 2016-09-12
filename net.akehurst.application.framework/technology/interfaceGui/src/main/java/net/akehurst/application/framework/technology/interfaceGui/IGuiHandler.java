@@ -23,5 +23,6 @@ public interface IGuiHandler {
 
 	<T extends IGuiScene> T getScene(final SceneIdentity sceneId, final Class<T> sceneType);
 
-	<T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content);
+	<T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, IGuiSceneHandler sceneHandler,
+			final URL content);
 }

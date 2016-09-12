@@ -16,58 +16,33 @@
 
 "use strict"
 
-if (typeof stageId === 'undefined' || null===stageId) { //may have an empty ("") stage id
-	alert("stageId must be given a value")
-}
 
-var expectedStart = rootPath+"/"+stageId
-//if (rootPath === 'undefined' || null===rootPath || rootPath === '/' || rootPath.length === 0) {
-//  expectedStart = stageId
-//}
-var path = window.location.pathname
-
-if (!path.startsWith(expectedStart)) {
-	alert("'rootPath +'/'+stageId' must have a value that matches the start of the url path, currently expectedStart = '"+expectedStart+"'")
-}
-
-var sceneId = path.substring(expectedStart.length+1, path.length-1); //pick sceneId out of path and loose the leading and trailing '/'
-if (path == '/') {
-  sceneId = "" //handle special case
-}
-
-//var end = sceneId.lastIndexOf('/')
-//var sceneIdRoot = sceneId.substring(0,end)
-//var stageId = sceneIdRoot
-console.log("sceneId="+sceneId)
-
-var eventbus = null
-var dynamic = null
 
 
 $(document).ready(function() {
-	dynamic = new Dynamic(stageId, sceneId)
+	 new Dynamic(rootPath, stageId)
 })
 
-	Element.prototype.cloneEventsTo = function(clone) {
+Element.prototype.cloneEventsTo = function(clone) {
 
-			let events = jQuery._data(this,'events')
-			for(let type in events) {
-				$.each(events[type], function(ix, h) {
-					jQuery.event.add(clone, type, h.handler, h.data)
-				})
-			}
+		let events = jQuery._data(this,'events')
+		for(let type in events) {
+			$.each(events[type], function(ix, h) {
+				jQuery.event.add(clone, type, h.handler, h.data)
+			})
+		}
 
-		let origEls = this.getElementsByTagName('*')
-		let cloneEls = clone.getElementsByTagName('*')
-		
-		for(let i=0; i<origEls.length; i++) {
-			let o = origEls[i]
-			let c = cloneEls[i]
-			let events = jQuery._data(o,'events')
-			for(let type in events) {
-				$.each(events[type], function(ix, h) {
-					jQuery.event.add(c, type, h.handler, h.data)
-				})
-			}
-		} //for
-	}
+	let origEls = this.getElementsByTagName('*')
+	let cloneEls = clone.getElementsByTagName('*')
+	
+	for(let i=0; i<origEls.length; i++) {
+		let o = origEls[i]
+		let c = cloneEls[i]
+		let events = jQuery._data(o,'events')
+		for(let type in events) {
+			$.each(events[type], function(ix, h) {
+				jQuery.event.add(c, type, h.handler, h.data)
+			})
+		}
+	} //for
+}

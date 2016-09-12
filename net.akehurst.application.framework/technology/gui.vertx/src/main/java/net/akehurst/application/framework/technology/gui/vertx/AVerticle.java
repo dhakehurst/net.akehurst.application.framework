@@ -62,9 +62,9 @@ public class AVerticle implements Verticle {
 	VertxWebsite ws;
 
 	void addRoute(final String stagePath, final Handler<RoutingContext> requestHandler, final String webroot, final Map<String, String> variables) {
-		final String routePath = stagePath + "/*";
+		final String routePath = stagePath + "*";
 
-		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "/*";
+		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
 			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
 				String stageIdStr = data.getString("stageId");
@@ -97,9 +97,9 @@ public class AVerticle implements Verticle {
 
 	void addAuthenticatedRoute(final String stagePath, final Handler<RoutingContext> requestHandler, final String webroot,
 			final Map<String, String> variables) {
-		final String routePath = stagePath + "/*";
+		final String routePath = stagePath + "*";
 
-		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "/*";
+		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
 			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
 				String stageIdStr = data.getString("stageId");
@@ -229,10 +229,11 @@ public class AVerticle implements Verticle {
 		// this.router.route(this.ws.getTestPath()).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
 		// this.router.route(this.ws.getTestPath()).handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
 		// this.router.route(this.ws.getTestPath()).handler(UserSessionHandler.create(this.authProvider));
-		this.router.route(this.ws.getTestPath()).handler(rc -> {
+		final String testPath = "/" + this.ws.getTestPath();
+		this.router.route(testPath).handler(rc -> {
 			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
 		});
-		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + this.ws.getTestPath());
+		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + testPath);
 
 		final ShiroAuthOptions authOpts = new ShiroAuthOptions();
 		final JsonObject config = new JsonObject();
@@ -244,9 +245,11 @@ public class AVerticle implements Verticle {
 
 		this.comms = new ClientServerComms(this.vertx, this.router, this.authProvider, "/eventbus");
 
-		this.router.route(this.ws.getJsPath() + "/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
+		final String jsPath = "/" + this.ws.getJsPath() + "/*";
+		this.router.route(jsPath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
 
-		this.router.route(this.ws.getDownloadPath() + "/:filename").handler(rc -> {
+		final String downloadPath = "/" + this.ws.getDownloadPath() + ":filename";
+		this.router.route(downloadPath).handler(rc -> {
 			final String filename = rc.request().getParam("filename");
 			final Buffer buffer = Buffer.buffer();
 			this.ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(this.createUserSession(rc.session()), filename, new IGuiCallback() {
@@ -266,15 +269,16 @@ public class AVerticle implements Verticle {
 
 			rc.response().putHeader("content-type", "download");
 		});
-		this.ws.logger.log(LogLevel.INFO, "Download path:  " + "http://localhost:" + this.port + this.ws.getDownloadPath());
+		this.ws.logger.log(LogLevel.INFO, "Download path:  " + "http://localhost:" + this.port + downloadPath);
 
-		this.addPostRoute(this.ws.getUploadPath(), rc -> {
+		final String uploadPath = "/" + this.ws.getUploadPath();
+		this.addPostRoute(uploadPath, rc -> {
 			final FileUpload fu = rc.fileUploads().iterator().next();
 
 			this.ws.portGui().out(IGuiNotification.class).notifyUpload(this.createUserSession(rc.session()), fu.uploadedFileName());
 
 		});
-		this.ws.logger.log(LogLevel.INFO, "Upload path:  " + "http://localhost:" + this.port + this.ws.getUploadPath());
+		this.ws.logger.log(LogLevel.INFO, "Upload path:  " + "http://localhost:" + this.port + uploadPath);
 
 		final HttpServer server = this.vertx.createHttpServer();
 		server.requestHandler(this.router::accept).listen(this.port);

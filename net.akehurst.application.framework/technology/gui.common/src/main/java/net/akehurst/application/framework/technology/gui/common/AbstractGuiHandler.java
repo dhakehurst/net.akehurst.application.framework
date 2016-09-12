@@ -27,6 +27,7 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiHandler;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiSceneHandler;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 
@@ -35,6 +36,7 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 	public AbstractGuiHandler(final String id) {
 		super(id);
 		this.scenes = new HashMap<>();
+		this.sceneHandlers = new HashMap<>();
 	}
 
 	protected IGuiRequest guiRequest;
@@ -49,21 +51,32 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 
 	abstract protected void onStageCreated(GuiEvent event);
 
-	abstract protected void onSceneLoaded(GuiEvent event);
+	protected void onSceneLoaded(final GuiEvent event) {
+		final SceneIdentity currentSceneId = event.getSignature().getSceneId();
+		final IGuiScene scene = this.getScene(currentSceneId);
+		final IGuiSceneHandler handler = this.sceneHandlers.get(event.getSignature().getSceneId());
+		handler.loaded(this, scene, event);
+	}
 
 	Map<SceneIdentity, IGuiScene> scenes;
+	Map<SceneIdentity, IGuiSceneHandler> sceneHandlers;
 
+	@Override
 	public IGuiScene getScene(final SceneIdentity sceneId) {
 		return this.scenes.get(sceneId);
 	}
 
+	@Override
 	public <T extends IGuiScene> T getScene(final SceneIdentity sceneId, final Class<T> sceneType) {
 		return (T) this.getScene(sceneId);
 	}
 
-	public <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content) {
+	@Override
+	public <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass,
+			final IGuiSceneHandler sceneHandler, final URL content) {
 		final T scene = this.getGuiRequest().createScene(stageId, sceneId, sceneClass, content);
 		this.scenes.put(sceneId, scene);
+		this.sceneHandlers.put(sceneId, sceneHandler);
 		return scene;
 	}
 

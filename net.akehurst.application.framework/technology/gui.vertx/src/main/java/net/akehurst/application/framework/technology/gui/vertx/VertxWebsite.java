@@ -63,36 +63,40 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	@ConfiguredValue(defaultValue = "")
 	String rootPath;
 
-	@ConfiguredValue(defaultValue = "/test")
+	String getNormalisedRootPath() {
+		return 0 == this.rootPath.length() ? "" : this.rootPath + "/";
+	}
+
+	@ConfiguredValue(defaultValue = "test/")
 	String testPath;
 
 	String getTestPath() {
-		return this.rootPath + this.testPath;
+		return this.getNormalisedRootPath() + this.testPath;
 	}
 
-	@ConfiguredValue(defaultValue = "/download")
+	@ConfiguredValue(defaultValue = "download/")
 	String downloadPath;
 
 	String getDownloadPath() {
-		return this.rootPath + this.downloadPath;
+		return this.getNormalisedRootPath() + this.downloadPath;
 	}
 
-	@ConfiguredValue(defaultValue = "/upload")
+	@ConfiguredValue(defaultValue = "upload/")
 	String uploadPath;
 
 	String getUploadPath() {
-		return this.rootPath + this.uploadPath;
+		return this.getNormalisedRootPath() + this.uploadPath;
 	}
 
-	@ConfiguredValue(defaultValue = "/js")
+	@ConfiguredValue(defaultValue = "js")
 	String jsPath;
 
 	String getJsPath() {
-		return this.rootPath + this.jsPath;
+		return this.getNormalisedRootPath() + this.jsPath;
 	}
 
 	String getSockjsPath() {
-		return "/sockjs"; // this value is hard coded in index-script.js, they must match
+		return "sockjs/"; // this value is hard coded in index-script.js, they must match
 	}
 
 	@ConfiguredValue(defaultValue = "9999")
@@ -145,14 +149,14 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 			variables.put("jsPath", this.getJsPath());
 			variables.put("stageId", stageId.asPrimitive());
 
-			final String stagePath = stageId.asPrimitive().isEmpty() ? "" : "/" + stageId.asPrimitive();
+			final String stagePath = stageId.asPrimitive().isEmpty() ? "" : stageId.asPrimitive() + "/";
 
 			String str = contentRoot.toString();
 			if (str.endsWith("/")) {
 				str = str.substring(0, str.length() - 1);
 			}
 			final String webroot = str.substring(str.lastIndexOf('/') + 1);
-			final String routePath = this.rootPath + stagePath;
+			final String routePath = "/" + this.getNormalisedRootPath() + stagePath;
 			if (authenticated) {
 				this.verticle.addAuthenticatedRoute(routePath, rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
@@ -363,11 +367,9 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		this.verticle.comms.send(session, "Gui.addDiagram", data);
 	}
 
-	// TODO: deal with buttons
 	@Override
 	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final String dialogId,
 			final String title, final String dialogContent) {
-
 		try {
 			final ClassLoader loader = this.getClass().getClassLoader();
 			final Class<?>[] interfaces = new Class<?>[] { dialogClass };
@@ -379,24 +381,15 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 			this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
 			return null;
 		}
+	}
 
-		// String content = "";
-		// content += "<div id='" + modalId + "' class='modal fade' role='dialog'>";
-		// content += " <div class='modal-dialog'>";
-		// content += " <fieldset class='modal-content'>";
-		// content += " <div class='modal-header'>";
-		// content += " <button type='button' class='close' data-dismiss='modal'>&times;</button>";
-		// content += " <h4 class='modal-title'>" + title + "</h4>";
-		// content += " </div>";
-		// content += " <div class='modal-body'>";
-		// content += modalContent;
-		// content += " </div>";
-		// content += " <div class='modal-footer'>";
-		// content += " <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
-		// content += " </div>";
-		// content += " </fieldset>";
-		// content += " </div>";
-		// this.addElement(ts, stageId, sceneId, parentId, modalId, "div", "{'class':'modal fade','role':'dialog'}", content);
+	@Override
+	public void addEditor(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("parentId", parentId);
+		this.verticle.comms.send(session, "Editor.addEditor", data);
 	}
 
 	// --------- Ports ---------

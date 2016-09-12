@@ -259,6 +259,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	}
 
+	@Override
+	public void addEditor(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+		// TODO Auto-generated method stub
+
+	}
+
 	// --------- IGuiNotification ---------
 
 	// --------- Ports ---------

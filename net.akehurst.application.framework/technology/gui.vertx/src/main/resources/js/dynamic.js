@@ -13,10 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function Dynamic(stageId, sceneId) {
+function Dynamic(rootPath, stageId) {
+
+	if (typeof stageId === 'undefined' || null===stageId) { //may have an empty ("") stage id
+		alert("var stageId must be given a value")
+	}
+	if (typeof rootPath === 'undefined' || null===rootPath) {
+	  alert("var rootPath must be given a value")
+	}
+	var expectedStart = '/'
+	if (rootPath.length > 0) {
+		expectedStart += rootPath+'/'
+	}
+	if (stageId.length > 0) {
+		expectedStart += stageId+'/'
+	}
+	
+	var path = window.location.pathname
+	
+	if (!path.startsWith(expectedStart)) {
+		alert("'rootPath +stageId' must have a value that matches the start of the url path, currently expectedStart = '"+expectedStart+"'")
+	}
+	
+	var sceneId = path.substring(expectedStart.length, path.length-1); //pick sceneId out of path and loose the leading and trailing '/'
+	if (sceneId === '/') {
+	  sceneId = "" //handle special case
+	}
+	
+	console.log("sceneId="+sceneId)
+
+	this.rootPath = rootPath
 	this.stageId = stageId
 	this.sceneId = sceneId
-	this.initComms();
+	this.initComms(expectedStart);
 }
 
 Dynamic.prototype.fetchEventData = function(el) {
@@ -95,7 +124,7 @@ Dynamic.prototype.switchToScene = function(stageId, sceneId,sceneArguments) {
 	   pstageId = ''
 	}
 	var psceneId = sceneId + '/';
-	if (stageId.length==0) {
+	if (sceneId.length==0) {
 	   psceneId = ''
 	}
 	var newRef = myLocation + '/' + pstageId + psceneId
@@ -224,6 +253,29 @@ Dynamic.prototype.tableRemoveRow = function(tableId, rowId) {
 	}
 }
 
+Dynamic.prototype.addEditor = function(parentId) {
+	let editor = $('#'+parentId)
+	if (editor.length == 0) {
+		console.log('Error: cannot find element with id ' + parentId)
+	} else {
+//		require(["orion/editor/edit"], function(edit) {
+//			edit({parent: parentId});
+//		})
+
+		require(["/js/orion/codeEdit/code_edit/built-codeEdit-amd.js"], function() {
+			require(["orion/codeEdit", "orion/Deferred"], function(mCodeEdit, Deferred) {
+				var codeEdit = new mCodeEdit()
+				var contents = 'var foo = "bar";'
+				codeEdit.create({parent: parentId}).then(function(editorViewer) {
+					editorViewer.setContents(contents, "application/javascript")
+				})
+			})
+		})
+
+	}
+}
+
+
 Dynamic.prototype.addChart = function(parentId, chartId, width, height, chartType, chartData, chartOptions) {
 	//currently uses Chart.js
 	var parent = document.getElementById(parentId)
@@ -257,20 +309,18 @@ Dynamic.prototype.commsSend = function(name, data) {
 	this.serverComms.send(name,data)
 }
 
-Dynamic.prototype.initComms = function() {
-	var dyn = this
-	var prefix = '/'
-	if (stageId.length == 0) { //special case
-		prefix = ''
-	}
-	this.serverComms = new ServerComms(prefix+stageId+'/sockjs', function() {
+Dynamic.prototype.initComms = function(prefix) {
+	var dynamic = this
+	let commsPath = prefix+'sockjs'
+	console.log('server comms path = '+commsPath)
+	this.serverComms = new ServerComms(commsPath, function() {
 		console.log('server comms open')
 		var sceneArgs = {}
 		window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str,key,value) {
 		    sceneArgs[key] = value;
 		})
-		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{sceneArgs:sceneArgs} }
-		dyn.commsSend('IGuiNotification.notifyEventOccured', outData)		
+		var outData = {stageId: dynamic.stageId, sceneId: dynamic.sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{sceneArgs:sceneArgs} }
+		dynamic.commsSend('IGuiNotification.notifyEventOccured', outData)		
 	})
 	this.serverComms.registerHandler('Gui.set', function(args) {
 		dynamic.set(args.id, args.property, args.value)
@@ -311,6 +361,12 @@ Dynamic.prototype.initComms = function() {
 	this.serverComms.registerHandler('Table.removeRow', function(args) {
 		console.log("Table.removeRow "+JSON.stringify(args))
 		dynamic.tableRemoveRow(args.tableId, args.rowId)
+	})
+	
+	//Editors
+	this.serverComms.registerHandler('Editor.addEditor', function(args) {
+		console.log("Editor.addEditor "+JSON.stringify(args))
+		dynamic.addEditor(args.parentId)
 	})
 	
 	//Charts
