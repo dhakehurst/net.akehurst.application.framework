@@ -46,6 +46,9 @@ function Dynamic(rootPath, stageId) {
 	this.stageId = stageId
 	this.sceneId = sceneId
 	this.initComms(expectedStart);
+	
+	// cache created editors so we can find them again
+	this.editors = {}
 }
 
 Dynamic.prototype.fetchEventData = function(el) {
@@ -53,21 +56,21 @@ Dynamic.prototype.fetchEventData = function(el) {
 	var p = el.closest('fieldset,tr')
 	if (null!=this.form) {
 		for(i=0; i< this.form.length; i++) {
-			var id = this.form[i].id
-			var value = this.form[i].value
+			let id = this.form[i].id
+			let value = this.form[i].value
 			data[id] = value
 		}
 	} else if (null!=p) {
 		var childs = $(p).find('input')
 		for(i=0; i< childs.length; i++) {
-			var id = childs[i].id
-			var value = childs[i].value
+			let id = childs[i].id
+			let value = childs[i].value
 			data[id] = value							
 		}
 		var ts = $(p).find('table.input')
 		for(i=0; i< ts.length; i++) {
-			var tbl = ts[i]
-			var entries = []
+			let tbl = ts[i]
+			let entries = []
 			for(var r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
 				var row = tbl.rows[r]
 				var e = {}
@@ -80,14 +83,22 @@ Dynamic.prototype.fetchEventData = function(el) {
 				}
 				entries.push(e)
 			}
-			var id = tbl.id
+			let id = tbl.id
 			data[id] = entries
 		}
 		var tas = $(p).find('textarea.input')
 		for(i=0; i< tas.length; i++) {
-			var ta = tas[i]
-			var id = ta.id
-			var value = $(ta).val()
+			let ta = tas[i]
+			let id = ta.id
+			let value = $(ta).val()
+			data[id] = value
+		}
+		//check for input from editors
+		let eds = $(p).find('.editor.input')
+		for(i=0; i< eds.length; i++) {
+			let ed = eds[i]
+			let id = ed.id
+			let value = this.editors[id].editor.getTextView().getText()
 			data[id] = value
 		}
 	}
@@ -253,25 +264,36 @@ Dynamic.prototype.tableRemoveRow = function(tableId, rowId) {
 	}
 }
 
-Dynamic.prototype.addEditor = function(parentId) {
+Dynamic.prototype.addEditor = function(parentId, contentType, initialContent, languageDefinition) {
+	let dynamic = this
 	let editor = $('#'+parentId)
 	if (editor.length == 0) {
 		console.log('Error: cannot find element with id ' + parentId)
 	} else {
-//		require(["orion/editor/edit"], function(edit) {
-//			edit({parent: parentId});
-//		})
-
 		require(["/js/orion/codeEdit/code_edit/built-codeEdit-amd.js"], function() {
 			require(["orion/codeEdit", "orion/Deferred"], function(mCodeEdit, Deferred) {
 				var codeEdit = new mCodeEdit()
-				var contents = 'var foo = "bar";'
-				codeEdit.create({parent: parentId}).then(function(editorViewer) {
-					editorViewer.setContents(contents, "application/javascript")
+				
+				codeEdit.create({
+					parent: parentId
+				}).then(function(editorViewer) {
+					
+					editorViewer.serviceRegistry.registerService(
+						"orion.edit.highlighter",
+						{},
+						{
+							id: languageDefinition.identity,
+							contentTypes: [contentType],
+							patterns: languageDefinition.syntaxHighlighterPatterns
+						}
+					)
+
+					editorViewer.setContents(initialContent, contentType)
+					dynamic.editors[parentId] = editorViewer
 				})
+				
 			})
 		})
-
 	}
 }
 
@@ -366,7 +388,7 @@ Dynamic.prototype.initComms = function(prefix) {
 	//Editors
 	this.serverComms.registerHandler('Editor.addEditor', function(args) {
 		console.log("Editor.addEditor "+JSON.stringify(args))
-		dynamic.addEditor(args.parentId)
+		dynamic.addEditor(args.parentId, args.contentType, args.initialContent, args.languageDefinition)
 	})
 	
 	//Charts

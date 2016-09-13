@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageDefinition;
 
 public interface IGuiRequest {
 
@@ -83,5 +84,6 @@ public interface IGuiRequest {
 
 	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String dialogId, String dialogContent);
 
-	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
+	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent,
+			IGuiLanguageDefinition languageDefinition);
 }

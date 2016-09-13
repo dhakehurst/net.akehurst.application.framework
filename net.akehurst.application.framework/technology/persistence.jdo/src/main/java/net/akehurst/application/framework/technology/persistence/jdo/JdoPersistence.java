@@ -34,7 +34,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
-import javax.jdo.annotations.Join;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
@@ -127,12 +126,14 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 				final Class<? extends Persistable> res = (Class<? extends Persistable>) this.cl.defineClass(enhancedName, bytes);
 
 				for (final Field f : class_.getFields()) {
+					final Class<?> fieldType = f.getType();
 					if (null != f.getAnnotation(Persistent.class)) {
-						if (null != f.getType().getAnnotation(PersistenceCapable.class)) {
-							this.fetchEnhanced(f.getType());
+						if (null != fieldType.getAnnotation(PersistenceCapable.class)) {
+							this.fetchEnhanced(fieldType);
+						} else if (List.class.isAssignableFrom(fieldType)) {
+							final Class<?> listElementType = (Class<?>) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
+							this.fetchEnhanced(listElementType);
 						}
-					} else if (null != f.getAnnotation(Join.class)) {
-
 					}
 				}
 
@@ -141,8 +142,6 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 						if (null != a.getReturnType().getAnnotation(PersistenceCapable.class)) {
 							this.fetchEnhanced(a.getReturnType());
 						}
-					} else if (null != a.getAnnotation(Join.class)) {
-
 					}
 				}
 
@@ -168,17 +167,22 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	 */
 	void convertToFromEnhanced(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt) throws IllegalArgumentException,
 			IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-		for (final Field f : srcType.getFields()) {
-			if (null != f.getAnnotation(Persistent.class)) {
-				final Field tgtField = tgtType.getField(f.getName());
-				if (Persistable.class.isAssignableFrom(f.getType())) {
-					final Object v = tgtField.getType().newInstance();
-					this.convertToFromEnhanced(f.getType(), f.get(src), tgtField.getType(), v);
-					tgtField.set(tgt, v);
-				} else if (List.class.isAssignableFrom(f.getType()) && this.isPersistentCollection(f.getGenericType())) {
-					final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
-					final List<?> srcColl = (List<?>) f.get(src);
-					final List<?> tgtColl = new AbstractList<Object>() {
+		for (final Field srcField : srcType.getFields()) {
+			if (null != srcField.getAnnotation(Persistent.class)) {
+				final Field tgtField = tgtType.getField(srcField.getName());
+				if (Persistable.class.isAssignableFrom(srcField.getType())) {
+					final Object tgtFieldObj = tgtField.getType().newInstance();
+					final Object srcFieldObj = srcField.get(src);
+					if (null != srcFieldObj) {
+						this.convertToFromEnhanced(srcField.getType(), srcFieldObj, tgtField.getType(), tgtFieldObj);
+						tgtField.set(tgt, tgtFieldObj);
+					}
+				} else if (List.class.isAssignableFrom(srcField.getType()) && this.isPersistentCollection(srcField.getGenericType())) {
+					final Class<?> srcCollObjType = (Class<?>) ((ParameterizedType) srcField.getGenericType()).getActualTypeArguments()[0];
+					final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtField.getGenericType()).getActualTypeArguments()[0];
+					final List<Object> srcColl = (List<Object>) srcField.get(src);
+					// TODO: not sure why srccoll is null here ? something to do with the jdo mapping
+					final List<Object> tgtColl = null == srcColl ? null : new AbstractList<Object>() {
 						@Override
 						public Object get(final int index) {
 							try {
@@ -196,10 +200,21 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 						public int size() {
 							return srcColl.size();
 						}
+
+						@Override
+						public void add(final int index, final Object element) {
+							try {
+								final Object srcCollObj = srcCollObjType.newInstance();
+								JdoPersistence.this.convertToFromEnhanced(element.getClass(), element, srcCollObjType, srcCollObj);
+								srcColl.add(srcCollObj);
+							} catch (final Exception ex) {
+								ex.printStackTrace();
+							}
+						}
 					};
 					tgtField.set(tgt, tgtColl);
 				} else {
-					tgtField.set(tgt, f.get(src));
+					tgtField.set(tgt, srcField.get(src));
 				}
 			} else {
 			}

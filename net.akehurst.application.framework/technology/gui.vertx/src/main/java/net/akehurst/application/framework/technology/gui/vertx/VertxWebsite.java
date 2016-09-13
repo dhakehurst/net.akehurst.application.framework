@@ -20,6 +20,7 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
@@ -45,6 +46,7 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
+import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageDefinition;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
@@ -384,11 +386,26 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
-	public void addEditor(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+	public void addEditor(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+			final String initialContent, final IGuiLanguageDefinition languageDefinition) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
 		data.put("parentId", parentId);
+		data.put("contentType", "text/plain");
+		data.put("initialContent", initialContent);
+
+		final JsonObject jsonLanguageDefinition = new JsonObject();
+		jsonLanguageDefinition.put("identity", languageDefinition.getIdentity());
+		jsonLanguageDefinition.put("syntaxHighlighterPatterns", new JsonArray(languageDefinition.getSyntaxHighlighting().stream().map((el) -> {
+			final JsonObject d = new JsonObject();
+			d.put("match", el.getPattern());
+			d.put("name", el.getLable());
+			return d;
+		}).collect(Collectors.toList())));
+
+		data.put("languageDefinition", jsonLanguageDefinition);
+
 		this.verticle.comms.send(session, "Editor.addEditor", data);
 	}
 
