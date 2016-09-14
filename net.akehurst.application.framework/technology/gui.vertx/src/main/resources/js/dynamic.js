@@ -120,7 +120,8 @@ Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChan
 	}
 	var dy = this
 	var sceneId = this.sceneId
-	$(el).on(eventType, function() {
+	$(el).on(eventType, function(event) {
+		event.stopPropagation()
 		var data = dy.fetchEventData(this)
 		var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, elementId:elementId, eventType:eventType, eventData:data}
 		console.log("event: "+outData)

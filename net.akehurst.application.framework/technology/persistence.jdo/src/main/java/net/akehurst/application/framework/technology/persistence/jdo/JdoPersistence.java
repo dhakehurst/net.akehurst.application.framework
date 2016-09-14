@@ -33,9 +33,9 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.jdo.Transaction;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.apache.commons.io.IOUtils;
 import org.datanucleus.enhancement.Persistable;
@@ -58,6 +58,8 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
  *
  * Must ensure that compatible versions are in use for javax.jdo, datanucleus-api-jdo, datanucleus-core, and the datanucleus-* make sure to use
  * org.datanucleus:javax.jdo, rather than javax.jdo:jdo-api
+ *
+ * It seems that using the @Persistent annotation on fields does not result in a working situation use getters and setters for your @PersistenceCapable classes
  *
  * @author akehurst
  *
@@ -96,12 +98,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	@ServiceReference
 	ILogger logger;
 
-	PersistenceManager manager;
-
-	@Override
-	public void afRun() {
-
-	}
+	PersistenceManagerFactory factory;
 
 	DynClassloader cl;
 
@@ -154,6 +151,30 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 		return null;
 	}
 
+	private Field getIdentityField(final Class<?> class_) throws PersistentStoreException {
+		for (final Field f : class_.getFields()) {
+			final PrimaryKey pk = f.getAnnotation(PrimaryKey.class);
+			if (null != pk) {
+				return f;
+			} else {
+				// iterate
+			}
+		}
+		throw new PersistentStoreException("all classes must have a PrimaryKey field defined", null);
+	}
+
+	Persistable fetch(final JdoTransaction tx, final String filter, final Class<? extends Persistable> type) {
+		final Query<? extends Persistable> q = tx.manager.newQuery(type, filter);
+		q.compile();
+		final List<? extends Persistable> res = q.executeList();
+		if (res.isEmpty()) {
+			return null;
+		} else {
+			// TODO: should also check for more than 1
+			return res.get(0);
+		}
+	}
+
 	/**
 	 *
 	 * @param srcType
@@ -169,61 +190,80 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	 * @throws InstantiationException
 	 * @throws NoSuchMethodException
 	 * @throws InvocationTargetException
+	 * @throws PersistentStoreException
 	 */
-	void convertToEnhanced(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt) throws IllegalArgumentException,
-			IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-		for (final Field tgtField : tgtType.getFields()) {
-			if (null != tgtField.getAnnotation(Persistent.class)) {
-				final Field srcField = srcType.getField(tgtField.getName());
-				if (Persistable.class.isAssignableFrom(tgtField.getType())) {
-					final Object tgtFieldObj = tgtField.getType().newInstance();
-					final Object srcFieldObj = srcField.get(src);
-					if (null != srcFieldObj) {
-						this.convertToEnhanced(srcField.getType(), srcFieldObj, tgtField.getType(), tgtFieldObj);
-						tgtField.set(tgt, tgtFieldObj);
-					}
-				} else if (List.class.isAssignableFrom(tgtField.getType()) && this.isPersistentCollection(tgtField.getGenericType())) {
-					final Class<?> srcCollObjType = (Class<?>) ((ParameterizedType) srcField.getGenericType()).getActualTypeArguments()[0];
-					final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtField.getGenericType()).getActualTypeArguments()[0];
-					final List<Object> srcColl = (List<Object>) srcField.get(src);
-					// TODO: not sure why srccoll is null here ? something to do with the jdo mapping
-					final List<Object> tgtColl = null == srcColl ? null : new AbstractList<Object>() {
-						@Override
-						public Object get(final int index) {
-							try {
-								final Object srcCollObj = srcColl.get(index);
-								final Object tgtCollObj = tgtCollObjType.newInstance();
-								JdoPersistence.this.convertToEnhanced(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
-								return tgtCollObj;
-							} catch (final Exception ex) {
-								ex.printStackTrace();
-								return null;
-							}
-						}
-
-						@Override
-						public int size() {
-							return srcColl.size();
-						}
-
-						@Override
-						public void add(final int index, final Object element) {
-							try {
-								final Object srcCollObj = srcCollObjType.newInstance();
-								JdoPersistence.this.convertFromEnhanced(element.getClass(), element, srcCollObjType, srcCollObj);
-								srcColl.add(srcCollObj);
-							} catch (final Exception ex) {
-								ex.printStackTrace();
-							}
-						}
-					};
-					tgtField.set(tgt, tgtColl);
-				} else {
-					tgtField.set(tgt, srcField.get(src));
-				}
+	Persistable convertToEnhanced(final JdoTransaction tx, final Class<?> srcType, final Object src, final Class<? extends Persistable> tgtType)
+			throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException, NoSuchMethodException,
+			InvocationTargetException, PersistentStoreException {
+		Persistable tgt = null;
+		if (src instanceof Persistable) {
+			tgt = (Persistable) src;
+		} else {
+			// try and find already persisted object with the same id
+			final Field idField = this.getIdentityField(srcType);
+			final Object id = idField.get(src);
+			final String filter = idField.getName() + " == '" + id + "'";
+			final Persistable p = this.fetch(tx, filter, tgtType);
+			if (null != p) {
+				tgt = p;
 			} else {
+				// create new instance and copy
+				// TODO: methods also!
+				tgt = tx.manager.newInstance(tgtType);
+				for (final Field tgtField : tgtType.getFields()) {
+					if (null != tgtField.getAnnotation(Persistent.class)) {
+						final Field srcField = srcType.getField(tgtField.getName());
+						if (Persistable.class.isAssignableFrom(tgtField.getType())) {
+							final Object srcFieldObj = srcField.get(src);
+							if (null != srcFieldObj) {
+								final Persistable tgtFieldObj = this.convertToEnhanced(tx, srcField.getType(), srcFieldObj,
+										(Class<? extends Persistable>) tgtField.getType());
+								tgtField.set(tgt, tgtFieldObj);
+							}
+						} else if (List.class.isAssignableFrom(tgtField.getType()) && this.isPersistentCollection(tgtField.getGenericType())) {
+							final Class<?> srcCollObjType = (Class<?>) ((ParameterizedType) srcField.getGenericType()).getActualTypeArguments()[0];
+							final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtField.getGenericType()).getActualTypeArguments()[0];
+							final List<Object> srcColl = (List<Object>) srcField.get(src);
+							// TODO: not sure why srccoll is null here ? something to do with the jdo mapping
+							final List<Object> tgtColl = null == srcColl ? null : new AbstractList<Object>() {
+								@Override
+								public Object get(final int index) {
+									try {
+										final Object srcCollObj = srcColl.get(index);
+										final Object tgtCollObj = JdoPersistence.this.convertToEnhanced(tx, srcCollObj.getClass(), srcCollObj,
+												(Class<? extends Persistable>) tgtCollObjType);
+										return tgtCollObj;
+									} catch (final Exception ex) {
+										ex.printStackTrace();
+										return null;
+									}
+								}
+
+								@Override
+								public int size() {
+									return srcColl.size();
+								}
+
+								@Override
+								public void add(final int index, final Object element) {
+									try {
+										final Object srcCollObj = JdoPersistence.this.convertFromEnhanced(tx, element.getClass(), element, srcCollObjType);
+										srcColl.add(srcCollObj);
+									} catch (final Exception ex) {
+										ex.printStackTrace();
+									}
+								}
+							};
+							tgtField.set(tgt, tgtColl);
+						} else {
+							tgtField.set(tgt, srcField.get(src));
+						}
+					} else {
+					}
+				}
 			}
 		}
+		return tgt;
 	}
 
 	/**
@@ -242,60 +282,69 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	 * @throws NoSuchMethodException
 	 * @throws InvocationTargetException
 	 */
-	void convertFromEnhanced(final Class<?> srcType, final Object src, final Class<?> tgtType, final Object tgt) throws IllegalArgumentException,
+	Object convertFromEnhanced(final JdoTransaction tx, final Class<?> srcType, final Object src, final Class<?> tgtType) throws IllegalArgumentException,
 			IllegalAccessException, NoSuchFieldException, SecurityException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-		for (final Field srcField : srcType.getFields()) {
-			if (null != srcField.getAnnotation(Persistent.class)) {
-				final Field tgtField = tgtType.getField(srcField.getName());
-				if (Persistable.class.isAssignableFrom(srcField.getType())) {
-					final Object tgtFieldObj = tgtField.getType().newInstance();
-					final Object srcFieldObj = srcField.get(src);
-					if (null != srcFieldObj) {
-						this.convertFromEnhanced(srcField.getType(), srcFieldObj, tgtField.getType(), tgtFieldObj);
-						tgtField.set(tgt, tgtFieldObj);
+		Object tgt;
+		if (Persistable.class.isAssignableFrom(tgtType)) {
+			// don't bother converting..tgt is also enhanced
+			tgt = src;
+		} else {
+
+			tgt = tgtType.newInstance();
+			// TODO: methods also!
+
+			for (final Field srcField : srcType.getFields()) {
+				if (null != srcField.getAnnotation(Persistent.class)) {
+					final Field tgtField = tgtType.getField(srcField.getName());
+					if (Persistable.class.isAssignableFrom(srcField.getType())) {
+						final Object srcFieldObj = srcField.get(src);
+						if (null != srcFieldObj) {
+							final Object tgtFieldObj = this.convertFromEnhanced(tx, srcField.getType(), srcFieldObj, tgtField.getType());
+							tgtField.set(tgt, tgtFieldObj);
+						}
+					} else if (List.class.isAssignableFrom(srcField.getType()) && this.isPersistentCollection(srcField.getGenericType())) {
+						final Class<?> srcCollObjType = (Class<?>) ((ParameterizedType) srcField.getGenericType()).getActualTypeArguments()[0];
+						final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtField.getGenericType()).getActualTypeArguments()[0];
+						final List<Object> srcColl = (List<Object>) srcField.get(src);
+						// TODO: not sure why srccoll is null here ? something to do with the jdo mapping
+						final List<Object> tgtColl = null == srcColl ? null : new AbstractList<Object>() {
+							@Override
+							public Object get(final int index) {
+								try {
+									final Object srcCollObj = srcColl.get(index);
+									final Object tgtCollObj = JdoPersistence.this.convertFromEnhanced(tx, srcCollObj.getClass(), srcCollObj, tgtCollObjType);
+									return tgtCollObj;
+								} catch (final Exception ex) {
+									ex.printStackTrace();
+									return null;
+								}
+							}
+
+							@Override
+							public int size() {
+								return srcColl.size();
+							}
+
+							@Override
+							public void add(final int index, final Object element) {
+								try {
+									final Persistable srcCollObj = JdoPersistence.this.convertToEnhanced(tx, element.getClass(), element,
+											(Class<? extends Persistable>) srcCollObjType);
+									srcColl.add(srcCollObj);
+								} catch (final Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+						};
+						tgtField.set(tgt, tgtColl);
+					} else {
+						tgtField.set(tgt, srcField.get(src));
 					}
-				} else if (List.class.isAssignableFrom(srcField.getType()) && this.isPersistentCollection(srcField.getGenericType())) {
-					final Class<?> srcCollObjType = (Class<?>) ((ParameterizedType) srcField.getGenericType()).getActualTypeArguments()[0];
-					final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtField.getGenericType()).getActualTypeArguments()[0];
-					final List<Object> srcColl = (List<Object>) srcField.get(src);
-					// TODO: not sure why srccoll is null here ? something to do with the jdo mapping
-					final List<Object> tgtColl = null == srcColl ? null : new AbstractList<Object>() {
-						@Override
-						public Object get(final int index) {
-							try {
-								final Object srcCollObj = srcColl.get(index);
-								final Object tgtCollObj = tgtCollObjType.newInstance();
-								JdoPersistence.this.convertFromEnhanced(srcCollObj.getClass(), srcCollObj, tgtCollObjType, tgtCollObj);
-								return tgtCollObj;
-							} catch (final Exception ex) {
-								ex.printStackTrace();
-								return null;
-							}
-						}
-
-						@Override
-						public int size() {
-							return srcColl.size();
-						}
-
-						@Override
-						public void add(final int index, final Object element) {
-							try {
-								final Object srcCollObj = srcCollObjType.newInstance();
-								JdoPersistence.this.convertToEnhanced(element.getClass(), element, srcCollObjType, srcCollObj);
-								srcColl.add(srcCollObj);
-							} catch (final Exception ex) {
-								ex.printStackTrace();
-							}
-						}
-					};
-					tgtField.set(tgt, tgtColl);
 				} else {
-					tgtField.set(tgt, srcField.get(src));
 				}
-			} else {
 			}
 		}
+		return tgt;
 	}
 
 	boolean isPersistentCollection(final Type type) {
@@ -313,71 +362,76 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 
 	@Override
 	public void connect(final Map<String, Object> properties) {
-		final PersistenceManagerFactory factory = JDOHelper.getPersistenceManagerFactory(properties);
-		this.manager = factory.getPersistenceManager();
+		this.factory = JDOHelper.getPersistenceManagerFactory(properties);
+	}
+
+	@Override
+	public IPersistenceTransaction startTransaction() {
+		final PersistenceManager manager = this.factory.getPersistenceManager();
+		final JdoTransaction tx = new JdoTransaction(manager);
+		tx.begin();
+		return tx;
+	}
+
+	@Override
+	public void commitTransaction(final IPersistenceTransaction transaction) {
+		final JdoTransaction tx = (JdoTransaction) transaction;
+		tx.commit();
+		tx.manager.close();
+	}
+
+	@Override
+	public void rollbackTransaction(final IPersistenceTransaction transaction) {
+		final JdoTransaction tx = (JdoTransaction) transaction;
+		tx.rollback();
+		tx.manager.close();
 	}
 
 	@Override
 	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery query, final T item, final Class<T> itemType)
 			throws PersistentStoreException {
-		final Transaction tx = this.manager.currentTransaction();
 		try {
+			final JdoTransaction tx = (JdoTransaction) transaction;
 			Object toPersist = null;
 			if (item instanceof Persistable) {
 				toPersist = item;
 			} else {
 				final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-				final Persistable enhancedObj = enhancedType.newInstance();
-				this.convertToEnhanced(itemType, item, enhancedType, enhancedObj);
+				final Persistable enhancedObj = this.convertToEnhanced(tx, itemType, item, enhancedType);
 				toPersist = enhancedObj;
 			}
 
-			tx.begin();
+			((JdoTransaction) transaction).makePersistent((Persistable) toPersist);
 
-			this.manager.makePersistent(toPersist);
-
-			tx.commit();
 		} catch (final Throwable ex) {
 			this.logger.log(LogLevel.ERROR, "Failed to store persistent item", ex);
-		} finally {
-			if (tx.isActive()) {
-				tx.rollback();
-			}
 		}
 	}
 
 	@Override
 	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
 			throws PersistentStoreException {
-		final Transaction tx = this.manager.currentTransaction();
 		try {
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
 
-			tx.begin();
-
-			final Query<? extends Persistable> jdoQuery = this.manager.newQuery(enhancedType, query.asPrimitive());
+			final Query<? extends Persistable> jdoQuery = ((JdoTransaction) transaction).newQuery(enhancedType, query.asPrimitive());
 			jdoQuery.compile();
 			final Collection<? extends Persistable> res = (Collection<? extends Persistable>) jdoQuery.execute();
 			for (final Persistable jdoObj : res) {
-				this.manager.deletePersistent(jdoObj);
+				((JdoTransaction) transaction).deletePersistent(jdoObj);
 			}
-
-			tx.commit();
 
 		} catch (final Throwable ex) {
 			this.logger.log(LogLevel.ERROR, "Failed to remove persistent item", ex);
-		} finally {
-			if (tx.isActive()) {
-				tx.rollback();
-			}
 		}
 	}
 
 	@Override
 	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType) throws PersistentStoreException {
 		try {
+			final JdoTransaction tx = (JdoTransaction) transaction;
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-			final Query<? extends Persistable> jdoquery = this.manager.newQuery(enhancedType, query.asPrimitive());
+			final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType, query.asPrimitive());
 			final Collection<T> res = (Collection<T>) jdoquery.execute();
 			if (res.isEmpty()) {
 				return null;
@@ -386,8 +440,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 				if (itemType.isInstance(o)) {
 					return (T) o;
 				} else {
-					final T item = itemType.newInstance();
-					this.convertFromEnhanced(enhancedType, o, itemType, item);
+					final T item = (T) this.convertFromEnhanced(tx, enhancedType, o, itemType);
 					return item;
 				}
 			}
@@ -405,13 +458,13 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 
 	@Override
 	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
+		final JdoTransaction tx = (JdoTransaction) transaction;
 		final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-		final Query<? extends Persistable> query = this.manager.newQuery(enhancedType);
+		final Query<? extends Persistable> query = ((JdoTransaction) transaction).newQuery(enhancedType);
 		final Collection<T> res = (Collection<T>) query.execute();
 		final Set<T> result = res.stream().map((el) -> {
 			try {
-				final T item = itemType.newInstance();
-				this.convertFromEnhanced(enhancedType, el, itemType, item);
+				final T item = (T) this.convertFromEnhanced(tx, enhancedType, el, itemType);
 				return item;
 			} catch (final Exception ex) {
 				throw new RuntimeException("Error mapping JDO enhanced object to un-enhanced", ex);
@@ -427,17 +480,6 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 
 	public IPort portPersist() {
 		return this.portPersist;
-	}
-
-	@Override
-	public IPersistenceTransaction startTransaction() {
-		return null;
-	}
-
-	@Override
-	public void commitTransaction(final IPersistenceTransaction transaction) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

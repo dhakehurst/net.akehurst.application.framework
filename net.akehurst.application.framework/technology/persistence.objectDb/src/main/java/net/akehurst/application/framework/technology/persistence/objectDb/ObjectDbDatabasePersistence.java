@@ -69,6 +69,24 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	};
 
 	@Override
+	public IPersistenceTransaction startTransaction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void commitTransaction(final IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void rollbackTransaction(final IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
 			throws PersistentStoreException {
 		// TODO Auto-generated method stub
@@ -121,15 +139,4 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 		return this.portPersist;
 	}
 
-	@Override
-	public IPersistenceTransaction startTransaction() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void commitTransaction(final IPersistenceTransaction transaction) {
-		// TODO Auto-generated method stub
-
-	}
 }

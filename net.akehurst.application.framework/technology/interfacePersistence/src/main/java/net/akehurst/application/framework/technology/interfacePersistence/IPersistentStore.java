@@ -26,6 +26,8 @@ public interface IPersistentStore {
 
 	void commitTransaction(IPersistenceTransaction transaction);
 
+	void rollbackTransaction(IPersistenceTransaction transaction);
+
 	/**
 	 *
 	 * @param query

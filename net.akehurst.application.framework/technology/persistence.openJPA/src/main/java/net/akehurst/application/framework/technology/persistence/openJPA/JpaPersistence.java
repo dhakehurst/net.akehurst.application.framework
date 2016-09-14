@@ -68,6 +68,28 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	};
 
 	@Override
+	public IPersistenceTransaction startTransaction() {
+		final EntityManager em = this.emf.createEntityManager();
+		final EntityTransaction transaction = em.getTransaction();
+		transaction.begin();
+		return new JpaPersistenceTransaction(em);
+	}
+
+	@Override
+	public void commitTransaction(final IPersistenceTransaction transaction) {
+		final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
+		trans.em.getTransaction().commit();
+		trans.em.close();
+		trans.em = null;
+	}
+
+	@Override
+	public void rollbackTransaction(final IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery location, final T item, final Class<T> itemType)
 			throws PersistentStoreException {
 		try {
@@ -88,22 +110,6 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 		} catch (final Exception ex) {
 			throw new PersistentStoreException("Failed to remove item", ex);
 		}
-	}
-
-	@Override
-	public IPersistenceTransaction startTransaction() {
-		final EntityManager em = this.emf.createEntityManager();
-		final EntityTransaction transaction = em.getTransaction();
-		transaction.begin();
-		return new JpaPersistenceTransaction(em);
-	}
-
-	@Override
-	public void commitTransaction(final IPersistenceTransaction transaction) {
-		final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
-		trans.em.getTransaction().commit();
-		trans.em.close();
-		trans.em = null;
 	}
 
 	@Override

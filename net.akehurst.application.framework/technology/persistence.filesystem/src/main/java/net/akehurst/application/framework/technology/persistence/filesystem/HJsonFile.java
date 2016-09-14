@@ -105,6 +105,23 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	};
 
 	@Override
+	public IPersistenceTransaction startTransaction() {
+		return null;
+	}
+
+	@Override
+	public void commitTransaction(final IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void rollbackTransaction(final IPersistenceTransaction transaction) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery location, final T item, final Class<T> itemType)
 			throws PersistentStoreException {
 
@@ -214,14 +231,4 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 		return null;
 	}
 
-	@Override
-	public IPersistenceTransaction startTransaction() {
-		return null;
-	}
-
-	@Override
-	public void commitTransaction(final IPersistenceTransaction transaction) {
-		// TODO Auto-generated method stub
-
-	}
 }
