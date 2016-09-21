@@ -1,0 +1,10 @@
+
+
+jar {
+
+	from ("${projectDir}/src/main/js", {
+		into "META-INF/resources/webjars/dynamic/${version}"
+		include "**/*.js"
+	})
+
+}

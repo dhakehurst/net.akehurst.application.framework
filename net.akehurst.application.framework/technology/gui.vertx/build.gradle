@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+repositories {
+	//for orion editor
+    ivy {
+		url 'http://download.eclipse.org'
+		layout 'pattern', {
+			artifact '/[organisation]/drops/[revision]/[module].[ext]'
+		}
+    }
+}
 
 dependencies {
 	compile project(":${rootProject.name}.common.realisation")
@@ -28,4 +37,15 @@ dependencies {
 	compile "io.vertx:vertx-auth-shiro:3.2.1"
 	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
 	
+	compile 'org.webjars:jquery:3.1.0'
+ 	compile 'org.webjars:requirejs:2.3.1'
+ 	compile 'org.webjars:sockjs-client:1.1.1'
+ 	compile 'org.webjars:chartjs:2.1.3'
+
+	compile project(":${rootProject.name}.technology.webjar.orion")
+	compile project(":${rootProject.name}.technology.webjar.languageclient")
+	compile project(":${rootProject.name}.technology.webjar.dynamic")
+	compile project(":${rootProject.name}.technology.webjar.cytoscape")
+
+
 }

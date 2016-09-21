@@ -1,0 +1,14 @@
+
+
+
+jar {
+
+	from ("${projectDir}/src/main/js", {
+		into "META-INF/resources/webjars/vscode-languageclient/2.5.0"
+		include "**/*.js"
+	})
+
+}
+
+
+

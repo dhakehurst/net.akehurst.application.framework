@@ -19,7 +19,7 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiEditor;
-import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageDefinition;
+import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageService;
 
 public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
 
@@ -28,7 +28,7 @@ public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
 	}
 
 	@Override
-	public void add(final UserSession session, final String initialContent, final IGuiLanguageDefinition languageDefinition) {
+	public void add(final UserSession session, final String initialContent, final IGuiLanguageService languageDefinition) {
 		super.guiRequest.addEditor(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, initialContent, languageDefinition);
 	}
 

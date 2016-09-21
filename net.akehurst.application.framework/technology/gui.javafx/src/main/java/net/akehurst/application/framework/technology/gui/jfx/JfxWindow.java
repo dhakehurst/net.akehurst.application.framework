@@ -49,7 +49,7 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
-import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageDefinition;
+import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageService;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class JfxWindow extends AbstractComponent implements IGuiRequest {
@@ -254,7 +254,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void addDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String diagramId,
+	public void addDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String jsonDiagramData) {
 		// TODO Auto-generated method stub
 
@@ -262,7 +262,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void addEditor(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String initialContent, final IGuiLanguageDefinition languageDefinition) {
+			final String initialContent, final IGuiLanguageService languageDefinition) {
 		// TODO Auto-generated method stub
 
 	}

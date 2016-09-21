@@ -19,7 +19,7 @@ import java.net.URL;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageDefinition;
+import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageService;
 
 public interface IGuiRequest {
 
@@ -74,7 +74,7 @@ public interface IGuiRequest {
 	void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, Integer width, Integer height,
 			String chartType, String jsonChartData, String jsonChartOptions);
 
-	void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String diagramId, String jsonDiagramData);
+	void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 
 	void set(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
 
@@ -85,5 +85,5 @@ public interface IGuiRequest {
 	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String dialogId, String dialogContent);
 
 	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent,
-			IGuiLanguageDefinition languageDefinition);
+			IGuiLanguageService languageDefinition);
 }

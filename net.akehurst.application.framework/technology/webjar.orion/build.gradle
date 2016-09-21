@@ -1,0 +1,42 @@
+
+
+repositories {
+    ivy {
+		url 'http://download.eclipse.org'
+		layout 'pattern', {
+			artifact '/[organisation]/drops/[revision]/[module].[ext]'
+		}
+    }
+}
+
+dependencies {
+	
+	compile 'orion:built-codeEdit:R-12.0-201606220105@zip'
+	
+}
+
+tasks['jar'].dependsOn('unzip')
+
+
+jar {
+
+	from ("${buildDir}/unzip/orion", {
+		into "META-INF/resources/webjars/orion/12.0"
+		include "**/*.js"
+		include "**/*.css"
+		include "**/*.html"
+	})
+
+}
+
+// unzip the orion zip
+task unzip(type: Copy) {
+
+  def zipPath = project.configurations.compile.find {it.name.startsWith("built") }
+  println zipPath
+  def zipFile = file(zipPath)
+  def outputDir = file("${buildDir}/unzip/orion")
+
+  from zipTree(zipFile)
+  into outputDir
+}

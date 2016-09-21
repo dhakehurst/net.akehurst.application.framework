@@ -1,0 +1,10 @@
+
+
+jar {
+
+	from ("${projectDir}/src/main/js", {
+		into "META-INF/resources/webjars/cytoscape/2.7.9"
+		include "**/*.js"
+	})
+
+}

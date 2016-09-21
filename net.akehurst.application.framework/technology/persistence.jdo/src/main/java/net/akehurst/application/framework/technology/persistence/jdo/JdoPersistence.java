@@ -163,6 +163,18 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 		throw new PersistentStoreException("all classes must have a PrimaryKey field defined", null);
 	}
 
+	private Method getIdentityMethod(final Class<?> class_) throws PersistentStoreException {
+		for (final Method m : class_.getMethods()) {
+			final PrimaryKey pk = m.getAnnotation(PrimaryKey.class);
+			if (null != pk) {
+				return m;
+			} else {
+				// iterate
+			}
+		}
+		throw new PersistentStoreException("all classes must have a PrimaryKey field defined", null);
+	}
+
 	Persistable fetch(final JdoTransaction tx, final String filter, final Class<? extends Persistable> type) {
 		final Query<? extends Persistable> q = tx.manager.newQuery(type, filter);
 		q.compile();
@@ -200,16 +212,22 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			tgt = (Persistable) src;
 		} else {
 			// try and find already persisted object with the same id
+			Object id = null;
 			final Field idField = this.getIdentityField(srcType);
-			final Object id = idField.get(src);
+			if (null != idField) {
+				id = idField.get(src);
+			} else {
+				final Method idMethod = this.getIdentityMethod(srcType);
+				id = idMethod.invoke(src);
+			}
 			final String filter = idField.getName() + " == '" + id + "'";
 			final Persistable p = this.fetch(tx, filter, tgtType);
 			if (null != p) {
 				tgt = p;
 			} else {
 				// create new instance and copy
-				// TODO: methods also!
 				tgt = tx.manager.newInstance(tgtType);
+				// copy fields
 				for (final Field tgtField : tgtType.getFields()) {
 					if (null != tgtField.getAnnotation(Persistent.class)) {
 						final Field srcField = srcType.getField(tgtField.getName());
@@ -257,6 +275,60 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 							tgtField.set(tgt, tgtColl);
 						} else {
 							tgtField.set(tgt, srcField.get(src));
+						}
+					} else {
+					}
+				}
+				// copy methods
+				for (final Method tgtMethod : tgtType.getMethods()) {
+					if (null != tgtMethod.getAnnotation(Persistent.class)) {
+						final Method srcMethod = srcType.getMethod(tgtMethod.getName());
+						final Method tgtSetMethod = tgtType.getMethod(tgtMethod.getName().replaceFirst("get", "set"), tgtMethod.getReturnType());
+						if (Persistable.class.isAssignableFrom(tgtMethod.getReturnType())) {
+							final Object srcMethodObj = srcMethod.invoke(src);
+							if (null != srcMethodObj) {
+								final Persistable tgtMethodObj = this.convertToEnhanced(tx, srcMethod.getReturnType(), srcMethodObj,
+										(Class<? extends Persistable>) tgtMethod.getReturnType());
+
+								tgtSetMethod.invoke(tgt, tgtMethodObj);
+							}
+						} else if (List.class.isAssignableFrom(tgtMethod.getReturnType()) && this.isPersistentCollection(tgtMethod.getGenericReturnType())) {
+							final Class<?> srcCollObjType = (Class<?>) ((ParameterizedType) srcMethod.getGenericReturnType()).getActualTypeArguments()[0];
+							final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtMethod.getGenericReturnType()).getActualTypeArguments()[0];
+							final List<Object> srcColl = (List<Object>) srcMethod.invoke(src);
+							// TODO: not sure why srccoll is null here ? something to do with the jdo mapping
+							final List<Object> tgtColl = null == srcColl ? null : new AbstractList<Object>() {
+								@Override
+								public Object get(final int index) {
+									try {
+										final Object srcCollObj = srcColl.get(index);
+										final Object tgtCollObj = JdoPersistence.this.convertToEnhanced(tx, srcCollObj.getClass(), srcCollObj,
+												(Class<? extends Persistable>) tgtCollObjType);
+										return tgtCollObj;
+									} catch (final Exception ex) {
+										ex.printStackTrace();
+										return null;
+									}
+								}
+
+								@Override
+								public int size() {
+									return srcColl.size();
+								}
+
+								@Override
+								public void add(final int index, final Object element) {
+									try {
+										final Object srcCollObj = JdoPersistence.this.convertFromEnhanced(tx, element.getClass(), element, srcCollObjType);
+										srcColl.add(srcCollObj);
+									} catch (final Exception ex) {
+										ex.printStackTrace();
+									}
+								}
+							};
+							tgtSetMethod.invoke(tgt, tgtColl);
+						} else {
+							tgtSetMethod.invoke(tgt, srcMethod.invoke(src));
 						}
 					} else {
 					}

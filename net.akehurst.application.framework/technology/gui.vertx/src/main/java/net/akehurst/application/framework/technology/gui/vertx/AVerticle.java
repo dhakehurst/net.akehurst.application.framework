@@ -66,20 +66,25 @@ public class AVerticle implements Verticle {
 
 		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
-			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-				String stageIdStr = data.getString("stageId");
-				stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
-				final StageIdentity stageId = new StageIdentity(stageIdStr);
-				final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
-				final String eventType = data.getString("eventType");
-				final String elementId = data.getString("elementId");
-				final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
+			switch (channelId) {
+				case "IGuiNotification.notifyEventOccured": {
+					String stageIdStr = data.getString("stageId");
+					stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
+					final StageIdentity stageId = new StageIdentity(stageIdStr);
+					final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
+					final String eventType = data.getString("eventType");
+					final String elementId = data.getString("elementId");
+					final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
 
-				this.ws.portGui().out(IGuiNotification.class)
-						.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
-			} else {
-				// ??
+					this.ws.portGui().out(IGuiNotification.class)
+							.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
+				}
+				break;
+
+				default:
+				break;
 			}
+
 		});
 
 		this.router.route(routePath).handler(CookieHandler.create());
@@ -247,6 +252,9 @@ public class AVerticle implements Verticle {
 
 		final String jsPath = "/" + this.ws.getJsPath() + "/*";
 		this.router.route(jsPath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
+
+		// TODO: replace jsPath with this once all my js code is ported
+		this.router.route("/lib/*").handler(StaticHandler.create("META-INF/resources/webjars"));
 
 		final String downloadPath = "/" + this.ws.getDownloadPath() + ":filename";
 		this.router.route(downloadPath).handler(rc -> {
