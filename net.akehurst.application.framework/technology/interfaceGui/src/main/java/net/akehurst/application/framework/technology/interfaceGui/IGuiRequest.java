@@ -71,8 +71,8 @@ public interface IGuiRequest {
 
 	void setText(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
 
-	void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, Integer width, Integer height,
-			String chartType, String jsonChartData, String jsonChartOptions);
+	void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, String chartType, String jsonChartData,
+			String jsonChartOptions);
 
 	void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 

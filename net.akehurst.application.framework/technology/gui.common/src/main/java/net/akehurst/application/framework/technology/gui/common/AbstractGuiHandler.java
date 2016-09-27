@@ -39,7 +39,7 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 		this.sceneHandlers = new HashMap<>();
 	}
 
-	protected IGuiRequest guiRequest;
+	public IGuiRequest guiRequest;
 
 	public IGuiRequest getGuiRequest() {
 		return this.guiRequest;
@@ -74,7 +74,7 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 	@Override
 	public <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass,
 			final IGuiSceneHandler sceneHandler, final URL content) {
-		final T scene = this.getGuiRequest().createScene(stageId, sceneId, sceneClass, content);
+		final T scene = this.guiRequest.createScene(stageId, sceneId, sceneClass, content);
 		this.scenes.put(sceneId, scene);
 		this.sceneHandlers.put(sceneId, sceneHandler);
 		return scene;

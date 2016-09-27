@@ -39,7 +39,7 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 
 	ExecutorService executor;
 
-	static class NamedSignal<R> {
+	class NamedSignal<R> {
 		public NamedSignal(final String name, final ISignalR<R> signal) {
 			this.name = name;
 			this.signal = signal;
@@ -47,7 +47,7 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 				try {
 					return signal.execute();
 				} catch (final Throwable t) {
-					t.printStackTrace();
+					AbstractActiveSignalProcessingObject.this.logger.log(LogLevel.ERROR, t.getMessage(), t);
 				}
 				return null;
 			});
@@ -73,7 +73,7 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 				});
 
 			} catch (final Throwable ex) {
-				ex.printStackTrace(); // TODO: make this log
+				this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
 			}
 		}
 

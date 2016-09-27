@@ -160,7 +160,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 				// iterate
 			}
 		}
-		throw new PersistentStoreException("all classes must have a PrimaryKey field defined", null);
+		return null;// throw new PersistentStoreException("all classes must have a PrimaryKey field defined", null);
 	}
 
 	private Method getIdentityMethod(final Class<?> class_) throws PersistentStoreException {
@@ -172,7 +172,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 				// iterate
 			}
 		}
-		throw new PersistentStoreException("all classes must have a PrimaryKey field defined", null);
+		return null;// throw new PersistentStoreException("all classes must have a PrimaryKey field defined", null);
 	}
 
 	Persistable fetch(final JdoTransaction tx, final String filter, final Class<? extends Persistable> type) {
@@ -214,13 +214,19 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			// try and find already persisted object with the same id
 			Object id = null;
 			final Field idField = this.getIdentityField(srcType);
+			String idName = null;
 			if (null != idField) {
 				id = idField.get(src);
+				idName = idField.getName();
 			} else {
 				final Method idMethod = this.getIdentityMethod(srcType);
+				if (null == idMethod) {
+					throw new PersistentStoreException("all classes must have a PrimaryKey field or method defined to use the runtime enahncement", null);
+				}
 				id = idMethod.invoke(src);
+				idName = idMethod.getName().substring(3, 4).toLowerCase() + idMethod.getName().substring(4);
 			}
-			final String filter = idField.getName() + " == '" + id + "'";
+			final String filter = idName + " == '" + id + "'";
 			final Persistable p = this.fetch(tx, filter, tgtType);
 			if (null != p) {
 				tgt = p;
@@ -411,6 +417,58 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 						tgtField.set(tgt, tgtColl);
 					} else {
 						tgtField.set(tgt, srcField.get(src));
+					}
+				} else {
+				}
+			}
+			// copy methods
+			for (final Method srcMethod : srcType.getMethods()) {
+				if (null != srcMethod.getAnnotation(Persistent.class)) {
+					final Method tgtMethod = tgtType.getMethod(srcMethod.getName());
+					final Method tgtSetMethod = tgtType.getMethod(tgtMethod.getName().replaceFirst("get", "set"), tgtMethod.getReturnType());
+					if (Persistable.class.isAssignableFrom(srcMethod.getReturnType())) {
+						final Object srcMethodObj = srcMethod.invoke(src);
+						if (null != srcMethodObj) {
+							final Object tgtMethodObj = this.convertFromEnhanced(tx, srcMethod.getReturnType(), srcMethodObj, tgtMethod.getReturnType());
+							tgtSetMethod.invoke(tgt, tgtMethodObj);
+						}
+					} else if (List.class.isAssignableFrom(srcMethod.getReturnType()) && this.isPersistentCollection(srcMethod.getGenericReturnType())) {
+						final Class<?> srcCollObjType = (Class<?>) ((ParameterizedType) srcMethod.getGenericReturnType()).getActualTypeArguments()[0];
+						final Class<?> tgtCollObjType = (Class<?>) ((ParameterizedType) tgtMethod.getGenericReturnType()).getActualTypeArguments()[0];
+						final List<Object> srcColl = (List<Object>) srcMethod.invoke(src);
+						// TODO: not sure why srccoll is null here ? something to do with the jdo mapping
+						final List<Object> tgtColl = null == srcColl ? null : new AbstractList<Object>() {
+							@Override
+							public Object get(final int index) {
+								try {
+									final Object srcCollObj = srcColl.get(index);
+									final Object tgtCollObj = JdoPersistence.this.convertFromEnhanced(tx, srcCollObj.getClass(), srcCollObj, tgtCollObjType);
+									return tgtCollObj;
+								} catch (final Exception ex) {
+									ex.printStackTrace();
+									return null;
+								}
+							}
+
+							@Override
+							public int size() {
+								return srcColl.size();
+							}
+
+							@Override
+							public void add(final int index, final Object element) {
+								try {
+									final Persistable srcCollObj = JdoPersistence.this.convertToEnhanced(tx, element.getClass(), element,
+											(Class<? extends Persistable>) srcCollObjType);
+									srcColl.add(srcCollObj);
+								} catch (final Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+						};
+						tgtSetMethod.invoke(tgt, tgtColl);
+					} else {
+						tgtSetMethod.invoke(tgt, srcMethod.invoke(src));
 					}
 				} else {
 				}

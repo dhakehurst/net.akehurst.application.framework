@@ -6,6 +6,10 @@ public interface IGuiGraphNode {
 
 	String getIdentity();
 
+	IGuiGraphNode getParent();
+
+	String[] getType();
+
 	Map<String, String> getData();
 
 }

@@ -15,6 +15,8 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
+import java.util.Map;
+
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
@@ -47,6 +49,7 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 		final JsonObject json = new JsonObject();
 
 		json.put("elements", this.createElements(diagramData));
+		json.put("style", diagramData.getStyle());
 
 		return json.encode();
 	}
@@ -71,9 +74,19 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 		jnode.put("group", "nodes");
 		final JsonObject data = new JsonObject();
 		data.put("id", nodeId);
-		data.put("bgc", node.getData().get("bgc"));
-		jnode.put("data", data);
+		if (null != node.getParent()) {
+			data.put("parent", node.getParent().getIdentity());
+		}
+		for (final Map.Entry<String, String> me : node.getData().entrySet()) {
+			data.put(me.getKey(), me.getValue());
+		}
 
+		jnode.put("data", data);
+		String classes = "";
+		for (final String c : node.getType()) {
+			classes += c + " ";
+		}
+		jnode.put("classes", classes);
 		return jnode;
 	}
 

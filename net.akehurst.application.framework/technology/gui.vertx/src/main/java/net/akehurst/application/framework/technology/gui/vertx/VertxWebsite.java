@@ -335,14 +335,12 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 
 	@Override
 	public void addChart(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
-			final Integer width, final Integer height, final String chartType, final String jsonChartData, final String jsonChartOptions) {
+			final String chartType, final String jsonChartData, final String jsonChartOptions) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
 		data.put("parentId", parentId);
 		data.put("chartId", chartId);
-		data.put("width", width);
-		data.put("height", height);
 		data.put("chartType", chartType);
 
 		if (jsonChartData.startsWith("[")) {

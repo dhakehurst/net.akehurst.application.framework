@@ -339,12 +339,14 @@ define([
 	}
 	
 	
-	Dynamic.prototype.addChart = function(parentId, chartId, width, height, chartType, chartData, chartOptions) {
+	Dynamic.prototype.addChart = function(parentId, chartId, chartType, chartData, chartOptions) {
 		require(["chartjs"],function(Chart){
-			var parent = document.getElementById(parentId)
+			let parent = document.getElementById(parentId)
+			let width = $(parent).width()
+			let height = $(parent).height()
 			$(parent).append("<canvas id='"+chartId+"' width='"+width+"' height='"+height+"'></canvas>")
-			var chartContext = document.getElementById(chartId).getContext("2d")
-			var chart = new Chart(chartContext)
+			let chartContext = document.getElementById(chartId).getContext("2d")
+			let chart = new Chart(chartContext)
 			chart[chartType](chartData, chartOptions)
 		})
 	}
@@ -365,7 +367,7 @@ define([
 				var data = dynamic.fetchEventData(parent)
 				data['nodeId'] = nodeId
 				var outData = {stageId: dynamic.stageId, sceneId: dynamic.sceneId, elementId:parentId, eventType:'tap', eventData:data}
-				dyn.commsSend('IGuiNotification.notifyEventOccured', outData)
+				dynamic.commsSend('IGuiNotification.notifyEventOccured', outData)
 			})
 		})
 
@@ -438,7 +440,7 @@ define([
 		//Charts
 		this.serverComms.registerHandler('Gui.addChart', function(args) {
 			console.log("addChart "+JSON.stringify(args))
-			dynamic.addChart(args.parentId, args.chartId, args.width, args.height, args.chartType, args.chartData, args.chartOptions)
+			dynamic.addChart(args.parentId, args.chartId, args.chartType, args.chartData, args.chartOptions)
 		})
 		this.serverComms.registerHandler('Gui.addDiagram', function(args) {
 			console.log("addDiagram "+JSON.stringify(args))
