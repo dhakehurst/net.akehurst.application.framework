@@ -15,8 +15,7 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
-import java.util.List;
-
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
@@ -25,62 +24,97 @@ import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGu
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChartData;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChartDataSeries;
 
-public class VertxGuiChart extends VertxGuiElement implements IGuiChart {
+public class VertxGuiChart<X, Y> extends VertxGuiElement implements IGuiChart<X, Y> {
 
 	public VertxGuiChart(final IGuiRequest guiRequest, final IGuiScene scene, final String elementName) {
 		super(guiRequest, scene, elementName);
+		this.data = new VertxGuiChartData<>();
 	}
 
-	JsonObject chartData;
-
-	@Override
-	public <X, Y> List<IGuiChartDataSeries<X, Y>> getSeries() {
-		// TODO Auto-generated method stub
-		return null;
+	private String getChartId() {
+		return this.elementName + "_chart";
 	}
 
 	@Override
-	public <X, Y> IGuiChartDataSeries<X, Y> getSeries(final String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public void create(final UserSession session, final IGuiChart.Type chartType) {
+		this.createChartContent(session, chartType);
 	}
+
+	IGuiChartData<X, Y> data;
 
 	@Override
-	public <X, Y> IGuiChartDataSeries<X, Y> addSeries(final String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public IGuiChartData<X, Y> getData() {
+		return this.data;
 	}
 
-	void createChartContent(final UserSession session, final String chartType, final JsonObject chartData, final JsonObject chartOptions) {
+	private void createChartContent(final UserSession session, final IGuiChart.Type chartType) {
+		final JsonObject chartData = this.createJsonData();
+		final JsonObject chartOptions = new JsonObject();
 
-		final String chartId = this.elementName + "_chart";
+		final String chartId = this.getChartId();
 
 		final String jsonChartDataStr = chartData.toString();
 		final String jsonChartOptions = chartOptions.toString();
 
 		final String parentId = this.elementName;
-		this.guiRequest.addChart(session, this.scene.getStageId(), this.scene.getSceneId(), parentId, chartId, chartType, jsonChartDataStr, jsonChartOptions);
+		final String chartTypeStr = this.getChartTypeName(chartType);
+		this.guiRequest.chartCreate(session, this.scene.getStageId(), this.scene.getSceneId(), parentId, chartId, chartTypeStr, jsonChartDataStr,
+				jsonChartOptions);
 	}
 
-	static class DataSeries<X, Y> implements IGuiChartDataSeries<X, Y> {
+	// these depend on the underlying js side chart library - currently Chart.js
 
-		String name;
+	private String getChartTypeName(final IGuiChart.Type type) {
+		switch (type) {
+			case Bar:
+				return "bar";
+			case Bubble:
+				return "bubble";
+			case Doughnut:
+				return "doughnut";
+			case Line:
+				return "line";
+			case Pie:
+				return "pie";
+			case PolarArea:
+				return "polarArea";
+			case Radar:
+				return "radar";
+			case XY:
+				return "line";
+			default:
+				return "";
 
-		@Override
-		public String getName() {
-			return this.name;
 		}
-
-		@Override
-		public void setName(final String value) {
-			this.name = this.name;
-		}
-
-		@Override
-		public IGuiChartData<X, Y> getData() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
 	}
+
+	private JsonObject createJsonData() {
+		final JsonObject data = new JsonObject();
+		data.put("datasets", this.getDatasets());
+		data.put("labels", new JsonArray(this.getData().getXs()));
+		// data.put("xLabels", new JsonArray(Arrays.asList("A", "B", "C", "D", "E")));
+		// data.put("yLabels", new JsonArray());
+		return data;
+	}
+
+	private JsonArray getDatasets() {
+		final JsonArray arr = new JsonArray();
+		for (final IGuiChartDataSeries<Y> s : this.getData().getSeries()) {
+			final JsonObject jsonSeries = new JsonObject();
+			arr.add(jsonSeries);
+			jsonSeries.put("label", s.getName());
+			final JsonArray dataArray = new JsonArray();
+			jsonSeries.put("data", dataArray);
+			for (final Y item : s.getItems()) {
+				dataArray.add(item);
+			}
+		}
+		return arr;
+	}
+
+	private void addDataItem(final String seriesName, final X x, final Y y) {
+		// this.guiRequest.chartAddDataItem(session, VertxGuiChart.this.scene.getStageId(), VertxGuiChart.this.scene.getSceneId(), this.getChartId(),
+		// seriesName, x, y);
+	}
+
 }

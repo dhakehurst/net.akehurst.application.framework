@@ -15,13 +15,16 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui.data.chart;
 
-import java.util.List;
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
-public interface IGuiChart {
+public interface IGuiChart<X, Y> {
 
-	<X, Y> List<IGuiChartDataSeries<X, Y>> getSeries();
+	enum Type {
+		Line, Bar, Pie, Doughnut, Radar, PolarArea, Bubble, XY
+	}
 
-	<X, Y> IGuiChartDataSeries<X, Y> getSeries(String name);
+	void create(UserSession session, Type chartType);
 
-	<X, Y> IGuiChartDataSeries<X, Y> addSeries(String name);
+	IGuiChartData<X, Y> getData();
+
 }

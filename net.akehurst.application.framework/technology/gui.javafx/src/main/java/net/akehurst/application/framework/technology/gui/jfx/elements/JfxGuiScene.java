@@ -97,8 +97,7 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 					// TODO: element not found exception
 					return null;
 				}
-			}
-			if (IGuiText.class == returnType) {
+			} else if (IGuiText.class == returnType) {
 				// Node n = this.root.lookup("#" + name);
 				final Styleable s = this.lookup(this.root, "#" + name);
 				if (s instanceof Node) {
@@ -106,8 +105,7 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 				} else {
 					return null;
 				}
-			}
-			if (IGuiMenuItem.class == returnType) {
+			} else if (IGuiMenuItem.class == returnType) {
 				// this.root.lookup("#" + name);
 				// can't use lookup for menuitems
 				// MenuItem menuItem = this.lookupMenuItemInNodes(this.root.getChildrenUnmodifiable(), name);
@@ -117,8 +115,7 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 				} else {
 					return null;
 				}
-			}
-			if (IGuiTreeView.class == returnType) {
+			} else if (IGuiTreeView.class == returnType) {
 				final Styleable s = this.lookup(this.root, "#" + name);
 				if (s instanceof TreeView<?>) {
 					return new JfxTreeView((TreeView<?>) s);

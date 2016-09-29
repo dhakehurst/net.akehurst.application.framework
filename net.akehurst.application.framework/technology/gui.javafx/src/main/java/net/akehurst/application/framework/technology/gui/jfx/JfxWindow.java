@@ -247,8 +247,15 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void addChart(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
+	public void chartCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
 			final String chartType, final String jsonChartData, final String jsonChartOptions) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public <X, Y> void chartAddDataItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String chartId,
+			final String seriesName, final X x, final Y y) {
 		// TODO Auto-generated method stub
 
 	}

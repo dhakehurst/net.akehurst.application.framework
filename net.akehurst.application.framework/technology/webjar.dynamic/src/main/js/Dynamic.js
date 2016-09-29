@@ -340,14 +340,14 @@ define([
 	
 	
 	Dynamic.prototype.addChart = function(parentId, chartId, chartType, chartData, chartOptions) {
-		require(["chartjs"],function(Chart){
+		require(["chartjs"],function(){
 			let parent = document.getElementById(parentId)
 			let width = $(parent).width()
 			let height = $(parent).height()
 			$(parent).append("<canvas id='"+chartId+"' width='"+width+"' height='"+height+"'></canvas>")
 			let chartContext = document.getElementById(chartId).getContext("2d")
-			let chart = new Chart(chartContext)
-			chart[chartType](chartData, chartOptions)
+			let chart = new Chart(chartContext, {type:chartType, data: chartData, options:chartOptions})
+			//chart[chartType](chartData, chartOptions)
 		})
 	}
 	

@@ -334,7 +334,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 	}
 
 	@Override
-	public void addChart(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
+	public void chartCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
 			final String chartType, final String jsonChartData, final String jsonChartOptions) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
@@ -351,6 +351,19 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		data.put("chartOptions", new JsonObject(jsonChartOptions));
 
 		this.verticle.comms.send(session, "Gui.addChart", data);
+	}
+
+	@Override
+	public <X, Y> void chartAddDataItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String chartId,
+			final String seriesName, final X x, final Y y) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("chartId", chartId);
+		data.put("series", seriesName);
+		data.put("x", x);
+		data.put("y", y);
+
 	}
 
 	@Override

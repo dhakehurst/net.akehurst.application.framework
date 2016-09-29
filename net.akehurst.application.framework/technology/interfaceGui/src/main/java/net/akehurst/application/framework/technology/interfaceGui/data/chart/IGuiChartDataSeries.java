@@ -15,12 +15,14 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui.data.chart;
 
-public interface IGuiChartDataSeries<X, Y> {
+import java.util.List;
+
+public interface IGuiChartDataSeries<Y> {
 
 	String getName();
 
 	void setName(String value);
 
-	IGuiChartData<X, Y> getData();
+	List<Y> getItems();
 
 }

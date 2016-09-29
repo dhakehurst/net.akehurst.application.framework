@@ -71,9 +71,6 @@ public interface IGuiRequest {
 
 	void setText(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
 
-	void addChart(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, String chartType, String jsonChartData,
-			String jsonChartOptions);
-
 	void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 
 	void set(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
@@ -86,4 +83,9 @@ public interface IGuiRequest {
 
 	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent,
 			IGuiLanguageService languageDefinition);
+
+	void chartCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, String chartType, String jsonChartData,
+			String jsonChartOptions);
+
+	<X, Y> void chartAddDataItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId, String seriesName, X x, Y y);
 }
