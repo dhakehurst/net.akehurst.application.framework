@@ -9,9 +9,13 @@ repositories {
     }
 }
 
+configurations {
+	unzip
+}
+
 dependencies {
 	
-	compile 'orion:built-codeEdit:R-12.0-201606220105@zip'
+	unzip 'orion:built-codeEdit:R-12.0-201606220105@zip'
 	
 }
 
@@ -32,7 +36,7 @@ jar {
 // unzip the orion zip
 task unzip(type: Copy) {
 
-  def zipPath = project.configurations.compile.find {it.name.startsWith("built") }
+  def zipPath = project.configurations.unzip.find {it.name.startsWith("built") }
   println zipPath
   def zipFile = file(zipPath)
   def outputDir = file("${buildDir}/unzip/orion")
