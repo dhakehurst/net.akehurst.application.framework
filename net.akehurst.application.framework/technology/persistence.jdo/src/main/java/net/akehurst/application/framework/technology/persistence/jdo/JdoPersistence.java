@@ -113,6 +113,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			if (null != enhCls && Persistable.class.isAssignableFrom(enhCls)) {
 				return (Class<? extends Persistable>) enhCls;
 			} else {
+				this.logger.log(LogLevel.WARN, "Runtime Enhancement of JDO Class: " + enhancedName);
 
 				final DataNucleusClassFileTransformer t = new DataNucleusClassFileTransformer("-api=JDO", null);
 				final ProtectionDomain protectionDomain = class_.getProtectionDomain();

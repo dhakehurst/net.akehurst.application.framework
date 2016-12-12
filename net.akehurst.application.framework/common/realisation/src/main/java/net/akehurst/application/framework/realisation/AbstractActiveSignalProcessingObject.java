@@ -21,6 +21,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.akehurst.application.framework.common.ISignal;
 import net.akehurst.application.framework.common.ISignalR;
@@ -60,10 +62,35 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 
 	BlockingQueue<NamedSignal<?>> signals;
 
+	static class NamedThreadFactory implements ThreadFactory {
+		private static final AtomicInteger poolNumber = new AtomicInteger(1);
+		private final ThreadGroup group;
+		private final AtomicInteger threadNumber = new AtomicInteger(1);
+		private final String namePrefix;
+
+		NamedThreadFactory(final String baseName) {
+			final SecurityManager s = System.getSecurityManager();
+			this.group = s != null ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+			this.namePrefix = baseName + "-pool-" + NamedThreadFactory.poolNumber.getAndIncrement() + "-thread-";
+		}
+
+		@Override
+		public Thread newThread(final Runnable r) {
+			final Thread t = new Thread(this.group, r, this.namePrefix + this.threadNumber.getAndIncrement(), 0);
+			if (t.isDaemon()) {
+				t.setDaemon(false);
+			}
+			if (t.getPriority() != Thread.NORM_PRIORITY) {
+				t.setPriority(Thread.NORM_PRIORITY);
+			}
+			return t;
+		}
+	}
+
 	@Override
 	public void afRun() {
 		this.logger.log(LogLevel.TRACE, "AbstractActiveSignalProcessingObject.afRun");
-		this.executor = Executors.newFixedThreadPool(this.numThreads);
+		this.executor = Executors.newFixedThreadPool(this.numThreads, new NamedThreadFactory(this.afId()));
 		while (true) {
 			try {
 				final NamedSignal<?> ns = this.signals.take();

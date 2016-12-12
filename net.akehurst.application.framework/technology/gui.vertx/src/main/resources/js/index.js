@@ -24,8 +24,8 @@ require.config({
 		"sockjs"          : "sockjs-client/1.1.1/sockjs.min",
 		"chartjs"         : "chartjs/2.1.3/Chart.min",
 		"cytoscape"       : "cytoscape/2.7.9/dist/cytoscape.min",
-		"Dynamic"         : "dynamic/1.0.alpha.16/Dynamic",
-		"ServerComms"     : "dynamic/1.0.alpha.16/ServerComms",
+		"Dynamic"         : "dynamic/1.0.alpha.17/Dynamic",
+		"ServerComms"     : "dynamic/1.0.alpha.17/ServerComms",
 		"orion/code_edit" : "orion/12.0/code_edit/built-codeEdit-amd",
 		"vscode/languageclient" : "languageclient/2.5.0/main"
     }

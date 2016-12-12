@@ -15,8 +15,8 @@
  */
 
 ext {
-  jdoVersion = '5.0.0-release'
-  javaxJdoVersion = '+'
+  jdoVersion = '5.0.5'
+  javaxJdoVersion = '3.2.0-m6'
 }
 
 dependencies {
@@ -28,7 +28,6 @@ dependencies {
 	compile "org.datanucleus:javax.jdo:${javaxJdoVersion}"
 	compile "org.datanucleus:datanucleus-api-jdo:${jdoVersion}"
 	compile "org.datanucleus:datanucleus-core:${jdoVersion}"
-	
 	
 	testCompile project(":${rootProject.name}.technology.logging.log4j")
 	//testRuntime 'org.datanucleus:datanucleus-rdbms:${jdoVersion}'
