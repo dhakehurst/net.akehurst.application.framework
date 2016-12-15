@@ -84,6 +84,7 @@ public class VertxGuiDialogProxy implements InvocationHandler, IIdentifiableObje
 			final Class<?> returnType = method.getReturnType();
 			if (method.getName().startsWith("get")) {
 				String elementName = method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4);
+				elementName = this.dialogId + "_" + elementName;
 
 				if (method.getParameterTypes().length == 1) {
 					final Class<?> pt = method.getParameterTypes()[0];
