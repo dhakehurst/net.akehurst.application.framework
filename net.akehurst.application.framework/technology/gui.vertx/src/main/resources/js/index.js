@@ -26,6 +26,7 @@ require.config({
 		"cytoscape"       : "cytoscape/2.7.9/dist/cytoscape.min",
 		"Dynamic"         : "dynamic/1.0.alpha.17/Dynamic",
 		"ServerComms"     : "dynamic/1.0.alpha.17/ServerComms",
+		"Highlighter"     : "dynamic/1.0.alpha.17/Highlighter",
 		"orion/code_edit" : "orion/12.0/code_edit/built-codeEdit-amd",
 		"vscode/languageclient" : "languageclient/2.5.0/main"
     }

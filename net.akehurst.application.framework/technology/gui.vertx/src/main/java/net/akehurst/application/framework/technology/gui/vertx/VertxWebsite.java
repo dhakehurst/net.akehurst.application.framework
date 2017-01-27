@@ -407,7 +407,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 
 		final JsonObject jsonLanguageDefinition = new JsonObject();
 		jsonLanguageDefinition.put("identity", languageDefinition.getIdentity());
-		jsonLanguageDefinition.put("syntaxHighlighterPatterns", new JsonArray(languageDefinition.getSyntaxHighlighting().stream().map((el) -> {
+		jsonLanguageDefinition.put("tokenHighlightingPatterns", new JsonArray(languageDefinition.getSyntaxHighlighting().stream().map((el) -> {
 			final JsonObject d = new JsonObject();
 			d.put("match", el.getPattern());
 			d.put("name", el.getLable());
@@ -417,6 +417,18 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		data.put("languageDefinition", jsonLanguageDefinition);
 
 		this.verticle.comms.send(session, "Editor.addEditor", data);
+	}
+
+	@Override
+	public void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
+			final String jsonParseTreeData) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("editorId", editorId);
+		data.put("parseTree", new JsonObject(jsonParseTreeData));
+
+		this.verticle.comms.send(session, "Editor.updateParseTree", data);
 	}
 
 	// --------- Ports ---------

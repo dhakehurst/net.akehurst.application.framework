@@ -29,6 +29,7 @@ import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
 import net.akehurst.application.framework.technology.interfaceGui.data.diagram.IGuiDiagram;
+import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiEditor;
 import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTable;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiContainer;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
@@ -104,6 +105,8 @@ public class VertxGuiSceneProxy implements InvocationHandler, IIdentifiableObjec
 					return new VertxGuiChart(this.guiRequest, this.getHandler(), elementName);
 				} else if (IGuiTable.class == returnType) {
 					return new VertxGuiTable(this.guiRequest, this.getHandler(), elementName);
+				} else if (IGuiEditor.class == returnType) {
+					return new VertxGuiEditor(this.guiRequest, this.getHandler(), elementName);
 				} else if (IGuiDiagram.class == returnType) {
 					return new VertxGuiDiagram(this.guiRequest, this.getHandler(), elementName);
 				} else {

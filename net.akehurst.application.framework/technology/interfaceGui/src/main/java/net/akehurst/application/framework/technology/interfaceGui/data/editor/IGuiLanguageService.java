@@ -14,7 +14,11 @@ public interface IGuiLanguageService {
 
 	void save();
 
-	void update();
+	/**
+	 *
+	 * @return JSON String of the parseTree
+	 */
+	String update(String text);
 
 	void assist();
 

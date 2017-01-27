@@ -84,6 +84,9 @@ public interface IGuiRequest {
 	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent,
 			IGuiLanguageService languageDefinition);
 
+	void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
+			final String jsonParseTreeData);
+
 	void chartCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, String chartType, String jsonChartData,
 			String jsonChartOptions);
 

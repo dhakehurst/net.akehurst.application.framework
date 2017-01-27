@@ -79,6 +79,7 @@ define([
 		
 		// cache created editors so we can find them again
 		this.editors = {}
+		this.highlighter = {}
 	}
 	
 	Dynamic.prototype.fetchEventData = function(el) {
@@ -299,43 +300,74 @@ define([
 		} else {
 		
 			require(["orion/code_edit"], function() {
-				require(["orion/codeEdit", "orion/Deferred"], function(mCodeEdit, Deferred) {
-					var codeEdit = new mCodeEdit()
+				require([
+					"orion/codeEdit",
+					"orion/Deferred",
+					"orion/EventTarget",
+					"orion/editor/annotations",
+					"Highlighter"
+				], function(
+				    mCodeEdit,
+				    Deferred,
+				    EventTarget,
+				    mAnnotations,
+				    mHighlighter
+				) {
+					let codeEdit = new mCodeEdit()
+					
+					dynamic.highlighter = new mHighlighter.Highlighter()
+				//	let highlighterServiceImpl = {
+				//		setContentType: function(contentType) {
+				//		}
+				//	}
+				//	EventTarget.attach(highlighterServiceImpl)
+				//	codeEdit.serviceRegistry.registerService(
+				//		"orion.edit.highlighter",
+				//		highlighterServiceImpl,
+				//		{ type: "highlighter",
+				//		  contentType: contentType
+				//		}
+				//	)
+					dynamic.highlighter.addEventListener("StyleReady", function(styleReadyEvent) {
+						styleReadyEvent.type = "orion.edit.highlighter.styleReady"
+					//	highlighterServiceImpl.dispatchEvent(styleReadyEvent)
+					})
+					
+					codeEdit.serviceRegistry.registerService(
+						"orion.edit.contentAssist",
+						{
+							computeProposals: function(buffer, offset, context) {
+							}
+						},
+						{
+							name: languageDefinition.identity+' content assist',
+							contentTypes: [contentType]
+						}
+					)
 					
 					codeEdit.create({
 						parent: parentId
 					}).then(function(editorViewer) {
-						
-						editorViewer.serviceRegistry.registerService(
-							"orion.edit.highlighter",
-							{},
-							{
-								id: languageDefinition.identity,
-								contentTypes: [contentType],
-								patterns: languageDefinition.syntaxHighlighterPatterns
-							}
-						)
-	
-						editorViewer.serviceRegistry.registerService(
-							"orion.edit.contentAssist",
-							{
-								computeProposals: function(buffer, offset, context) {
-								}
-							},
-							{
-								name: languageDefinition.identity+' content assist',
-								contentTypes: [contentType]
-							}
-						)
-	
 						editorViewer.setContents(initialContent, contentType)
 						dynamic.editors[parentId] = editorViewer
+					    editorViewer.editor.addEventListener("InputChanged", function(evt) {
+					        if(evt.contentsSaved) {
+						    	//Save your editor contents;
+							}
+							$(editor).trigger( "editor.InputChanged", evt )
+					    });
+
+					    dynamic.highlighter.setAnnotationModel(editorViewer)
 					})
 					
 				})
 			})
 		}
 		
+	}
+	
+	Dynamic.prototype.updateParseTree = function(id, parseTree) {
+		this.highlighter.update(parseTree)
 	}
 	
 	
@@ -435,6 +467,10 @@ define([
 		this.serverComms.registerHandler('Editor.addEditor', function(args) {
 			console.log("Editor.addEditor "+JSON.stringify(args))
 			dynamic.addEditor(args.parentId, args.contentType, args.initialContent, args.languageDefinition)
+		})
+		this.serverComms.registerHandler('Editor.updateParseTree', function(args) {
+			console.log("Editor.updateParseTree "+JSON.stringify(args))
+			dynamic.updateParseTree(args.id, args.parseTree)
 		})
 		
 		//Charts

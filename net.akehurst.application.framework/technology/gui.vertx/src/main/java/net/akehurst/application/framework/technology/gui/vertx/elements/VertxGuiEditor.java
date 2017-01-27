@@ -27,9 +27,17 @@ public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
 		super(guiRequest, scene, elementName);
 	}
 
+	IGuiLanguageService languageService;
+
 	@Override
-	public void add(final UserSession session, final String initialContent, final IGuiLanguageService languageDefinition) {
-		super.guiRequest.addEditor(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, initialContent, languageDefinition);
+	public void add(final UserSession session, final String initialContent, final IGuiLanguageService languageService) {
+		this.languageService = languageService;
+		super.guiRequest.addEditor(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, initialContent, languageService);
+		this.onEvent(session, "editor.InputChanged", (e) -> {
+			final String text = (String) e.getDataItem(this.elementName);
+			final String jsonParseTreeData = this.languageService.update(text);
+			super.guiRequest.updateParseTree(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, jsonParseTreeData);
+		});
 	}
 
 }

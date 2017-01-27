@@ -274,6 +274,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	}
 
+	@Override
+	public void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
+			final String jsonParseTreeData) {
+		// TODO Auto-generated method stub
+
+	}
 	// --------- IGuiNotification ---------
 
 	// --------- Ports ---------
