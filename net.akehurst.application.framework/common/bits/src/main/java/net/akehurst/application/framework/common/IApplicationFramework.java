@@ -19,8 +19,6 @@ public interface IApplicationFramework {
 
 	<T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws ApplicationFrameworkException;
 
-	// void defineCommandLineArgument(String[] groupNames, boolean required, String argumentName, boolean hasValue, String description);
-	// void setCommandLine(String[] args);
 	void outputCommandLineHelp();
 
 	<T extends IService> T createServiceInstance(String serviceName, Class<T> class_, String id) throws ApplicationFrameworkException;
@@ -36,5 +34,7 @@ public interface IApplicationFramework {
 	<T extends IService> T injectIntoService(T object) throws ApplicationFrameworkException;
 
 	<T extends IActiveObject> T injectIntoActiveObject(T object) throws ApplicationFrameworkException;
+
+	<T extends IIdentifiableObject> T injectIntoSimpleObject(T object) throws ApplicationFrameworkException;
 
 }

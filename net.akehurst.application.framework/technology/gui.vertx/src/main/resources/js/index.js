@@ -24,9 +24,11 @@ require.config({
 		"sockjs"          : "sockjs-client/1.1.1/sockjs.min",
 		"chartjs"         : "chartjs/2.1.3/Chart.min",
 		"cytoscape"       : "cytoscape/2.7.9/dist/cytoscape.min",
-		"Dynamic"         : "dynamic/1.0.alpha.17/Dynamic",
-		"ServerComms"     : "dynamic/1.0.alpha.17/ServerComms",
-		"Highlighter"     : "dynamic/1.0.alpha.17/Highlighter",
+		"crypto.pbkdf2"   : "cryptojs/3.1.2/rollups/pbkdf2",
+		"crypto.aes"      : "cryptojs/3.1.2/rollups/aes",
+		"Dynamic"         : "dynamic/1.0.alpha.18/Dynamic",
+		"ServerComms"     : "dynamic/1.0.alpha.18/ServerComms",
+		"Highlighter"     : "dynamic/1.0.alpha.18/Highlighter",
 		"orion/code_edit" : "orion/12.0/code_edit/built-codeEdit-amd",
 		"vscode/languageclient" : "languageclient/2.5.0/main"
     }

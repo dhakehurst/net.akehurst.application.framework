@@ -21,12 +21,12 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class ConsoleLogger implements ILogger, IService {
 
-	public ConsoleLogger(String id) {
+	public ConsoleLogger(final String id) {
 		this.id = id;
 	}
-	
+
 	String id;
-	
+
 	@Override
 	public String afId() {
 		return this.id;
@@ -34,31 +34,45 @@ public class ConsoleLogger implements ILogger, IService {
 
 	// --------- IService ---------
 	@Override
-	public Object createReference(String locationId) {
+	public Object createReference(final String locationId) {
 		return new ConsoleLogger(locationId);
 	}
-	
+
 	// --------- ILogger ---------
 	@Override
-	public void log(LogLevel level, String message) {
-		String prefix = level.getName()+": "+"["+this.afId()+"] ";
+	public void log(final LogLevel level, final String message) {
+		final String prefix = level.getName() + ": " + "[" + this.afId() + "] ";
 		if (level.getValue() > LogLevel.INFO.getValue()) {
-			System.err.println(prefix+message);
+			System.err.println(prefix + message);
 		} else {
-			System.out.println(prefix+message);
-		}
-	}
-	
-	@Override
-	public void log(LogLevel level, String message, Throwable t) {
-		String prefix = level.getName()+": "+"["+this.afId()+"] ";
-		if (level.getValue() > LogLevel.INFO.getValue()) {
-			System.err.println(prefix+message);
-			t.printStackTrace(System.err);
-		} else {
-			System.out.println(prefix+message);
-			t.printStackTrace(System.out);
+			System.out.println(prefix + message);
 		}
 	}
 
+	@Override
+	public void log(final LogLevel level, final String message, final Throwable t) {
+		if (null == t) {
+			this.log(level, message);
+		} else {
+			final String prefix = level.getName() + ": " + "[" + this.afId() + "] ";
+			if (level.getValue() > LogLevel.INFO.getValue()) {
+				System.err.println(prefix + message);
+				t.printStackTrace(System.err);
+			} else {
+				System.out.println(prefix + message);
+				t.printStackTrace(System.out);
+			}
+		}
+	}
+
+	@Override
+	public void log(final LogLevel level, final String format, final Object... objects) {
+		final String prefix = level.getName() + ": " + "[" + this.afId() + "] ";
+		final String message = String.format(format, objects);
+		if (level.getValue() > LogLevel.INFO.getValue()) {
+			System.err.println(prefix + message);
+		} else {
+			System.out.println(prefix + message);
+		}
+	}
 }

@@ -1,11 +1,11 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.diagram;
 
-import java.util.List;
+import java.util.Map;
 
 public interface IGuiGraph {
 
-	List<IGuiGraphNode> getNodes();
+	Map<String, IGuiGraphNode> getNodes();
 
-	List<IGuiGraphEdge> getEdges();
+	Map<String, IGuiGraphEdge> getEdges();
 
 }

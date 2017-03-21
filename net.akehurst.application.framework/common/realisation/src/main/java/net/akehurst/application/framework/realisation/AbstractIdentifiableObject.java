@@ -29,4 +29,25 @@ public class AbstractIdentifiableObject implements IIdentifiableObject {
 	public String afId() {
 		return this.afId;
 	}
+
+	@Override
+	public int hashCode() {
+		return this.afId().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj instanceof IIdentifiableObject) {
+			final IIdentifiableObject other = (IIdentifiableObject) obj;
+			return this.afId().equals(other.afId());
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return this.afId();
+	}
+
 }

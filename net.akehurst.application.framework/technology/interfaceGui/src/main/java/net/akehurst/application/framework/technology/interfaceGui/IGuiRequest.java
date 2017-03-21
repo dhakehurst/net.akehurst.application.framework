@@ -91,4 +91,6 @@ public interface IGuiRequest {
 			String jsonChartOptions);
 
 	<X, Y> void chartAddDataItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId, String seriesName, X x, Y y);
+
+	void authenticate(UserSession session) throws GuiException;
 }

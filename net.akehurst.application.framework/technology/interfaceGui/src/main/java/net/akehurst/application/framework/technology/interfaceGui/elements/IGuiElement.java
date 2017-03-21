@@ -25,4 +25,6 @@ public interface IGuiElement {
 	void set(UserSession session, String propertyName, Object value);
 
 	void onEvent(final UserSession session, final String eventName, OnEventHandler handler);
+
+	void addSubElement(UserSession session, String newElementId, String newElementType, String attributes, Object content);
 }

@@ -16,8 +16,10 @@
  
 define([
 	"jquery",
-	"ServerComms"
-], function($, ServerComms) {
+	"ServerComms",
+	"crypto.pbkdf2",
+	"crypto.aes"
+], function($, ServerComms, cryptoPBK, cryptoAES) {
  
 	Element.prototype.cloneEventsTo = function(clone) {
 	
@@ -96,7 +98,16 @@ define([
 			for(i=0; i< childs.length; i++) {
 				let id = childs[i].id
 				let value = childs[i].value
-				data[id] = value							
+				if ($(childs[i]).attr('type') == 'password') {
+					//TODO: need better hiding of passwords than this really
+					let v = "1234567890abcdef1234567890abcdef"
+					let bv = CryptoJS.enc.Hex.parse(v);
+					let key = CryptoJS.PBKDF2(v, bv, { keySize: 128/32, iterations: 100 });
+					let encrypted = CryptoJS.AES.encrypt(value, key, { iv: bv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7  })
+					data[id] = encrypted.toString()
+				} else {
+					data[id] = value
+				}						
 			}
 			var ts = $(p).find('table.input')
 			for(i=0; i< ts.length; i++) {

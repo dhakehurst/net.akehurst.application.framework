@@ -31,6 +31,7 @@ import net.akehurst.application.framework.common.IActiveObject;
 import net.akehurst.application.framework.common.IApplication;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IComponent;
+import net.akehurst.application.framework.common.IConfiguration;
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.IService;
@@ -45,9 +46,6 @@ import net.akehurst.application.framework.common.annotations.instance.ServiceIns
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
-import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
-import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 import net.akehurst.application.framework.technology.logging.console.ConsoleLogger;
 import net.akehurst.holser.reflect.BetterMethodFinder;
@@ -56,7 +54,6 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	public static <T extends IApplication> T start(final Class<T> applicationClass, final String[] arguments) {
 		try {
-
 			final IApplicationFramework af = new ApplicationFramework("af", "af");
 			final T app = af.createApplication(applicationClass, "application", arguments);
 			app.afStart();
@@ -83,7 +80,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		// this.commandLineOptionGroups = new HashMap<>();
 	}
 
-	ICommandLineHandler commandLineHandler;
+	protected ICommandLineHandler commandLineHandler;
 
 	// --------- IIdentifiable ---------
 	String afId;
@@ -187,7 +184,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			this.injectIntoActiveObject(obj);
 			return obj;
 		} catch (final Exception ex) {
-			throw new ApplicationFrameworkException("Failed to create Basic Object", ex);
+			throw new ApplicationFrameworkException("Failed to create Active Object", ex);
 		}
 	}
 
@@ -215,6 +212,17 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	}
 
 	@Override
+	public <T extends IIdentifiableObject> T injectIntoSimpleObject(final T object) throws ApplicationFrameworkException {
+		try {
+			this.injectServiceReferences(object.getClass(), object);
+			this.injectParts(object);
+			return object;
+		} catch (final Exception ex) {
+			throw new ApplicationFrameworkException("Failed to create Service", ex);
+		}
+	}
+
+	@Override
 	public <T extends IActiveObject> T injectIntoActiveObject(final T obj) throws ApplicationFrameworkException {
 		try {
 			this.injectServiceReferences(obj.getClass(), obj);
@@ -228,7 +236,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	private void defineCommandLine(final IApplication applicationObject) {
+	protected void defineCommandLine(final IApplication applicationObject) {
 		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
 		// Define groups
@@ -271,23 +279,6 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	}
 
-	// @Override
-	// public void defineCommandLineArgument(String[] groupNames, boolean required, String argumentName, boolean hasValue, String description) {
-	// // remove applicationName from start
-	// int i = argumentName.indexOf('.');
-	// if (i > 0) {
-	// argumentName = argumentName.substring(i + 1);
-	// }
-	// Options group = this.commandLineOptionGroups.get(groupNames);
-	// if (null == group) {
-	// group = new Options();
-	// this.commandLineOptionGroups.put(groupNames, group);
-	// }
-	//
-	// Option opt = Option.builder().longOpt(argumentName).desc(description).required(required).hasArg(hasValue).build();
-	// group.addOption(opt);
-	// }
-
 	@Override
 	public void outputCommandLineHelp() {
 		final String help = this.commandLineHandler.getHelp();
@@ -298,7 +289,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		this.logger().log(LogLevel.INFO, System.lineSeparator() + help);
 	}
 
-	ILogger logger() {
+	protected ILogger logger() {
 		if (null == this.fetchService("logger")) {
 			this.services.put("logger", new ConsoleLogger("logger"));
 		}
@@ -306,7 +297,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		return logger;
 	}
 
-	void logError(final String message, final Throwable t) {
+	protected void logError(final String message, final Throwable t) {
 		final ILogger logger = this.logger();
 		if (null == logger) {
 			System.err.println(message);
@@ -318,58 +309,9 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	// Map<String, Options> commandLineOptionGroups;
+	protected Map<String, IService> services;
 
-	// CommandLine commandLine;
-
-	// public void setCommandLine(String[] args) {
-	// try {
-	// CommandLineParser parser = new DefaultParser();
-	// if (args.length < 1) {
-	// this.commandLine = parser.parse(new Options(), args, true);
-	// return; // nothing to parse
-	// } else {
-	// for (Options opts : this.commandLineOptionGroups.values()) {
-	//
-	// this.commandLine = parser.parse(opts, args, true);
-	// if (this.commandLine.getArgList().isEmpty()) {
-	// // parse has succeeded
-	// return;
-	// } else {
-	// // try next OptionGroup
-	// }
-	// }
-	// // all OptionGroups failed to parse
-	// this.outputCommandLineHelp();
-	// System.exit(1);
-	// }
-	// } catch (MissingOptionException ex) {
-	// this.outputCommandLineHelp();
-	// System.exit(1);
-	// } catch (Exception ex) {
-	// ex.printStackTrace();
-	// }
-	// }
-
-	// Object getOptionValue(String argumentName) {
-	//// int i = argumentName.indexOf('.');
-	//// if (i > 0) {
-	//// argumentName = argumentName.substring(i + 1);
-	//// }
-	// return this.commandLine.getOptionValue(argumentName);
-	// }
-	//
-	// boolean hasOption(String argumentName) {
-	//// int i = argumentName.indexOf('.');
-	//// if (i > 0) {
-	//// argumentName = argumentName.substring(i + 1);
-	//// }
-	// return this.commandLine.hasOption(argumentName);
-	// }
-
-	Map<String, IService> services;
-
-	IService fetchService(final String name) {
+	protected IService fetchService(final String name) {
 		return this.services.get(name);
 	}
 
@@ -414,7 +356,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	 * Inject service instances, which should only exist in an 'Application' class
 	 *
 	 */
-	private <T extends IApplication> void injectServiceInstances(final Class<?> class_, final T obj) throws IllegalArgumentException, IllegalAccessException {
+	protected <T extends IApplication> void injectServiceInstances(final Class<?> class_, final T obj) throws IllegalArgumentException, IllegalAccessException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
@@ -432,7 +374,8 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 						} else {
 							// do nothing
 						}
-						final IService service = this.createServiceInstance(serviceId, (Class<IService>) f.getType(), obj.afId() + "." + serviceId);
+						final Class<IService> fieldType = (Class<IService>) f.getType();
+						final IService service = this.createServiceInstance(serviceId, fieldType, obj.afId() + "." + serviceId);
 						f.set(obj, service);
 					}
 				} catch (final Exception ex) {
@@ -442,25 +385,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
-	// private void injectServiceReferences(IIdentifiableObject obj) throws IllegalArgumentException, IllegalAccessException {
-	//
-	// ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
-	//
-	// walker.walkOneAndApply(obj, (tObj, tObjId) -> {
-	// try {
-	// this.injectServiceReferences(tObj.getClass(), tObj, tObjId);
-	// } catch (IllegalArgumentException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (IllegalAccessException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// });
-	//
-	// }
-
-	private void injectServiceReferences(final Class<?> class_, final IIdentifiableObject obj) throws IllegalArgumentException, IllegalAccessException {
+	protected void injectServiceReferences(final Class<?> class_, final IIdentifiableObject obj) throws IllegalArgumentException, IllegalAccessException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
@@ -486,7 +411,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	}
 
 	private void injectConfigurationValues(final Class<?> class_, final IIdentifiableObject obj)
-			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
+			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
 		} else {
@@ -511,37 +436,44 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 						// do nothing
 					}
 
-					final IPersistentStore config = (IPersistentStore) this.services.get(serviceName);
+					final IConfiguration config = (IConfiguration) this.services.get(serviceName);
 					if (null == config) {
-						this.logError("no configuration service found", null);
-						final Object value = this.createDatatype(f.getType(), ann.defaultValue());
-						f.set(obj, value);
-					} else {
-						final IPersistenceTransaction trans = config.startTransaction();
+						this.logError("no configuration service found, using default values", null);
+
 						final Class<? extends Object> itemType = f.getType();
-						String idPath = obj.afId() + "." + itemId;
-						// remove the 'application.' first bit of the path
-						idPath = idPath.substring(idPath.indexOf('.') + 1);
-						final PersistentItemQuery pid = new PersistentItemQuery(idPath);
-						Object value = config.retrieve(trans, pid, itemType);
-						if (null == value) {
-							if (itemType.isAssignableFrom(ArrayList.class)) {
-								value = new ArrayList<>();
-							} else if (itemType.isAssignableFrom(HashMap.class)) {
-								value = new HashMap<>();
-							} else {
-								value = this.createDatatype(f.getType(), ann.defaultValue());
-							}
+						Object value = null;
+						if (itemType.isAssignableFrom(ArrayList.class)) {
+							value = new ArrayList<>();
+						} else if (itemType.isAssignableFrom(HashMap.class)) {
+							value = new HashMap<>();
+						} else {
+							value = this.createDatatype(f.getType(), ann.defaultValue());
 						}
 						f.set(obj, value);
-						config.commitTransaction(trans);
+					} else {
+						final Class<? extends Object> itemType = f.getType();
+						String idPath = obj.afId() + "." + itemId;
+						// TODO: get rid of 'application' start over all
+						// remove the 'application.' first bit of the path
+						idPath = idPath.substring(idPath.indexOf('.') + 1);
+						final Object value = config.fetchValue(itemType, idPath, ann.defaultValue());
+						// if (null == value) {
+						// if (itemType.isAssignableFrom(ArrayList.class)) {
+						// value = new ArrayList<>();
+						// } else if (itemType.isAssignableFrom(HashMap.class)) {
+						// value = new HashMap<>();
+						// } else {
+						// value = this.createDatatype(f.getType(), ann.defaultValue());
+						// }
+						// }
+						f.set(obj, value);
 					}
 				}
 			}
 		}
 	}
 
-	private void injectConfigurationValues(final IApplication applicationObject)
+	protected void injectConfigurationValues(final IApplication applicationObject)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
 
 		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
@@ -555,44 +487,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	}
 
-	// private void injectCommandLineArgs(Class<?> class_, IIdentifiableObject obj)
-	// throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException {
-	// if (null == class_.getSuperclass()) {
-	// return; // Object.class will have a null superclass, no need to inject anything for Object.class
-	// } else {
-	// this.injectCommandLineArgs(class_.getSuperclass(), obj);
-	// for (Field f : class_.getDeclaredFields()) {
-	// f.setAccessible(true);
-	// CommandLineArgument ann = f.getAnnotation(CommandLineArgument.class);
-	// if (null == ann) {
-	// // do nothing
-	// } else {
-	// String name = ann.name();
-	// if (name.isEmpty()) {
-	// name = f.getName();
-	// } else {
-	// // do nothing
-	// }
-	//
-	// String idPath = obj.afId() + "." +name;
-	// //remove the 'application.' first bit of the path
-	// idPath = idPath.substring(idPath.indexOf('.')+1);
-	//
-	// Object argValue = this.commandLineHandler.getArgumentValue(ann.group(), idPath); //
-	// if (null == argValue && Boolean.class.isAssignableFrom(f.getType())) {
-	// argValue = this.commandLineHandler.hasArgument(ann.group(),name);
-	// }
-	// if (null != argValue) {
-	// Object value = this.createDatatype(f.getType(), argValue);
-	//
-	// f.set(obj, value);
-	// }
-	// }
-	// }
-	// }
-	// }
-
-	private void injectCommandLineArgs(final IApplication applicationObject)
+	protected void injectCommandLineArgs(final IApplication applicationObject)
 			throws IllegalArgumentException, IllegalAccessException, ApplicationFrameworkException, PersistentStoreException {
 
 		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
@@ -643,7 +538,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	}
 
-	private void injectParts(final IApplication appObj) {
+	protected void injectParts(final IApplication appObj) {
 
 		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
@@ -687,7 +582,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	}
 
-	private void injectParts(final IComponent compObj) {
+	protected void injectParts(final IComponent compObj) {
 
 		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
@@ -727,12 +622,12 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 				default:
 				break;
 			}
-			return null; // should never happen
+			return null;
 		});
 
 	}
 
-	private void injectParts(final IIdentifiableObject obj) {
+	protected void injectParts(final IIdentifiableObject obj) {
 
 		final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
@@ -756,7 +651,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
 	}
 
-	private void injectPorts(final Class<?> class_, final IComponent obj) throws IllegalArgumentException, IllegalAccessException, InstantiationException,
+	protected void injectPorts(final Class<?> class_, final IComponent obj) throws IllegalArgumentException, IllegalAccessException, InstantiationException,
 			InvocationTargetException, NoSuchMethodException, ApplicationFrameworkException {
 		if (null == class_.getSuperclass()) {
 			return; // Object.class will have a null superclass, no need to inject anything for Object.class
@@ -856,4 +751,5 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 		return providers;
 	}
+
 }

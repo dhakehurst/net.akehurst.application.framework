@@ -9,34 +9,49 @@ import net.akehurst.application.framework.common.annotations.declaration.DataTyp
 @DataType
 public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 
-	public GuiGraphEdge(final IGuiGraphNode source, final IGuiGraphNode target, final String label, final String type) {
-		super(source, target, label);
-		this.type = type;
+	public GuiGraphEdge(final String identity, final IGuiGraphNode parent, final IGuiGraphNode source, final IGuiGraphNode target, final String... types) {
+		super(identity);
+		this.parent = parent;
+		this.source = source;
+		this.target = target;
+
+		this.types = types;
 		this.data = new HashMap<>();
+		// add to data do they can be used in the styling
+		this.data.put("identity", identity);
+	}
+
+	private final IGuiGraphNode parent;
+	private final IGuiGraphNode source;
+	private final IGuiGraphNode target;
+
+	private final String[] types;
+	private final Map<String, String> data;
+
+	@Override
+	public String getIdentity() {
+		return (String) super.getIdentityValues().get(0);
+	}
+
+	@Override
+	public IGuiGraphNode getParent() {
+		return this.parent;
 	}
 
 	@Override
 	public IGuiGraphNode getSource() {
-		return (IGuiGraphNode) super.getIdentityValues().get(0);
+		return this.source;
 	}
 
 	@Override
 	public IGuiGraphNode getTarget() {
-		return (IGuiGraphNode) super.getIdentityValues().get(1);
+		return this.target;
 	}
 
 	@Override
-	public String getLabel() {
-		return (String) super.getIdentityValues().get(2);
+	public String[] getType() {
+		return this.types;
 	}
-
-	String type;
-
-	public String getType() {
-		return this.type;
-	}
-
-	Map<String, String> data;
 
 	@Override
 	public Map<String, String> getData() {

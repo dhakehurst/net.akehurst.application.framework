@@ -29,6 +29,7 @@ import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IService;
+import net.akehurst.application.framework.common.annotations.declaration.SimpleObject;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceFilesystem.FilesystemException;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
@@ -38,7 +39,14 @@ import net.akehurst.application.framework.technology.interfacePersistence.IPersi
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 
+@SimpleObject
 public class HJsonFile implements IService, IIdentifiableObject, IPersistentStore {
+
+	@ServiceReference
+	IApplicationFramework af;
+
+	@ServiceReference
+	IFilesystem fs;
 
 	@Override
 	public Object createReference(final String locationId) {
@@ -56,16 +64,11 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 		return this.afId;
 	}
 
-	@ServiceReference
-	IApplicationFramework af;
-
-	@ServiceReference
-	IFilesystem fs;
-
 	JsonValue json_cache;
 
 	public IFile getFile() {
-		final IFile file = this.fs.file(this.afId() + ".hjson");
+		final String fileName = this.afId() + ".hjson";
+		final IFile file = this.fs.file(fileName);
 		return file;
 	}
 

@@ -3,8 +3,10 @@ package net.akehurst.application.framework.technology.gui.vertx.elements;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.stream.XMLEventFactory;
@@ -19,6 +21,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
@@ -31,25 +34,21 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 		super(afId, guiRequest, scene.getStageId(), scene.getSceneId());
 		this.scene = scene;
 		this.dialogId = dialogId;
+		this.dialogElementPrefix = this.dialogId + "_";
 		this.dialogContent = dialogContent;
 	}
 
 	@ServiceReference
 	ILogger logger;
 
-	IGuiScene scene;
-	String dialogId;
-	String dialogContent;
+	private final IGuiScene scene;
+	private final String dialogId;
+	private final String dialogElementPrefix;
+	private final String dialogContent;
 
 	@Override
 	public void show(final UserSession session) {
 		final InputStream is = this.getClass().getClassLoader().getResourceAsStream(this.dialogContent + ".html");
-		// final Scanner s = new Scanner(is);
-		// String content = "";
-		// while (s.hasNextLine()) {
-		// content += s.nextLine();
-		// }
-		// s.close();
 		final String content = this.readAndPrefixIds(is);
 		this.guiRequest.showDialog(session, this.stageId, this.sceneId, this.dialogId, content);
 	}
@@ -60,6 +59,22 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 	}
 
 	// TODO: create own set of event handlers, must unregister them when dialog closes
+
+	@Override
+	public void notifyEventOccured(final GuiEvent event) {
+		// remove the dialog prefix from event data
+		final int len = this.dialogElementPrefix.length();
+		final Map<String, Object> ed = event.getEventData();
+		final Map<String, Object> newEventData = new HashMap<>();
+		for (final Map.Entry<String, Object> me : ed.entrySet()) {
+			final String key = me.getKey();
+			final String newKey = key.substring(len);
+			final Object value = me.getValue();
+			newEventData.put(newKey, value);
+		}
+		final GuiEvent newEvent = new GuiEvent(event.getSession(), event.getSignature(), newEventData);
+		super.notifyEventOccured(newEvent);
+	}
 
 	private String readAndPrefixIds(final InputStream inStream) {
 		final StringWriter result = new StringWriter();
@@ -83,7 +98,7 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 						final Attribute att = itt.next();
 						final String localName = att.getName().getLocalPart();
 						if ("id".equals(localName) || "for".equals(localName)) {
-							final String value = this.dialogId + "_" + att.getValue();
+							final String value = this.dialogElementPrefix + att.getValue();
 							final Attribute newAtt = eventFactory.createAttribute(localName, value);
 							newAtts.add(newAtt);
 						} else {

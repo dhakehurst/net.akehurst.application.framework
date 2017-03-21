@@ -17,6 +17,8 @@ package net.akehurst.application.framework.technology.interfaceGui;
 
 import java.net.URL;
 
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
+
 public interface IGuiHandler {
 
 	IGuiScene getScene(final SceneIdentity sceneId);
@@ -25,4 +27,6 @@ public interface IGuiHandler {
 
 	<T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, IGuiSceneHandler sceneHandler,
 			final URL content);
+
+	void authenticate(UserSession session) throws GuiException;
 }

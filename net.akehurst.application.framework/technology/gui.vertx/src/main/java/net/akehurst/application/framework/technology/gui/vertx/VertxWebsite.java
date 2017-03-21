@@ -40,6 +40,7 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
@@ -50,7 +51,7 @@ import net.akehurst.application.framework.technology.interfaceGui.data.editor.IG
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAuthenticatorRequest {
+public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
 	public VertxWebsite(final String objectId) {
 		super(objectId);
@@ -118,18 +119,12 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest, IAut
 		vertx.deployVerticle(this.verticle);
 	}
 
-	// --------- IAuthenticatorRequest ---------
-	@Override
-	public void requestLogin(final UserSession session, final String username, final String password) {
-		this.verticle.requestLogin(session, username, password);
-	}
-
-	@Override
-	public void requestLogout(final UserSession session) {
-		this.verticle.requestLogout(session);
-	}
-
 	// --------- IGuiRequest ---------
+	@Override
+	public void authenticate(final UserSession session) throws GuiException {
+		this.verticle.authenticate(session);
+	}
+
 	@Override
 	public void requestRecieveEvent(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
 			final String eventType) {

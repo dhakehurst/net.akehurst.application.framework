@@ -43,6 +43,7 @@ import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.gui.jfx.elements.JfxGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
@@ -277,6 +278,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	@Override
 	public void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
 			final String jsonParseTreeData) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void authenticate(final UserSession session) throws GuiException {
 		// TODO Auto-generated method stub
 
 	}

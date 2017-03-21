@@ -18,7 +18,9 @@ package net.akehurst.application.framework.technology.interfacePersistence;
 import java.util.Map;
 import java.util.Set;
 
-public interface IPersistentStore {
+import net.akehurst.application.framework.common.IIdentifiableObject;
+
+public interface IPersistentStore extends IIdentifiableObject {
 
 	void connect(Map<String, Object> properties);
 

@@ -35,4 +35,8 @@ public class UserSession extends AbstractDataType {
 	public UserDetails getUser() {
 		return this.user;
 	}
+
+	public boolean isAuthenticated() {
+		return null != this.getUser();
+	}
 }

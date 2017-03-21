@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.text.StrSubstitutor;
 
-import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileProps;
 import io.vertx.ext.web.RoutingContext;
@@ -46,7 +45,7 @@ public class TemplateStaticHandler extends StaticHandlerImpl {
 	}
 
 	protected String getFileContent(final String path, final RoutingContext context) {
-		final Buffer b = Vertx.vertx().fileSystem().readFileBlocking(path);
+		final Buffer b = context.vertx().fileSystem().readFileBlocking(path);
 		final byte[] bytes = b.getBytes();
 		String fileContent = new String(bytes);
 

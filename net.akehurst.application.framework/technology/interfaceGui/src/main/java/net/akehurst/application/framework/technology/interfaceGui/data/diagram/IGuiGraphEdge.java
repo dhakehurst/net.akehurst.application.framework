@@ -4,11 +4,15 @@ import java.util.Map;
 
 public interface IGuiGraphEdge {
 
+	String getIdentity();
+
+	IGuiGraphNode getParent();
+
 	IGuiGraphNode getSource();
 
 	IGuiGraphNode getTarget();
 
-	String getLabel();
+	String[] getType();
 
 	Map<String, String> getData();
 

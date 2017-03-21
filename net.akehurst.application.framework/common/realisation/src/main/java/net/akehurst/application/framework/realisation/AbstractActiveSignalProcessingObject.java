@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.akehurst.application.framework.common.ISignal;
 import net.akehurst.application.framework.common.ISignalR;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
+import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract public class AbstractActiveSignalProcessingObject extends AbstractActiveObject {
@@ -67,8 +68,10 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 		private final ThreadGroup group;
 		private final AtomicInteger threadNumber = new AtomicInteger(1);
 		private final String namePrefix;
+		private final ILogger logger;
 
-		NamedThreadFactory(final String baseName) {
+		NamedThreadFactory(final String baseName, final ILogger logger) {
+			this.logger = logger;
 			final SecurityManager s = System.getSecurityManager();
 			this.group = s != null ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
 			this.namePrefix = baseName + "-pool-" + NamedThreadFactory.poolNumber.getAndIncrement() + "-thread-";
@@ -76,13 +79,17 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 
 		@Override
 		public Thread newThread(final Runnable r) {
-			final Thread t = new Thread(this.group, r, this.namePrefix + this.threadNumber.getAndIncrement(), 0);
+			final String threadName = this.namePrefix + this.threadNumber.getAndIncrement();
+			final Thread t = new Thread(this.group, r, threadName, 0);
 			if (t.isDaemon()) {
 				t.setDaemon(false);
 			}
 			if (t.getPriority() != Thread.NORM_PRIORITY) {
 				t.setPriority(Thread.NORM_PRIORITY);
 			}
+			t.setUncaughtExceptionHandler((th, e) -> {
+				this.logger.log(LogLevel.ERROR, "Thread %s terminated with uncaught exception %s", threadName, e);
+			});
 			return t;
 		}
 	}
@@ -90,13 +97,17 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 	@Override
 	public void afRun() {
 		this.logger.log(LogLevel.TRACE, "AbstractActiveSignalProcessingObject.afRun");
-		this.executor = Executors.newFixedThreadPool(this.numThreads, new NamedThreadFactory(this.afId()));
+		this.executor = Executors.newFixedThreadPool(this.numThreads, new NamedThreadFactory(this.afId(), this.logger));
 		while (true) {
 			try {
 				final NamedSignal<?> ns = this.signals.take();
 				this.executor.submit(() -> {
-					this.logger.log(LogLevel.TRACE, ns.name);
-					ns.future.run();
+					try {
+						this.logger.log(LogLevel.TRACE, ns.name);
+						ns.future.run();
+					} catch (final Throwable ex) {
+						this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
+					}
 				});
 
 			} catch (final Throwable ex) {

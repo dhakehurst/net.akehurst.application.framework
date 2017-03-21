@@ -61,4 +61,11 @@ public class JfxGuiElement implements IGuiElement {
 
 	}
 
+	@Override
+	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
+			final Object content) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

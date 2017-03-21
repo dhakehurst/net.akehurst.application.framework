@@ -87,6 +87,13 @@ public class JfxMenuItem implements IGuiMenuItem {
 	}
 
 	@Override
+	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
+			final Object content) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void onSelected(final EventSelected event) {
 		this.menuItem.setOnAction((e) -> {
 			event.execute();

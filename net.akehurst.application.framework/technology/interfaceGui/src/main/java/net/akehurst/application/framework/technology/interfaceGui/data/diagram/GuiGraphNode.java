@@ -9,31 +9,33 @@ import net.akehurst.application.framework.common.annotations.declaration.DataTyp
 @DataType
 public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
 
-	public GuiGraphNode(final IGuiGraphNode parent, final String identity, final String... types) {
+	public GuiGraphNode(final String identity, final IGuiGraphNode parent, final String... types) {
 		super(identity);
+		this.parent = parent;
 		this.types = types;
 		this.data = new HashMap<>();
+		// add to data do they can be used in the styling
+		this.data.put("identity", identity);
 	}
+
+	private final IGuiGraphNode parent;
+	private final String[] types;
+	private final Map<String, String> data;
 
 	@Override
 	public String getIdentity() {
 		return (String) super.getIdentityValues().get(0);
 	}
 
-	IGuiGraphNode parent;
-
+	@Override
 	public IGuiGraphNode getParent() {
 		return this.parent;
 	}
-
-	String[] types;
 
 	@Override
 	public String[] getType() {
 		return this.types;
 	}
-
-	Map<String, String> data;
 
 	@Override
 	public Map<String, String> getData() {

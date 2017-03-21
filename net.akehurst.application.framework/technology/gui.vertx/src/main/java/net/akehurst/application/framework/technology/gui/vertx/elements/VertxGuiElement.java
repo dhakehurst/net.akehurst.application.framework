@@ -52,4 +52,10 @@ public class VertxGuiElement implements IGuiElement {
 		this.scene.onEvent(session, sig, handler);
 	}
 
+	@Override
+	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
+			final Object content) {
+		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, newElementId, newElementType, attributes,
+				content);
+	}
 }

@@ -120,9 +120,6 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 	}
 
 	@Override
-	public void afConnectParts() {}
-
-	@Override
 	public void afRun() {
 		try {
 			if (this.displayHelp) {

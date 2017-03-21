@@ -57,11 +57,11 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 	private JsonArray createElements(final IGuiDiagramData diagramData) {
 		final JsonArray jArr = new JsonArray();
 
-		for (final IGuiGraphNode node : diagramData.getGraph().getNodes()) {
+		for (final IGuiGraphNode node : diagramData.getGraph().getNodes().values()) {
 			jArr.add(this.createNode(node));
 		}
 
-		for (final IGuiGraphEdge edge : diagramData.getGraph().getEdges()) {
+		for (final IGuiGraphEdge edge : diagramData.getGraph().getEdges().values()) {
 			jArr.add(this.createEdge(edge));
 		}
 
@@ -91,16 +91,20 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 	}
 
 	private JsonObject createEdge(final IGuiGraphEdge edge) {
+		final String edgeId = edge.getIdentity();
 		final String srcId = edge.getSource().getIdentity();
 		final String tgtId = edge.getTarget().getIdentity();
 		final JsonObject jedge = new JsonObject();
 		jedge.put("group", "edges");
 		final JsonObject data = new JsonObject();
-		data.put("id", srcId + "-->" + tgtId);
+		data.put("id", edgeId);
 		data.put("source", srcId);
 		data.put("target", tgtId);
 
-		data.put("label", edge.getLabel());
+		for (final Map.Entry<String, String> me : edge.getData().entrySet()) {
+			data.put(me.getKey(), me.getValue());
+		}
+
 		jedge.put("data", data);
 
 		return jedge;

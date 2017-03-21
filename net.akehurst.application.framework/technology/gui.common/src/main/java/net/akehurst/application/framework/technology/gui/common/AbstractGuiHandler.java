@@ -22,6 +22,7 @@ import java.util.Map;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractActiveSignalProcessingObject;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
+import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiCallback;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiHandler;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
@@ -30,6 +31,7 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiSceneHandler;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
+import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingObject implements IGuiHandler, IGuiNotification {
 
@@ -55,7 +57,12 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 		final SceneIdentity currentSceneId = event.getSignature().getSceneId();
 		final IGuiScene scene = this.getScene(currentSceneId);
 		final IGuiSceneHandler handler = this.sceneHandlers.get(event.getSignature().getSceneId());
-		handler.loaded(this, scene, event);
+		if (null == handler) {
+			// scene not found...do nothing !
+			this.logger.log(LogLevel.DEBUG, "Scene %s not found for %s", currentSceneId, this.afId());
+		} else {
+			handler.loaded(this, scene, event);
+		}
 	}
 
 	Map<SceneIdentity, IGuiScene> scenes;
@@ -94,7 +101,14 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 			} else if (IGuiNotification.EVENT_SCENE_LOADED.equals(event.getSignature().getEventType())) {
 				this.onSceneLoaded(event);
 			} else {
-				this.getScene(event.getSignature().getSceneId()).notifyEventOccured(event);
+				final SceneIdentity currentSceneId = event.getSignature().getSceneId();
+				final IGuiScene scene = this.getScene(currentSceneId);
+				if (null == scene) {
+					// scene not found...do nothing !
+					this.logger.log(LogLevel.DEBUG, "Scene %s not found for %s", currentSceneId, this.afId());
+				} else {
+					scene.notifyEventOccured(event);
+				}
 			}
 		});
 	}
@@ -111,4 +125,8 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 
 	}
 
+	@Override
+	public void authenticate(final UserSession session) throws GuiException {
+		this.getGuiRequest().authenticate(session);
+	}
 }

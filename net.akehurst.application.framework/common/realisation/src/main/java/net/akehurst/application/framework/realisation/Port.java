@@ -182,6 +182,7 @@ public class Port implements IPort {
 			final Set<Object> objs = (Set<Object>) other.getProvided(req);
 			for (final Object o : objs) {
 				this.provideRequired(t, o);
+				this.logger.log(LogLevel.TRACE, "Connected %s[%s] to %s.", this.afId(), t.getName(), o.toString());
 			}
 		}
 
@@ -190,6 +191,7 @@ public class Port implements IPort {
 			final Set<Object> objs = (Set<Object>) this.getProvided(req);
 			for (final Object o : objs) {
 				other.provideRequired(t, o);
+				this.logger.log(LogLevel.TRACE, "Connected %s[%s] to %s.", other.afId(), t.getName(), o.toString());
 			}
 		}
 
@@ -202,6 +204,7 @@ public class Port implements IPort {
 			for (final Object provider : providers) {
 				final Class<Object> t = (Class<Object>) intf;
 				this.provideProvided(t, provider);
+				this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.afId(), t.getName(), provider.toString());
 			}
 		}
 
@@ -209,6 +212,7 @@ public class Port implements IPort {
 			final Class<Object> t = (Class<Object>) intf;
 			final Object provider = this.out(intf);
 			internalPort.provideRequired(t, provider);
+			this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.afId(), t.getName(), provider.toString());
 		}
 
 	}
@@ -222,6 +226,7 @@ public class Port implements IPort {
 						final Class<Object> t = (Class<Object>) req;
 						final Object o = this.out(req);
 						f.set(internalProvider, o);
+						this.logger.log(LogLevel.TRACE, "Internally connected %s.%s to %s.", internalProvider.toString(), f.getName(), o.toString());
 					}
 				}
 			} catch (final Exception ex) {
@@ -232,6 +237,7 @@ public class Port implements IPort {
 			final Class<Object> t = (Class<Object>) prov;
 			if (t.isAssignableFrom(internalProvider.getClass())) {
 				this.provideProvided(t, internalProvider);
+				this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.toString(), t.getName(), internalProvider.toString());
 			}
 		}
 	}
