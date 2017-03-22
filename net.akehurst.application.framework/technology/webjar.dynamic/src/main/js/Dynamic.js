@@ -85,8 +85,15 @@ define([
 	}
 	
 	Dynamic.prototype.fetchEventData = function(el) {
+	//TODO: not sure if this is quite what we want!
+		var d1 = this.fetchEventData1(el,'tr')
+		var d2 = this.fetchEventData1(el,'fieldset')
+		var data = $.extend({}, d1, d2)
+		return data
+	}
+	Dynamic.prototype.fetchEventData1 = function(el, type) {
 		var data = {}
-		var p = el.closest('fieldset,tr')
+		var p = el.closest(type)
 		if (null!=this.form) {
 			for(i=0; i< this.form.length; i++) {
 				let id = this.form[i].id

@@ -54,14 +54,18 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 	abstract protected void onStageCreated(GuiEvent event);
 
 	protected void onSceneLoaded(final GuiEvent event) {
-		final SceneIdentity currentSceneId = event.getSignature().getSceneId();
-		final IGuiScene scene = this.getScene(currentSceneId);
-		final IGuiSceneHandler handler = this.sceneHandlers.get(event.getSignature().getSceneId());
-		if (null == handler) {
-			// scene not found...do nothing !
-			this.logger.log(LogLevel.DEBUG, "Scene %s not found for %s", currentSceneId, this.afId());
-		} else {
-			handler.loaded(this, scene, event);
+		try {
+			final SceneIdentity currentSceneId = event.getSignature().getSceneId();
+			final IGuiScene scene = this.getScene(currentSceneId);
+			final IGuiSceneHandler handler = this.sceneHandlers.get(event.getSignature().getSceneId());
+			if (null == handler) {
+				// scene not found...do nothing !
+				this.logger.log(LogLevel.DEBUG, "Scene %s not found for %s", currentSceneId, this.afId());
+			} else {
+				handler.loaded(this, scene, event);
+			}
+		} catch (final Throwable e) {
+			this.logger.log(LogLevel.ERROR, "Error loading scene", e);
 		}
 	}
 

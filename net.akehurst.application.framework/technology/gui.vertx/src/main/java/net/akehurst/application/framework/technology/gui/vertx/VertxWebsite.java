@@ -67,7 +67,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	String rootPath;
 
 	String getNormalisedRootPath() {
-		return 0 == this.rootPath.length() ? "" : this.rootPath + "/";
+		return 0 == this.rootPath.length() ? "/" : "/" + this.rootPath + "/";
 	}
 
 	@ConfiguredValue(defaultValue = "test/")
@@ -153,7 +153,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 				str = str.substring(0, str.length() - 1);
 			}
 			final String webroot = str.substring(str.lastIndexOf('/') + 1);
-			final String routePath = "/" + this.getNormalisedRootPath() + stagePath;
+			final String routePath = this.getNormalisedRootPath() + stagePath;
 			if (authenticated) {
 				this.verticle.addAuthenticatedRoute(routePath, rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());

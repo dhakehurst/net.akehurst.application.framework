@@ -22,7 +22,7 @@ require.config({
         "text"            : "requirejs-text/3.2.1/text",
         "jquery"          : "jquery/3.1.0/jquery.min",
 		"sockjs"          : "sockjs-client/1.1.1/sockjs.min",
-		"chartjs"         : "chartjs/2.1.3/Chart.min",
+		"chartjs"         : "chartjs/2.4.0/Chart.min",
 		"cytoscape"       : "cytoscape/2.7.9/dist/cytoscape.min",
 		"crypto.pbkdf2"   : "cryptojs/3.1.2/rollups/pbkdf2",
 		"crypto.aes"      : "cryptojs/3.1.2/rollups/aes",

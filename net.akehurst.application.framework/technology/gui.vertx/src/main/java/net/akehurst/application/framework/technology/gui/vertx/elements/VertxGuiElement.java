@@ -53,9 +53,21 @@ public class VertxGuiElement implements IGuiElement {
 	}
 
 	@Override
+	public void clear(final UserSession session) {
+		this.guiRequest.clearElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName);
+	}
+
+	@Override
 	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
 			final Object content) {
 		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, newElementId, newElementType, attributes,
 				content);
+	}
+
+	@Override
+	public void createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
+			final String jsonChartOptions) {
+		this.guiRequest.chartCreate(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, chartId, chartType, jsonChartData,
+				jsonChartOptions);
 	}
 }

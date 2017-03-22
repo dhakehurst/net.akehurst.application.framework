@@ -19,6 +19,7 @@ import java.util.Map;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 
 public interface IGuiScene extends IIdentifiableObject {
 
@@ -52,4 +53,11 @@ public interface IGuiScene extends IIdentifiableObject {
 
 	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, String modalId, String title, String dialogContent);
 
+	/**
+	 *
+	 * @param elementName
+	 *            the id (or class) of an element
+	 * @return
+	 */
+	IGuiElement getElement(String elementName);
 }

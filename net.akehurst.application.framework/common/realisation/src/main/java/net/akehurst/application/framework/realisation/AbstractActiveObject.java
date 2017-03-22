@@ -15,8 +15,14 @@
  */
 package net.akehurst.application.framework.realisation;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.akehurst.application.framework.common.IActiveObject;
 import net.akehurst.application.framework.common.IApplicationFramework;
+import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
+import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
@@ -52,6 +58,23 @@ abstract public class AbstractActiveObject implements IActiveObject {
 	@Override
 	public void afJoin() throws InterruptedException {
 		this.thread.join();
+	}
+
+	protected List<IActiveObject> afActiveParts() throws IllegalArgumentException, IllegalAccessException {
+		final List<IActiveObject> objects = new ArrayList<>();
+		for (final Field f : this.getClass().getDeclaredFields()) {
+			f.setAccessible(true);
+			final ComponentInstance annC = f.getAnnotation(ComponentInstance.class);
+			final ActiveObjectInstance annAO = f.getAnnotation(ActiveObjectInstance.class);
+			if (null == annC && null == annAO) {
+				// do nothing
+			} else {
+				final IActiveObject ao = (IActiveObject) f.get(this);
+				// TODO: support ordering of objects
+				objects.add(ao);
+			}
+		}
+		return objects;
 	}
 
 	@Override

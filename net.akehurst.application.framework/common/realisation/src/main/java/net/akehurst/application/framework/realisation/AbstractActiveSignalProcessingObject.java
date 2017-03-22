@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.realisation;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,6 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.akehurst.application.framework.common.IActiveObject;
 import net.akehurst.application.framework.common.ISignal;
 import net.akehurst.application.framework.common.ISignalR;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
@@ -97,22 +99,42 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 	@Override
 	public void afRun() {
 		this.logger.log(LogLevel.TRACE, "AbstractActiveSignalProcessingObject.afRun");
-		this.executor = Executors.newFixedThreadPool(this.numThreads, new NamedThreadFactory(this.afId(), this.logger));
-		while (true) {
-			try {
-				final NamedSignal<?> ns = this.signals.take();
-				this.executor.submit(() -> {
-					try {
-						this.logger.log(LogLevel.TRACE, ns.name);
-						ns.future.run();
-					} catch (final Throwable ex) {
-						this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
-					}
-				});
 
-			} catch (final Throwable ex) {
-				this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
+		try {
+			final List<IActiveObject> objects = super.afActiveParts();
+
+			for (final IActiveObject ao : objects) {
+				ao.afStart();
 			}
+
+			this.executor = Executors.newFixedThreadPool(this.numThreads, new NamedThreadFactory(this.afId(), this.logger));
+			while (true) {
+				try {
+					final NamedSignal<?> ns = this.signals.take();
+					this.executor.submit(() -> {
+						try {
+							this.logger.log(LogLevel.TRACE, ns.name);
+							ns.future.run();
+						} catch (final Throwable ex) {
+							this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
+						}
+					});
+
+				} catch (final InterruptedException ex) {
+					break;
+				} catch (final Throwable ex) {
+					this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
+				}
+			}
+
+			for (final IActiveObject ao : objects) {
+				ao.afJoin();
+			}
+
+		} catch (final IllegalArgumentException | IllegalAccessException ex) {
+			this.logger.log(LogLevel.ERROR, "Failed get active parts " + this.afId(), ex);
+		} catch (final InterruptedException ex) {
+			this.logger.log(LogLevel.INFO, "Interrupted " + this.afId(), ex);
 		}
 
 	}

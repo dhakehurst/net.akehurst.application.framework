@@ -15,8 +15,6 @@
  */
 package net.akehurst.application.framework.realisation;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,8 +22,6 @@ import java.util.Set;
 import net.akehurst.application.framework.common.IActiveObject;
 import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IPort;
-import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
-import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract public class AbstractComponent extends AbstractActiveObject implements IComponent {
@@ -65,20 +61,7 @@ abstract public class AbstractComponent extends AbstractActiveObject implements 
 	public void afRun() {
 		this.logger.log(LogLevel.TRACE, "AbstractComponent.afRun");
 		try {
-			// TODO handle inheritance ?
-			final List<IActiveObject> objects = new ArrayList<>();
-			for (final Field f : this.getClass().getDeclaredFields()) {
-				f.setAccessible(true);
-				final ComponentInstance annC = f.getAnnotation(ComponentInstance.class);
-				final ActiveObjectInstance annAO = f.getAnnotation(ActiveObjectInstance.class);
-				if (null == annC && null == annAO) {
-					// do nothing
-				} else {
-					final IActiveObject ao = (IActiveObject) f.get(this);
-					// TODO: support ordering of objects
-					objects.add(ao);
-				}
-			}
+			final List<IActiveObject> objects = super.afActiveParts();
 
 			for (final IActiveObject ao : objects) {
 				ao.afStart();

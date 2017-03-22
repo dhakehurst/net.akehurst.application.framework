@@ -13,6 +13,7 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 
 public class VertxGuiScene implements IGuiScene {
 	public VertxGuiScene(final String afId, final IGuiRequest guiRequest, final StageIdentity stageId, final SceneIdentity sceneId) {
@@ -75,6 +76,11 @@ public class VertxGuiScene implements IGuiScene {
 	public void onEvent(final UserSession session, final GuiEventSignature eventSignature, final OnEventHandler handler) {
 		this.eventHandler.register(eventSignature, handler);
 
+	}
+
+	@Override
+	public IGuiElement getElement(final String elementName) {
+		return new VertxGuiElement(this.guiRequest, this, elementName);
 	}
 
 	@Override

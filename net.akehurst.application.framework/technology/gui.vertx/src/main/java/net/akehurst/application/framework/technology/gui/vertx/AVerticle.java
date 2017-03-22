@@ -273,7 +273,7 @@ public class AVerticle implements Verticle {
 		// this.router.route(this.ws.getTestPath()).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
 		// this.router.route(this.ws.getTestPath()).handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
 		// this.router.route(this.ws.getTestPath()).handler(UserSessionHandler.create(this.authProvider));
-		final String testPath = "/" + this.ws.getTestPath();
+		final String testPath = this.ws.getTestPath();
 		this.router.route(testPath).handler(rc -> {
 			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
 		});
@@ -290,13 +290,13 @@ public class AVerticle implements Verticle {
 
 		this.comms = new ClientServerComms(this.getVertx(), this.router, this.authProvider, "/eventbus");
 
-		final String jsPath = "/" + this.ws.getJsPath() + "/*";
+		final String jsPath = this.ws.getJsPath() + "/*";
 		this.router.route(jsPath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
 
 		// TODO: replace jsPath with this once all my js code is ported
 		this.router.route("/lib/*").handler(StaticHandler.create("META-INF/resources/webjars"));
 
-		final String downloadPath = "/" + this.ws.getDownloadPath() + ":filename";
+		final String downloadPath = this.ws.getDownloadPath() + ":filename";
 		this.router.route(downloadPath).handler(rc -> {
 			final String filename = rc.request().getParam("filename");
 			final Buffer buffer = Buffer.buffer();
@@ -319,7 +319,7 @@ public class AVerticle implements Verticle {
 		});
 		this.ws.logger.log(LogLevel.INFO, "Download path:  " + "http://localhost:" + this.port + downloadPath);
 
-		final String uploadPath = "/" + this.ws.getUploadPath();
+		final String uploadPath = this.ws.getUploadPath();
 		this.addPostRoute(uploadPath, rc -> {
 			final FileUpload fu = rc.fileUploads().iterator().next();
 

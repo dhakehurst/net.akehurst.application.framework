@@ -56,7 +56,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		try {
 			final IApplicationFramework af = new ApplicationFramework("af", "af");
 			final T app = af.createApplication(applicationClass, "application", arguments);
-			app.afStart();
+			af.activate(app);
 			return app;
 		} catch (final Throwable t) {
 			t.printStackTrace();
@@ -750,6 +750,28 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			}
 		}
 		return providers;
+	}
+
+	@Override
+	public <T extends IApplication> void activate(final T object) {
+		object.afStart();
+		// final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
+		//
+		// walker.build(object, (partKind, partClass, partId) -> {
+		// switch (partKind) {
+		// case COMPONENT: {
+		// return this.createComponent((Class<? extends IComponent>) partClass, partId);
+		// }
+		// case ACTIVE_OBJECT: {
+		// return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+		// }
+		// case PASSIVE_OBJECT:
+		// return this.createObject((Class<? extends IActiveObject>) partClass, partId);
+		// default:
+		// break;
+		// }
+		// return null; // should never happen
+		// });
 	}
 
 }

@@ -37,4 +37,5 @@ public interface IApplicationFramework {
 
 	<T extends IIdentifiableObject> T injectIntoSimpleObject(T object) throws ApplicationFrameworkException;
 
+	<T extends IApplication> void activate(final T object);
 }

@@ -87,8 +87,21 @@ public class JfxMenuItem implements IGuiMenuItem {
 	}
 
 	@Override
+	public void clear(final UserSession session) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
 			final Object content) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
+			final String jsonChartOptions) {
 		// TODO Auto-generated method stub
 
 	}

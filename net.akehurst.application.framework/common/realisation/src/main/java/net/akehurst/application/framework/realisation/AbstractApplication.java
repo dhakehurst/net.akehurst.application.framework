@@ -16,7 +16,6 @@
 package net.akehurst.application.framework.realisation;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hjson.JsonObject;
@@ -132,28 +131,7 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 				System.exit(0);
 			}
 
-			// TODO handle inheritance ?
-			final List<IActiveObject> objects = new ArrayList<>();
-			for (final Field f : this.getClass().getDeclaredFields()) {
-				f.setAccessible(true);
-				final ComponentInstance ann = f.getAnnotation(ComponentInstance.class);
-				if (null == ann) {
-					// do nothing
-				} else {
-					final IActiveObject ao = (IActiveObject) f.get(this);
-					// TODO: support ordering of objects
-					objects.add(ao);
-				}
-
-				final ActiveObjectInstance ann2 = f.getAnnotation(ActiveObjectInstance.class);
-				if (null == ann2) {
-					// do nothing
-				} else {
-					final IActiveObject ao = (IActiveObject) f.get(this);
-					// TODO: support ordering of objects
-					objects.add(ao);
-				}
-			}
+			final List<IActiveObject> objects = super.afActiveParts();
 
 			for (final IActiveObject ao : objects) {
 				ao.afStart();

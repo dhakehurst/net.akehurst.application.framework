@@ -42,6 +42,7 @@ import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
 import net.akehurst.application.framework.technology.interfaceGui.data.tree.IGuiTreeView;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiMenuItem;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
@@ -206,6 +207,12 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 	public void onEvent(final UserSession session, final GuiEventSignature eventSignature, final OnEventHandler handler) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public IGuiElement getElement(final String elementName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
