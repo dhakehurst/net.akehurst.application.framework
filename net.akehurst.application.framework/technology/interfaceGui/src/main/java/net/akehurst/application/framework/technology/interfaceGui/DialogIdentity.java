@@ -13,13 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.computational.interfaceAuthenticator;
+package net.akehurst.application.framework.technology.interfaceGui;
 
-import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import java.util.regex.Pattern;
 
-public interface ICAuthenticatorRequest {
+import net.akehurst.application.framework.common.AbstractDataType;
 
-	void requestLogin(UserSession session, String username, String password);
+public class DialogIdentity extends AbstractDataType {
 
-	void requestLogout(UserSession session);
+	private static Pattern valid = Pattern.compile("[a-zA-z][a-zA-Z0-9]*");
+
+	public DialogIdentity(final String value) throws GuiException {
+		super(value);
+		if (DialogIdentity.valid.matcher(value).matches()) {
+			// ok
+		} else {
+			throw new GuiException("Invalid DialogIdentity value - " + value, null);
+		}
+	}
+
+	public String asPrimitive() {
+		return (String) super.getIdentityValues().get(0);
+	}
 }

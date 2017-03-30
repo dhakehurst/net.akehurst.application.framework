@@ -32,7 +32,7 @@ public class VertxAuthenticationHandler extends AbstractActiveSignalProcessingOb
 	AuthProvider authProvider;
 
 	@Override
-	public void requestLogin(final UserSession session, final String username, final String password, final String encoding) {
+	public void requestLogin(final UserSession session, final String username, final String password) {
 		// final Session sess = this.getSession(session.getId());
 		final JsonObject authInfo = new JsonObject();
 		authInfo.put("username", username);

@@ -61,11 +61,12 @@ define(['orion/editor/eventTarget'], function(mEventTarget) {
 		},
 		doNode : function(node) {
 			if (node.isPattern) {
-				return //can't use pattern name as a css-class
+				//can't use pattern name as a css-class
+			} else {
+				let ann = this.createAnnotation(node.start, node.length, node.name, node.name)
+				this.annotationModel.addAnnotation(ann)
+				this.sendStyle(ann)
 			}
-			let ann = this.createAnnotation(node.start, node.length, node.name, node.name)
-			this.annotationModel.addAnnotation(ann)
-			this.sendStyle(ann)
 			if (null != node.children) {
 				for(let i=0, len=node.children.length; i < len; i++) {
 					let child = node.children[i]
@@ -74,7 +75,7 @@ define(['orion/editor/eventTarget'], function(mEventTarget) {
 			}
 		},
 		update : function(parseTree) {
-			this.annotationModel.removeAnnotations('parseTree')
+			this.annotationModel.removeAnnotations('orion.annotation.error') //'parseTree')
 			this.doNode(parseTree)
 			
 		}

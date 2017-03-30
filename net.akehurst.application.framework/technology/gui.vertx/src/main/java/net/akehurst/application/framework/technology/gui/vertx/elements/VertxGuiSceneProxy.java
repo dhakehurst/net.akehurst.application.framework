@@ -96,19 +96,19 @@ public class VertxGuiSceneProxy implements InvocationHandler, IIdentifiableObjec
 				}
 
 				if (IGuiElement.class == returnType) {
-					return new VertxGuiElement(this.guiRequest, this.getHandler(), elementName);
+					return new VertxGuiElement(this.guiRequest, this.getHandler(), null, elementName);
 				} else if (IGuiContainer.class == returnType) {
-					return new VertxGuiContainer(this.guiRequest, this.getHandler(), elementName);
+					return new VertxGuiContainer(this.guiRequest, this.getHandler(), null, elementName);
 				} else if (IGuiText.class == returnType) {
-					return new VertxGuiText(this.guiRequest, this.getHandler(), elementName);
+					return new VertxGuiText(this.guiRequest, this.getHandler(), null, elementName);
 				} else if (IGuiChart.class == returnType) {
-					return new VertxGuiChart(this.guiRequest, this.getHandler(), elementName);
+					return new VertxGuiChart(this.guiRequest, this.getHandler(), null, elementName);
 				} else if (IGuiTable.class == returnType) {
-					return new VertxGuiTable(this.guiRequest, this.getHandler(), elementName);
+					return new VertxGuiTable(this.guiRequest, this.getHandler(), null, elementName);
 				} else if (IGuiEditor.class == returnType) {
-					return new VertxGuiEditor(this.guiRequest, this.getHandler(), elementName);
+					return new VertxGuiEditor(this.guiRequest, this.getHandler(), null, elementName);
 				} else if (IGuiDiagram.class == returnType) {
-					return new VertxGuiDiagram(this.guiRequest, this.getHandler(), elementName);
+					return new VertxGuiDiagram(this.guiRequest, this.getHandler(), null, elementName);
 				} else {
 					return null;
 				}

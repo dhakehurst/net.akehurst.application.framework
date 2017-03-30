@@ -20,6 +20,7 @@ import java.util.Map;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.data.diagram.IGuiDiagram;
@@ -29,14 +30,14 @@ import net.akehurst.application.framework.technology.interfaceGui.data.diagram.I
 
 public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 
-	public VertxGuiDiagram(final IGuiRequest guiRequest, final IGuiScene scene, final String elementName) {
-		super(guiRequest, scene, elementName);
+	public VertxGuiDiagram(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
+		super(guiRequest, scene, dialog, elementName);
 	}
 
 	@Override
 	public void add(final UserSession session, final IGuiDiagramData content) {
 		final String jsonDiagramData = this.createJsonString(content);
-		super.guiRequest.addDiagram(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, jsonDiagramData);
+		super.getGuiRequest().addDiagram(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
 	}
 
 	@Override
@@ -50,6 +51,7 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 
 		json.put("elements", this.createElements(diagramData));
 		json.put("style", diagramData.getStyle());
+		json.put("layout", new JsonObject(diagramData.getLayout()));
 
 		return json.encode();
 	}

@@ -41,6 +41,7 @@ import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractComponent;
 import net.akehurst.application.framework.technology.gui.jfx.elements.JfxGuiScene;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
@@ -85,7 +86,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 			this.stages.put(stageId, primary);
 
 			final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")));
-			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, IGuiNotification.EVENT_STAGE_CREATED);
+			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, IGuiNotification.EVENT_STAGE_CREATED);
 			final Map<String, Object> eventData = new HashMap<>();
 			final GuiEvent event = new GuiEvent(session, signature, eventData);
 			this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
@@ -125,7 +126,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 				primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev) -> {
 					final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")));
-					final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, IGuiNotification.EVENT_SCENE_LOADED);
+					final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, null, IGuiNotification.EVENT_SCENE_LOADED);
 					final Map<String, Object> eventData = new HashMap<>();
 					final GuiEvent event = new GuiEvent(session, signature, eventData);
 					this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
@@ -149,14 +150,14 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final String modalId,
+	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
 			final String title, final String dialogContent) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String dialogId,
+	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
 			final String dialogContent) {
 		// TODO Auto-generated method stub
 

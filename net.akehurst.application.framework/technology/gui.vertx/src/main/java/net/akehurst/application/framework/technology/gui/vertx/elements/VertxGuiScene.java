@@ -6,6 +6,7 @@ import java.util.Map;
 import net.akehurst.application.framework.common.annotations.instance.IdentifiableObjectInstance;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.gui.common.GuiEventHandler;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
@@ -21,9 +22,16 @@ public class VertxGuiScene implements IGuiScene {
 		this.stageId = stageId;
 		this.sceneId = sceneId;
 		this.guiRequest = guiRequest;
+		this.dialogs = new HashMap<>();
 	}
 
+	Map<DialogIdentity, IGuiDialog> dialogs;
+
 	IGuiRequest guiRequest;
+
+	protected IGuiRequest getGuiRequest() {
+		return this.guiRequest;
+	}
 
 	String afId;
 
@@ -80,12 +88,19 @@ public class VertxGuiScene implements IGuiScene {
 
 	@Override
 	public IGuiElement getElement(final String elementName) {
-		return new VertxGuiElement(this.guiRequest, this, elementName);
+		return new VertxGuiElement(this.guiRequest, this, null, elementName);
 	}
 
 	@Override
-	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final String modalId, final String title,
+	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final DialogIdentity dialogId, final String title,
 			final String dialogContent) {
-		return this.guiRequest.createDialog(dialogClass, session, this, modalId, title, dialogContent);
+		final T dialog = this.guiRequest.createDialog(dialogClass, session, this, dialogId, title, dialogContent);
+		this.dialogs.put(dialogId, dialog);
+		return dialog;
+	}
+
+	@Override
+	public IGuiDialog getDialog(final DialogIdentity dialogId) {
+		return this.dialogs.get(dialogId);
 	}
 }

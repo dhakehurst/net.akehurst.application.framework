@@ -15,18 +15,24 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui;
 
+import java.util.regex.Pattern;
+
 import net.akehurst.application.framework.common.AbstractDataType;
 
 public class SceneIdentity extends AbstractDataType {
 
-	public SceneIdentity(final String value) {
+	private static Pattern valid = Pattern.compile("[a-zA-z][a-zA-Z0-9/]*");
+
+	public SceneIdentity(final String value) throws GuiException {
 		super(value);
-		this.value = value;
+		if (value.isEmpty() || SceneIdentity.valid.matcher(value).matches()) {
+			// ok
+		} else {
+			throw new GuiException("Invalid SceneIdentity value - " + value, null);
+		}
 	}
 
-	String value;
-
 	public String asPrimitive() {
-		return this.value;
+		return (String) super.getIdentityValues().get(0);
 	}
 }

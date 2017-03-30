@@ -31,7 +31,8 @@ public interface IGuiRequest {
 
 	void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String eventType);
 
-	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, IGuiScene scene, String modalId, String title, String dialogContent);
+	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, IGuiScene scene, DialogIdentity dialogId, String title,
+			String dialogContent);
 
 	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type);
 
@@ -55,7 +56,7 @@ public interface IGuiRequest {
 	 * @param sceneId
 	 * @param dialogId
 	 */
-	void removeElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String dialogId);
+	void removeElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
 
 	/**
 	 * clean the content of an element, but leave it present
@@ -79,7 +80,7 @@ public interface IGuiRequest {
 
 	void tableRemoveRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, String rowId);
 
-	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String dialogId, String dialogContent);
+	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId, String dialogContent);
 
 	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent,
 			IGuiLanguageService languageDefinition);

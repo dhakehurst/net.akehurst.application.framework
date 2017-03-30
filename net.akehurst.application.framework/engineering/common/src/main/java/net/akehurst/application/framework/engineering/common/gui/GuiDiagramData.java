@@ -3,6 +3,8 @@ package net.akehurst.application.framework.engineering.common.gui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.akehurst.application.framework.technology.interfaceGui.data.diagram.GuiGraph;
 import net.akehurst.application.framework.technology.interfaceGui.data.diagram.GuiGraphEdge;
@@ -14,6 +16,14 @@ import net.akehurst.application.framework.technology.interfaceGui.data.diagram.I
 
 public class GuiDiagramData implements IGuiDiagramData {
 
+	/**
+	 *
+	 * @param styleReader
+	 *            reads a .css file defining the diagram style
+	 * @param layout
+	 *            a json string defining the layout for the diagram
+	 * @throws IOException
+	 */
 	public GuiDiagramData(final Reader styleReader) throws IOException {
 		final BufferedReader br = new BufferedReader(styleReader);
 		String line = br.readLine();
@@ -24,7 +34,7 @@ public class GuiDiagramData implements IGuiDiagramData {
 			line = br.readLine();
 		}
 		this.style = buf.toString();
-
+		this.layout = new HashMap<>();
 		this.graph = new GuiGraph();
 	}
 
@@ -40,6 +50,13 @@ public class GuiDiagramData implements IGuiDiagramData {
 	@Override
 	public String getStyle() {
 		return this.style;
+	}
+
+	protected Map<String, Object> layout;
+
+	@Override
+	public Map<String, Object> getLayout() {
+		return this.layout;
 	}
 
 	public IGuiGraphNode addNode(final IGuiGraphNode parent, final String identity, final String... types) {

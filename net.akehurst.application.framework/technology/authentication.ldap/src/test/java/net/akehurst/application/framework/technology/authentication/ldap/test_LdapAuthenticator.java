@@ -40,7 +40,7 @@ public class test_LdapAuthenticator extends AbstractTestCase {
 			final UserDetails user = new UserDetails("<unknown>");
 			final UserSession session = new UserSession("test-session", user);
 
-			super.perform(this.testContext.tc1.handler.authenticatorRequest, IAuthenticatorRequest::requestLogin, session, "username", "password", "none");
+			super.perform(this.testContext.tc1.handler.authenticatorRequest, IAuthenticatorRequest::requestLogin, session, "username", "password");
 			super.sleep(200);
 			super.expect(this.testContext.tc1.handler, IAuthenticatorNotification::notifyAuthenticationSuccess, session);
 

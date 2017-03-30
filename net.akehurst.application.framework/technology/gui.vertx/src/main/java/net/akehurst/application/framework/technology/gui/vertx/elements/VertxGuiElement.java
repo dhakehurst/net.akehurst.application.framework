@@ -16,7 +16,9 @@
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
@@ -24,15 +26,33 @@ import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiE
 
 public class VertxGuiElement implements IGuiElement {
 
-	public VertxGuiElement(final IGuiRequest guiRequest, final IGuiScene scene, final String elementName) {
+	public VertxGuiElement(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
 		this.guiRequest = guiRequest;
 		this.scene = scene;
+		this.dialog = dialog;
 		this.elementName = elementName;
 	}
 
-	IGuiRequest guiRequest;
-	IGuiScene scene;
-	String elementName;
+	private final IGuiRequest guiRequest;
+	private final IGuiScene scene;
+	protected final IGuiDialog dialog;
+	private final String elementName;
+
+	protected IGuiRequest getGuiRequest() {
+		return this.guiRequest;
+	}
+
+	protected IGuiScene getScene() {
+		return this.scene;
+	}
+
+	protected IGuiDialog getDialog() {
+		return this.dialog;
+	}
+
+	public String getElementId() {
+		return this.elementName;
+	}
 
 	@Override
 	public Object get(final UserSession session, final String propertyName) {
@@ -48,8 +68,13 @@ public class VertxGuiElement implements IGuiElement {
 	@Override
 	public void onEvent(final UserSession session, final String eventType, final OnEventHandler handler) {
 		this.guiRequest.requestRecieveEvent(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, eventType);
-		final GuiEventSignature sig = new GuiEventSignature(this.scene.getStageId(), this.scene.getSceneId(), this.elementName, eventType);
-		this.scene.onEvent(session, sig, handler);
+		final DialogIdentity dialogId = null == this.dialog ? null : this.dialog.getId();
+		final GuiEventSignature eventSignature = new GuiEventSignature(this.scene.getStageId(), this.scene.getSceneId(), dialogId, this.elementName, eventType);
+		if (null == this.dialog) {
+			this.scene.onEvent(session, eventSignature, handler);
+		} else {
+			this.dialog.onEvent(session, eventSignature, handler);
+		}
 	}
 
 	@Override

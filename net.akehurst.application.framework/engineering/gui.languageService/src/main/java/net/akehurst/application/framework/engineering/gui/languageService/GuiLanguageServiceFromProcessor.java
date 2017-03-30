@@ -18,11 +18,13 @@ import net.akehurst.language.core.parser.RuleNotFoundException;
 
 public class GuiLanguageServiceFromProcessor implements IGuiLanguageService {
 
-	public GuiLanguageServiceFromProcessor(final ILanguageProcessor processor) {
+	public GuiLanguageServiceFromProcessor(final ILanguageProcessor processor, final String ruleName) {
 		this.processor = processor;
+		this.ruleName = ruleName;
 	}
 
-	final ILanguageProcessor processor;
+	private final ILanguageProcessor processor;
+	private final String ruleName;
 
 	@Override
 	public String getIdentity() {
@@ -58,7 +60,7 @@ public class GuiLanguageServiceFromProcessor implements IGuiLanguageService {
 		try {
 			final Reader reader = new StringReader(text);
 			System.out.println("parsing " + text);
-			final IParseTree pt = this.processor.getParser().parse("element", reader);
+			final IParseTree pt = this.processor.getParser().parse(this.ruleName, reader);
 			System.out.println("parse success " + pt.getRoot().getName());
 			final ToJsonVisitor visitor = new ToJsonVisitor();
 			final JsonObject json = pt.accept(visitor, null);

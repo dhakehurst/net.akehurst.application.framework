@@ -33,8 +33,8 @@ public class AuthenticatorChannel extends AbstractComponent implements ICAuthent
 
 	// --------- ICAuthenticatorRequest ---------
 	@Override
-	public void requestLogin(final UserSession session, final String username, final String password, final String encoding) {
-		this.portTechnology().out(IAuthenticatorRequest.class).requestLogin(session, username, password, encoding);
+	public void requestLogin(final UserSession session, final String username, final String password) {
+		this.portTechnology().out(IAuthenticatorRequest.class).requestLogin(session, username, password);
 	}
 
 	@Override

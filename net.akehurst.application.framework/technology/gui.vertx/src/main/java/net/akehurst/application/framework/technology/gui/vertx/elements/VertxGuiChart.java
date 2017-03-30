@@ -18,6 +18,7 @@ package net.akehurst.application.framework.technology.gui.vertx.elements;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
@@ -26,13 +27,13 @@ import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGu
 
 public class VertxGuiChart<X, Y> extends VertxGuiElement implements IGuiChart<X, Y> {
 
-	public VertxGuiChart(final IGuiRequest guiRequest, final IGuiScene scene, final String elementName) {
-		super(guiRequest, scene, elementName);
+	public VertxGuiChart(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
+		super(guiRequest, scene, dialog, elementName);
 		this.data = new VertxGuiChartData<>();
 	}
 
 	private String getChartId() {
-		return this.elementName + "_chart";
+		return this.getElementId() + "_chart";
 	}
 
 	@Override
@@ -56,9 +57,9 @@ public class VertxGuiChart<X, Y> extends VertxGuiElement implements IGuiChart<X,
 		final String jsonChartDataStr = chartData.toString();
 		final String jsonChartOptions = chartOptions.toString();
 
-		final String parentId = this.elementName;
+		final String parentId = this.getElementId();
 		final String chartTypeStr = this.getChartTypeName(chartType);
-		this.guiRequest.chartCreate(session, this.scene.getStageId(), this.scene.getSceneId(), parentId, chartId, chartTypeStr, jsonChartDataStr,
+		this.getGuiRequest().chartCreate(session, this.getScene().getStageId(), this.getScene().getSceneId(), parentId, chartId, chartTypeStr, jsonChartDataStr,
 				jsonChartOptions);
 	}
 

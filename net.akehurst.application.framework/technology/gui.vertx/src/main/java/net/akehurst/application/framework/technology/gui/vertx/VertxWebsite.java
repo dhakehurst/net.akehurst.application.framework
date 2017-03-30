@@ -28,6 +28,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
@@ -38,6 +39,7 @@ import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGui
 import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiSceneProxy;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
@@ -102,6 +104,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		return "sockjs/"; // this value is hard coded in index-script.js, they must match
 	}
 
+	@CommandLineArgument(description = "Override the default (9999) port")
 	@ConfiguredValue(defaultValue = "9999")
 	IpPort port;
 
@@ -143,7 +146,8 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		try {
 			final Map<String, String> variables = new HashMap<>();
 			variables.put("rootPath", this.rootPath);
-			variables.put("jsPath", this.getJsPath());
+			final String js = this.getJsPath().startsWith("/") ? this.getJsPath().substring(1) : this.getJsPath();
+			variables.put("jsPath", js);
 			variables.put("stageId", stageId.asPrimitive());
 
 			final String stagePath = stageId.asPrimitive().isEmpty() ? "" : stageId.asPrimitive() + "/";
@@ -172,7 +176,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 				}, webroot, variables);
 			}
 
-			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, IGuiNotification.EVENT_STAGE_CREATED);
+			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, IGuiNotification.EVENT_STAGE_CREATED);
 			final Map<String, Object> eventData = new HashMap<>();
 			final GuiEvent event = new GuiEvent(null, signature, eventData);
 			this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
@@ -211,12 +215,13 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String dialogId, final String content) {
+	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
+			final String content) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", this.rootPath + stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
 		data.put("parentId", "dialogs");
-		data.put("dialogId", dialogId);
+		data.put("dialogId", dialogId.asPrimitive());
 		data.put("content", content);
 		this.verticle.comms.send(session, "Gui.showDialog", data);
 	}
@@ -375,12 +380,12 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final String dialogId,
+	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
 			final String title, final String dialogContent) {
 		try {
 			final ClassLoader loader = this.getClass().getClassLoader();
 			final Class<?>[] interfaces = new Class<?>[] { dialogClass };
-			final InvocationHandler h = this.af.createObject(VertxGuiDialogProxy.class, dialogId, this, scene, dialogId, dialogContent);
+			final InvocationHandler h = this.af.createObject(VertxGuiDialogProxy.class, dialogId.asPrimitive(), this, scene, dialogId, dialogContent);
 			final Object proxy = Proxy.newProxyInstance(loader, interfaces, h);
 
 			return (T) proxy;

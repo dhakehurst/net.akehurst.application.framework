@@ -21,6 +21,7 @@ import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractActiveSignalProcessingObject;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiCallback;
@@ -111,7 +112,12 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 					// scene not found...do nothing !
 					this.logger.log(LogLevel.DEBUG, "Scene %s not found for %s", currentSceneId, this.afId());
 				} else {
-					scene.notifyEventOccured(event);
+					final DialogIdentity dialogId = event.getSignature().getDialogId();
+					if (null == dialogId) {
+						scene.notifyEventOccured(event);
+					} else {
+						scene.getDialog(dialogId).notifyEventOccured(event);
+					}
 				}
 			}
 		});

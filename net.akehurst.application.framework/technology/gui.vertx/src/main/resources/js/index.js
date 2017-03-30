@@ -26,9 +26,9 @@ require.config({
 		"cytoscape"       : "cytoscape/2.7.9/dist/cytoscape.min",
 		"crypto.pbkdf2"   : "cryptojs/3.1.2/rollups/pbkdf2",
 		"crypto.aes"      : "cryptojs/3.1.2/rollups/aes",
-		"Dynamic"         : "dynamic/1.0.alpha.18/Dynamic",
-		"ServerComms"     : "dynamic/1.0.alpha.18/ServerComms",
-		"Highlighter"     : "dynamic/1.0.alpha.18/Highlighter",
+		"Dynamic"         : "dynamic/1.0.alpha.19/Dynamic",
+		"ServerComms"     : "dynamic/1.0.alpha.19/ServerComms",
+		"Highlighter"     : "dynamic/1.0.alpha.19/Highlighter",
 		"orion/code_edit" : "orion/12.0/code_edit/built-codeEdit-amd",
 		"vscode/languageclient" : "languageclient/2.5.0/main"
     }

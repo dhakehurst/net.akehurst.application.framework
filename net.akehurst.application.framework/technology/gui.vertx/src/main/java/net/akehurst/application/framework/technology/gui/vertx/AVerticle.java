@@ -43,6 +43,7 @@ import io.vertx.ext.web.sstore.LocalSessionStore;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
@@ -67,25 +68,30 @@ public class AVerticle implements Verticle {
 
 		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
-			switch (channelId) {
-				case "IGuiNotification.notifyEventOccured": {
-					String stageIdStr = data.getString("stageId");
-					stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
-					final StageIdentity stageId = new StageIdentity(stageIdStr);
-					final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
-					final String eventType = data.getString("eventType");
-					final String elementId = data.getString("elementId");
-					final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
+			try {
+				switch (channelId) {
+					case "IGuiNotification.notifyEventOccured": {
+						String stageIdStr = data.getString("stageId");
+						stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
+						final StageIdentity stageId = new StageIdentity(stageIdStr);
+						final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
+						final String dialogIdStr = data.getString("dialogId");
+						final DialogIdentity dialogId = null == dialogIdStr ? null : new DialogIdentity(dialogIdStr);
+						final String eventType = data.getString("eventType");
+						final String elementId = data.getString("elementId");
+						final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
 
-					this.ws.portGui().out(IGuiNotification.class)
-							.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
+						this.ws.portGui().out(IGuiNotification.class)
+								.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, dialogId, elementId, eventType), eventData));
+					}
+					break;
+
+					default:
+					break;
 				}
-				break;
-
-				default:
-				break;
+			} catch (final GuiException e) {
+				this.ws.logger.log(LogLevel.ERROR, e.getMessage(), e);
 			}
-
 		});
 
 		this.router.route(routePath).handler(CookieHandler.create());
@@ -107,18 +113,24 @@ public class AVerticle implements Verticle {
 
 		final String sockjsCommsPath = stagePath + this.ws.getSockjsPath() + "*";
 		this.comms.addSocksChannel(sockjsCommsPath, (session, channelId, data) -> {
-			if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-				String stageIdStr = data.getString("stageId");
-				stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
-				final StageIdentity stageId = new StageIdentity(stageIdStr);
-				final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
-				final String eventType = data.getString("eventType");
-				final String elementId = data.getString("elementId");
-				final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
-				this.ws.portGui().out(IGuiNotification.class)
-						.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, elementId, eventType), eventData));
-			} else {
-				// ??
+			try {
+				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
+					String stageIdStr = data.getString("stageId");
+					stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
+					final StageIdentity stageId = new StageIdentity(stageIdStr);
+					final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
+					final String dialogIdStr = data.getString("dialogId");
+					final DialogIdentity dialogId = null == dialogIdStr ? null : new DialogIdentity(dialogIdStr);
+					final String eventType = data.getString("eventType");
+					final String elementId = data.getString("elementId");
+					final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
+					this.ws.portGui().out(IGuiNotification.class)
+							.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, dialogId, elementId, eventType), eventData));
+				} else {
+					// ??
+				}
+			} catch (final GuiException e) {
+				this.ws.logger.log(LogLevel.ERROR, e.getMessage(), e);
 			}
 		});
 
@@ -292,9 +304,12 @@ public class AVerticle implements Verticle {
 
 		final String jsPath = this.ws.getJsPath() + "/*";
 		this.router.route(jsPath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
+		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + jsPath);
 
 		// TODO: replace jsPath with this once all my js code is ported
-		this.router.route("/lib/*").handler(StaticHandler.create("META-INF/resources/webjars"));
+		final String libPath = "/lib/*";
+		this.router.route(libPath).handler(StaticHandler.create("META-INF/resources/webjars"));
+		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + libPath);
 
 		final String downloadPath = this.ws.getDownloadPath() + ":filename";
 		this.router.route(downloadPath).handler(rc -> {

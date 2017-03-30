@@ -21,12 +21,9 @@ public class StageIdentity extends AbstractDataType {
 
 	public StageIdentity(final String value) {
 		super(value);
-		this.value = value;
 	}
 
-	String value;
-
 	public String asPrimitive() {
-		return this.value;
+		return (String) super.getIdentityValues().get(0);
 	}
 }

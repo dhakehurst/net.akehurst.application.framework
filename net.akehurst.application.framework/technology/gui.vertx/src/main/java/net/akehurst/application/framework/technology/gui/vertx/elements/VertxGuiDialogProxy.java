@@ -23,6 +23,7 @@ import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
@@ -38,18 +39,19 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class VertxGuiDialogProxy implements InvocationHandler, IIdentifiableObject {
 
-	public VertxGuiDialogProxy(final String afId, final IGuiRequest guiRequest, final IGuiScene scene, final String dialogId, final String content) {
+	public VertxGuiDialogProxy(final String afId, final IGuiRequest guiRequest, final IGuiScene scene, final DialogIdentity dialogId, final String content) {
+		this.afId = afId;
 		this.guiRequest = guiRequest;
 		this.scene = scene;
 		this.dialogId = dialogId;
 		this.content = content;
 	}
 
-	String afId;
-	IGuiRequest guiRequest;
-	IGuiScene scene;
-	String dialogId;
-	String content;
+	final private String afId;
+	final private IGuiRequest guiRequest;
+	final private IGuiScene scene;
+	final private DialogIdentity dialogId;
+	final private String content;
 
 	@ServiceReference
 	IApplicationFramework af;
@@ -84,7 +86,7 @@ public class VertxGuiDialogProxy implements InvocationHandler, IIdentifiableObje
 			final Class<?> returnType = method.getReturnType();
 			if (method.getName().startsWith("get")) {
 				String elementName = method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4);
-				elementName = this.dialogId + "_" + elementName;
+				elementName = this.dialogId.asPrimitive() + "_" + elementName;
 
 				if (method.getParameterTypes().length == 1) {
 					final Class<?> pt = method.getParameterTypes()[0];
@@ -95,19 +97,19 @@ public class VertxGuiDialogProxy implements InvocationHandler, IIdentifiableObje
 				}
 
 				if (IGuiElement.class == returnType) {
-					return new VertxGuiElement(this.guiRequest, this.scene, elementName);
+					return new VertxGuiElement(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiContainer.class == returnType) {
-					return new VertxGuiContainer(this.guiRequest, this.scene, elementName);
+					return new VertxGuiContainer(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiText.class == returnType) {
-					return new VertxGuiText(this.guiRequest, this.scene, elementName);
+					return new VertxGuiText(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiChart.class == returnType) {
-					return new VertxGuiChart(this.guiRequest, this.scene, elementName);
+					return new VertxGuiChart(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiTable.class == returnType) {
-					return new VertxGuiTable(this.guiRequest, this.scene, elementName);
+					return new VertxGuiTable(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiEditor.class == returnType) {
-					return new VertxGuiEditor(this.guiRequest, this.scene, elementName);
+					return new VertxGuiEditor(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiDiagram.class == returnType) {
-					return new VertxGuiDiagram(this.guiRequest, this.scene, elementName);
+					return new VertxGuiDiagram(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else {
 					return null;
 				}

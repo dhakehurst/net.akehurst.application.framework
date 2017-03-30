@@ -75,7 +75,7 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 	private String userNamePattern;
 
 	@Override
-	public void requestLogin(final UserSession session, final String username, final String password, final String encoding) {
+	public void requestLogin(final UserSession session, final String username, final String password) {
 		super.submit("requestLogin", () -> {
 
 			try {

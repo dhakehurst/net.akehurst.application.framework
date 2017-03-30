@@ -18,6 +18,7 @@ package net.akehurst.application.framework.technology.gui.vertx.elements;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTable;
@@ -26,8 +27,8 @@ import net.akehurst.application.framework.technology.interfaceGui.data.table.IGu
 
 public class VertxGuiTable extends VertxGuiElement implements IGuiTable {
 
-	public VertxGuiTable(final IGuiRequest guiRequest, final IGuiScene scene, final String elementName) {
-		super(guiRequest, scene, elementName);
+	public VertxGuiTable(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
+		super(guiRequest, scene, dialog, elementName);
 	}
 
 	@Override
@@ -54,11 +55,11 @@ public class VertxGuiTable extends VertxGuiElement implements IGuiTable {
 
 	@Override
 	public void appendRow(final UserSession session, final Map<String, Object> rowData) {
-		this.guiRequest.tableAppendRow(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, rowData);
+		this.getGuiRequest().tableAppendRow(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), rowData);
 	}
 
 	@Override
 	public void removeRow(final UserSession session, final String rowId) {
-		this.guiRequest.tableRemoveRow(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, rowId);
+		this.getGuiRequest().tableRemoveRow(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), rowId);
 	}
 }

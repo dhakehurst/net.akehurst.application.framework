@@ -51,7 +51,7 @@ public interface IGuiScene extends IIdentifiableObject {
 	 */
 	void onEvent(UserSession session, GuiEventSignature eventSignature, OnEventHandler handler);
 
-	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, String modalId, String title, String dialogContent);
+	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, DialogIdentity dialogId, String title, String dialogContent);
 
 	/**
 	 *
@@ -60,4 +60,6 @@ public interface IGuiScene extends IIdentifiableObject {
 	 * @return
 	 */
 	IGuiElement getElement(String elementName);
+
+	IGuiDialog getDialog(DialogIdentity dialogId);
 }

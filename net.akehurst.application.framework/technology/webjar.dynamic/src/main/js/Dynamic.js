@@ -154,6 +154,16 @@ define([
 		return data
 	}
 	
+	Dynamic.prototype.fetchDialogId = function(el) {
+		let dialog = el.closest('dialog')
+		if (null==dialog) {
+			return null
+		} else {
+			let dialogId = $(dialog).attr('id')
+			return dialogId
+		}
+		
+	}
 	
 	Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChannelId) {
 		var dyn = this
@@ -171,8 +181,9 @@ define([
 		var sceneId = this.sceneId
 		$(el).on(eventType, function(event) {
 			event.stopPropagation()
-			var data = dy.fetchEventData(this)
-			var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, elementId:elementId, eventType:eventType, eventData:data}
+			let data = dy.fetchEventData(this)
+			let dialogId = dy.fetchDialogId(this)
+			var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, dialogId:dialogId, elementId:elementId, eventType:eventType, eventData:data}
 			console.log("event: "+outData)
 			dyn.commsSend(eventChannelId, outData)
 		})
@@ -409,7 +420,8 @@ define([
 			var cy = cytoscape({
 				container : parent,
 				elements : data.elements,
-				style : data.style
+				style : data.style,
+				layout: data.layout
 			})
 		
 			cy.on('tap', 'node', {}, function(evt) {

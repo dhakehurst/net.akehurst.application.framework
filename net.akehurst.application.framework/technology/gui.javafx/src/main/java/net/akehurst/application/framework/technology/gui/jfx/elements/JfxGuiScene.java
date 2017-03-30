@@ -34,6 +34,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeView;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
@@ -75,7 +76,7 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 			final SceneIdentity sceneId = null;
 			final String elementId = null;
 			final String eventType = null;
-			final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, elementId, eventType);
+			final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, elementId, eventType);
 			final Map<String, Object> eventData = new HashMap<>();
 			this.notifyEventOccured(new GuiEvent(session, signature, eventData));
 		});
@@ -216,8 +217,14 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 	}
 
 	@Override
-	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final String modalId, final String title,
+	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final DialogIdentity dialogId, final String title,
 			final String dialogContent) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IGuiDialog getDialog(final DialogIdentity dialogId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

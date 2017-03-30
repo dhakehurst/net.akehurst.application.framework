@@ -21,6 +21,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
@@ -30,11 +31,11 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 
-	public VertxGuiDialog(final String afId, final IGuiRequest guiRequest, final IGuiScene scene, final String dialogId, final String dialogContent) {
+	public VertxGuiDialog(final String afId, final IGuiRequest guiRequest, final IGuiScene scene, final DialogIdentity dialogId, final String dialogContent) {
 		super(afId, guiRequest, scene.getStageId(), scene.getSceneId());
 		this.scene = scene;
 		this.dialogId = dialogId;
-		this.dialogElementPrefix = this.dialogId + "_";
+		this.dialogElementPrefix = this.dialogId.asPrimitive() + "_";
 		this.dialogContent = dialogContent;
 	}
 
@@ -42,20 +43,25 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 	ILogger logger;
 
 	private final IGuiScene scene;
-	private final String dialogId;
+	private final DialogIdentity dialogId;
 	private final String dialogElementPrefix;
 	private final String dialogContent;
+
+	@Override
+	public DialogIdentity getId() {
+		return this.dialogId;
+	}
 
 	@Override
 	public void show(final UserSession session) {
 		final InputStream is = this.getClass().getClassLoader().getResourceAsStream(this.dialogContent + ".html");
 		final String content = this.readAndPrefixIds(is);
-		this.guiRequest.showDialog(session, this.stageId, this.sceneId, this.dialogId, content);
+		this.getGuiRequest().showDialog(session, this.stageId, this.sceneId, this.getId(), content);
 	}
 
 	@Override
 	public void close(final UserSession session) {
-		this.guiRequest.removeElement(session, this.stageId, this.sceneId, this.dialogId);
+		this.getGuiRequest().removeElement(session, this.stageId, this.sceneId, this.dialogId.asPrimitive());
 	}
 
 	// TODO: create own set of event handlers, must unregister them when dialog closes

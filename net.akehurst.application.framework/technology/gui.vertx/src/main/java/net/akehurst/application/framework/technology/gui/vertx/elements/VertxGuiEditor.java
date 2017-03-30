@@ -16,6 +16,7 @@
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiEditor;
@@ -23,8 +24,8 @@ import net.akehurst.application.framework.technology.interfaceGui.data.editor.IG
 
 public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
 
-	public VertxGuiEditor(final IGuiRequest guiRequest, final IGuiScene scene, final String elementName) {
-		super(guiRequest, scene, elementName);
+	public VertxGuiEditor(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
+		super(guiRequest, scene, dialog, elementName);
 	}
 
 	IGuiLanguageService languageService;
@@ -32,12 +33,15 @@ public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
 	@Override
 	public void add(final UserSession session, final String initialContent, final IGuiLanguageService languageService) {
 		this.languageService = languageService;
-		super.guiRequest.addEditor(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, initialContent, languageService);
+		super.getGuiRequest().addEditor(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), initialContent,
+				languageService);
+
 		this.onEvent(session, "editor.InputChanged", (e) -> {
-			final String text = (String) e.getDataItem(this.elementName);
+			final String text = (String) e.getDataItem(this.getElementId());
 			final String jsonParseTreeData = this.languageService.update(text);
-			super.guiRequest.updateParseTree(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, jsonParseTreeData);
+			super.getGuiRequest().updateParseTree(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonParseTreeData);
 		});
+
 	}
 
 }
