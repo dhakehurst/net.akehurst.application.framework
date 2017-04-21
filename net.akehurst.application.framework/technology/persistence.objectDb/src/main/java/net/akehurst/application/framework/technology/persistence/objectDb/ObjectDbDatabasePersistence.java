@@ -69,6 +69,11 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	};
 
 	@Override
+	public void disconnect() {
+		this.entityManager.close();
+	}
+
+	@Override
 	public IPersistenceTransaction startTransaction() {
 		// TODO Auto-generated method stub
 		return null;

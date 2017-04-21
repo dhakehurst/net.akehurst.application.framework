@@ -18,12 +18,17 @@ package net.akehurst.application.framework.technology.interfaceGui.data.table;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 
-public interface IGuiTable {
+public interface IGuiTable extends IGuiElement {
+
+	// <C, R> IGuiTableData<C, R> getData(UserSession session);
 
 	<C, R> void setData(UserSession session, IGuiTableData<C, R> data);
 
 	void appendRow(UserSession session, Map<String, Object> rowData);
 
 	void removeRow(UserSession session, String rowId);
+
+	void clearAllRows(UserSession session);
 }

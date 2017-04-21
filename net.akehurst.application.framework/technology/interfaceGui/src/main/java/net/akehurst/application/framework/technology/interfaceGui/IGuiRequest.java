@@ -19,7 +19,6 @@ import java.net.URL;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageService;
 
 public interface IGuiRequest {
 
@@ -59,20 +58,24 @@ public interface IGuiRequest {
 	void removeElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
 
 	/**
-	 * clean the content of an element, but leave it present
+	 * clear the content of an element, but leave it present
 	 *
 	 * @param session
 	 * @param stageId
 	 * @param sceneId
 	 * @param elementId
 	 */
-	void clearElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
+	void elementClear(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
+
+	void elementDisable(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
 
 	void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String text);
 
 	void setText(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
 
-	void addDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
+	void createDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
+
+	void updateDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 
 	void set(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
 
@@ -80,10 +83,11 @@ public interface IGuiRequest {
 
 	void tableRemoveRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, String rowId);
 
+	void tableClearAllRows(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
+
 	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId, String dialogContent);
 
-	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent,
-			IGuiLanguageService languageDefinition);
+	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent, String languageId);
 
 	void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
 			final String jsonParseTreeData);

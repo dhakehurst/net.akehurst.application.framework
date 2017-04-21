@@ -41,17 +41,11 @@ public class test_LdapAuthenticator extends AbstractTestCase {
 			final UserSession session = new UserSession("test-session", user);
 
 			super.perform(this.testContext.tc1.handler.authenticatorRequest, IAuthenticatorRequest::requestLogin, session, "username", "password");
-			super.sleep(200);
+			super.delay(200);
 			super.expect(this.testContext.tc1.handler, IAuthenticatorNotification::notifyAuthenticationSuccess, session);
 
 			super.play();
-
-			try {
-				Thread.sleep(1000);
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
-			}
-
+			super.sleep(1000);
 			super.verify();
 
 		} catch (final ApplicationFrameworkException e) {

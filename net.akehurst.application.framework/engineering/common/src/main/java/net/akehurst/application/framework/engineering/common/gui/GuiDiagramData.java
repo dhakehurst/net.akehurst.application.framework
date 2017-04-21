@@ -16,6 +16,12 @@ import net.akehurst.application.framework.technology.interfaceGui.data.diagram.I
 
 public class GuiDiagramData implements IGuiDiagramData {
 
+	public GuiDiagramData() {
+		this.style = "";
+		this.layout = new HashMap<>();
+		this.graph = new GuiGraph();
+	}
+
 	/**
 	 *
 	 * @param styleReader
@@ -59,18 +65,18 @@ public class GuiDiagramData implements IGuiDiagramData {
 		return this.layout;
 	}
 
-	public IGuiGraphNode addNode(final IGuiGraphNode parent, final String identity, final String... types) {
-		final IGuiGraphNode node = new GuiGraphNode(identity, parent, types);
+	public IGuiGraphNode addNode(final IGuiGraphNode parent, final String identity, final String... classes) {
+		final IGuiGraphNode node = new GuiGraphNode(identity, parent, classes);
 		this.graph.getNodes().put(identity, node);
 		return node;
 	}
 
 	public IGuiGraphEdge addEdge(final String identity, final IGuiGraphNode parent, final String sourceNodeId, final String targetNodeId,
-			final String... types) {
+			final String... classes) {
 		final IGuiGraphNode source = this.getGraph().getNodes().get(sourceNodeId);
 		final IGuiGraphNode target = this.getGraph().getNodes().get(targetNodeId);
 
-		final IGuiGraphEdge edge = new GuiGraphEdge(identity, parent, source, target, types);
+		final IGuiGraphEdge edge = new GuiGraphEdge(identity, parent, source, target, classes);
 		this.graph.getEdges().put(identity, edge);
 		return edge;
 	}

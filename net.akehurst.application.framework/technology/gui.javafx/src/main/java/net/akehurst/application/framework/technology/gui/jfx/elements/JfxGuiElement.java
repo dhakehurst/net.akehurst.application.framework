@@ -68,6 +68,12 @@ public class JfxGuiElement implements IGuiElement {
 	}
 
 	@Override
+	public void disable(final UserSession session, final boolean value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
 			final Object content) {
 		// TODO Auto-generated method stub

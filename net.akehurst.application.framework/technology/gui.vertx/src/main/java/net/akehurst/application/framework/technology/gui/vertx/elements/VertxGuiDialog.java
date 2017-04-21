@@ -33,7 +33,7 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 
 	public VertxGuiDialog(final String afId, final IGuiRequest guiRequest, final IGuiScene scene, final DialogIdentity dialogId, final String dialogContent) {
 		super(afId, guiRequest, scene.getStageId(), scene.getSceneId());
-		this.scene = scene;
+		// this.scene = scene;
 		this.dialogId = dialogId;
 		this.dialogElementPrefix = this.dialogId.asPrimitive() + "_";
 		this.dialogContent = dialogContent;
@@ -42,7 +42,7 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 	@ServiceReference
 	ILogger logger;
 
-	private final IGuiScene scene;
+	// private final IGuiScene scene;
 	private final DialogIdentity dialogId;
 	private final String dialogElementPrefix;
 	private final String dialogContent;
@@ -76,7 +76,24 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 			final String key = me.getKey();
 			final String newKey = key.substring(len);
 			final Object value = me.getValue();
-			newEventData.put(newKey, value);
+			if (value instanceof List) {
+				final ArrayList<Object> newList = new ArrayList<>();
+				for (final Object lv : (List<Object>) value) {
+					if (lv instanceof Map) {
+						final Map<String, Object> newMap = new HashMap<>();
+						for (final Map.Entry<String, Object> lvme : ((Map<String, Object>) lv).entrySet()) {
+							final String newMapKey = lvme.getKey().substring(len);
+							newMap.put(newMapKey, lvme.getValue());
+						}
+						newList.add(newMap);
+					} else {
+						newList.add(lv);
+					}
+				}
+				newEventData.put(newKey, newList);
+			} else {
+				newEventData.put(newKey, value);
+			}
 		}
 		final GuiEvent newEvent = new GuiEvent(event.getSession(), event.getSignature(), newEventData);
 		super.notifyEventOccured(newEvent);
@@ -103,7 +120,7 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 					while (itt.hasNext()) {
 						final Attribute att = itt.next();
 						final String localName = att.getName().getLocalPart();
-						if ("id".equals(localName) || "for".equals(localName)) {
+						if ("id".equals(localName) || "for".equals(localName) || "data-ref".equals(localName)) {
 							final String value = this.dialogElementPrefix + att.getValue();
 							final Attribute newAtt = eventFactory.createAttribute(localName, value);
 							newAtts.add(newAtt);

@@ -108,6 +108,12 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	};
 
 	@Override
+	public void disconnect() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public IPersistenceTransaction startTransaction() {
 		return null;
 	}

@@ -21,6 +21,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.xml.bind.DatatypeConverter;
 
+import net.akehurst.application.framework.common.annotations.declaration.ExternalConnection;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
@@ -41,6 +42,7 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 		super(afId);
 	}
 
+	@ExternalConnection
 	public IAuthenticatorNotification authenticationNotification;
 
 	@ConfiguredValue(defaultValue = "ldap://...")
@@ -162,7 +164,8 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 	@Override
 	public void requestLogout(final UserSession session) {
 		super.submit("requestLogout", () -> {
-			this.authenticationNotification.notifyAuthenticationCleared(session);
+			final UserSession clearedSession = new UserSession(session.getId(), null);
+			this.authenticationNotification.notifyAuthenticationCleared(clearedSession);
 		});
 	}
 

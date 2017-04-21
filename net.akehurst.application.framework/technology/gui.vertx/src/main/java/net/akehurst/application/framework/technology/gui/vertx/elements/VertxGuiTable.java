@@ -31,26 +31,17 @@ public class VertxGuiTable extends VertxGuiElement implements IGuiTable {
 		super(guiRequest, scene, dialog, elementName);
 	}
 
+	// @Override
+	// public <C, R> IGuiTableData<C, R> getData(final UserSession session) {
+	// this.getGuiRequest().
+	// }
+
 	@Override
 	public <C, R> void setData(final UserSession session, final IGuiTableData<C, R> data) {
-		// String tableData = "";
-		// for (final IGuiTableRow<C, R> row : data.getRows()) {
-		// final String rowId = this.elementName + "-" + row.getRow();
-		// tableData += "<tr id='" + rowId + "' >";
-		// for (final IGuiTableCell<C, R> cell : row.getCells()) {
-		// final String cellId = rowId + "-" + cell.getColumn();
-		// tableData += "<td id='" + cellId + "' >" + cell.getValue() + "</td>";
-		// }
-		// tableData += "</tr>";
-		// }
-		// final String newElementId = this.elementName + "_tbody";
-		// this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, newElementId, "tbody", "{}", tableData);
-
 		for (final IGuiTableRow<C, R> row : data.getRows()) {
 			final Map<String, Object> rowData = row.getData();
 			this.appendRow(session, rowData);
 		}
-
 	}
 
 	@Override
@@ -61,5 +52,10 @@ public class VertxGuiTable extends VertxGuiElement implements IGuiTable {
 	@Override
 	public void removeRow(final UserSession session, final String rowId) {
 		this.getGuiRequest().tableRemoveRow(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), rowId);
+	}
+
+	@Override
+	public void clearAllRows(final UserSession session) {
+		this.getGuiRequest().tableClearAllRows(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId());
 	}
 }

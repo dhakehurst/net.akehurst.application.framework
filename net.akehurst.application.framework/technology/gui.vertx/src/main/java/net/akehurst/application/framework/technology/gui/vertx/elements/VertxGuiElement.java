@@ -79,7 +79,12 @@ public class VertxGuiElement implements IGuiElement {
 
 	@Override
 	public void clear(final UserSession session) {
-		this.guiRequest.clearElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName);
+		this.guiRequest.elementClear(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName);
+	}
+
+	@Override
+	public void disable(final UserSession session, final boolean value) {
+		this.guiRequest.elementDisable(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, value);
 	}
 
 	@Override

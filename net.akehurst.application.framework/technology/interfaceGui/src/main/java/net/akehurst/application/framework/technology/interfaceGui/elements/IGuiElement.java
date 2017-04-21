@@ -28,6 +28,8 @@ public interface IGuiElement {
 
 	void clear(UserSession session);
 
+	void disable(UserSession session, boolean value);
+
 	void addSubElement(UserSession session, String newElementId, String newElementType, String attributes, Object content);
 
 	void createChart(final UserSession session, String chartId, String chartType, String jsonChartData, String jsonChartOptions);

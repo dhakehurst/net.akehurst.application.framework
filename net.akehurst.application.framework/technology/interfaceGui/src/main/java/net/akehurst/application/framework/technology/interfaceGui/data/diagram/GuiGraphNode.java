@@ -9,18 +9,18 @@ import net.akehurst.application.framework.common.annotations.declaration.DataTyp
 @DataType
 public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
 
-	public GuiGraphNode(final String identity, final IGuiGraphNode parent, final String... types) {
+	public GuiGraphNode(final String identity, final IGuiGraphNode parent, final String... classes) {
 		super(identity);
 		this.parent = parent;
-		this.types = types;
+		this.classes = classes;
 		this.data = new HashMap<>();
 		// add to data do they can be used in the styling
 		this.data.put("identity", identity);
 	}
 
 	private final IGuiGraphNode parent;
-	private final String[] types;
-	private final Map<String, String> data;
+	private final String[] classes;
+	private final Map<String, Object> data;
 
 	@Override
 	public String getIdentity() {
@@ -33,12 +33,12 @@ public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
 	}
 
 	@Override
-	public String[] getType() {
-		return this.types;
+	public String[] getClasses() {
+		return this.classes;
 	}
 
 	@Override
-	public Map<String, String> getData() {
+	public Map<String, Object> getData() {
 		return this.data;
 	}
 

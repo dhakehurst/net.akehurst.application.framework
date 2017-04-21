@@ -45,7 +45,7 @@ public class GuiEvent {
 		return this.eventData;
 	}
 
-	public Object getDataItem(final String key) {
-		return this.eventData.get(key);
+	public <T> T getDataItem(final String key) {
+		return (T) this.eventData.get(key);
 	}
 }

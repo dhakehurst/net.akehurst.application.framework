@@ -2,14 +2,11 @@ package net.akehurst.application.framework.engineering.gui.languageService;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 
 import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageService;
-import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiSyntaxHighlightDefinition;
 import net.akehurst.language.core.ILanguageProcessor;
 import net.akehurst.language.core.parser.IParseTree;
 import net.akehurst.language.core.parser.ParseFailedException;
@@ -29,12 +26,6 @@ public class GuiLanguageServiceFromProcessor implements IGuiLanguageService {
 	@Override
 	public String getIdentity() {
 		return this.processor.getGrammar().getName();
-	}
-
-	@Deprecated
-	@Override
-	public List<IGuiSyntaxHighlightDefinition> getSyntaxHighlighting() {
-		return new ArrayList<>();
 	}
 
 	@Override

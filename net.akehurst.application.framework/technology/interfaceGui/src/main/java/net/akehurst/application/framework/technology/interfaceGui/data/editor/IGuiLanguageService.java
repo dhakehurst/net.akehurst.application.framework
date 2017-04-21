@@ -1,12 +1,8 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.editor;
 
-import java.util.List;
-
 public interface IGuiLanguageService {
 
 	String getIdentity();
-
-	List<IGuiSyntaxHighlightDefinition> getSyntaxHighlighting();
 
 	void load();
 

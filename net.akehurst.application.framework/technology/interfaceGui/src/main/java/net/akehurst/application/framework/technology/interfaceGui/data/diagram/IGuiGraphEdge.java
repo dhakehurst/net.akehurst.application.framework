@@ -12,8 +12,8 @@ public interface IGuiGraphEdge {
 
 	IGuiGraphNode getTarget();
 
-	String[] getType();
+	String[] getClasses();
 
-	Map<String, String> getData();
+	Map<String, Object> getData();
 
 }

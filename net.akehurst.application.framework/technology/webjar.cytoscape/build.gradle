@@ -1,4 +1,6 @@
-
+dependencies {
+	compile 'org.webjars.bower:dagre:0.7.4'
+}
 
 jar {
 

@@ -9,13 +9,13 @@ import net.akehurst.application.framework.common.annotations.declaration.DataTyp
 @DataType
 public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 
-	public GuiGraphEdge(final String identity, final IGuiGraphNode parent, final IGuiGraphNode source, final IGuiGraphNode target, final String... types) {
+	public GuiGraphEdge(final String identity, final IGuiGraphNode parent, final IGuiGraphNode source, final IGuiGraphNode target, final String... classes) {
 		super(identity);
 		this.parent = parent;
 		this.source = source;
 		this.target = target;
 
-		this.types = types;
+		this.classes = classes;
 		this.data = new HashMap<>();
 		// add to data do they can be used in the styling
 		this.data.put("identity", identity);
@@ -25,8 +25,8 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 	private final IGuiGraphNode source;
 	private final IGuiGraphNode target;
 
-	private final String[] types;
-	private final Map<String, String> data;
+	private final String[] classes;
+	private final Map<String, Object> data;
 
 	@Override
 	public String getIdentity() {
@@ -49,12 +49,12 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 	}
 
 	@Override
-	public String[] getType() {
-		return this.types;
+	public String[] getClasses() {
+		return this.classes;
 	}
 
 	@Override
-	public Map<String, String> getData() {
+	public Map<String, Object> getData() {
 		return this.data;
 	}
 

@@ -8,8 +8,8 @@ public interface IGuiGraphNode {
 
 	IGuiGraphNode getParent();
 
-	String[] getType();
+	String[] getClasses();
 
-	Map<String, String> getData();
+	Map<String, Object> getData();
 
 }

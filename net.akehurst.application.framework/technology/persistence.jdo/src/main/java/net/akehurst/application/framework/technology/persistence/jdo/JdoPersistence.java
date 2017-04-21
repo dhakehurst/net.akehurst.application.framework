@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.security.ProtectionDomain;
 import java.util.AbstractList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -497,6 +498,11 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
+	public void disconnect() {
+		this.factory.close();
+	}
+
+	@Override
 	public IPersistenceTransaction startTransaction() {
 		final PersistenceManager manager = this.factory.getPersistenceManager();
 		final JdoTransaction tx = new JdoTransaction(manager);
@@ -563,7 +569,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			final JdoTransaction tx = (JdoTransaction) transaction;
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
 			final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType, query.asPrimitive());
-			final Collection<T> res = (Collection<T>) jdoquery.execute();
+			final List<? extends Persistable> res = jdoquery.executeList();
 			if (res.isEmpty()) {
 				return null;
 			} else {
@@ -591,17 +597,21 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
 		final JdoTransaction tx = (JdoTransaction) transaction;
 		final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-		final Query<? extends Persistable> query = ((JdoTransaction) transaction).newQuery(enhancedType);
-		final Collection<T> res = (Collection<T>) query.execute();
-		final Set<T> result = res.stream().map((el) -> {
-			try {
-				final T item = (T) this.convertFromEnhanced(tx, enhancedType, el, itemType);
-				return item;
-			} catch (final Exception ex) {
-				throw new RuntimeException("Error mapping JDO enhanced object to un-enhanced", ex);
-			}
-		}).collect(Collectors.toSet());
-		return result;
+		final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType);
+		final List<? extends Persistable> res = jdoquery.executeList();
+		if (res.isEmpty()) {
+			return Collections.emptySet();
+		} else {
+			final Set<T> result = res.stream().map((el) -> {
+				try {
+					final T item = (T) this.convertFromEnhanced(tx, enhancedType, el, itemType);
+					return item;
+				} catch (final Exception ex) {
+					throw new RuntimeException("Error mapping JDO enhanced object to un-enhanced", ex);
+				}
+			}).collect(Collectors.toSet());
+			return result;
+		}
 	}
 
 	// ---------- Ports ---------

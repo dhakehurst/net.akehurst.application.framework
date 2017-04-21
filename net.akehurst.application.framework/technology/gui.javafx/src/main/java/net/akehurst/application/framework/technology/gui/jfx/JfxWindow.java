@@ -51,7 +51,6 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
-import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageService;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class JfxWindow extends AbstractComponent implements IGuiRequest {
@@ -200,7 +199,14 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void clearElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+	public void elementClear(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void elementDisable(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final boolean value) {
 		// TODO Auto-generated method stub
 
 	}
@@ -249,6 +255,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void tableClearAllRows(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void chartCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
 			final String chartType, final String jsonChartData, final String jsonChartOptions) {
 		// TODO Auto-generated method stub
@@ -263,7 +275,14 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void addDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+	public void createDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+			final String jsonDiagramData) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void updateDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String jsonDiagramData) {
 		// TODO Auto-generated method stub
 
@@ -271,7 +290,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void addEditor(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String initialContent, final IGuiLanguageService languageDefinition) {
+			final String initialContent, final String languageId) {
 		// TODO Auto-generated method stub
 
 	}

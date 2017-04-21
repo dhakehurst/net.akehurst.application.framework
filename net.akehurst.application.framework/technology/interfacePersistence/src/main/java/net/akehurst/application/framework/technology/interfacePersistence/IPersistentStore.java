@@ -24,6 +24,8 @@ public interface IPersistentStore extends IIdentifiableObject {
 
 	void connect(Map<String, Object> properties);
 
+	void disconnect();
+
 	IPersistenceTransaction startTransaction();
 
 	void commitTransaction(IPersistenceTransaction transaction);

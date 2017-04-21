@@ -1,0 +1,10 @@
+
+
+jar {
+
+	from ("${projectDir}/src/main/web", {
+		into "META-INF/resources/webjars/adminLTE/2.3.0"
+		include "**/*"
+	})
+
+}

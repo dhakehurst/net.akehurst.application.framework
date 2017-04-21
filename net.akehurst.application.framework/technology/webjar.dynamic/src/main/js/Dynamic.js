@@ -81,19 +81,22 @@ define([
 		
 		// cache created editors so we can find them again
 		this.editors = {}
+		this.diagrams = {}
 		this.highlighter = {}
 	}
 	
 	Dynamic.prototype.fetchEventData = function(el) {
 	//TODO: not sure if this is quite what we want!
 		var d1 = this.fetchEventData1(el,'tr')
-		var d2 = this.fetchEventData1(el,'fieldset')
-		var data = $.extend({}, d1, d2)
+		var d2 = this.fetchEventData1(el,'fieldset') //legacy now replaced with div.event-group (mainly because browser support for fieldset css/flex is broken on some browsers)
+		var d3 = this.fetchEventData1(el,'event-group')
+		var data = $.extend({}, d1, d2, d3)
 		return data
 	}
 	Dynamic.prototype.fetchEventData1 = function(el, type) {
-		var data = {}
-		var p = el.closest(type)
+		let data = {}
+		let type_or_class = type+', .'+type
+		let p = el.closest(type_or_class)
 		if (null!=this.form) {
 			for(i=0; i< this.form.length; i++) {
 				let id = this.form[i].id
@@ -122,15 +125,23 @@ define([
 				let entries = []
 				for(var r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
 					var row = tbl.rows[r]
-					var e = {}
-					for(var c=0; c<row.cells.length; c++) {
-						var cell = row.cells[c]
-						var th = $(tbl).find('th').eq($(cell).index())
-						var key = th.attr('id')
-						var value = $(cell).text()
-						e[key] = value
+					if ($(row).hasClass('table-row-template')) {
+						// don't add the template
+					} else {
+						var e = {}
+						for(var c=0; c<row.cells.length; c++) {
+							var cell = row.cells[c]
+							var th = $(tbl).find('th').eq($(cell).index())
+							if(th[0].hasAttribute('id')) {
+								var key = th.attr('id')
+								var value = $(cell).text()
+								e[key] = value
+							} else {
+								//don't add vlaue if can't get an id/key
+							}
+						}
+						entries.push(e)
 					}
-					entries.push(e)
 				}
 				let id = tbl.id
 				data[id] = entries
@@ -147,7 +158,7 @@ define([
 			for(i=0; i< eds.length; i++) {
 				let ed = eds[i]
 				let id = ed.id
-				let value = this.editors[id].editor.getTextView().getText()
+				let value = this.editors[id].getText()
 				data[id] = value
 			}
 		}
@@ -169,7 +180,13 @@ define([
 		var dyn = this
 		//first try element identity
 		var el = $('#'+elementId)
+		//if not found, try find an element with attribute data-ref=elementId
+		// used in cases where multiple elements take the same ref/id (e.g. table rows)
+		if (el.length == 0) {
+			el = $('[data-ref='+elementId+']')
+		}
 		//if not found, try a class name
+		//depricate this...use data-ref instead
 		if (el.length == 0) {
 			el = $('.'+elementId)
 		}
@@ -180,12 +197,16 @@ define([
 		var dy = this
 		var sceneId = this.sceneId
 		$(el).on(eventType, function(event) {
-			event.stopPropagation()
-			let data = dy.fetchEventData(this)
-			let dialogId = dy.fetchDialogId(this)
-			var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, dialogId:dialogId, elementId:elementId, eventType:eventType, eventData:data}
-			console.log("event: "+outData)
-			dyn.commsSend(eventChannelId, outData)
+			try {
+				event.stopPropagation()
+				let data = dy.fetchEventData(this)
+				let dialogId = dy.fetchDialogId(this)
+				var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, dialogId:dialogId, elementId:elementId, eventType:eventType, eventData:data}
+				console.log("event: "+outData)
+				dyn.commsSend(eventChannelId, outData)
+			} catch (err) {
+				console.log("Error: "+err.message)
+			}
 		})
 	}
 	
@@ -268,12 +289,22 @@ define([
 		}
 	}
 	
-	Dynamic.prototype.clearElement = function(elementId) {
+	Dynamic.prototype.elementClear = function(elementId) {
 		var el = $('#'+elementId)
 		if (el.length == 0) {
 			console.log('Error: cannot find element with id ' + elementId)
 		} else {
-			el.empty()
+			$(el).empty()
+			return 'ok'
+		}
+	}
+	
+	Dynamic.prototype.elementDisable = function(elementId, value) {
+		var el = $('#'+elementId)
+		if (el.length == 0) {
+			console.log('Error: cannot find element with id ' + elementId)
+		} else {
+			$(el).prop('disabled', value)
 			return 'ok'
 		}
 	}
@@ -296,7 +327,7 @@ define([
 		} else {
 			var rowTemplate = $(table).find('tr.table-row-template')
 			if (rowTemplate.length ==0) {
-				console.log('Error: table does not define a table-row-template' + tableId)
+				console.log('Error: table does not define a table-row-template ' + tableId)
 			} else {
 				let rowTemplateHtml = $(rowTemplate)[0].outerHTML
 				let row = rowData
@@ -310,7 +341,6 @@ define([
 		}
 	}
 	
-	
 	Dynamic.prototype.tableRemoveRow = function(tableId, rowId) {
 		var table = $('#'+tableId)
 		if (table.length == 0) {
@@ -320,85 +350,40 @@ define([
 		}
 	}
 	
-	Dynamic.prototype.addEditor = function(parentId, contentType, initialContent, languageDefinition) {
+	Dynamic.prototype.tableClearAllRows = function(tableId) {
+		var table = $('#'+tableId)
+		if (table.length == 0) {
+			console.log('Error: cannot find table element with id ' + tableId)
+		} else {
+			$(table).find('tbody').find('tr').not('.table-row-template').remove()
+		}
+	}
+	
+	
+	Dynamic.prototype.createEditor = function(parentId, languageId, initialContent) {
 		let dynamic = this
-				
-		let editor = $('#'+parentId)
-		if (editor.length == 0) {
+		if ($('#'+parentId).length == 0) {
 			console.log('Error: cannot find element with id ' + parentId)
 		} else {
-		
-			require(["orion/code_edit"], function() {
-				require([
-					"orion/codeEdit",
-					"orion/Deferred",
-					"orion/EventTarget",
-					"orion/editor/annotations",
-					"Highlighter"
-				], function(
-				    mCodeEdit,
-				    Deferred,
-				    EventTarget,
-				    mAnnotations,
-				    mHighlighter
-				) {
-					let codeEdit = new mCodeEdit()
-					
-					dynamic.highlighter = new mHighlighter.Highlighter()
-				//	let highlighterServiceImpl = {
-				//		setContentType: function(contentType) {
-				//		}
-				//	}
-				//	EventTarget.attach(highlighterServiceImpl)
-				//	codeEdit.serviceRegistry.registerService(
-				//		"orion.edit.highlighter",
-				//		highlighterServiceImpl,
-				//		{ type: "highlighter",
-				//		  contentType: contentType
-				//		}
-				//	)
-					dynamic.highlighter.addEventListener("StyleReady", function(styleReadyEvent) {
-						styleReadyEvent.type = "orion.edit.highlighter.styleReady"
-					//	highlighterServiceImpl.dispatchEvent(styleReadyEvent)
-					})
-					
-					codeEdit.serviceRegistry.registerService(
-						"orion.edit.contentAssist",
-						{
-							computeProposals: function(buffer, offset, context) {
-							}
-						},
-						{
-							name: languageDefinition.identity+' content assist',
-							contentTypes: [contentType]
-						}
-					)
-					
-					codeEdit.create({
-						parent: parentId
-					}).then(function(editorViewer) {
-						editorViewer.setContents(initialContent, contentType)
-						dynamic.editors[parentId] = editorViewer
-					    editorViewer.editor.addEventListener("InputChanged", function(evt) {
-					        if(evt.contentsSaved) {
-						    	//Save your editor contents;
-							}
-							$(editor).trigger( "editor.InputChanged", evt )
-					    });
-
-					    dynamic.highlighter.setAnnotationModel(editorViewer)
-					})
-					
-				})
+			require(["Editor"],function(Editor) {
+				let ed = new Editor(parentId, languageId, initialContent)
+				dynamic.editors[parentId] = ed
 			})
 		}
-		
 	}
 	
 	Dynamic.prototype.updateParseTree = function(id, parseTree) {
-		this.highlighter.update(parseTree)
+		var dynamic = this
+		
+		let ed = this.editors[id]
+		if (null!=d) {
+			ed.updateParseTree(parseTree)
+		} else {
+			console.log('Cannot find Editor for id = '+parentId)
+		}
+		
 	}
-	
+		
 	
 	Dynamic.prototype.addChart = function(parentId, chartId, chartType, chartData, chartOptions) {
 		require(["chartjs"],function(){
@@ -412,27 +397,27 @@ define([
 		})
 	}
 	
-	Dynamic.prototype.addDiagram = function(parentId, data) {
+	Dynamic.prototype.createDiagram = function(parentId, data) {
 		var dynamic = this
-
-		require(["cytoscape"],function(cytoscape) {
-			var parent = document.getElementById(parentId)
-			var cy = cytoscape({
-				container : parent,
-				elements : data.elements,
-				style : data.style,
-				layout: data.layout
+		if ($('#'+parentId).length == 0) {
+			console.log('Error: cannot find element with id ' + parentId)
+		} else {		
+			require(["Diagram"],function(Diagram) {
+				let d = new Diagram(parentId, data)
+				dynamic.diagrams[parentId] = d
 			})
+		}
+	}
+
+	Dynamic.prototype.updateDiagram = function(parentId, data) {
+		var dynamic = this
 		
-			cy.on('tap', 'node', {}, function(evt) {
-				var nodeId = evt.cyTarget.id()
-				var data = dynamic.fetchEventData(parent)
-				data['nodeId'] = nodeId
-				var outData = {stageId: dynamic.stageId, sceneId: dynamic.sceneId, elementId:parentId, eventType:'tap', eventData:data}
-				dynamic.commsSend('IGuiNotification.notifyEventOccured', outData)
-			})
-		})
-
+		let d = this.diagrams[parentId]
+		if (null!=d) {
+			d.update(data)
+		} else {
+			console.log('Cannot find Diagram for id = '+parentId)
+		}
 	}
 	
 	Dynamic.prototype.commsSend = function(name, data) {
@@ -467,8 +452,11 @@ define([
 		this.serverComms.registerHandler('Gui.removeElement', function(args) {
 			dynamic.removeElement(args.elementId)
 		})
-		this.serverComms.registerHandler('Gui.clearElement', function(args) {
-			dynamic.clearElement(args.elementId)
+		this.serverComms.registerHandler('Gui.elementClear', function(args) {
+			dynamic.elementClear(args.elementId)
+		})
+		this.serverComms.registerHandler('Gui.elementDisable', function(args) {
+			dynamic.elementDisable(args.elementId, args.value)
 		})
 		this.serverComms.registerHandler('Gui.requestRecieveEvent', function(args) {
 			console.log("requestRecieveEvent "+JSON.stringify(args))
@@ -492,11 +480,15 @@ define([
 			console.log("Table.removeRow "+JSON.stringify(args))
 			dynamic.tableRemoveRow(args.tableId, args.rowId)
 		})
+		this.serverComms.registerHandler('Table.clearAllRows', function(args) {
+			console.log("Table.clearAllRows "+JSON.stringify(args))
+			dynamic.tableClearAllRows(args.tableId)
+		})
 		
 		//Editors
 		this.serverComms.registerHandler('Editor.addEditor', function(args) {
 			console.log("Editor.addEditor "+JSON.stringify(args))
-			dynamic.addEditor(args.parentId, args.contentType, args.initialContent, args.languageDefinition)
+			dynamic.createEditor(args.parentId, args.languageId, args.initialContent)
 		})
 		this.serverComms.registerHandler('Editor.updateParseTree', function(args) {
 			console.log("Editor.updateParseTree "+JSON.stringify(args))
@@ -508,9 +500,13 @@ define([
 			console.log("addChart "+JSON.stringify(args))
 			dynamic.addChart(args.parentId, args.chartId, args.chartType, args.chartData, args.chartOptions)
 		})
-		this.serverComms.registerHandler('Gui.addDiagram', function(args) {
-			console.log("addDiagram "+JSON.stringify(args))
-			dynamic.addDiagram(args.parentId, args.data)
+		this.serverComms.registerHandler('Gui.createDiagram', function(args) {
+			console.log("createDiagram "+JSON.stringify(args))
+			dynamic.createDiagram(args.parentId, args.data)
+		})
+		this.serverComms.registerHandler('Gui.updateDiagram', function(args) {
+			console.log("updateDiagram "+JSON.stringify(args))
+			dynamic.updateDiagram(args.parentId, args.data)
 		})
 		
 		//2d Canvas

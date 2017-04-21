@@ -16,9 +16,9 @@
 
 
 dependencies {
-	compile project(":${rootProject.name}.technology.interfaceLogging")
-
-	compile 'org.apache.logging.log4j:log4j-api:2.8.2'
-	compile 'org.apache.logging.log4j:log4j-core:2.8.2'
-	runtime 'org.apache.logging.log4j:log4j-1.2-api:2.8.2'
+	
+	compile project(":${rootProject.name}.technology.interfaceAuthentication")
+	compile project(":${rootProject.name}.common.realisation")
+	
+	testCompile project(":${rootProject.name}.common.test")
 }

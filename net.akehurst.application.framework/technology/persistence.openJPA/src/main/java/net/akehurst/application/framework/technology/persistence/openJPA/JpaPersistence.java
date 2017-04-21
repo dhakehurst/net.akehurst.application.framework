@@ -68,6 +68,11 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	};
 
 	@Override
+	public void disconnect() {
+		this.emf.close();
+	}
+
+	@Override
 	public IPersistenceTransaction startTransaction() {
 		final EntityManager em = this.emf.createEntityManager();
 		final EntityTransaction transaction = em.getTransaction();

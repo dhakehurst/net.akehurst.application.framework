@@ -35,9 +35,15 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 	}
 
 	@Override
-	public void add(final UserSession session, final IGuiDiagramData content) {
-		final String jsonDiagramData = this.createJsonString(content);
-		super.getGuiRequest().addDiagram(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
+	public void create(final UserSession session, final IGuiDiagramData initialContent) {
+		final String jsonDiagramData = this.createJsonString(initialContent);
+		super.getGuiRequest().createDiagram(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
+	}
+
+	@Override
+	public void update(final UserSession session, final IGuiDiagramData newContent) {
+		final String jsonDiagramData = this.createJsonString(newContent);
+		super.getGuiRequest().updateDiagram(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
 	}
 
 	@Override
@@ -79,13 +85,13 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 		if (null != node.getParent()) {
 			data.put("parent", node.getParent().getIdentity());
 		}
-		for (final Map.Entry<String, String> me : node.getData().entrySet()) {
+		for (final Map.Entry<String, Object> me : node.getData().entrySet()) {
 			data.put(me.getKey(), me.getValue());
 		}
 
 		jnode.put("data", data);
 		String classes = "";
-		for (final String c : node.getType()) {
+		for (final String c : node.getClasses()) {
 			classes += c + " ";
 		}
 		jnode.put("classes", classes);
@@ -103,7 +109,7 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 		data.put("source", srcId);
 		data.put("target", tgtId);
 
-		for (final Map.Entry<String, String> me : edge.getData().entrySet()) {
+		for (final Map.Entry<String, Object> me : edge.getData().entrySet()) {
 			data.put(me.getKey(), me.getValue());
 		}
 

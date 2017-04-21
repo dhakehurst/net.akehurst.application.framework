@@ -1,3 +1,22 @@
+dependencies {
+//	compile 'org.webjars.bower:cytoscape:2.7.9'
+//	compile 'org.webjars.bower:cytoscape-dagre:1.3.0'
+
+	compile 'org.webjars.npm:graphlib:2.1.1'
+	compile 'org.webjars:lodash:3.10.1'
+	compile 'org.webjars.bower:dagre:0.7.4'
+	compile 'org.webjars.bower:backbone:1.3.3'
+	compile 'org.webjars.bower:jointjs:1.0.3'
+	
+	compile 'org.webjars:chartjs:2.4.0'
+	
+ 	compile 'org.webjars:sockjs-client:1.1.1'
+	
+	compile 'org.webjars:cryptojs:3.1.2'
+
+	compile project(":${rootProject.name}.technology.webjar.orion")
+	//compile 'org.webjars.npm:monaco-editor:0.8.3'
+}
 
 
 jar {

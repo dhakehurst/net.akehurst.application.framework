@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import org.easymock.EasyMock;
 import org.easymock.IExpectationSetters;
@@ -38,6 +40,10 @@ public class AbstractTestCase {
 		R apply(T t, P1 p1, P2 p2, P3 p3);
 	}
 
+	public interface Func4<T, R, P1, P2, P3, P4> {
+		R apply(T t, P1 p1, P2 p2, P3 p3, P4 p4);
+	}
+
 	public interface Proc0<T> {
 		void call(T t);
 	}
@@ -64,6 +70,25 @@ public class AbstractTestCase {
 		EasyMock.expectLastCall().once();
 	}
 
+	public <TO extends T, T, P1, P2> void expect(final TO toObj, final Proc2<T, P1, P2> proc, final P1 p1, final P2 p2) {
+		this.mocks.add(toObj);
+		proc.call(toObj, p1, p2);
+		EasyMock.expectLastCall().once();
+	}
+
+	public <TO extends T, T, P1, P2, P3> void expect(final TO toObj, final Proc3<T, P1, P2, P3> func, final P1 p1, final P2 p2, final P3 p3) {
+		this.mocks.add(toObj);
+		func.call(toObj, p1, p2, p3);
+		EasyMock.expectLastCall().once();
+	}
+
+	public <TO extends T, T, P1, P2, P3, P4> void expect(final TO toObj, final Proc4<T, P1, P2, P3, P4> func, final P1 p1, final P2 p2, final P3 p3,
+			final P4 p4) {
+		this.mocks.add(toObj);
+		func.call(toObj, p1, p2, p3, p4);
+		EasyMock.expectLastCall().once();
+	}
+
 	public <R, TO extends T, T, P1> IMockExpectation<R> expect(final TO toObj, final Func1<T, R, P1> func, final P1 p1) {
 		this.mocks.add(toObj);
 		func.apply(toObj, p1);
@@ -78,13 +103,7 @@ public class AbstractTestCase {
 
 	}
 
-	public <TO extends T, T, P1, P2> void expect(final TO toObj, final Proc2<T, P1, P2> proc, final P1 p1, final P2 p2) {
-		this.mocks.add(toObj);
-		proc.call(toObj, p1, p2);
-		EasyMock.expectLastCall().once();
-	}
-
-	public <R, TO extends T, T, P1, P2> IMockExpectation<R> expectR(final TO toObj, final Func2<T, R, P1, P2> func, final P1 p1, final P2 p2) {
+	public <R, TO extends T, T, P1, P2> IMockExpectation<R> expect(final TO toObj, final Func2<T, R, P1, P2> func, final P1 p1, final P2 p2) {
 		this.mocks.add(toObj);
 		func.apply(toObj, p1, p2);
 		final IExpectationSetters<R> easy = EasyMock.expectLastCall();
@@ -97,14 +116,32 @@ public class AbstractTestCase {
 		};
 	}
 
-	public <TO extends T, T, P1, P2, P3> void expect(final TO toObj, final Proc3<T, P1, P2, P3> func, final P1 p1, final P2 p2, final P3 p3) {
+	public <R, TO extends T, T, P1, P2, P3> IMockExpectation<R> expect(final TO toObj, final Func3<T, R, P1, P2, P3> func, final P1 p1, final P2 p2,
+			final P3 p3) {
 		this.mocks.add(toObj);
-		func.call(toObj, p1, p2, p3);
-		EasyMock.expectLastCall().once();
+		func.apply(toObj, p1, p2, p3);
+		final IExpectationSetters<R> easy = EasyMock.expectLastCall();
+		return new IMockExpectation<R>() {
+			@Override
+			public IMockExpectation<R> andReturn(final R returnValue) {
+				easy.andReturn(returnValue);
+				return this;
+			}
+		};
 	}
 
-	public <TO extends T, T, P1> void perform(final TO toObj, final Proc1<T, P1> func, final P1 p1) {
-		this.steps.add(() -> func.call(toObj, p1));
+	public <R, TO extends T, T, P1, P2, P3, P4> IMockExpectation<R> expect(final TO toObj, final Func4<T, R, P1, P2, P3, P4> func, final P1 p1, final P2 p2,
+			final P3 p3, final P4 p4) {
+		this.mocks.add(toObj);
+		func.apply(toObj, p1, p2, p3, p4);
+		final IExpectationSetters<R> easy = EasyMock.expectLastCall();
+		return new IMockExpectation<R>() {
+			@Override
+			public IMockExpectation<R> andReturn(final R returnValue) {
+				easy.andReturn(returnValue);
+				return this;
+			}
+		};
 	}
 
 	public <TO extends T, T, P1, P2> void perform(final TO toObj, final Proc2<T, P1, P2> func, final P1 p1, final P2 p2) {
@@ -120,7 +157,28 @@ public class AbstractTestCase {
 		this.steps.add(() -> func.call(toObj, p1, p2, p3, p4));
 	}
 
-	public void sleep(final int milliseconds) {
+	public <TO extends T, T, P1> void perform(final TO toObj, final Proc1<T, P1> func, final P1 p1) {
+		this.steps.add(() -> func.call(toObj, p1));
+	}
+
+	public <R, TO extends T, T, P1> Future<R> perform(final TO toObj, final Func1<T, R, P1> func, final P1 p1) {
+		final FutureTask<R> result = new FutureTask<>(() -> func.apply(toObj, p1));
+		this.steps.add(() -> result.run());
+		return result;
+	}
+
+	public <R, TO extends T, T, P1, P2> Future<R> perform(final TO toObj, final Func2<T, R, P1, P2> func, final P1 p1, final P2 p2) {
+		final FutureTask<R> result = new FutureTask<>(() -> func.apply(toObj, p1, p2));
+		this.steps.add(() -> result.run());
+		return result;
+	}
+
+	/**
+	 * cause a delay in the scenario playback for the given number of milliseconds
+	 *
+	 * @param milliseconds
+	 */
+	public void delay(final int milliseconds) {
 		this.steps.add(() -> {
 			try {
 				Thread.sleep(milliseconds);
@@ -136,6 +194,19 @@ public class AbstractTestCase {
 			r.run();
 		}
 
+	}
+
+	/**
+	 * put the current thread to sleep for the given number of milliseconds
+	 *
+	 * @param milliseconds
+	 */
+	public void sleep(final long milliseconds) {
+		try {
+			Thread.sleep(1000);
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void verify() {
