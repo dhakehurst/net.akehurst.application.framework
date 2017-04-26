@@ -158,8 +158,10 @@ define([
 			for(i=0; i< eds.length; i++) {
 				let ed = eds[i]
 				let id = ed.id
-				let value = this.editors[id].getText()
-				data[id] = value
+				if (id in this.editors) {
+					let value = this.editors[id].getText()
+					data[id] = value
+				}
 			}
 		}
 		return data
@@ -319,44 +321,63 @@ define([
 		}
 	}
 	
+	Dynamic.prototype.tableAddColumn = function(tableId, colHeaderContent, rowTemplateCellContent, existingRowCellContent) {
+		require(["Table"],function(Table) {
+			let t = new Table(tableId)
+			t.addColumn(colHeaderContent, rowTemplateCellContent, existingRowCellContent);
+		})
+	}
 	
 	Dynamic.prototype.tableAppendRow = function(tableId, rowData) {
-		var table = $('#'+tableId)
-		if (table.length == 0) {
-			console.log('Error: cannot find table element with id ' + tableId)
-		} else {
-			var rowTemplate = $(table).find('tr.table-row-template')
-			if (rowTemplate.length ==0) {
-				console.log('Error: table does not define a table-row-template ' + tableId)
-			} else {
-				let rowTemplateHtml = $(rowTemplate)[0].outerHTML
-				let row = rowData
-				let tpl = eval('`'+rowTemplateHtml+'`');
-				let tbody = $(table).find('tbody')
-				let tr = $(tpl)
-				$(tr).removeClass('table-row-template')
-				$(tbody).append(tr)
-				rowTemplate[0].cloneEventsTo(tr[0])
-			}
-		}
+		require(["Table"],function(Table) {
+			let t = new Table(tableId)
+			t.appendRow(rowData);
+		});
+		
+//		var table = $('#'+tableId)
+//		if (table.length == 0) {
+//			console.log('Error: cannot find table element with id ' + tableId)
+//		} else {
+//			var rowTemplate = $(table).find('tr.table-row-template')
+//			if (rowTemplate.length ==0) {
+//				console.log('Error: table does not define a table-row-template ' + tableId)
+//			} else {
+//				let rowTemplateHtml = $(rowTemplate)[0].outerHTML
+//				let row = rowData
+//				let tpl = eval('`'+rowTemplateHtml+'`');
+//				let tbody = $(table).find('tbody')
+//				let tr = $(tpl)
+//				$(tr).removeClass('table-row-template')
+//				$(tbody).append(tr)
+//				rowTemplate[0].cloneEventsTo(tr[0])
+//			}
+//		}
 	}
 	
 	Dynamic.prototype.tableRemoveRow = function(tableId, rowId) {
-		var table = $('#'+tableId)
-		if (table.length == 0) {
-			console.log('Error: cannot find table element with id ' + tableId)
-		} else {
-			$(table).find('#'+rowId).remove()
-		}
+		require(["Table"],function(Table) {
+			let t = new Table(tableId)
+			t.removeRow(rowId);
+		});
+//		var table = $('#'+tableId)
+//		if (table.length == 0) {
+//			console.log('Error: cannot find table element with id ' + tableId)
+//		} else {
+//			$(table).find('#'+rowId).remove()
+//		}
 	}
 	
 	Dynamic.prototype.tableClearAllRows = function(tableId) {
-		var table = $('#'+tableId)
-		if (table.length == 0) {
-			console.log('Error: cannot find table element with id ' + tableId)
-		} else {
-			$(table).find('tbody').find('tr').not('.table-row-template').remove()
-		}
+		require(["Table"],function(Table) {
+			let t = new Table(tableId)
+			t.clearAllRows();
+		});
+//		var table = $('#'+tableId)
+//		if (table.length == 0) {
+//			console.log('Error: cannot find table element with id ' + tableId)
+//		} else {
+//			$(table).find('tbody').find('tr').not('.table-row-template').remove()
+//		}
 	}
 	
 	
@@ -472,6 +493,10 @@ define([
 		})
 		
 		//Tables
+		this.serverComms.registerHandler('Table.addColumn', function(args) {
+			console.log("Table.addColumn "+JSON.stringify(args))
+			dynamic.tableAddColumn(args.tableId, args.colHeaderContent, args.rowTemplateCellContent, args.existingRowCellContent)
+		})
 		this.serverComms.registerHandler('Table.appendRow', function(args) {
 			console.log("Table.appendRow "+JSON.stringify(args))
 			dynamic.tableAppendRow(args.tableId, args.rowData)

@@ -321,6 +321,20 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void tableAddColumn(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId,
+			final String colHeaderContent, final String rowTemplateCellContent, final String existingRowCellContent) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("tableId", tableId);
+		data.put("colHeaderContent", colHeaderContent);
+		data.put("rowTemplateCellContent", rowTemplateCellContent);
+		data.put("existingRowCellContent", existingRowCellContent);
+
+		this.verticle.comms.send(session, "Table.addColumn", data);
+	}
+
+	@Override
 	public void tableAppendRow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId,
 			final Map<String, Object> rowData) {
 		final JsonObject data = new JsonObject();

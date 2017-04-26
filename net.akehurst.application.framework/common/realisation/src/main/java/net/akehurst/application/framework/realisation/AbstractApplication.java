@@ -132,6 +132,7 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 			}
 
 			final List<IActiveObject> objects = super.afActiveParts();
+			this.logger.log(LogLevel.TRACE, "Active Parts: %s", objects);
 
 			for (final IActiveObject ao : objects) {
 				ao.afStart();

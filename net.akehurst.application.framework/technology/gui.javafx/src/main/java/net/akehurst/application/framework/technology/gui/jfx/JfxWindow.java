@@ -242,6 +242,13 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void tableAddColumn(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final String colHeaderContent, final String rowTemplateCellContent, final String existingRowCellContent) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void tableAppendRow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId,
 			final Map<String, Object> rowData) {
 		// TODO Auto-generated method stub

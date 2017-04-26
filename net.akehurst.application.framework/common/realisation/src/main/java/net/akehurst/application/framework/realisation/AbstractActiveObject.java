@@ -61,8 +61,21 @@ abstract public class AbstractActiveObject implements IActiveObject {
 	}
 
 	protected List<IActiveObject> afActiveParts() throws IllegalArgumentException, IllegalAccessException {
+		final List<IActiveObject> objects = this.afActiveParts(this.getClass());
+
+		return objects;
+	}
+
+	private List<IActiveObject> afActiveParts(final Class<?> class_) throws IllegalArgumentException, IllegalAccessException {
 		final List<IActiveObject> objects = new ArrayList<>();
-		for (final Field f : this.getClass().getDeclaredFields()) {
+
+		if (null == class_.getSuperclass()) {
+		} else {
+			final List<IActiveObject> superObjs = this.afActiveParts(class_.getSuperclass());
+			objects.addAll(superObjs);
+		}
+
+		for (final Field f : class_.getDeclaredFields()) {
 			f.setAccessible(true);
 			final ComponentInstance annC = f.getAnnotation(ComponentInstance.class);
 			final ActiveObjectInstance annAO = f.getAnnotation(ActiveObjectInstance.class);

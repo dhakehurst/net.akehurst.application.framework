@@ -33,6 +33,7 @@ require.config({
 		'jointjs-loader-hack': 'dynamic/1.0.alpha.19/jointjs-loader-hack',
 		"crypto.pbkdf2"   : "cryptojs/3.1.2/rollups/pbkdf2",
 		"crypto.aes"      : "cryptojs/3.1.2/rollups/aes",
+		"Table"         : "dynamic/1.0.alpha.19/Table",
 		"Diagram"         : "dynamic/1.0.alpha.19/Diagram",
 		"Editor"         : "dynamic/1.0.alpha.19/Editor",
 		"Dynamic"         : "dynamic/1.0.alpha.19/Dynamic",
@@ -63,7 +64,8 @@ require.config({
     }	
 });
 
-require(['jquery','Dynamic','css!styles/normalize'],function($, Dynamic){
+//require(['jquery','Dynamic','css!styles/normalize'],function($, Dynamic){
+require(['jquery','Dynamic'],function($, Dynamic){
 
 	$(document).ready(function() {
 		 new Dynamic(rootPath, stageId)

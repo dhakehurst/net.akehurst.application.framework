@@ -79,6 +79,9 @@ public interface IGuiRequest {
 
 	void set(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
 
+	void tableAddColumn(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String colHeaderContent,
+			String rowTemplateCellContent, String existingRowCellContent);
+
 	void tableAppendRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, Map<String, Object> rowData);
 
 	void tableRemoveRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, String rowId);
@@ -98,4 +101,5 @@ public interface IGuiRequest {
 	<X, Y> void chartAddDataItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId, String seriesName, X x, Y y);
 
 	void authenticate(UserSession session) throws GuiException;
+
 }

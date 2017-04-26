@@ -26,6 +26,8 @@ public interface IGuiTable extends IGuiElement {
 
 	<C, R> void setData(UserSession session, IGuiTableData<C, R> data);
 
+	void addColumn(UserSession session, String colHeaderContent, String rowTemplateCellContent, String existingRowCellContent);
+
 	void appendRow(UserSession session, Map<String, Object> rowData);
 
 	void removeRow(UserSession session, String rowId);
