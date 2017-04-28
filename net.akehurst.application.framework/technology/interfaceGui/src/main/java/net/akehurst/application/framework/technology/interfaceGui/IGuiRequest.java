@@ -22,7 +22,7 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiRequest {
 
-	void createStage(StageIdentity stageId, boolean authenticated, URL content);
+	void createStage(StageIdentity stageId, boolean authenticated, String rootPath);
 
 	<T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content);
 

@@ -67,7 +67,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	String rootPath;
 
 	String getNormalisedRootPath() {
-		return 0 == this.rootPath.length() ? "/" : "/" + this.rootPath + "/";
+		return 0 == this.rootPath.length() ? "/" : this.rootPath + "/";
 	}
 
 	@ConfiguredValue(defaultValue = "test/")
@@ -94,8 +94,15 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	@ConfiguredValue(defaultValue = "js")
 	String jsPath;
 
+	@ConfiguredValue(defaultValue = "lib", description = "The path to which webjar libraries are maped, i.e. js libs on the classpath")
+	String libPath;
+
 	String getJsPath() {
 		return this.getNormalisedRootPath() + this.jsPath;
+	}
+
+	String getLibPath() {
+		return this.getNormalisedRootPath() + this.libPath;
 	}
 
 	String getSockjsPath() {
@@ -140,7 +147,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void createStage(final StageIdentity stageId, final boolean authenticated, final URL contentRoot) {
+	public void createStage(final StageIdentity stageId, final boolean authenticated, final String contentRoot) {
 		try {
 			final Map<String, String> variables = new HashMap<>();
 			variables.put("rootPath", this.rootPath);
@@ -150,7 +157,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
 			final String stagePath = stageId.asPrimitive().isEmpty() ? "" : stageId.asPrimitive() + "/";
 
-			String str = contentRoot.toString();
+			String str = contentRoot;
 			if (str.endsWith("/")) {
 				str = str.substring(0, str.length() - 1);
 			}
@@ -206,7 +213,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	@Override
 	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
 		final JsonObject data = new JsonObject();
-		data.put("stageId", this.rootPath + stageId.asPrimitive());
+		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
 		data.put("sceneArguments", new JsonObject(new HashMap<String, Object>(sceneArguments)));
 		this.verticle.comms.send(session, "Gui.switchToScene", data);
@@ -216,7 +223,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
 			final String content) {
 		final JsonObject data = new JsonObject();
-		data.put("stageId", this.rootPath + stageId.asPrimitive());
+		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
 		data.put("parentId", "dialogs");
 		data.put("dialogId", dialogId.asPrimitive());

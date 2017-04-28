@@ -307,7 +307,7 @@ public class AVerticle implements Verticle {
 		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + jsPath);
 
 		// TODO: replace jsPath with this once all my js code is ported
-		final String libPath = "/lib/*";
+		final String libPath = this.ws.getLibPath() + "/*";
 		this.router.route(libPath).handler(StaticHandler.create("META-INF/resources/webjars"));
 		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + libPath);
 

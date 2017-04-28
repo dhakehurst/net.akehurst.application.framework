@@ -78,7 +78,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void createStage(final StageIdentity stageId, final boolean authenticated, final URL content) {
+	public void createStage(final StageIdentity stageId, final boolean authenticated, final String rootPath) {
 		Platform.runLater(() -> {
 			final Stage primary = new Stage();
 			primary.setTitle(stageId.asPrimitive());

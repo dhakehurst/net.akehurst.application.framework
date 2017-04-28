@@ -37,16 +37,5 @@ dependencies {
 	compile "io.vertx:vertx-auth-shiro:3.2.1"
 	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
 	
-	compile 'org.webjars:require-css:0.1.10'
-	compile 'org.webjars:normalize.css:5.0.0'
-	compile 'org.webjars:jquery:3.1.0'
- 	compile 'org.webjars:requirejs:2.3.1'
-
-
-
-	compile project(":${rootProject.name}.technology.webjar.languageclient")
-	compile project(":${rootProject.name}.technology.webjar.dynamic")
-	//compile project(":${rootProject.name}.technology.webjar.cytoscape")
-
 
 }

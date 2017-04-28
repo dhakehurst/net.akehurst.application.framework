@@ -34,7 +34,7 @@ public class TemplateStaticHandler extends StaticHandlerImpl {
 
 	@Override
 	protected void sendFile(final RoutingContext context, final String path, final FileProps fileProps) {
-		if (path.endsWith(".html")) {
+		if (path.endsWith(".html") || path.endsWith(".css")) {
 			// TODO maybe need to wrapInTCCLSwitch
 			final String content = this.getFileContent(path, context);
 			context.response().end(content);

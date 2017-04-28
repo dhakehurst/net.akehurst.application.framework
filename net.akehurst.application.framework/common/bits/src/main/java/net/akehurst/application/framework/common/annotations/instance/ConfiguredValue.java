@@ -24,6 +24,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfiguredValue {
 	String id() default "";
+
 	String defaultValue();
+
 	String service() default "configuration";
+
+	String description() default "";
 }

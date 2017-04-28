@@ -17,7 +17,7 @@
 "use strict"
 
 require.config({
-	baseUrl: "/lib",
+	baseUrl: rootPath+"/lib",
     paths: {
         "text"            : "requirejs-text/3.2.1/text",
         "jquery"          : "jquery/3.1.0/jquery.min",

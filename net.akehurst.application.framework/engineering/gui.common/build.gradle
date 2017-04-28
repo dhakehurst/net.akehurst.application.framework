@@ -17,4 +17,6 @@
 dependencies {
 	compile project(":${rootProject.name}.common.realisation")
 	compile project(":${rootProject.name}.technology.interfaceGui")
+	
+	compile project(":${rootProject.name}.technology.webjar.dynamic")
 }

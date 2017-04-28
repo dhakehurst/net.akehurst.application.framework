@@ -55,7 +55,7 @@ define([
 		}
 		var expectedStart = '/'
 		if (rootPath.length > 0) {
-			expectedStart += rootPath+'/'
+			expectedStart = rootPath+'/'
 		}
 		if (stageId.length > 0) {
 			expectedStart += stageId+'/'
@@ -146,6 +146,7 @@ define([
 				let id = tbl.id
 				data[id] = entries
 			}
+			// input from textareas
 			var tas = $(p).find('textarea.input')
 			for(i=0; i< tas.length; i++) {
 				let ta = tas[i]
@@ -153,6 +154,15 @@ define([
 				let value = $(ta).val()
 				data[id] = value
 			}
+			//input from select dropdowns
+			var selects = $(p).find('select.input')
+			for(i=0; i< selects.length; i++) {
+				let select = selects[i]
+				let id = select.id
+				let value = $('#'+id+' option:selected').val()
+				data[id] = value
+			}
+			
 			//check for input from editors
 			let eds = $(p).find('.editor.input')
 			for(i=0; i< eds.length; i++) {
@@ -214,15 +224,16 @@ define([
 	
 	Dynamic.prototype.switchToScene = function(stageId, sceneId,sceneArguments) {
 		var myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-		var pstageId = stageId + '/';
+		var prootPath = this.rootPath + '/'
+		var pstageId = stageId + '/'
 		if (stageId.length==0) {
 		   pstageId = ''
 		}
-		var psceneId = sceneId + '/';
+		var psceneId = sceneId + '/'
 		if (sceneId.length==0) {
 		   psceneId = ''
 		}
-		var newRef = myLocation + '/' + pstageId + psceneId
+		var newRef = myLocation + prootPath + pstageId + psceneId
 		var refArgs = ''
 			if (null!=sceneArguments && !jQuery.isEmptyObject(sceneArguments)) {
 				refArgs ='?'
