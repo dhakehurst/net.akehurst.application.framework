@@ -41,6 +41,7 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
@@ -135,15 +136,56 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void requestRecieveEvent(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
-			final String eventType) {
+			final GuiEventType eventType) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
 		data.put("elementId", elementId);
-		data.put("eventType", eventType);
+		final String jsEventType = this.convertToJsEvent(eventType);
+		data.put("eventType", jsEventType);
 
 		this.verticle.comms.send(session, "Gui.requestRecieveEvent", data);
 
+	}
+
+	static final String EVENT_STAGE_CREATED = "IGuiNotification.notifyStageCreated";
+	static final String EVENT_STAGE_CLOSED = "IGuiNotification.notifyStageClosed";
+	static final String EVENT_SCENE_LOADED = "IGuiNotification.notifySceneLoaded";
+
+	public GuiEventType convertToGuiEvent(final String eventType) {
+		switch (eventType) {
+			case "click":
+				return GuiEventType.CLICK;
+			case "oninput":
+				return GuiEventType.TEXT_CHANGE;
+			case EVENT_SCENE_LOADED:
+				return GuiEventType.SCENE_LOADED;
+			case EVENT_STAGE_CLOSED:
+				return GuiEventType.STAGE_CLOSED;
+			case EVENT_STAGE_CREATED:
+				return GuiEventType.STAGE_CREATED;
+			default:
+			break;
+		}
+		return null;
+	}
+
+	private String convertToJsEvent(final GuiEventType eventType) {
+		switch (eventType) {
+			case CLICK:
+				return "click";
+			case TEXT_CHANGE:
+				return "oninput";
+			case SCENE_LOADED:
+				return VertxWebsite.EVENT_SCENE_LOADED;
+			case STAGE_CLOSED:
+				return VertxWebsite.EVENT_STAGE_CLOSED;
+			case STAGE_CREATED:
+				return VertxWebsite.EVENT_STAGE_CREATED;
+			default:
+			break;
+		}
+		return null;
 	}
 
 	@Override
@@ -181,7 +223,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 				}, webroot, variables);
 			}
 
-			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, IGuiNotification.EVENT_STAGE_CREATED);
+			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CREATED);
 			final Map<String, Object> eventData = new HashMap<>();
 			final GuiEvent event = new GuiEvent(null, signature, eventData);
 			this.portGui().out(IGuiNotification.class).notifyEventOccured(event);

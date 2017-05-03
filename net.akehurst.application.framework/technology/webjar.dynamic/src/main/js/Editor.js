@@ -61,10 +61,10 @@
 		        if(evt.contentsSaved) {
 			    	//Save your editor contents;
 				}
-		        $(self.parentEl).trigger( "editor.InputChanged", evt )
+		        $(self.parentEl).trigger( "oninput", evt )
 		    });
 
-		    this.highlighter.setAnnotationModel(editorViewer)
+		    self.highlighter.setAnnotationModel(editorViewer)
 		})
 	}
 

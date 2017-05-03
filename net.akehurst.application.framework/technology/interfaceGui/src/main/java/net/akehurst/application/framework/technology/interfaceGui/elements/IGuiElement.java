@@ -16,6 +16,7 @@
 package net.akehurst.application.framework.technology.interfaceGui.elements;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 
 public interface IGuiElement {
@@ -24,7 +25,7 @@ public interface IGuiElement {
 
 	void set(UserSession session, String propertyName, Object value);
 
-	void onEvent(UserSession session, String eventName, OnEventHandler handler);
+	void onEvent(UserSession session, GuiEventType eventType, OnEventHandler handler);
 
 	void clear(UserSession session);
 

@@ -20,7 +20,7 @@ import net.akehurst.application.framework.common.AbstractDataType;
 public class GuiEventSignature extends AbstractDataType {
 
 	public GuiEventSignature(final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId, final String elementId,
-			final String eventType) {
+			final GuiEventType eventType) {
 		super(stageId, sceneId, dialogId, elementId, eventType);
 		this.stageId = stageId;
 		this.sceneId = sceneId;
@@ -30,32 +30,29 @@ public class GuiEventSignature extends AbstractDataType {
 	}
 
 	private final StageIdentity stageId;
+	private final SceneIdentity sceneId;
+	private final DialogIdentity dialogId;
+	private final String elementId;
 
 	public StageIdentity getStageId() {
 		return this.stageId;
 	}
 
-	private final SceneIdentity sceneId;
-
 	public SceneIdentity getSceneId() {
 		return this.sceneId;
 	}
-
-	private final DialogIdentity dialogId;
 
 	public DialogIdentity getDialogId() {
 		return this.dialogId;
 	}
 
-	private final String elementId;
-
 	public String getElementId() {
 		return this.elementId;
 	}
 
-	private final String eventType;
+	private final GuiEventType eventType;
 
-	public String getEventType() {
+	public GuiEventType getEventType() {
 		return this.eventType;
 	}
 }

@@ -51,13 +51,22 @@ abstract public class AbstractActiveObject implements IActiveObject {
 	@Override
 	public void afStart() {
 		this.logger.log(LogLevel.TRACE, "AbstractActiveObject.afStart");
-		this.thread = new Thread(() -> this.afRun(), this.afId());
+		this.thread = new Thread(() -> {
+			this.afRun();
+			this.logger.log(LogLevel.TRACE, "Finished");
+		}, this.afId());
 		this.thread.start();
 	}
 
 	@Override
 	public void afJoin() throws InterruptedException {
+		this.logger.log(LogLevel.TRACE, "Waiting for %s to Finish", this.afId());
 		this.thread.join();
+	}
+
+	@Override
+	public void afInterrupt() {
+		this.thread.interrupt();
 	}
 
 	protected List<IActiveObject> afActiveParts() throws IllegalArgumentException, IllegalAccessException {

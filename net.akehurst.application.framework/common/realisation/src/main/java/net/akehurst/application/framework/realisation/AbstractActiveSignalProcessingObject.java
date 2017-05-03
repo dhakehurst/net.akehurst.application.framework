@@ -36,12 +36,14 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 
 	public AbstractActiveSignalProcessingObject(final String afId) {
 		super(afId);
+		this.terminateRequested = false;
 		this.signals = new LinkedBlockingQueue<>();
 	}
 
 	@ConfiguredValue(defaultValue = "1")
 	Integer numThreads;
 
+	boolean terminateRequested;
 	ExecutorService executor;
 
 	class NamedSignal<R> {
@@ -108,18 +110,21 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 			}
 
 			this.executor = Executors.newFixedThreadPool(this.numThreads, new NamedThreadFactory(this.afId(), this.logger));
-			while (true) {
+			while (!this.terminateRequested) {
 				try {
 					final NamedSignal<?> ns = this.signals.take();
-					this.executor.submit(() -> {
-						try {
-							this.logger.log(LogLevel.TRACE, ns.name);
-							ns.future.run();
-						} catch (final Throwable ex) {
-							this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
-						}
-					});
-
+					if (this.executor.isShutdown()) {
+						this.logger.log(LogLevel.TRACE, "Shutdown, not executing task %s", ns.name);
+					} else {
+						this.executor.submit(() -> {
+							try {
+								this.logger.log(LogLevel.TRACE, ns.name);
+								ns.future.run();
+							} catch (final Throwable ex) {
+								this.logger.log(LogLevel.ERROR, ex.getMessage(), ex);
+							}
+						});
+					}
 				} catch (final InterruptedException ex) {
 					break;
 				} catch (final Throwable ex) {
@@ -137,6 +142,22 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 			this.logger.log(LogLevel.INFO, "Interrupted " + this.afId(), ex);
 		}
 
+	}
+
+	@Override
+	public void afInterrupt() {
+		this.terminateRequested = true;
+		this.submit("afInterrupt", () -> {
+		});
+		this.executor.shutdownNow();
+	}
+
+	@Override
+	public void afTerminate() {
+		this.terminateRequested = true;
+		this.submit("afTerminate", () -> {
+		});
+		this.executor.shutdown();
 	}
 
 	protected Future<Void> submit(final String name, final ISignal signal) {

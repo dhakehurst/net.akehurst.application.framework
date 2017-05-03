@@ -18,6 +18,7 @@ package net.akehurst.application.framework.technology.gui.vertx.elements;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
@@ -66,7 +67,7 @@ public class VertxGuiElement implements IGuiElement {
 	}
 
 	@Override
-	public void onEvent(final UserSession session, final String eventType, final OnEventHandler handler) {
+	public void onEvent(final UserSession session, final GuiEventType eventType, final OnEventHandler handler) {
 		this.guiRequest.requestRecieveEvent(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, eventType);
 		final DialogIdentity dialogId = null == this.dialog ? null : this.dialog.getId();
 		final GuiEventSignature eventSignature = new GuiEventSignature(this.scene.getStageId(), this.scene.getSceneId(), dialogId, this.elementName, eventType);

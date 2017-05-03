@@ -37,6 +37,7 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
@@ -75,7 +76,7 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 			final StageIdentity stageId = null;
 			final SceneIdentity sceneId = null;
 			final String elementId = null;
-			final String eventType = null;
+			final GuiEventType eventType = null;
 			final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, elementId, eventType);
 			final Map<String, Object> eventData = new HashMap<>();
 			this.notifyEventOccured(new GuiEvent(session, signature, eventData));

@@ -28,6 +28,7 @@ define([
 	}
 
 	Diagram.prototype.create = function(parentId) {
+		let self = this
 		try {
 		    let item = $('#'+parentId)
 	        let canvas = $("<div style='height:100%;width:100%;overflow-y:auto;overflow-x:auto;'></div>").appendTo(item)
@@ -37,13 +38,13 @@ define([
 	            el: $(canvas),
 	            height: $(item).height(),
 	            width: $(item).width(),
-	            model: this.graph,
+	            model: self.graph,
 	            gridSize: 1
 	        });
-	
+		    
 	        window.onresize = function(event) {
 	        	let el = $(item)
-	        	this.paper.setDimensions(el.width(), el.height())
+	        	self.paper.setDimensions(el.width(), el.height())
 	        }
 		} catch (err) {
 			console.log("Error: "+err.message)

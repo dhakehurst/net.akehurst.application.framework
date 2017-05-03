@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 
 import javafx.scene.Node;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 import net.akehurst.holser.reflect.BetterMethodFinder;
@@ -56,7 +57,7 @@ public class JfxGuiElement implements IGuiElement {
 	}
 
 	@Override
-	public void onEvent(final UserSession session, final String eventName, final OnEventHandler handler) {
+	public void onEvent(final UserSession session, final GuiEventType eventType, final OnEventHandler handler) {
 		// TODO Auto-generated method stub
 
 	}

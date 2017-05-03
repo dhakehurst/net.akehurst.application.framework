@@ -75,4 +75,9 @@ abstract public class AbstractComponent extends AbstractActiveObject implements 
 			this.logger.log(LogLevel.ERROR, "Failed to run component " + this.afId(), ex);
 		}
 	}
+
+	@Override
+	public void afTerminate() {
+		// no need to do anything, default run behaviour will terminate on its own
+	}
 }

@@ -19,9 +19,6 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiNotification {
 
-	static final String EVENT_STAGE_CREATED = "IGuiNotification.notifyStageCreated";
-	static final String EVENT_SCENE_LOADED = "IGuiNotification.notifySceneLoaded";
-
 	void notifyReady();
 
 	void notifyEventOccured(GuiEvent event);

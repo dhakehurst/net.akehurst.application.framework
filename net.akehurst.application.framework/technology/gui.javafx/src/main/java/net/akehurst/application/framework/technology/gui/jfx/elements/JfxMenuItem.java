@@ -21,6 +21,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiMenuItem;
 import net.akehurst.holser.reflect.BetterMethodFinder;
@@ -81,7 +82,7 @@ public class JfxMenuItem implements IGuiMenuItem {
 	}
 
 	@Override
-	public void onEvent(final UserSession session, final String eventName, final OnEventHandler handler) {
+	public void onEvent(final UserSession session, final GuiEventType eventType, final OnEventHandler handler) {
 		// TODO Auto-generated method stub
 
 	}

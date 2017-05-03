@@ -54,6 +54,10 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 
 	abstract protected void onStageCreated(GuiEvent event);
 
+	protected void onStageClosed(final GuiEvent event) {
+		this.afTerminate();
+	}
+
 	protected void onSceneLoaded(final GuiEvent event) {
 		try {
 			final SceneIdentity currentSceneId = event.getSignature().getSceneId();
@@ -101,25 +105,41 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 	public void notifyEventOccured(final GuiEvent event) {
 		super.submit("notifyEventOccured", () -> {
 
-			if (IGuiNotification.EVENT_STAGE_CREATED.equals(event.getSignature().getEventType())) {
-				this.onStageCreated(event);
-			} else if (IGuiNotification.EVENT_SCENE_LOADED.equals(event.getSignature().getEventType())) {
-				this.onSceneLoaded(event);
-			} else {
-				final SceneIdentity currentSceneId = event.getSignature().getSceneId();
-				final IGuiScene scene = this.getScene(currentSceneId);
-				if (null == scene) {
-					// scene not found...do nothing !
-					this.logger.log(LogLevel.DEBUG, "Scene %s not found for %s", currentSceneId, this.afId());
-				} else {
-					final DialogIdentity dialogId = event.getSignature().getDialogId();
-					if (null == dialogId) {
-						scene.notifyEventOccured(event);
+			switch (event.getSignature().getEventType()) {
+
+				case SCENE_LOADED:
+					this.onSceneLoaded(event);
+				break;
+
+				case STAGE_CLOSED:
+					this.onStageClosed(event);
+				break;
+
+				case STAGE_CREATED:
+					this.onStageCreated(event);
+				break;
+
+				case CLICK:
+				case TEXT_CHANGE:
+				default: {
+					final SceneIdentity currentSceneId = event.getSignature().getSceneId();
+					final IGuiScene scene = this.getScene(currentSceneId);
+					if (null == scene) {
+						// scene not found...do nothing !
+						this.logger.log(LogLevel.DEBUG, "Scene %s not found for %s", currentSceneId, this.afId());
 					} else {
-						scene.getDialog(dialogId).notifyEventOccured(event);
+						final DialogIdentity dialogId = event.getSignature().getDialogId();
+						if (null == dialogId) {
+							scene.notifyEventOccured(event);
+						} else {
+							scene.getDialog(dialogId).notifyEventOccured(event);
+						}
 					}
 				}
+				break;
+
 			}
+
 		});
 	}
 

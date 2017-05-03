@@ -147,4 +147,9 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 		}
 	}
 
+	@Override
+	public void afTerminate() {
+		// no need to do anything, default run behaviour will terminate on its own
+	}
+
 }

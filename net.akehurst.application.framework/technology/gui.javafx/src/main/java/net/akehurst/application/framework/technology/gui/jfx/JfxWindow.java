@@ -23,6 +23,8 @@ import java.util.Map;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -44,6 +46,7 @@ import net.akehurst.application.framework.technology.gui.jfx.elements.JfxGuiScen
 import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
@@ -78,6 +81,13 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void afTerminate() {
+		Platform.runLater(() -> {
+			Platform.exit();
+		});
+	}
+
+	@Override
 	public void createStage(final StageIdentity stageId, final boolean authenticated, final String rootPath) {
 		Platform.runLater(() -> {
 			final Stage primary = new Stage();
@@ -85,7 +95,15 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 			this.stages.put(stageId, primary);
 
 			final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")));
-			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, IGuiNotification.EVENT_STAGE_CREATED);
+
+			primary.setOnCloseRequest((e) -> {
+				final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CLOSED);
+				final Map<String, Object> eventData = new HashMap<>();
+				final GuiEvent event = new GuiEvent(session, signature, eventData);
+				this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
+			});
+
+			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CREATED);
 			final Map<String, Object> eventData = new HashMap<>();
 			final GuiEvent event = new GuiEvent(session, signature, eventData);
 			this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
@@ -125,7 +143,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 				primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev) -> {
 					final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")));
-					final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, null, IGuiNotification.EVENT_SCENE_LOADED);
+					final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, null, GuiEventType.SCENE_LOADED);
 					final Map<String, Object> eventData = new HashMap<>();
 					final GuiEvent event = new GuiEvent(session, signature, eventData);
 					this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
@@ -164,18 +182,26 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void requestRecieveEvent(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
-			final String eventType) {
-		// Platform.runLater(() -> {
-		// Node n = this.primary.getScene().lookup("#" + elementId);
-		// EventType<Event> eventType;
-		// n.addEventHandler(eventType, (ev)->{
-		// GuiEventSignature signature = new GuiEventSignature(stageId, null, null, IGuiNotification.EVENT_SCENE_LOADED);
-		// Map<String, Object> eventData = new HashMap<>();
-		// GuiEvent event = new GuiEvent(session, signature, eventData);
-		// portGui().out(IGuiNotification.class).notifyEventOccured(event);
-		// });
-		// });
+			final GuiEventType eventType) {
+		Platform.runLater(() -> {
+			final Stage stage = this.stages.get(stageId);
+			final Node n = stage.getScene().lookup("#" + elementId);
 
+			final EventType<Event> jfxEventType = this.convertToJfxEvent(eventType);
+
+			n.addEventHandler(jfxEventType, (ev) -> {
+				final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, elementId, eventType);
+				final Map<String, Object> eventData = new HashMap<>();
+				final GuiEvent event = new GuiEvent(session, signature, eventData);
+				this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
+			});
+		});
+
+	}
+
+	private EventType<Event> convertToJfxEvent(final GuiEventType eventType) {
+		// TODO:
+		return null;
 	}
 
 	@Override

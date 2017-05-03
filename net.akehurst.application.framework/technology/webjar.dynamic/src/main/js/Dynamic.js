@@ -204,7 +204,7 @@ define([
 		}
 		//if still not found then error
 		if (el.length == 0) {
-			console.log('Error: cannot find element with id or class ' + elementId)
+			console.log('Error: cannot find element with id or data-ref equal to ' + elementId)
 		}
 		var dy = this
 		var sceneId = this.sceneId
@@ -214,7 +214,7 @@ define([
 				let data = dy.fetchEventData(this)
 				let dialogId = dy.fetchDialogId(this)
 				var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, dialogId:dialogId, elementId:elementId, eventType:eventType, eventData:data}
-				console.log("event: "+outData)
+				console.log("event: "+JSON.stringify(outData))
 				dyn.commsSend(eventChannelId, outData)
 			} catch (err) {
 				console.log("Error: "+err.message)
@@ -408,7 +408,7 @@ define([
 		var dynamic = this
 		
 		let ed = this.editors[id]
-		if (null!=d) {
+		if (null!=ed) {
 			ed.updateParseTree(parseTree)
 		} else {
 			console.log('Cannot find Editor for id = '+parentId)
@@ -528,7 +528,7 @@ define([
 		})
 		this.serverComms.registerHandler('Editor.updateParseTree', function(args) {
 			console.log("Editor.updateParseTree "+JSON.stringify(args))
-			dynamic.updateParseTree(args.id, args.parseTree)
+			dynamic.updateParseTree(args.editorId, args.parseTree)
 		})
 		
 		//Charts

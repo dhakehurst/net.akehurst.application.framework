@@ -46,6 +46,7 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiCallback;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
@@ -77,7 +78,7 @@ public class AVerticle implements Verticle {
 						final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
 						final String dialogIdStr = data.getString("dialogId");
 						final DialogIdentity dialogId = null == dialogIdStr ? null : new DialogIdentity(dialogIdStr);
-						final String eventType = data.getString("eventType");
+						final GuiEventType eventType = this.ws.convertToGuiEvent(data.getString("eventType"));
 						final String elementId = data.getString("elementId");
 						final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
 
@@ -121,7 +122,7 @@ public class AVerticle implements Verticle {
 					final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
 					final String dialogIdStr = data.getString("dialogId");
 					final DialogIdentity dialogId = null == dialogIdStr ? null : new DialogIdentity(dialogIdStr);
-					final String eventType = data.getString("eventType");
+					final GuiEventType eventType = this.ws.convertToGuiEvent(data.getString("eventType"));
 					final String elementId = data.getString("elementId");
 					final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
 					this.ws.portGui().out(IGuiNotification.class)
