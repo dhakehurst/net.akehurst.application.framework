@@ -34,7 +34,8 @@ public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
 	 */
 	@Override
 	public void create(final UserSession session, final String languageId, final String initialContent) {
-		super.getGuiRequest().addEditor(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), initialContent, languageId);
+		super.getGuiRequest().editorCreate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), initialContent,
+				languageId);
 
 	}
 

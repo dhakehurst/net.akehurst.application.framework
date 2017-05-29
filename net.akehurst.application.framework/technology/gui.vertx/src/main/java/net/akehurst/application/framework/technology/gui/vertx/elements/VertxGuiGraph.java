@@ -23,53 +23,54 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
-import net.akehurst.application.framework.technology.interfaceGui.data.diagram.IGuiDiagram;
-import net.akehurst.application.framework.technology.interfaceGui.data.diagram.IGuiDiagramData;
+import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraph;
 import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraphEdge;
 import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraphNode;
+import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraphViewData;
+import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraphViewer;
 
-public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
+public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 
-	public VertxGuiDiagram(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
+	public VertxGuiGraph(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
 		super(guiRequest, scene, dialog, elementName);
 	}
 
 	@Override
-	public void create(final UserSession session, final IGuiDiagramData initialContent) {
+	public void create(final UserSession session, final IGuiGraphViewData initialContent) {
 		final String jsonDiagramData = this.createJsonString(initialContent);
-		super.getGuiRequest().diagramCreate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
+		super.getGuiRequest().graphCreate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
 	}
 
 	@Override
-	public void update(final UserSession session, final IGuiDiagramData newContent) {
+	public void update(final UserSession session, final IGuiGraphViewData newContent) {
 		final String jsonDiagramData = this.createJsonString(newContent);
 		super.getGuiRequest().diagramUpdate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
 	}
 
 	@Override
-	public void remove(final UserSession session, final IGuiDiagramData content) {
+	public void remove(final UserSession session, final IGuiGraphViewData content) {
 		// TODO Auto-generated method stub
 
 	}
 
-	String createJsonString(final IGuiDiagramData diagramData) {
+	String createJsonString(final IGuiGraphViewData graphData) {
 		final JsonObject json = new JsonObject();
 
-		json.put("elements", this.createElements(diagramData));
-		json.put("style", diagramData.getStyle());
-		json.put("layout", new JsonObject(diagramData.getLayout()));
+		json.put("elements", this.createElements(graphData.getGraph()));
+		json.put("style", graphData.getStyle());
+		json.put("layout", new JsonObject(graphData.getLayout()));
 
 		return json.encode();
 	}
 
-	private JsonArray createElements(final IGuiDiagramData diagramData) {
+	private JsonArray createElements(final IGuiGraph graph) {
 		final JsonArray jArr = new JsonArray();
 
-		for (final IGuiGraphNode node : diagramData.getGraph().getNodes().values()) {
+		for (final IGuiGraphNode node : graph.getNodes().values()) {
 			jArr.add(this.createNode(node));
 		}
 
-		for (final IGuiGraphEdge edge : diagramData.getGraph().getEdges().values()) {
+		for (final IGuiGraphEdge edge : graph.getEdges().values()) {
 			jArr.add(this.createEdge(edge));
 		}
 

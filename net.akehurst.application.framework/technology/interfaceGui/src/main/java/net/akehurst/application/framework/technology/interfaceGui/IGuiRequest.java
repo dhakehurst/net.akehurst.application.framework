@@ -22,16 +22,53 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiRequest {
 
-	void createStage(StageIdentity stageId, boolean authenticated, String rootPath);
+	/**
+	 *
+	 * @param stageId
+	 * @param rootPath
+	 * @param authenticationRedirectURL
+	 *            pass null for non authenticated roots
+	 */
+	void createStage(StageIdentity stageId, String rootPath, StageIdentity authenticationStageId, SceneIdentity authenticationSceneId);
 
 	<T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content);
+
+	/**
+	 * add authentication to the gui
+	 *
+	 * @param session
+	 * @throws GuiException
+	 */
+	void addAuthentication(UserSession session) throws GuiException;
+
+	/**
+	 * clear/remove authentication from the gui
+	 *
+	 * @param session
+	 * @throws GuiException
+	 */
+	void clearAuthentication(UserSession session) throws GuiException;
+
+	/**
+	 * if location starts with '/' then navigate to a location relative to the root of this site
+	 *
+	 * else
+	 *
+	 * assume a full URL and navigate to it
+	 *
+	 * @param session
+	 * @param location
+	 */
+	void navigateTo(UserSession session, String location);
 
 	void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId, Map<String, String> sceneArguments);
 
 	void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, GuiEventType eventType);
 
-	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, IGuiScene scene, DialogIdentity dialogId, String title,
+	<T extends IGuiDialog> T dialogCreate(Class<T> dialogClass, UserSession session, IGuiScene scene, DialogIdentity dialogId, String title,
 			String dialogContent);
+
+	void dialogShow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId, String dialogContent);
 
 	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type);
 
@@ -69,15 +106,15 @@ public interface IGuiRequest {
 
 	void elementDisable(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
 
+	void elementSetProperty(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
+
 	void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String text);
 
-	void setText(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
+	void textSetValue(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
 
-	void createDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
+	void diagramCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 
-	void updateDiagram(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
-
-	void set(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
+	void diagramUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 
 	void tableAddColumn(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String colHeaderContent,
 			String rowTemplateCellContent, String existingRowCellContent);
@@ -88,9 +125,7 @@ public interface IGuiRequest {
 
 	void tableClearAllRows(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
 
-	void showDialog(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId, String dialogContent);
-
-	void addEditor(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent, String languageId);
+	void editorCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent, String languageId);
 
 	void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
 			final String jsonParseTreeData);
@@ -100,6 +135,6 @@ public interface IGuiRequest {
 
 	<X, Y> void chartAddDataItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId, String seriesName, X x, Y y);
 
-	void authenticate(UserSession session) throws GuiException;
+	void graphCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
 
 }

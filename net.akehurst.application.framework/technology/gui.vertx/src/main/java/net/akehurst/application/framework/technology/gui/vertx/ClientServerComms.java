@@ -43,9 +43,10 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public class ClientServerComms {
 
-	public ClientServerComms(final Vertx vertx, final Router router, final AuthProvider authProvider, final String busPath) {
+	public ClientServerComms(final Vertx vertx, final Router router, final AuthProvider authProvider, final String rootPath, final String busPath) {
 		this.vertx = vertx;
 		this.router = router;
+		this.rootPath = rootPath;
 		this.authProvider = authProvider;
 		// for session comms
 		this.socks = new HashMap<>();
@@ -60,6 +61,7 @@ public class ClientServerComms {
 
 	Vertx vertx;
 	Router router;
+	String rootPath;
 	AuthProvider authProvider;
 
 	String busPath;
@@ -67,17 +69,18 @@ public class ClientServerComms {
 
 	Map<String, Session> activeSessions;
 
-	UserSession createTechSession(final Session session) {
-		this.activeSessions.put(session.id(), session);
+	UserSession createUserSession(final Session webSession) {
+		this.activeSessions.put(webSession.id(), webSession);
 		UserDetails user = null;
-		final UserHolder holder = session.get("__vertx.userHolder");
+		final UserHolder holder = webSession.get("__vertx.userHolder");
 		if (null != holder && null != holder.user) {
 			final String n = holder.user.principal().getString("username");
 			user = new UserDetails(n);
 		} else {
 			// not authenticated, leave user as null
 		}
-		return new UserSession(session.id(), user);
+		final UserSession us = new UserSession(webSession.id(), user, webSession.data());
+		return us;
 	}
 
 	Session getSession(final String sessionId) {
@@ -99,24 +102,33 @@ public class ClientServerComms {
 		void apply(T1 o1, T2 o2, T3 o3);
 	}
 
-	public void addSocksChannel(final String socksRoutePath, final F3<UserSession, String, JsonObject> handler) {
+	public void addSocksChannel(final boolean authenticated, final String authenticationRedirect, final String stagePath, final String sockjsPath,
+			final F3<UserSession, String, JsonObject> handler) {
+		final String socksRoutePath = stagePath + sockjsPath + "*";
+
 		this.router.route(socksRoutePath).handler(CookieHandler.create());
 		this.router.route(socksRoutePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
 		this.router.route(socksRoutePath)
 				.handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
 		this.router.route(socksRoutePath).handler(UserSessionHandler.create(this.authProvider));
+		if (authenticated) {
+			final String loginRedirectURL = this.rootPath.isEmpty() ? authenticationRedirect : this.rootPath + authenticationRedirect;
+			this.router.route(socksRoutePath).handler(new MyAuthHandler(this.authProvider, loginRedirectURL, this.rootPath));
+		}
+
 		final SockJSHandler sockJSHandler = SockJSHandler.create(this.vertx);
 		this.router.route(socksRoutePath).handler(sockJSHandler);
 		sockJSHandler.socketHandler(ss -> {
 			this.socks.put(ss.webSession(), ss);
-			final UserSession sess = this.createTechSession(ss.webSession());
+			final UserSession sess = this.createUserSession(ss.webSession());
 			ss.handler(b -> {
 				final String s = new String(b.getBytes());
 				System.out.println(s);
 				final JsonObject json = new JsonObject(s);
 				final String channelId = json.getString("channelId");
 				final JsonObject data = json.getJsonObject("data");
-				handler.apply(sess, channelId, data);
+				final UserSession us = sess;
+				handler.apply(us, channelId, data);
 			});
 		});
 	}

@@ -30,6 +30,7 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
 import net.akehurst.application.framework.technology.interfaceGui.data.diagram.IGuiDiagram;
 import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiEditor;
+import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraph;
 import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTable;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiContainer;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
@@ -110,6 +111,8 @@ public class VertxGuiDialogProxy implements InvocationHandler, IIdentifiableObje
 					return new VertxGuiEditor(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiDiagram.class == returnType) {
 					return new VertxGuiDiagram(this.guiRequest, this.scene, this.getHandler(), elementName);
+				} else if (IGuiGraph.class == returnType) {
+					return new VertxGuiGraph(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else {
 					return null;
 				}

@@ -1,4 +1,19 @@
-package net.akehurst.application.framework.service.authorisation;
+/**
+ * Copyright (C) 2016 Dr. David H. Akehurst (http://dr.david.h.akehurst.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package net.akehurst.application.framework.computational.authorisation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +28,12 @@ import net.akehurst.application.framework.common.annotations.instance.PortContra
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
+import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationActivity;
+import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationException;
+import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationSubject;
+import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationTarget;
+import net.akehurst.application.framework.computational.interfaceAccessControl.IAuthorisationRequest;
 import net.akehurst.application.framework.realisation.AbstractComponent;
-import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationActivity;
-import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationException;
-import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationSubject;
-import net.akehurst.application.framework.service.interfaceAccessControl.AuthorisationTarget;
-import net.akehurst.application.framework.service.interfaceAccessControl.IAuthorisationRequest;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 

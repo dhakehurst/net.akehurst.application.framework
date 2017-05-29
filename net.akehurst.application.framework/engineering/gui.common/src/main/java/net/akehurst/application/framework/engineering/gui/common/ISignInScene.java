@@ -13,8 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.authentication.any;
+package net.akehurst.application.framework.engineering.gui.common;
 
-public class test_AlwaysAuthenticator {
+import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
+public interface ISignInScene extends IGuiScene {
+
+	IGuiElement getActionSignIn();
+
+	IGuiElement getMessageBox();
+
+	IGuiText getMessageText();
 }

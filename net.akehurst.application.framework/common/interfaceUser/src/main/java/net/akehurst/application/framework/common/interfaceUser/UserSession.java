@@ -15,22 +15,33 @@
  */
 package net.akehurst.application.framework.common.interfaceUser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.akehurst.application.framework.common.AbstractDataType;
 
 public class UserSession extends AbstractDataType {
 
-	public UserSession(final String sessionId, final UserDetails user) {
+	/**
+	 *
+	 * @param sessionId
+	 * @param user
+	 * @param data
+	 *            entries are copies into this UserSessions data
+	 */
+	public UserSession(final String sessionId, final UserDetails user, final Map<String, Object> data) {
 		this.sessionId = sessionId;
 		this.user = user;
+		this.data = null == data ? new HashMap<>() : new HashMap<>(data);
 	}
 
-	String sessionId;
+	private final String sessionId;
+	private final UserDetails user;
+	private final Map<String, Object> data;
 
 	public String getId() {
 		return this.sessionId;
 	}
-
-	UserDetails user;
 
 	public UserDetails getUser() {
 		return this.user;
@@ -38,5 +49,9 @@ public class UserSession extends AbstractDataType {
 
 	public boolean isAuthenticated() {
 		return null != this.getUser();
+	}
+
+	public Map<String, Object> getData() {
+		return this.data;
 	}
 }

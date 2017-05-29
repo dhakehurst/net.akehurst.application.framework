@@ -1,4 +1,4 @@
-package net.akehurst.application.framework.technology.interfaceGui.data.diagram;
+package net.akehurst.application.framework.technology.interfaceGui.data.graph;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,11 +7,14 @@ import net.akehurst.application.framework.common.AbstractDataType;
 import net.akehurst.application.framework.common.annotations.declaration.DataType;
 
 @DataType
-public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
+public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 
-	public GuiGraphNode(final String identity, final IGuiGraphNode parent, final String... classes) {
+	public GuiGraphEdge(final String identity, final IGuiGraphNode parent, final IGuiGraphNode source, final IGuiGraphNode target, final String... classes) {
 		super(identity);
 		this.parent = parent;
+		this.source = source;
+		this.target = target;
+
 		this.classes = classes;
 		this.data = new HashMap<>();
 		// add to data do they can be used in the styling
@@ -19,6 +22,9 @@ public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
 	}
 
 	private final IGuiGraphNode parent;
+	private final IGuiGraphNode source;
+	private final IGuiGraphNode target;
+
 	private final String[] classes;
 	private final Map<String, Object> data;
 
@@ -30,6 +36,16 @@ public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
 	@Override
 	public IGuiGraphNode getParent() {
 		return this.parent;
+	}
+
+	@Override
+	public IGuiGraphNode getSource() {
+		return this.source;
+	}
+
+	@Override
+	public IGuiGraphNode getTarget() {
+		return this.target;
 	}
 
 	@Override

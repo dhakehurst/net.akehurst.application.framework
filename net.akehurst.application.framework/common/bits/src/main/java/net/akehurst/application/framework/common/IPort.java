@@ -32,13 +32,22 @@ public interface IPort extends IIdentifiableObject {
 	<T> void provideRequired(Class<T> interfaceType, T provider);
 
 	/**
-	 * returns an object that implements the required interfaceType normally a 'connection' to something outside the component probably something 'provided' by
-	 * a different Component.Port
+	 * returns a proxy object that implements the providedInterfaceType by calling methods on all the internal connections to the port that 'provide' the
+	 * required interface
 	 *
 	 * @param interfaceType
 	 * @return
 	 */
-	<T> T out(Class<T> interfaceType);
+	<T> T in(final Class<T> providedInterfaceType);
+
+	/**
+	 * returns a proxy object that implements the requiredInterfaceType by calling methods on all the external connections to the port that 'provide' the
+	 * required interface
+	 *
+	 * @param requiredInterfaceType
+	 * @return
+	 */
+	<T> T out(Class<T> requiredInterfaceType);
 
 	void connect(IPort other);
 

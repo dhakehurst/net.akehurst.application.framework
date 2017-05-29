@@ -1,4 +1,4 @@
-package net.akehurst.application.framework.technology.interfaceGui.data.diagram;
+package net.akehurst.application.framework.technology.interfaceGui.data.graph;
 
 import java.util.HashMap;
 import java.util.Map;

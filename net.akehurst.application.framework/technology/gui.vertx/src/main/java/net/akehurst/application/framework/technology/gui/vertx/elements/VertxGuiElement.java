@@ -63,7 +63,7 @@ public class VertxGuiElement implements IGuiElement {
 
 	@Override
 	public void set(final UserSession session, final String propertyName, final Object value) {
-		this.guiRequest.set(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, propertyName, value);
+		this.guiRequest.elementSetProperty(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, propertyName, value);
 	}
 
 	@Override

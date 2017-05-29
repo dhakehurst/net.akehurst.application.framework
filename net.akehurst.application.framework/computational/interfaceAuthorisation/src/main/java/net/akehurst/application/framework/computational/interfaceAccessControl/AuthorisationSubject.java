@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.engineering.common.gui;
+package net.akehurst.application.framework.computational.interfaceAccessControl;
 
-import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
-import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
-import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
+import net.akehurst.application.framework.common.AbstractDataType;
+import net.akehurst.application.framework.common.annotations.declaration.DataType;
 
-public interface ISignInScene extends IGuiScene {
+@DataType
+public class AuthorisationSubject extends AbstractDataType {
 
-	IGuiElement getActionSignIn();
+	public AuthorisationSubject(final String identity) {
+		super(identity);
+	}
 
-	IGuiElement getMessageBox();
-
-	IGuiText getMessageText();
+	public String getIdentity() {
+		return (String) super.getIdentityValues().get(0);
+	}
 }

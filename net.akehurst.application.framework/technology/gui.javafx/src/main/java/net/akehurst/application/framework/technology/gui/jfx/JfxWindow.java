@@ -88,13 +88,14 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void createStage(final StageIdentity stageId, final boolean authenticated, final String rootPath) {
+	public void createStage(final StageIdentity stageId, final String rootPath, final StageIdentity authenticationStageId,
+			final SceneIdentity authenticationSceneId) {
 		Platform.runLater(() -> {
 			final Stage primary = new Stage();
 			primary.setTitle(stageId.asPrimitive());
 			this.stages.put(stageId, primary);
 
-			final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")));
+			final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")), null);
 
 			primary.setOnCloseRequest((e) -> {
 				final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CLOSED);
@@ -142,7 +143,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 				primary.sizeToScene();
 
 				primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev) -> {
-					final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")));
+					final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")), null);
 					final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, null, GuiEventType.SCENE_LOADED);
 					final Map<String, Object> eventData = new HashMap<>();
 					final GuiEvent event = new GuiEvent(session, signature, eventData);
@@ -167,14 +168,26 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
+	public void addAuthentication(final UserSession session) throws GuiException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void clearAuthentication(final UserSession session) throws GuiException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public <T extends IGuiDialog> T dialogCreate(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
 			final String title, final String dialogContent) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
+	public void dialogShow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
 			final String dialogContent) {
 		// TODO Auto-generated method stub
 
@@ -238,20 +251,26 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void navigateTo(final UserSession session, final String location) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void set(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName, final String propertyName,
-			final Object value) {
+	public void elementSetProperty(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
+			final String propertyName, final Object value) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void setText(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String id, final String text) {
+	public void textSetValue(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String id, final String text) {
 		final Stage primary = this.stages.get(stageId);
 		final Node n = primary.getScene().lookup("#" + id);
 		if (n instanceof TextInputControl) {
@@ -308,21 +327,21 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void createDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+	public void diagramCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String jsonDiagramData) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void updateDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+	public void diagramUpdate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String jsonDiagramData) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void addEditor(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+	public void editorCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String initialContent, final String languageId) {
 		// TODO Auto-generated method stub
 
@@ -336,11 +355,11 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void authenticate(final UserSession session) throws GuiException {
+	public void graphCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+			final String jsonGraphData) {
 		// TODO Auto-generated method stub
 
 	}
-	// --------- IGuiNotification ---------
 
 	// --------- Ports ---------
 	@PortInstance
@@ -350,4 +369,5 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	public IPort portGui() {
 		return this.portGui;
 	}
+
 }

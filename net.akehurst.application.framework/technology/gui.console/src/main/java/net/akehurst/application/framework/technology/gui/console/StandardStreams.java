@@ -34,7 +34,7 @@ public class StandardStreams extends AbstractComponent implements IConsoleReques
 
 	@Override
 	public void afRun() {
-		final UserSession session = new UserSession(null, new UserDetails(System.getProperty("user.name")));
+		final UserSession session = new UserSession(null, new UserDetails(System.getProperty("user.name")), null);
 		this.portOutput().out(IConsoleNotification.class).notifyReady(session);
 	}
 

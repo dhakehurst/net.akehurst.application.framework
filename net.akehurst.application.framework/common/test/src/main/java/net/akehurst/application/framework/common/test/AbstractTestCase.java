@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
@@ -28,12 +29,16 @@ import org.easymock.IExpectationSetters;
 public class AbstractTestCase {
 
 	public AbstractTestCase() {
-		this.mocks = new HashSet<>();
-		this.steps = new ArrayList<>();
+		this.reset();
 	}
 
 	Set<Object> mocks;
-	List<Runnable> steps;
+	List<FutureTask<?>> steps;
+
+	public void reset() {
+		this.mocks = new HashSet<>();
+		this.steps = new ArrayList<>();
+	}
 
 	public interface IMockExpectation<R> {
 		IMockExpectation<R> andReturn(R returnValue);
@@ -159,32 +164,41 @@ public class AbstractTestCase {
 		};
 	}
 
+	public void perform(final Runnable task) {
+		final FutureTask<Void> result = new FutureTask<>(task, null);
+		this.steps.add(result);
+	}
+
+	public <TO extends T, T, P1> void perform(final TO toObj, final Proc1<T, P1> func, final P1 p1) {
+		final FutureTask<Void> result = new FutureTask<>(() -> func.call(toObj, p1), null);
+		this.steps.add(result);
+	}
+
 	public <TO extends T, T, P1, P2> void perform(final TO toObj, final Proc2<T, P1, P2> func, final P1 p1, final P2 p2) {
-		this.steps.add(() -> func.call(toObj, p1, p2));
+		final FutureTask<Void> result = new FutureTask<>(() -> func.call(toObj, p1, p2), null);
+		this.steps.add(result);
 	}
 
 	public <TO extends T, T, P1, P2, P3> void perform(final TO toObj, final Proc3<T, P1, P2, P3> func, final P1 p1, final P2 p2, final P3 p3) {
-		this.steps.add(() -> func.call(toObj, p1, p2, p3));
+		final FutureTask<Void> result = new FutureTask<>(() -> func.call(toObj, p1, p2, p3), null);
+		this.steps.add(result);
 	}
 
 	public <TO extends T, T, P1, P2, P3, P4> void perform(final TO toObj, final Proc4<T, P1, P2, P3, P4> func, final P1 p1, final P2 p2, final P3 p3,
 			final P4 p4) {
-		this.steps.add(() -> func.call(toObj, p1, p2, p3, p4));
-	}
-
-	public <TO extends T, T, P1> void perform(final TO toObj, final Proc1<T, P1> func, final P1 p1) {
-		this.steps.add(() -> func.call(toObj, p1));
+		final FutureTask<Void> result = new FutureTask<>(() -> func.call(toObj, p1, p2, p3, p4), null);
+		this.steps.add(result);
 	}
 
 	public <R, TO extends T, T, P1> Future<R> perform(final TO toObj, final Func1<T, R, P1> func, final P1 p1) {
 		final FutureTask<R> result = new FutureTask<>(() -> func.apply(toObj, p1));
-		this.steps.add(() -> result.run());
+		this.steps.add(result);
 		return result;
 	}
 
 	public <R, TO extends T, T, P1, P2> Future<R> perform(final TO toObj, final Func2<T, R, P1, P2> func, final P1 p1, final P2 p2) {
 		final FutureTask<R> result = new FutureTask<>(() -> func.apply(toObj, p1, p2));
-		this.steps.add(() -> result.run());
+		this.steps.add(result);
 		return result;
 	}
 
@@ -194,21 +208,27 @@ public class AbstractTestCase {
 	 * @param milliseconds
 	 */
 	public void delay(final int milliseconds) {
-		this.steps.add(() -> {
+		final FutureTask<Void> result = new FutureTask<>(() -> {
 			try {
 				Thread.sleep(milliseconds);
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
-		});
+		}, null);
+		this.steps.add(result);
 	}
 
-	public void play() {
+	/**
+	 * @throws ExecutionException
+	 * @throws InterruptedException
+	 *
+	 */
+	public void play() throws InterruptedException, ExecutionException {
 		EasyMock.replay(this.mocks.toArray());
-		for (final Runnable r : this.steps) {
-			r.run();
+		for (final FutureTask<?> t : this.steps) {
+			t.run();
+			t.get();
 		}
-
 	}
 
 	/**
@@ -218,7 +238,7 @@ public class AbstractTestCase {
 	 */
 	public void sleep(final long milliseconds) {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(milliseconds);
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}

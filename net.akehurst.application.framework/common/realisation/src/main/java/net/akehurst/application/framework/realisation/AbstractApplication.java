@@ -148,8 +148,27 @@ abstract public class AbstractApplication extends AbstractActiveObject implement
 	}
 
 	@Override
+	public void afInterrupt() {
+		try {
+			final List<IActiveObject> objects = super.afActiveParts();
+			for (final IActiveObject ao : objects) {
+				ao.afInterrupt();
+			}
+		} catch (final Exception ex) {
+			this.logger.log(LogLevel.ERROR, "Error during Interrupt application " + this.afId(), ex);
+		}
+	}
+
+	@Override
 	public void afTerminate() {
-		// no need to do anything, default run behaviour will terminate on its own
+		try {
+			final List<IActiveObject> objects = super.afActiveParts();
+			for (final IActiveObject ao : objects) {
+				ao.afTerminate();
+			}
+		} catch (final Exception ex) {
+			this.logger.log(LogLevel.ERROR, "Error during Terminate application " + this.afId(), ex);
+		}
 	}
 
 }

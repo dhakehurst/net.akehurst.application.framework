@@ -130,8 +130,13 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
 	// --------- IGuiRequest ---------
 	@Override
-	public void authenticate(final UserSession session) throws GuiException {
-		this.verticle.authenticate(session);
+	public void addAuthentication(final UserSession session) throws GuiException {
+		this.verticle.addAuthentication(session);
+	}
+
+	@Override
+	public void clearAuthentication(final UserSession session) throws GuiException {
+		this.verticle.clearAuthentication(session);
 	}
 
 	@Override
@@ -189,7 +194,8 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void createStage(final StageIdentity stageId, final boolean authenticated, final String contentRoot) {
+	public void createStage(final StageIdentity stageId, final String contentRoot, final StageIdentity authenticationStageId,
+			final SceneIdentity authenticationSceneId) {
 		try {
 			final Map<String, String> variables = new HashMap<>();
 			variables.put("rootPath", this.rootPath);
@@ -205,8 +211,8 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 			}
 			final String webroot = str.substring(str.lastIndexOf('/') + 1);
 			final String routePath = this.getNormalisedRootPath() + stagePath;
-			if (authenticated) {
-				this.verticle.addAuthenticatedRoute(routePath, rc -> {
+			if (null == authenticationStageId || null == authenticationSceneId) {
+				this.verticle.addRoute(false, null, routePath, rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
 					final User u = rc.user();
 					final String path = rc.normalisedPath();
@@ -214,13 +220,15 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 					rc.next();
 				}, webroot, variables);
 			} else {
-				this.verticle.addRoute(routePath, rc -> {
+				final String authenticationRedirect = "/" + authenticationStageId.asPrimitive() + "/" + authenticationSceneId.asPrimitive() + "/";
+				this.verticle.addRoute(true, authenticationRedirect, routePath, rc -> {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
 					final User u = rc.user();
 					final String path = rc.normalisedPath();
 					System.out.println(path + " " + (null == u ? "null" : u.principal()));
 					rc.next();
 				}, webroot, variables);
+
 			}
 
 			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CREATED);
@@ -253,6 +261,14 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void navigateTo(final UserSession session, final String location) {
+		final JsonObject data = new JsonObject();
+		data.put("location", location);
+		// data.put("sceneArguments", new JsonObject(new HashMap<String, Object>(sceneArguments)));
+		this.verticle.comms.send(session, "Gui.navigateTo", data);
+	}
+
+	@Override
 	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
@@ -262,7 +278,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void showDialog(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
+	public void dialogShow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
 			final String content) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
@@ -346,8 +362,8 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void set(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId, final String propertyName,
-			final Object value) {
+	public void elementSetProperty(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final String propertyName, final Object value) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
@@ -359,7 +375,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void setText(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String id, final String value) {
+	public void textSetValue(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String id, final String value) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
@@ -450,7 +466,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void createDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+	public void diagramCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String jsonDiagramData) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
@@ -463,7 +479,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void updateDiagram(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+	public void diagramUpdate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String jsonDiagramData) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
@@ -476,7 +492,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
+	public <T extends IGuiDialog> T dialogCreate(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
 			final String title, final String dialogContent) {
 		try {
 			final ClassLoader loader = this.getClass().getClassLoader();
@@ -492,7 +508,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void addEditor(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+	public void editorCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String initialContent, final String languageId) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
@@ -524,6 +540,13 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		data.put("parseTree", new JsonObject(jsonParseTreeData));
 
 		this.verticle.comms.send(session, "Editor.updateParseTree", data);
+	}
+
+	@Override
+	public void graphCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+			final String jsonGraphData) {
+		// TODO Auto-generated method stub
+
 	}
 
 	// --------- Ports ---------

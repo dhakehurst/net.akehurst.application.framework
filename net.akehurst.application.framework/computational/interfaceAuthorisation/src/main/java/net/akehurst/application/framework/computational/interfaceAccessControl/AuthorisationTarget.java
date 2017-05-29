@@ -13,8 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.authentication.any;
+package net.akehurst.application.framework.computational.interfaceAccessControl;
 
-public class test_AlwaysAuthenticator {
+import net.akehurst.application.framework.common.AbstractDataType;
 
+public class AuthorisationTarget extends AbstractDataType {
+
+	public AuthorisationTarget(final String identity) {
+		super(identity);
+	}
+
+	public String getIdentity() {
+		return (String) super.getIdentityValues().get(0);
+	}
 }

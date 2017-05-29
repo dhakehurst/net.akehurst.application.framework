@@ -114,7 +114,7 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 
 					final DirContext userContext = new InitialDirContext(userProps);
 
-					final UserSession authenticatedSession = new UserSession(session.getId(), new UserDetails(username));
+					final UserSession authenticatedSession = new UserSession(session.getId(), new UserDetails(username), session.getData());
 
 					this.authenticationNotification.notifyAuthenticationSuccess(authenticatedSession);
 				} else {
@@ -164,7 +164,7 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 	@Override
 	public void requestLogout(final UserSession session) {
 		super.submit("requestLogout", () -> {
-			final UserSession clearedSession = new UserSession(session.getId(), null);
+			final UserSession clearedSession = new UserSession(session.getId(), null, null);
 			this.authenticationNotification.notifyAuthenticationCleared(clearedSession);
 		});
 	}

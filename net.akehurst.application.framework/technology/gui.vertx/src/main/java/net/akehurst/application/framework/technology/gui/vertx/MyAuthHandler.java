@@ -23,20 +23,45 @@ import io.vertx.ext.web.handler.impl.AuthHandlerImpl;
 
 public class MyAuthHandler extends AuthHandlerImpl {
 
-	public MyAuthHandler(AuthProvider authProvider) {
+	private final String loginRedirectURL;
+	private final String rootPath;
+
+	public MyAuthHandler(final AuthProvider authProvider, final String loginRedirectURL, final String rootPath) {
 		super(authProvider);
-		// TODO Auto-generated constructor stub
+		this.loginRedirectURL = loginRedirectURL;
+		this.rootPath = rootPath;
+	}
+
+	public AuthProvider getProvider() {
+		return super.authProvider;
 	}
 
 	@Override
-	public void handle(RoutingContext context) {
-		User user = context.user();
-		Session sess = context.session();
-		if (null == user) {
-			context.fail(401);
+	public void handle(final RoutingContext context) {
+		final Session session = context.session();
+		if (session != null) {
+			final User user = context.user();
+			if (user != null) {
+				// Already logged in, just authorise
+				this.authorise(user, context);
+			} else {
+				// Now redirect to the login url - we'll get redirected back here after successful login
+				this.decodeOriginalUrl(session, context.request().absoluteURI());
+				context.response().putHeader("location", this.loginRedirectURL).setStatusCode(302).end();
+			}
 		} else {
-			authorise(user, context);
+			context.fail(new NullPointerException("No session - did you forget to include a SessionHandler?"));
 		}
+	}
+
+	private void decodeOriginalUrl(final Session session, final String originalUrlStr) {
+		session.put("originalUrl", originalUrlStr);
+		// TODO: find a way to decode the url into a stage,scene pair ??
+		// String stageSceneStr = originalUrlStr.replace(this.rootPath, "");
+		// int sepIndex = stageSceneStr.indexOf('/');
+		// String stageIdStr =stageSceneStr.substring(stageSceneStr.inde);
+		// session.put("originalStageId", stageIdStr);
+		// session.put("originalSceneId", sceneIdStr);
 	}
 
 }

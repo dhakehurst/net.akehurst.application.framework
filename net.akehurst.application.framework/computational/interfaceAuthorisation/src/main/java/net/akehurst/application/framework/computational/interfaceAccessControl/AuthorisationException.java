@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.authentication.any;
+package net.akehurst.application.framework.computational.interfaceAccessControl;
 
-public class test_AlwaysAuthenticator {
-
+public class AuthorisationException extends Exception {
+	public AuthorisationException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 }

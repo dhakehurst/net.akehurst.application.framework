@@ -15,13 +15,9 @@
  */
 package net.akehurst.application.framework.common.test;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.akehurst.application.framework.common.IActiveObject;
-import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
-import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
 import net.akehurst.application.framework.realisation.AbstractActiveObject;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.test.ITestEnvironment;
@@ -35,28 +31,7 @@ abstract public class AbstractTestContext extends AbstractActiveObject implement
 	@Override
 	public void afRun() {
 		try {
-			// TODO handle inheritance ?
-			final List<IActiveObject> objects = new ArrayList<>();
-			for (final Field f : this.getClass().getDeclaredFields()) {
-				f.setAccessible(true);
-				final ComponentInstance ann = f.getAnnotation(ComponentInstance.class);
-				if (null == ann) {
-					// do nothing
-				} else {
-					final IActiveObject ao = (IActiveObject) f.get(this);
-					// TODO: support ordering of objects
-					objects.add(ao);
-				}
-
-				final ActiveObjectInstance ann2 = f.getAnnotation(ActiveObjectInstance.class);
-				if (null == ann2) {
-					// do nothing
-				} else {
-					final IActiveObject ao = (IActiveObject) f.get(this);
-					// TODO: support ordering of objects
-					objects.add(ao);
-				}
-			}
+			final List<IActiveObject> objects = super.afActiveParts();
 
 			for (final IActiveObject ao : objects) {
 				ao.afStart();
@@ -67,13 +42,32 @@ abstract public class AbstractTestContext extends AbstractActiveObject implement
 			}
 
 		} catch (final Exception ex) {
-			this.logger.log(LogLevel.ERROR, "Failed to run application " + this.afId(), ex);
+			this.logger.log(LogLevel.ERROR, "Failed to run testContext " + this.afId(), ex);
+		}
+	}
+
+	@Override
+	public void afInterrupt() {
+		try {
+			final List<IActiveObject> objects = super.afActiveParts();
+			for (final IActiveObject ao : objects) {
+				ao.afInterrupt();
+			}
+		} catch (final Exception ex) {
+			this.logger.log(LogLevel.ERROR, "Error during Interrupt testContext " + this.afId(), ex);
 		}
 	}
 
 	@Override
 	public void afTerminate() {
-		// no need to do anything, default run behaviour will terminate on its own
+		try {
+			final List<IActiveObject> objects = super.afActiveParts();
+			for (final IActiveObject ao : objects) {
+				ao.afTerminate();
+			}
+		} catch (final Exception ex) {
+			this.logger.log(LogLevel.ERROR, "Error during Terminate testContext " + this.afId(), ex);
+		}
 	}
 
 }

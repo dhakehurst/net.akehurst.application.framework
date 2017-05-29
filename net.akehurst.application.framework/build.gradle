@@ -27,13 +27,18 @@ subprojects {
 	apply plugin: 'osgi'
 	apply plugin: 'maven-publish'
 	apply plugin: 'com.jfrog.bintray'
-
+	apply plugin: 'checkstyle'
 
 	group 'net.akehurst.application.framework'
 	version '1.0.alpha.19'
 
 	sourceCompatibility = '1.8'
 	targetCompatibility = '1.8'
+
+	checkstyle {
+		toolVersion = '7.8'
+		configFile = rootProject.file('checkstyle/checkstyle.xml')
+	}
 
 	task sourceJar(type: Jar) {
 	    from sourceSets.main.allJava

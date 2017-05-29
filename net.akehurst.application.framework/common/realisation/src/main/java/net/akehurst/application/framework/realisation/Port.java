@@ -105,6 +105,73 @@ public class Port implements IPort {
 		set.add(provider);
 	}
 
+	static class PortIn<T> implements InvocationHandler {
+
+		public PortIn(final Port port, final Class<T> interfaceType) {
+			this.port = port;
+			this.interfaceType = interfaceType;
+		}
+
+		Port port;
+		Class<T> interfaceType;
+
+		@Override
+		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+			if (Arrays.asList(Object.class.getMethods()).contains(method)) {
+				return method.invoke(this, args);
+			} else {
+				return this.invokeProxy(proxy, method, args);
+			}
+
+		}
+
+		private Object invokeProxy(final Object proxy, final Method method, final Object[] args) throws Throwable {
+			try {
+				this.port.logger.log(LogLevel.TRACE, method.getName());
+				Object result = null;
+				// get these here to delay resolving the object until moment of call
+				final Set<T> set = this.port.getProvided(this.interfaceType);
+				if (null == set) {
+					throw new ApplicationFrameworkException("Port " + this.port.afId() + " does not provide interface " + this.interfaceType, null);
+				}
+				for (final Object provider : set) {
+					if (null == provider) {
+						throw new ApplicationFrameworkException("Port " + this.port.afId() + " does not provide interface " + this.interfaceType, null);
+					} else {
+						result = method.invoke(provider, args);
+					}
+				}
+				return result;
+			} catch (final InvocationTargetException ex) {
+				throw ex.getCause();
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return this.toString().hashCode();
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			return this == other;
+		}
+
+		@Override
+		public String toString() {
+			return this.port.toString() + ".in(" + this.interfaceType.getName() + ")";
+		}
+	}
+
+	@Override
+	public <T> T in(final Class<T> interfaceType) {
+
+		final InvocationHandler h = new PortIn<>(this, interfaceType);
+
+		final Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { interfaceType }, h);
+		return (T) proxy;
+	}
+
 	static class PortOut<T> implements InvocationHandler {
 
 		public PortOut(final Port port, final Class<T> interfaceType) {

@@ -30,7 +30,7 @@ public class VertxGuiText extends VertxGuiElement implements IGuiText {
 
 	@Override
 	public void setText(final UserSession session, final String value) {
-		this.getGuiRequest().setText(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), value);
+		this.getGuiRequest().textSetValue(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), value);
 	}
 
 	@Override

@@ -78,6 +78,21 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 	Map<SceneIdentity, IGuiSceneHandler> sceneHandlers;
 
 	@Override
+	public void addAuthentication(final UserSession session) throws GuiException {
+		this.getGuiRequest().addAuthentication(session);
+	}
+
+	@Override
+	public void clearAuthentication(final UserSession session) throws GuiException {
+		this.getGuiRequest().clearAuthentication(session);
+	}
+
+	@Override
+	public void navigateTo(final UserSession session, final String location) {
+		this.guiRequest.navigateTo(session, location);
+	}
+
+	@Override
 	public IGuiScene getScene(final SceneIdentity sceneId) {
 		return this.scenes.get(sceneId);
 	}
@@ -155,8 +170,4 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 
 	}
 
-	@Override
-	public void authenticate(final UserSession session) throws GuiException {
-		this.getGuiRequest().authenticate(session);
-	}
 }

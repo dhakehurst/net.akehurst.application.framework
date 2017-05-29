@@ -222,6 +222,17 @@ define([
 		})
 	}
 	
+	Dynamic.prototype.navigateTo = function(location) {
+		if (location.startsWith('/')) {
+			var myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+			var newRef = myLocation + location
+	
+			window.location.href = newRef
+		} else {
+			window.location.href = location
+		}
+	}
+	
 	Dynamic.prototype.switchToScene = function(stageId, sceneId,sceneArguments) {
 		var myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
 		var prootPath = this.rootPath + '/'
@@ -493,6 +504,10 @@ define([
 		this.serverComms.registerHandler('Gui.requestRecieveEvent', function(args) {
 			console.log("requestRecieveEvent "+JSON.stringify(args))
 			dynamic.requestRecieveEvent(args.elementId, args.eventType, 'IGuiNotification.notifyEventOccured')
+		})
+		this.serverComms.registerHandler('Gui.navigateTo', function(args) {
+			console.log("navigateTo "+JSON.stringify(args))
+			dynamic.navigateTo(args.location)
 		})
 		this.serverComms.registerHandler('Gui.switchToScene', function(args) {
 			console.log("switchToScene "+JSON.stringify(args))
