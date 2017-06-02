@@ -131,19 +131,18 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	}
 
 	@Override
-	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery location, final T item, final Class<T> itemType)
-			throws PersistentStoreException {
+	public <T> void store(final IPersistenceTransaction transaction, final T item, final Class<T> itemType) throws PersistentStoreException {
 
 	}
 
 	@Override
-	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType)
+	public <T> T retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final PersistentItemQuery query, final Object... params)
 			throws PersistentStoreException {
 		try {
-			final JsonValue value = this.fetchJson(this.getJson(), location.asPrimitive());
+			final JsonValue value = this.fetchJson(this.getJson(), query.getValue());
 			return this.convertJsonTo(value, itemType);
 		} catch (final Exception ex) {
-			throw new PersistentStoreException("Failed to retrieve item from location " + location, ex);
+			throw new PersistentStoreException("Failed to retrieve item from location " + query, ex);
 		}
 	}
 
@@ -221,21 +220,21 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	}
 
 	@Override
-	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
+	public <T> void remove(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
 			throws PersistentStoreException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType,
-			final Map<String, Object> filter) throws PersistentStoreException {
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
+			throws PersistentStoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
+	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}

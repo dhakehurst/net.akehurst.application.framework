@@ -82,6 +82,7 @@ define([
 		// cache created editors so we can find them again
 		this.editors = {}
 		this.diagrams = {}
+		this.graphs = {}
 		this.highlighter = {}
 	}
 	
@@ -263,7 +264,7 @@ define([
 	
 	Dynamic.prototype.setText = function(id, value) {
 		var el = $('#'+id)
-		if (el.is('input') || el.is('textarea')) {
+		if (el.is('input') || el.is('textarea') || el.is('select')) {
 			el.val(value)
 		} else {
 			el.text(value)	
@@ -323,12 +324,51 @@ define([
 		}
 	}
 	
-	Dynamic.prototype.elementDisable = function(elementId, value) {
+	Dynamic.prototype.elementSetDisabled = function(elementId, value) {
 		var el = $('#'+elementId)
 		if (el.length == 0) {
 			console.log('Error: cannot find element with id ' + elementId)
 		} else {
 			$(el).prop('disabled', value)
+			return 'ok'
+		}
+	}
+	
+	Dynamic.prototype.elementSetLoading = function(elementId, value) {
+		var el = $('#'+elementId)
+		if (el.length == 0) {
+			console.log('Error: cannot find element with id ' + elementId)
+		} else {
+			let loadingId = elementId+'-loading'
+			if (value) {
+				$(el).addClass('loading')
+				$(el).prop('disabled', true)
+				$("<div id='"+loadingId+"' class='loading-spinner-container'><div class='loading-spinner'></div></div>").prependTo($(el))
+			} else {
+				 $('#'+loadingId).remove()
+				 $(el).prop('disabled', false)
+				 $(el).removeClass('loading')
+			}
+			return 'ok'
+		}
+	}
+	
+	Dynamic.prototype.elementAddClass = function(elementId, className) {
+		var el = $('#'+elementId)
+		if (el.length == 0) {
+			console.log('Error: cannot find element with id ' + elementId)
+		} else {
+			$(el).addClass(className)
+			return 'ok'
+		}
+	}
+	
+	Dynamic.prototype.elementRemoveClass = function(elementId, className) {
+		var el = $('#'+elementId)
+		if (el.length == 0) {
+			console.log('Error: cannot find element with id ' + elementId)
+		} else {
+			$(el).removeClass(className)
 			return 'ok'
 		}
 	}
@@ -463,6 +503,28 @@ define([
 		}
 	}
 	
+	Dynamic.prototype.graphCreate = function(parentId, data) {
+		var dynamic = this
+		if ($('#'+parentId).length == 0) {
+			console.log('Error: cannot find element with id ' + parentId)
+		} else {		
+			require(["Graph"],function(Graph) {
+				let d = new Graph(parentId, data)
+				dynamic.graphs[parentId] = d
+			})
+		}
+	}
+
+	Dynamic.prototype.graphUpdate = function(parentId, data) {
+		var dynamic = this
+		let d = this.graphs[parentId]
+		if (null!=d) {
+			d.update(data)
+		} else {
+			console.log('Cannot find Graph for id = '+parentId)
+		}
+	}
+	
 	Dynamic.prototype.commsSend = function(name, data) {
 		this.serverComms.send(name,data)
 	}
@@ -480,84 +542,92 @@ define([
 			var outData = {stageId: dynamic.stageId, sceneId: dynamic.sceneId, eventType: 'IGuiNotification.notifySceneLoaded', elementId:'', eventData:{sceneArgs:sceneArgs} }
 			dynamic.commsSend('IGuiNotification.notifyEventOccured', outData)		
 		})
-		this.serverComms.registerHandler('Gui.set', function(args) {
-			dynamic.set(args.id, args.property, args.value)
-		})
 		this.serverComms.registerHandler('Gui.setTitle', function(args) {
 			dynamic.setTitle(args.value)
 		})
 		this.serverComms.registerHandler('Gui.setText', function(args) {
 			dynamic.setText(args.id, args.value)
 		})
-		this.serverComms.registerHandler('Gui.addElement', function(args) {
+		
+		this.serverComms.registerHandler('Element.setProperty', function(args) {
+			dynamic.set(args.id, args.property, args.value)
+		})
+		this.serverComms.registerHandler('Element.add', function(args) {
 			dynamic.addElement(args.parentId, args.newElementId, args.type, args.attributes, args.content)
 		})
-		this.serverComms.registerHandler('Gui.removeElement', function(args) {
-			dynamic.removeElement(args.elementId)
+		this.serverComms.registerHandler('Element.remove', function(args) {
+			dynamic.removeElement(args.id)
 		})
-		this.serverComms.registerHandler('Gui.elementClear', function(args) {
-			dynamic.elementClear(args.elementId)
+		this.serverComms.registerHandler('Element.clear', function(args) {
+			dynamic.elementClear(args.id)
 		})
-		this.serverComms.registerHandler('Gui.elementDisable', function(args) {
-			dynamic.elementDisable(args.elementId, args.value)
+		this.serverComms.registerHandler('Element.setDisabled', function(args) {
+			dynamic.elementSetDisabled(args.id, args.value)
 		})
+		this.serverComms.registerHandler('Element.setLoading', function(args) {
+			dynamic.elementSetLoading(args.id, args.value)
+		})
+		this.serverComms.registerHandler('Element.addClass', function(args) {
+			dynamic.elementAddClass(args.id, args.className)
+		})
+		this.serverComms.registerHandler('Element.removeClass', function(args) {
+			dynamic.elementRemoveClass(args.id, args.className)
+		})
+		
 		this.serverComms.registerHandler('Gui.requestRecieveEvent', function(args) {
-			console.log("requestRecieveEvent "+JSON.stringify(args))
 			dynamic.requestRecieveEvent(args.elementId, args.eventType, 'IGuiNotification.notifyEventOccured')
 		})
 		this.serverComms.registerHandler('Gui.navigateTo', function(args) {
-			console.log("navigateTo "+JSON.stringify(args))
 			dynamic.navigateTo(args.location)
 		})
 		this.serverComms.registerHandler('Gui.switchToScene', function(args) {
-			console.log("switchToScene "+JSON.stringify(args))
 			dynamic.switchToScene(args.stageId, args.sceneId, args.sceneArguments)
 		})
 		this.serverComms.registerHandler('Gui.showDialog', function(args) {
-			console.log("showDialog "+JSON.stringify(args))
 			dynamic.showDialog(args.parentId, args.dialogId, args.content)
 		})
 		
 		//Tables
 		this.serverComms.registerHandler('Table.addColumn', function(args) {
-			console.log("Table.addColumn "+JSON.stringify(args))
 			dynamic.tableAddColumn(args.tableId, args.colHeaderContent, args.rowTemplateCellContent, args.existingRowCellContent)
 		})
 		this.serverComms.registerHandler('Table.appendRow', function(args) {
-			console.log("Table.appendRow "+JSON.stringify(args))
 			dynamic.tableAppendRow(args.tableId, args.rowData)
 		})
 		this.serverComms.registerHandler('Table.removeRow', function(args) {
-			console.log("Table.removeRow "+JSON.stringify(args))
 			dynamic.tableRemoveRow(args.tableId, args.rowId)
 		})
 		this.serverComms.registerHandler('Table.clearAllRows', function(args) {
-			console.log("Table.clearAllRows "+JSON.stringify(args))
 			dynamic.tableClearAllRows(args.tableId)
 		})
 		
 		//Editors
 		this.serverComms.registerHandler('Editor.addEditor', function(args) {
-			console.log("Editor.addEditor "+JSON.stringify(args))
 			dynamic.createEditor(args.parentId, args.languageId, args.initialContent)
 		})
 		this.serverComms.registerHandler('Editor.updateParseTree', function(args) {
-			console.log("Editor.updateParseTree "+JSON.stringify(args))
 			dynamic.updateParseTree(args.editorId, args.parseTree)
 		})
 		
 		//Charts
 		this.serverComms.registerHandler('Gui.addChart', function(args) {
-			console.log("addChart "+JSON.stringify(args))
 			dynamic.addChart(args.parentId, args.chartId, args.chartType, args.chartData, args.chartOptions)
 		})
-		this.serverComms.registerHandler('Gui.createDiagram', function(args) {
-			console.log("createDiagram "+JSON.stringify(args))
+		
+		//Diagram
+		this.serverComms.registerHandler('Diagram.create', function(args) {
 			dynamic.createDiagram(args.parentId, args.data)
 		})
-		this.serverComms.registerHandler('Gui.updateDiagram', function(args) {
-			console.log("updateDiagram "+JSON.stringify(args))
+		this.serverComms.registerHandler('Diagram.update', function(args) {
 			dynamic.updateDiagram(args.parentId, args.data)
+		})
+		
+		//Diagram
+		this.serverComms.registerHandler('Graph.create', function(args) {
+			dynamic.graphCreate(args.parentId, args.data)
+		})
+		this.serverComms.registerHandler('Graph.update', function(args) {
+			dynamic.graphUpdate(args.parentId, args.data)
 		})
 		
 		//2d Canvas

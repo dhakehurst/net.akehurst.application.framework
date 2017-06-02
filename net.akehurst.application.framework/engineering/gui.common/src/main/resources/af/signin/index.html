@@ -53,6 +53,16 @@
 		<script>
 		  var rootPath = '${rootPath}'
           var stageId = '${stageId}'
+          
+        	  $(document).ready(function() {
+        		  $("input").keypress(function(e) {
+        		    if (e.which == 13) {
+        		      $('#actionSignIn').click();
+        		      return false;
+        		    }
+        		    return true;
+        		  });
+        		});
         </script>
         
 		<script data-main='${rootPath}/lib/dynamic/1.0.alpha.19/config.js' src='${rootPath}/lib/requirejs/2.3.1/require.min.js' type='text/javascript' charset='utf-8'></script>

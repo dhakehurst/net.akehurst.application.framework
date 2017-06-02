@@ -244,7 +244,14 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void elementDisable(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+	public void elementSetDisabled(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final boolean value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void elementSetLoading(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
 			final boolean value) {
 		// TODO Auto-generated method stub
 
@@ -265,6 +272,20 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	@Override
 	public void elementSetProperty(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
 			final String propertyName, final Object value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void elementAddClass(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
+			final String className) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void elementRemoveClass(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
+			final String className) {
 		// TODO Auto-generated method stub
 
 	}
@@ -356,6 +377,13 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void graphCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+			final String jsonGraphData) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void graphUpdate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String jsonGraphData) {
 		// TODO Auto-generated method stub
 

@@ -34,16 +34,15 @@ public interface IPersistentStore extends IIdentifiableObject {
 
 	/**
 	 *
-	 * @param query
-	 *            location of the item to store
+	 * @param transaction
 	 * @param item
 	 *            the item to store, must be a DataType
 	 * @param itemType
 	 *            (optional) class that defines the datatype of the item
 	 */
-	<T> void store(IPersistenceTransaction transaction, PersistentItemQuery query, T item, Class<T> itemType) throws PersistentStoreException;
+	<T> void store(IPersistenceTransaction transaction, T item, Class<T> itemType) throws PersistentStoreException;
 
-	<T> void remove(IPersistenceTransaction transaction, PersistentItemQuery query, Class<T> itemType) throws PersistentStoreException;
+	<T> void remove(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
 
 	/**
 	 *
@@ -54,21 +53,19 @@ public interface IPersistentStore extends IIdentifiableObject {
 	 * @return
 	 * @throws PersistentStoreException
 	 */
-	<T> T retrieve(IPersistenceTransaction transaction, PersistentItemQuery query, Class<T> itemType) throws PersistentStoreException;
+	<T> T retrieve(IPersistenceTransaction transaction, Class<T> itemType, PersistentItemQuery query, Object... params) throws PersistentStoreException;
 
 	/**
 	 *
-	 * @param query
-	 *            location of the items to retrieve
+	 * @param transaction
 	 * @param itemType
-	 *            (optional) class that defines the datatype of the item
+	 *            class that defines the datatype of the item
 	 * @param filter
-	 *            filters out objects with the give property-value pairs
+	 *            filters out objects with the given property-value pairs
 	 * @return
 	 */
-	<T> Set<T> retrieve(IPersistenceTransaction transaction, PersistentItemQuery query, Class<T> itemType, Map<String, Object> filter)
-			throws PersistentStoreException;
+	<T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
 
-	<T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType);
+	<T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter);
 
 }

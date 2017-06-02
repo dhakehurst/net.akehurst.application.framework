@@ -21,17 +21,27 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEv
 
 public interface IGuiElement {
 
+	String getElementId();
+
 	Object get(UserSession session, String propertyName);
 
 	void set(UserSession session, String propertyName, Object value);
+
+	void addClass(UserSession session, String className);
+
+	void removeClass(UserSession session, String className);
 
 	void onEvent(UserSession session, GuiEventType eventType, OnEventHandler handler);
 
 	void clear(UserSession session);
 
-	void disable(UserSession session, boolean value);
+	void setDisabled(UserSession session, boolean value);
+
+	void setLoading(UserSession session, boolean value);
 
 	void addSubElement(UserSession session, String newElementId, String newElementType, String attributes, Object content);
 
-	void createChart(final UserSession session, String chartId, String chartType, String jsonChartData, String jsonChartOptions);
+	void removeSubElement(UserSession session, String subElementId);
+
+	void createChart(UserSession session, String chartId, String chartType, String jsonChartData, String jsonChartOptions);
 }

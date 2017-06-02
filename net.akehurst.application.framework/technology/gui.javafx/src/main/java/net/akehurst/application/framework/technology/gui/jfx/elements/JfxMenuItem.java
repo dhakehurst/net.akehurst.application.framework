@@ -58,6 +58,12 @@ public class JfxMenuItem implements IGuiMenuItem {
 	MenuItem menuItem;
 
 	@Override
+	public String getElementId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public Object get(final UserSession session, final String propertyName) {
 		try {
 			final BetterMethodFinder bmf = new BetterMethodFinder(this.menuItem.getClass());
@@ -94,7 +100,25 @@ public class JfxMenuItem implements IGuiMenuItem {
 	}
 
 	@Override
-	public void disable(final UserSession session, final boolean value) {
+	public void setDisabled(final UserSession session, final boolean value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setLoading(final UserSession session, final boolean value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addClass(final UserSession session, final String className) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeClass(final UserSession session, final String className) {
 		// TODO Auto-generated method stub
 
 	}
@@ -102,6 +126,12 @@ public class JfxMenuItem implements IGuiMenuItem {
 	@Override
 	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
 			final Object content) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeSubElement(final UserSession session, final String subElementId) {
 		// TODO Auto-generated method stub
 
 	}

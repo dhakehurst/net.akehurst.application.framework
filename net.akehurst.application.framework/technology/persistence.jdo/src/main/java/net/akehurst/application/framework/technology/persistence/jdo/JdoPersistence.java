@@ -23,8 +23,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.security.ProtectionDomain;
 import java.util.AbstractList;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -525,8 +526,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery query, final T item, final Class<T> itemType)
-			throws PersistentStoreException {
+	public <T> void store(final IPersistenceTransaction transaction, final T item, final Class<T> itemType) throws PersistentStoreException {
 		try {
 			final JdoTransaction tx = (JdoTransaction) transaction;
 			Object toPersist = null;
@@ -546,30 +546,49 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
+	public <T> void remove(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
 			throws PersistentStoreException {
 		try {
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-
-			final Query<? extends Persistable> jdoQuery = ((JdoTransaction) transaction).newQuery(enhancedType, query.asPrimitive());
-			jdoQuery.compile();
-			final Collection<? extends Persistable> res = (Collection<? extends Persistable>) jdoQuery.execute();
-			for (final Persistable jdoObj : res) {
-				((JdoTransaction) transaction).deletePersistent(jdoObj);
+			final Map<String, Object> params = new HashMap<>();
+			final List<String> filterValues = new ArrayList<>();
+			for (final Map.Entry<String, Object> me : filter.entrySet()) {
+				final String n = me.getKey();
+				final String pn = n.replace('.', '_');
+				filterValues.add(n + " == :" + pn);
+				params.put(pn, me.getValue());
+			}
+			String filterString = "";
+			if (filterValues.isEmpty()) {
+			} else {
+				filterString = filterValues.get(0);
+			}
+			for (int i = 1; i < filterValues.size(); ++i) {
+				filterString += " && " + filterValues.get(i);
 			}
 
+			final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType, "javax.jdo.query.JDOQL", filterString);
+			final List<? extends Persistable> res = (List<? extends Persistable>) jdoquery.executeWithMap(params);
+			if (res.isEmpty()) {
+				this.logger.log(LogLevel.WARN, "Nothing to remove for type %s with filter %s", itemType.getSimpleName(), filter);
+			} else {
+				for (final Persistable jdoObj : res) {
+					((JdoTransaction) transaction).deletePersistent(jdoObj);
+				}
+			}
 		} catch (final Throwable ex) {
 			this.logger.log(LogLevel.ERROR, "Failed to remove persistent item", ex);
 		}
 	}
 
 	@Override
-	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType) throws PersistentStoreException {
+	public <T> T retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final PersistentItemQuery query, final Object... params)
+			throws PersistentStoreException {
 		try {
 			final JdoTransaction tx = (JdoTransaction) transaction;
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-			final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType, query.asPrimitive());
-			final List<? extends Persistable> res = jdoquery.executeList();
+			final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType, query.getLanguage(), query.getValue());
+			final List<? extends Persistable> res = (List<? extends Persistable>) jdoquery.executeWithArray(params);
 			if (res.isEmpty()) {
 				return null;
 			} else {
@@ -587,14 +606,51 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType,
-			final Map<String, Object> filter) throws PersistentStoreException {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
+			throws PersistentStoreException {
+		try {
+			final JdoTransaction tx = (JdoTransaction) transaction;
+			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
+
+			final Map<String, Object> params = new HashMap<>();
+			final List<String> filterValues = new ArrayList<>();
+			for (final Map.Entry<String, Object> me : filter.entrySet()) {
+				final String n = me.getKey();
+				final String pn = n.replace('.', '_');
+				filterValues.add(n + " == :" + pn);
+				params.put(pn, me.getValue());
+			}
+			String filterString = "";
+			if (filterValues.isEmpty()) {
+			} else {
+				filterString = filterValues.get(0);
+			}
+			for (int i = 1; i < filterValues.size(); ++i) {
+				filterString += " && " + filterValues.get(i);
+			}
+
+			final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType, "javax.jdo.query.JDOQL", filterString);
+			final List<? extends Persistable> res = (List<? extends Persistable>) jdoquery.executeWithMap(params);
+			if (res.isEmpty()) {
+				return null;
+			} else {
+				final Set<T> result = res.stream().map((el) -> {
+					try {
+						final T item = (T) this.convertFromEnhanced(tx, enhancedType, el, itemType);
+						return item;
+					} catch (final Exception ex) {
+						throw new RuntimeException("Error mapping JDO enhanced object to un-enhanced", ex);
+					}
+				}).collect(Collectors.toSet());
+				return result;
+			}
+		} catch (final Exception ex) {
+			throw new PersistentStoreException("", ex);
+		}
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
+	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
 		final JdoTransaction tx = (JdoTransaction) transaction;
 		final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
 		final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType);

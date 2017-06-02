@@ -51,6 +51,7 @@ public class VertxGuiElement implements IGuiElement {
 		return this.dialog;
 	}
 
+	@Override
 	public String getElementId() {
 		return this.elementName;
 	}
@@ -64,6 +65,16 @@ public class VertxGuiElement implements IGuiElement {
 	@Override
 	public void set(final UserSession session, final String propertyName, final Object value) {
 		this.guiRequest.elementSetProperty(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, propertyName, value);
+	}
+
+	@Override
+	public void addClass(final UserSession session, final String className) {
+		this.guiRequest.elementAddClass(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, className);
+	}
+
+	@Override
+	public void removeClass(final UserSession session, final String className) {
+		this.guiRequest.elementRemoveClass(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, className);
 	}
 
 	@Override
@@ -84,8 +95,13 @@ public class VertxGuiElement implements IGuiElement {
 	}
 
 	@Override
-	public void disable(final UserSession session, final boolean value) {
-		this.guiRequest.elementDisable(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, value);
+	public void setDisabled(final UserSession session, final boolean value) {
+		this.guiRequest.elementSetDisabled(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, value);
+	}
+
+	@Override
+	public void setLoading(final UserSession session, final boolean value) {
+		this.guiRequest.elementSetLoading(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, value);
 	}
 
 	@Override
@@ -93,6 +109,11 @@ public class VertxGuiElement implements IGuiElement {
 			final Object content) {
 		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, newElementId, newElementType, attributes,
 				content);
+	}
+
+	@Override
+	public void removeSubElement(final UserSession session, final String subElementId) {
+		this.guiRequest.removeElement(session, this.scene.getStageId(), this.scene.getSceneId(), subElementId);
 	}
 
 	@Override

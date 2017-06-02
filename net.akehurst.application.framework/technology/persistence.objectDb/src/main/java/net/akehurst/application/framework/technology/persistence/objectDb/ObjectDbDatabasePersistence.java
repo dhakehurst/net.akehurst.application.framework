@@ -92,14 +92,7 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	@Override
-	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
-			throws PersistentStoreException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery location, final T item, final Class<T> itemType) {
+	public <T> void store(final IPersistenceTransaction transaction, final T item, final Class<T> itemType) {
 		try {
 			this.entityManager.getTransaction().begin();
 			this.entityManager.persist(item);
@@ -110,9 +103,9 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	@Override
-	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType) {
+	public <T> T retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final PersistentItemQuery query, final Object... params) {
 		try {
-			final T t = this.entityManager.find(itemType, location.asPrimitive());
+			final T t = this.entityManager.find(itemType, query.getValue());
 			return t;
 		} catch (final Exception ex) {
 			System.err.println(ex.getMessage());
@@ -121,18 +114,24 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 	}
 
 	@Override
-	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType,
-			final Map<String, Object> filter) {
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
+	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
 		final String qs = "SELECT x FROM " + itemType.getSimpleName() + " x";
 		final TypedQuery<T> q = this.entityManager.createQuery(qs, itemType);
 		final List<T> res = q.getResultList();
 		return new HashSet<>(res);
+	}
+
+	@Override
+	public <T> void remove(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
+			throws PersistentStoreException {
+		// TODO Auto-generated method stub
+
 	}
 
 	// ---------- Ports ---------

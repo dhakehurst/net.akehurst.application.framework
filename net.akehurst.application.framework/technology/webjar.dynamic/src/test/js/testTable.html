@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+
+		<title>Table Test</title>
+	</head>
+	
+	<body>
+	
+	<table id='tbl1'>
+	</table>
+	
+	<table id='tbl2'>
+		<thead>
+			<tr>
+				<th>id</th>
+			</tr>
+		</thead>
+	</table>
+	
+	<table id='tbl3'>
+		<thead>
+			<tr>
+				<th>id</th>
+			</tr>
+			<tr class='table-row-template'>
+				<td>${row.id}</td>
+			</tr>
+		</thead>
+	</table>
+	
+	<table id='tbl4'>
+		<thead>
+			<tr>
+				<th>id</th>
+			</tr>
+			<tr hidden='true' class='table-row-template'>
+				<td>${row.id}</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>id1</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js'></script>
+	<script src='../../main/js/Dynamic.js'></script>
+	<script src='../../main/js/Table.js'></script>
+
+	<script>
+		let tbl1 = new Table('tbl1')
+		let tbl2 = new Table('tbl2')
+		let tbl3 = new Table('tbl3')
+		let tbl4 = new Table('tbl4')
+		
+		tbl1.addColumn('name', '${row.name}', 'xxx')
+		tbl2.addColumn('name', '${row.name}', 'xxx')
+		tbl3.addColumn('name', '${row.name}', 'xxx')
+		tbl4.addColumn('name', '${row.name}', 'xxx')
+		
+		
+		tbl1.appendRow({id:'xx', name:'nn'})
+		tbl2.appendRow({id:'xx', name:'nn'})
+		tbl3.appendRow({id:'xx', name:'nn'})
+		tbl4.appendRow({id:'xx', name:'nn'})
+		
+	</script>
+	</body>
+</html>

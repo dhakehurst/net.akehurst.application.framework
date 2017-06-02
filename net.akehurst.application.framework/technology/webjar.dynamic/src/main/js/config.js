@@ -26,8 +26,8 @@ require.config({
 		"lodash"          : "lodash/3.10.1/lodash.min",
 		"graphlib"        : "graphlib/2.1.1/dist/graphlib.min",
 		"dagre"           : "dagre/0.7.4/dist/dagre.core.min",
-//		"cytoscape"       : "cytoscape/2.7.9/dist/cytoscape.min",
-//		"cytoscape-dagre" : "cytoscape-dagre/1.3.0/cytoscape-dagre",
+		"cytoscape"       : "cytoscape/2.7.16/dist/cytoscape.min",
+		"cytoscape-dagre" : "cytoscape-dagre/1.3.0/cytoscape-dagre",
 		"backbone"        : "backbone/1.3.3/backbone-min",
 		"jointjs"         : "jointjs/1.0.3/dist/joint.min",
 		'jointjs-loader-hack': 'dynamic/1.0.alpha.19/jointjs-loader-hack',
@@ -35,19 +35,22 @@ require.config({
 		"crypto.aes"      : "cryptojs/3.1.2/rollups/aes",
 		"Table"         : "dynamic/1.0.alpha.19/Table",
 		"Diagram"         : "dynamic/1.0.alpha.19/Diagram",
-		"Editor"         : "dynamic/1.0.alpha.19/Editor",
+		"Graph"         : "dynamic/1.0.alpha.19/Graph",
+		"Editor"         : "dynamic/1.0.alpha.19/EditorMonaco",
 		"Dynamic"         : "dynamic/1.0.alpha.19/Dynamic",
 		"ServerComms"     : "dynamic/1.0.alpha.19/ServerComms",
 		"Highlighter"     : "dynamic/1.0.alpha.19/Highlighter",
 		"orion/code_edit" : "orion/12.0/code_edit/built-codeEdit-amd",
 //		"vscode/languageclient" : "languageclient/2.5.0/main",
-		"styles/normalize" : "normalize.css/5.0.0/normalize"
+		"styles/normalize" : "normalize.css/5.0.0/normalize",
+		"vs"           : "monaco-editor/0.8.3/min/vs"
     },
     shim: {
         'graphlib': ['lodash'],
         'dagre': ['graphlib'],
         'jointjs': ['dagre', 'graphlib'],
-        'Editor': ['orion/code_edit'],
+        'Editor': ['vs/loader','vs/editor/editor.main'], //['orion/code_edit'],
+        'Graph': ['cytoscape', 'cytoscape-dagre'],
         'Dynamic':['Diagram', 'Editor']
     },
     map: {

@@ -95,8 +95,7 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> void store(final IPersistenceTransaction transaction, final PersistentItemQuery location, final T item, final Class<T> itemType)
-			throws PersistentStoreException {
+	public <T> void store(final IPersistenceTransaction transaction, final T item, final Class<T> itemType) throws PersistentStoreException {
 		try {
 			final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
 			trans.em.persist(item);
@@ -106,22 +105,10 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> void remove(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Class<T> itemType)
-			throws PersistentStoreException {
+	public <T> T retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final PersistentItemQuery location, final Object... params) {
 		try {
 			final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
-			final T obj = trans.em.find(itemType, query.asPrimitive());
-			trans.em.remove(obj);
-		} catch (final Exception ex) {
-			throw new PersistentStoreException("Failed to remove item", ex);
-		}
-	}
-
-	@Override
-	public <T> T retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType) {
-		try {
-			final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
-			final T t = trans.em.find(itemType, location.asPrimitive());
+			final T t = trans.em.find(itemType, location.getValue());
 			return t;
 		} catch (final Exception ex) {
 			System.err.println(ex.getMessage());
@@ -130,8 +117,7 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery location, final Class<T> itemType,
-			final Map<String, Object> filter) {
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
 		String qs = "SELECT item FROM " + itemType.getSimpleName() + " item";
 		if (filter.isEmpty()) {
 			// do nothing, return all
@@ -159,12 +145,37 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType) {
+	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
 		final String qs = "SELECT x FROM " + itemType.getSimpleName() + " x";
 		final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
 		final TypedQuery<T> q = trans.em.createQuery(qs, itemType);
 		final List<T> res = q.getResultList();
 		return new HashSet<>(res);
+	}
+
+	@Override
+	public <T> void remove(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
+			throws PersistentStoreException {
+		try {
+			String qs = "SELECT item FROM " + itemType.getSimpleName() + " item";
+			if (filter.isEmpty()) {
+				// do nothing, return all
+			} else {
+				qs += " WHERE ";
+				final ArrayList<Map.Entry<String, Object>> list = new ArrayList<>(filter.entrySet());
+				qs += "item." + list.get(0).getKey() + " = " + this.convert(list.get(0).getValue());
+				for (int i = 1; i < list.size(); ++i) {
+					final Map.Entry<String, Object> me = list.get(i);
+					qs += " AND " + "item." + me.getKey() + " = " + this.convert(me.getValue());
+				}
+			}
+
+			final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
+			final T obj = trans.em.find(itemType, qs);
+			trans.em.remove(obj);
+		} catch (final Exception ex) {
+			throw new PersistentStoreException("Failed to remove item", ex);
+		}
 	}
 
 	// ---------- Ports ---------

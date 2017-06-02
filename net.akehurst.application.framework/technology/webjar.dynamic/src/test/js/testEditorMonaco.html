@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+
+		<title>Monaco Editor Test</title>
+	</head>
+	
+	<body>
+	
+		<div id="container" style="height:40em;"></div>
+	
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js' type='text/javascript' charset='utf-8'></script>
+	
+		<script>
+			require.config({ paths: { 'vs': 'http://unpkg.com/monaco-editor@0.7.0/min/vs' }});
+			
+			window.MonacoEnvironment = {
+					getWorkerUrl: function(workerId, label) {
+						return 'monaco-editor-worker-loader-proxy.js';
+					}
+				};
+			
+			require(['vs/loader','vs/editor/editor.main'], function() {
+				var editor = monaco.editor.create(document.getElementById('container'), {value:'init'});
+				
+				let i=0
+				
+			});
+		//});
+		</script>
+	</body>
+</html>

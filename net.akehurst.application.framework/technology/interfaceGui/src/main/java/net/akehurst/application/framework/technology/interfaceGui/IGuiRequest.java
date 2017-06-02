@@ -104,9 +104,15 @@ public interface IGuiRequest {
 	 */
 	void elementClear(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
 
-	void elementDisable(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
+	void elementSetDisabled(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
+
+	void elementSetLoading(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
 
 	void elementSetProperty(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
+
+	void elementAddClass(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String className);
+
+	void elementRemoveClass(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String className);
 
 	void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String text);
 
@@ -137,4 +143,5 @@ public interface IGuiRequest {
 
 	void graphCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
 
+	void graphUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
 }

@@ -308,7 +308,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		data.put("newElementId", newElementId);
 		data.put("type", type);
 
-		this.verticle.comms.send(session, "Gui.addElement", data);
+		this.verticle.comms.send(session, "Element.add", data);
 
 	};
 
@@ -326,7 +326,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		final JsonObject atts = new JsonObject(jsonStr);
 		data.put("attributes", atts);
 
-		this.verticle.comms.send(session, "Gui.addElement", data);
+		this.verticle.comms.send(session, "Element.add", data);
 	}
 
 	@Override
@@ -334,9 +334,9 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
-		data.put("elementId", elementId);
+		data.put("id", elementId);
 
-		this.verticle.comms.send(session, "Gui.removeElement", data);
+		this.verticle.comms.send(session, "Element.remove", data);
 	}
 
 	@Override
@@ -344,21 +344,33 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
-		data.put("elementId", elementId);
+		data.put("id", elementId);
 
-		this.verticle.comms.send(session, "Gui.elementClear", data);
+		this.verticle.comms.send(session, "Element.clear", data);
 	}
 
 	@Override
-	public void elementDisable(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+	public void elementSetDisabled(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
 			final boolean value) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
-		data.put("elementId", elementId);
+		data.put("id", elementId);
 		data.put("value", value);
 
-		this.verticle.comms.send(session, "Gui.elementDisable", data);
+		this.verticle.comms.send(session, "Element.setDisabled", data);
+	}
+
+	@Override
+	public void elementSetLoading(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final boolean value) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("id", elementId);
+		data.put("value", value);
+
+		this.verticle.comms.send(session, "Element.setLoading", data);
 	}
 
 	@Override
@@ -371,7 +383,29 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		data.put("property", propertyName);
 		data.put("value", value);
 
-		this.verticle.comms.send(session, "Gui.set", data);
+		this.verticle.comms.send(session, "Element.setProperty", data);
+	}
+
+	@Override
+	public void elementAddClass(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final String className) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("id", elementId);
+		data.put("className", className);
+		this.verticle.comms.send(session, "Element.addClass", data);
+	}
+
+	@Override
+	public void elementRemoveClass(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final String className) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("id", elementId);
+		data.put("className", className);
+		this.verticle.comms.send(session, "Element.removeClass", data);
 	}
 
 	@Override
@@ -475,7 +509,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		final JsonObject ddata = new JsonObject(jsonDiagramData);
 		data.put("data", ddata);
 
-		this.verticle.comms.send(session, "Gui.createDiagram", data);
+		this.verticle.comms.send(session, "Diagram.create", data);
 	}
 
 	@Override
@@ -488,7 +522,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		final JsonObject ddata = new JsonObject(jsonDiagramData);
 		data.put("data", ddata);
 
-		this.verticle.comms.send(session, "Gui.updateDiagram", data);
+		this.verticle.comms.send(session, "Diagram.update", data);
 	}
 
 	@Override
@@ -545,8 +579,27 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	@Override
 	public void graphCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String jsonGraphData) {
-		// TODO Auto-generated method stub
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("parentId", parentId);
+		final JsonObject ddata = new JsonObject(jsonGraphData);
+		data.put("data", ddata);
 
+		this.verticle.comms.send(session, "Graph.create", data);
+	}
+
+	@Override
+	public void graphUpdate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+			final String jsonGraphData) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("parentId", parentId);
+		final JsonObject ddata = new JsonObject(jsonGraphData);
+		data.put("data", ddata);
+
+		this.verticle.comms.send(session, "Graph.update", data);
 	}
 
 	// --------- Ports ---------

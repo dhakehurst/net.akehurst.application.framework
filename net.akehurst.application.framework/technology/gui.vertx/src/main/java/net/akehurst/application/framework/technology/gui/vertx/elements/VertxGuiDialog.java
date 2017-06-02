@@ -89,25 +89,27 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 		final Map<String, Object> newEventData = new HashMap<>();
 		for (final Map.Entry<String, Object> me : ed.entrySet()) {
 			final String key = me.getKey();
-			final String newKey = key.substring(len);
-			final Object value = me.getValue();
-			if (value instanceof List) {
-				final ArrayList<Object> newList = new ArrayList<>();
-				for (final Object lv : (List<Object>) value) {
-					if (lv instanceof Map) {
-						final Map<String, Object> newMap = new HashMap<>();
-						for (final Map.Entry<String, Object> lvme : ((Map<String, Object>) lv).entrySet()) {
-							final String newMapKey = lvme.getKey().substring(len);
-							newMap.put(newMapKey, lvme.getValue());
+			if (key.startsWith(this.dialogElementPrefix)) {
+				final String newKey = key.substring(len);
+				final Object value = me.getValue();
+				if (value instanceof List) {
+					final ArrayList<Object> newList = new ArrayList<>();
+					for (final Object lv : (List<Object>) value) {
+						if (lv instanceof Map) {
+							final Map<String, Object> newMap = new HashMap<>();
+							for (final Map.Entry<String, Object> lvme : ((Map<String, Object>) lv).entrySet()) {
+								final String newMapKey = lvme.getKey().substring(len);
+								newMap.put(newMapKey, lvme.getValue());
+							}
+							newList.add(newMap);
+						} else {
+							newList.add(lv);
 						}
-						newList.add(newMap);
-					} else {
-						newList.add(lv);
 					}
+					newEventData.put(newKey, newList);
+				} else {
+					newEventData.put(newKey, value);
 				}
-				newEventData.put(newKey, newList);
-			} else {
-				newEventData.put(newKey, value);
 			}
 		}
 		final GuiEvent newEvent = new GuiEvent(event.getSession(), event.getSignature(), newEventData);

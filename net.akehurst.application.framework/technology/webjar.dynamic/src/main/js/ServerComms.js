@@ -41,6 +41,7 @@
 		if (null==h) {
 			console.log('no handler for '+channelId)
 		} else {
+			console.log(channelId+' '+JSON.stringify(data))
 			h(data)
 		}
 	}

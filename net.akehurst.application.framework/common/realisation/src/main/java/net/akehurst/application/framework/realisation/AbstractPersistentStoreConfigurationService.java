@@ -38,8 +38,8 @@ abstract public class AbstractPersistentStoreConfigurationService extends Abstra
 	public <T> T fetchValue(final Class<T> itemType, final String idPath, final String defaultValueString) {
 		try {
 			final IPersistenceTransaction trans = this.getStore().startTransaction();
-			final PersistentItemQuery pid = new PersistentItemQuery(idPath);
-			final T value = this.getStore().retrieve(trans, pid, itemType);
+			final PersistentItemQuery pid = new PersistentItemQuery("", idPath);
+			final T value = this.getStore().retrieve(trans, itemType, pid);
 			this.getStore().commitTransaction(trans);
 			if (null != value) {
 				this.logger.log(LogLevel.TRACE,

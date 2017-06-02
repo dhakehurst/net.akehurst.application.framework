@@ -19,13 +19,20 @@ import net.akehurst.application.framework.common.AbstractDataType;
 
 public class PersistentItemQuery extends AbstractDataType {
 
-	public PersistentItemQuery(String value) {
-		super(value);
+	public PersistentItemQuery(final String language, final String value) {
+		super(language, value);
 		this.value = value;
+		this.language = language;
 	}
-	
-	String value;
-	public String asPrimitive() {
+
+	private final String language;
+	private final String value;
+
+	public String getLanguage() {
+		return this.language;
+	}
+
+	public String getValue() {
 		return this.value;
 	}
 }
