@@ -15,7 +15,6 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx;
 
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
@@ -26,32 +25,35 @@ public class MyAuthHandler extends AuthHandlerImpl {
 	private final String loginRedirectURL;
 	private final String rootPath;
 
-	public MyAuthHandler(final AuthProvider authProvider, final String loginRedirectURL, final String rootPath) {
+	public MyAuthHandler(final MyAuthProvider authProvider, final String loginRedirectURL, final String rootPath) {
 		super(authProvider);
 		this.loginRedirectURL = loginRedirectURL;
 		this.rootPath = rootPath;
 	}
 
-	public AuthProvider getProvider() {
-		return super.authProvider;
+	public MyAuthProvider getProvider() {
+		return (MyAuthProvider) super.authProvider;
 	}
 
 	@Override
 	public void handle(final RoutingContext context) {
-		final Session session = context.session();
-		if (session != null) {
-			final User user = context.user();
-			if (user != null) {
-				// Already logged in, just authorise
-				this.authorise(user, context);
-			} else {
-				// Now redirect to the login url - we'll get redirected back here after successful login
-				this.decodeOriginalUrl(session, context.request().absoluteURI());
-				context.response().putHeader("location", this.loginRedirectURL).setStatusCode(302).end();
-			}
+
+		User user = context.user();
+		if (user != null) {
+			// Already logged in, just authorise
+			this.authorise(user, context);
 		} else {
-			context.fail(new NullPointerException("No session - did you forget to include a SessionHandler?"));
+			this.getProvider().authenticate(context);
+			user = context.user();
+			if (user == null) {
+				// Now redirect to the login url - we'll get redirected back here after successful login
+				this.decodeOriginalUrl(context.session(), context.request().absoluteURI());
+				context.response().putHeader("location", this.loginRedirectURL).setStatusCode(302).end();
+			} else {
+				this.authorise(user, context);
+			}
 		}
+
 	}
 
 	private void decodeOriginalUrl(final Session session, final String originalUrlStr) {

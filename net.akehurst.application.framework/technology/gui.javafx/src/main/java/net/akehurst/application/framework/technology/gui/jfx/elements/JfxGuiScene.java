@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import com.sun.javafx.css.Selector;
 
@@ -203,6 +204,25 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 	public void switchTo(final UserSession session, final Map<String, String> sceneArguments) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void navigateTo(final UserSession session, final String location) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void newWindow(final UserSession session, final String location) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String tokenPath,
+			final String authorisationPath, final String scopes) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

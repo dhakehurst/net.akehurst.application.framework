@@ -17,6 +17,7 @@ package net.akehurst.application.framework.technology.interfaceGui;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
@@ -49,6 +50,9 @@ public interface IGuiRequest {
 	 */
 	void clearAuthentication(UserSession session) throws GuiException;
 
+	Future<String> oauthAuthorise(UserSession session, String clientId, String clientSecret, String site, String tokenPath, String authorisationPath,
+			String scopes);
+
 	/**
 	 * if location starts with '/' then navigate to a location relative to the root of this site
 	 *
@@ -60,6 +64,8 @@ public interface IGuiRequest {
 	 * @param location
 	 */
 	void navigateTo(UserSession session, String location);
+
+	void newWindow(UserSession session, String location);
 
 	void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId, Map<String, String> sceneArguments);
 

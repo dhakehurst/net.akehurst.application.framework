@@ -20,6 +20,7 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -180,6 +181,13 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String tokenPath,
+			final String authorisationPath, final String scopes) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public <T extends IGuiDialog> T dialogCreate(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
 			final String title, final String dialogContent) {
 		// TODO Auto-generated method stub
@@ -259,6 +267,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void navigateTo(final UserSession session, final String location) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void newWindow(final UserSession session, final String location) {
 		// TODO Auto-generated method stub
 
 	}

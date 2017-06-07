@@ -51,7 +51,7 @@ require.config({
         'jointjs': ['dagre', 'graphlib'],
         'Editor': ['vs/loader','vs/editor/editor.main'], //['orion/code_edit'],
         'Graph': ['cytoscape', 'cytoscape-dagre'],
-        'Dynamic':['Diagram', 'Editor']
+        'Dynamic':[]
     },
     map: {
         '*': {

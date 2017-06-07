@@ -18,7 +18,7 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 
 public class test_LdapAuthenticator extends AbstractTestCase {
 
-	test_context_LdapAuthenticator testContext;
+	testContext_LdapAuthenticator testContext;
 
 	@Ignore
 	@Test
@@ -35,7 +35,7 @@ public class test_LdapAuthenticator extends AbstractTestCase {
 
 			final Map<String, IService> services = new HashMap<>();
 			services.put("configuration", configuration);
-			this.testContext = tf.createTestEnvironment(test_context_LdapAuthenticator.class, services, new String[0]);
+			this.testContext = tf.createTestEnvironment(testContext_LdapAuthenticator.class, services, new String[0]);
 			this.testContext.afStart();
 
 			final UserDetails user = new UserDetails("<unknown>");

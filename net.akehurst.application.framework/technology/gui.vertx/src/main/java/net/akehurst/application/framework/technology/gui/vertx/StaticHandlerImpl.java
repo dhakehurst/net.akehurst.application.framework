@@ -16,6 +16,7 @@
 package net.akehurst.application.framework.technology.gui.vertx;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.file.NoSuchFileException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -67,6 +68,8 @@ public class StaticHandlerImpl implements StaticHandler {
 	private int maxCacheSize = StaticHandler.DEFAULT_MAX_CACHE_SIZE;
 	protected boolean rangeSupport = StaticHandler.DEFAULT_RANGE_SUPPORT;
 	private boolean allowRootFileSystemAccess = StaticHandler.DEFAULT_ROOT_FILESYSTEM_ACCESS;
+	private boolean sendVaryHeader = StaticHandler.DEFAULT_SEND_VARY_HEADER;
+	private String defaultContentEncoding = Charset.defaultCharset().name(); // TODO: !! see original
 
 	// These members are all related to auto tuning of synchronous vs asynchronous file system access
 	private static int NUM_SERVES_TUNING_FS_ACCESS = 1000;
@@ -113,6 +116,11 @@ public class StaticHandlerImpl implements StaticHandler {
 			// We *do not use* etags and expires (since they do the same thing - redundant)
 			headers.set("cache-control", "public, max-age=" + this.maxAgeSeconds);
 			headers.set("last-modified", this.dateTimeFormatter.format(props.lastModifiedTime()));
+			// We send the vary header (for intermediate caches)
+			// (assumes that most will turn on compression when using static handler)
+			if (this.sendVaryHeader && request.headers().contains("accept-encoding")) {
+				headers.set("vary", "accept-encoding");
+			}
 		}
 
 		// date header is mandatory
@@ -487,6 +495,18 @@ public class StaticHandlerImpl implements StaticHandler {
 	@Override
 	public StaticHandler setMaxAvgServeTimeNs(final long maxAvgServeTimeNanoSeconds) {
 		this.maxAvgServeTimeNanoSeconds = maxAvgServeTimeNanoSeconds;
+		return this;
+	}
+
+	@Override
+	public StaticHandler setSendVaryHeader(final boolean sendVaryHeader) {
+		this.sendVaryHeader = sendVaryHeader;
+		return this;
+	}
+
+	@Override
+	public StaticHandler setDefaultContentEncoding(final String contentEncoding) {
+		this.defaultContentEncoding = contentEncoding;
 		return this;
 	}
 

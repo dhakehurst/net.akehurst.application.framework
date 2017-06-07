@@ -88,16 +88,25 @@ define([
 	
 	Dynamic.prototype.fetchEventData = function(el) {
 	//TODO: not sure if this is quite what we want!
-		var d1 = this.fetchEventData1(el,'tr')
-		var d2 = this.fetchEventData1(el,'fieldset') //legacy now replaced with div.event-group (mainly because browser support for fieldset css/flex is broken on some browsers)
+		var d1 = this.fetchPossibleRowId(el,'tr')
+		//var d2 = this.fetchEventData1(el,'fieldset') //legacy now replaced with div.event-group (mainly because browser support for fieldset css/flex is broken on some browsers)
 		var d3 = this.fetchEventData1(el,'event-group')
-		var data = $.extend({}, d1, d2, d3)
+		var data = $.extend({}, d1, d3)
 		return data
 	}
-	Dynamic.prototype.fetchEventData1 = function(el, type) {
+	Dynamic.prototype.fetchPossibleRowId = function(el, type) {
+		let p = el.closest('tr')
+		if (null!=p) {
+			let id = $(p).attr('id')
+			return {afRowId:id}
+		} else {
+			return {}
+		}
+	}
+	
+	Dynamic.prototype.fetchEventData1 = function(el, cls) {
 		let data = {}
-		let type_or_class = type+', .'+type
-		let p = el.closest(type_or_class)
+		let p = el.closest(cls)
 		if (null!=this.form) {
 			for(i=0; i< this.form.length; i++) {
 				let id = this.form[i].id
@@ -231,6 +240,22 @@ define([
 			window.location.href = newRef
 		} else {
 			window.location.href = location
+		}
+	}
+	
+	Dynamic.prototype.newWindow = function(location) {
+		let newLocation = ''
+		if (location.startsWith('/')) {
+			var myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+			var newRef = myLocation + location
+	
+			newLocation = newRef
+		} else {
+			newLocation = location
+		}
+		let newWindow = window.open(newLocation)
+		if (window.focus) {
+			newWindow.focus()
 		}
 	}
 	
@@ -582,6 +607,9 @@ define([
 		})
 		this.serverComms.registerHandler('Gui.switchToScene', function(args) {
 			dynamic.switchToScene(args.stageId, args.sceneId, args.sceneArguments)
+		})
+		this.serverComms.registerHandler('Gui.newWindow', function(args) {
+			dynamic.newWindow(args.location)
 		})
 		this.serverComms.registerHandler('Gui.showDialog', function(args) {
 			dynamic.showDialog(args.parentId, args.dialogId, args.content)

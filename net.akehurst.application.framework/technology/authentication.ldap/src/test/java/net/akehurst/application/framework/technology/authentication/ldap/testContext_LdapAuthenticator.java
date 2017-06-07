@@ -6,7 +6,7 @@ import net.akehurst.application.framework.common.test.annotation.TestComponentIn
 import net.akehurst.application.framework.common.test.annotation.TestContext;
 
 @TestContext
-public class test_context_LdapAuthenticator extends AbstractTestContext {
+public class testContext_LdapAuthenticator extends AbstractTestContext {
 
 	@ComponentInstance
 	public LdapAuthenticator sut;

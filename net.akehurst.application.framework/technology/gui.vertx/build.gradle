@@ -32,10 +32,13 @@ dependencies {
 	compile project(":${rootProject.name}.technology.interfaceComms")
 	
 	compile 'org.apache.commons:commons-lang3:3.4'
-	compile "io.vertx:vertx-core:3.2.1"
-	compile "io.vertx:vertx-web:3.2.1"
-	compile "io.vertx:vertx-auth-shiro:3.2.1"
+	compile "io.vertx:vertx-core:3.4.1"
+	compile "io.vertx:vertx-web:3.4.1"
+	compile "io.vertx:vertx-auth-shiro:3.4.1"
+	compile "io.vertx:vertx-auth-oauth2:3.4.1"
+	
 	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
 	
-
+	testCompile project(":${rootProject.name}.common.test")
+	testCompile project(":${rootProject.name}.engineering.gui.common")
 }

@@ -25,7 +25,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -43,7 +42,7 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public class ClientServerComms {
 
-	public ClientServerComms(final Vertx vertx, final Router router, final AuthProvider authProvider, final String rootPath, final String busPath) {
+	public ClientServerComms(final Vertx vertx, final Router router, final MyAuthProvider authProvider, final String rootPath, final String busPath) {
 		this.vertx = vertx;
 		this.router = router;
 		this.rootPath = rootPath;
@@ -62,7 +61,7 @@ public class ClientServerComms {
 	Vertx vertx;
 	Router router;
 	String rootPath;
-	AuthProvider authProvider;
+	MyAuthProvider authProvider;
 
 	String busPath;
 	EventBus eventbus;

@@ -54,70 +54,90 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
+	static final String EVENT_STAGE_CREATED = "IGuiNotification.notifyStageCreated";
+	static final String EVENT_STAGE_CLOSED = "IGuiNotification.notifyStageClosed";
+	static final String EVENT_SCENE_LOADED = "IGuiNotification.notifySceneLoaded";
+
 	public VertxWebsite(final String objectId) {
 		super(objectId);
 	}
 
 	@ServiceReference
-	IApplicationFramework af;
+	private IApplicationFramework af;
 
 	@ServiceReference
-	ILogger logger;
+	public ILogger logger;
 
 	@ConfiguredValue(defaultValue = "")
-	String rootPath;
-
-	String getNormalisedRootPath() {
-		return 0 == this.rootPath.length() ? "/" : this.rootPath + "/";
-	}
+	public String rootPath;
 
 	@ConfiguredValue(defaultValue = "test/")
-	String testPath;
-
-	String getTestPath() {
-		return this.getNormalisedRootPath() + this.testPath;
-	}
+	private String testPath;
 
 	@ConfiguredValue(defaultValue = "download/")
-	String downloadPath;
-
-	String getDownloadPath() {
-		return this.getNormalisedRootPath() + this.downloadPath;
-	}
+	private String downloadPath;
 
 	@ConfiguredValue(defaultValue = "upload/")
-	String uploadPath;
+	private String uploadPath;
 
-	String getUploadPath() {
-		return this.getNormalisedRootPath() + this.uploadPath;
-	}
+	@ConfiguredValue(defaultValue = "oauth/callback")
+	private String oauthCallbackPath;
 
 	@ConfiguredValue(defaultValue = "js")
-	String jsPath;
+	private String jsPath;
 
 	@ConfiguredValue(defaultValue = "lib", description = "The path to which webjar libraries are maped, i.e. js libs on the classpath")
-	String libPath;
+	private String libPath;
 
-	String getJsPath() {
-		return this.getNormalisedRootPath() + this.jsPath;
-	}
-
-	String getLibPath() {
-		return this.getNormalisedRootPath() + this.libPath;
-	}
-
-	String getSockjsPath() {
-		return "sockjs/"; // this value is hard coded in index-script.js, they must match
-	}
+	@ConfiguredValue(defaultValue = "META-INF/resources/webjars", description = "The class path for finding js libraries, the 'libPath' is mapped to this.")
+	private String libClassPath;
 
 	@CommandLineArgument(description = "Override the default (9999) port")
 	@ConfiguredValue(defaultValue = "9999")
-	IpPort port;
+	private IpPort port;
 
-	AVerticle verticle;
+	private AVerticle verticle;
 
-	Map<SceneIdentity, IGuiScene> scenes;
+	private Map<SceneIdentity, IGuiScene> scenes;
 
+	public String getTestPath() {
+		return this.getNormalisedRootPath() + this.testPath;
+	}
+
+	public String getNormalisedRootPath() {
+		return 0 == this.rootPath.length() ? "/" : this.rootPath + "/";
+	}
+
+	public String getDownloadPath() {
+		return this.getNormalisedRootPath() + this.downloadPath;
+	}
+
+	public String getUploadPath() {
+		return this.getNormalisedRootPath() + this.uploadPath;
+	}
+
+	public String getJsPath() {
+		return this.getNormalisedRootPath() + this.jsPath;
+	}
+
+	public String getLibPath() {
+		return this.getNormalisedRootPath() + this.libPath;
+	}
+
+	public String getLibClassPath() {
+		return this.libClassPath;
+	}
+
+	public String getSockjsPath() {
+		// this value is hard coded in companion javascript, they must match
+		return "sockjs/";
+	}
+
+	public String getOAuthCallbckPath() {
+		return this.getNormalisedRootPath() + this.oauthCallbackPath;
+	}
+
+	// --- Component ---
 	@Override
 	public void afConnectParts() {}
 
@@ -140,6 +160,12 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public java.util.concurrent.Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site,
+			final String tokenPath, final String authorisationPath, final String scopes) {
+		return this.verticle.oauthAuthorise(session, clientId, clientSecret, site, tokenPath, authorisationPath, scopes);
+	}
+
+	@Override
 	public void requestRecieveEvent(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
 			final GuiEventType eventType) {
 		final JsonObject data = new JsonObject();
@@ -152,10 +178,6 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		this.verticle.comms.send(session, "Gui.requestRecieveEvent", data);
 
 	}
-
-	static final String EVENT_STAGE_CREATED = "IGuiNotification.notifyStageCreated";
-	static final String EVENT_STAGE_CLOSED = "IGuiNotification.notifyStageClosed";
-	static final String EVENT_SCENE_LOADED = "IGuiNotification.notifySceneLoaded";
 
 	public GuiEventType convertToGuiEvent(final String eventType) {
 		switch (eventType) {
@@ -275,6 +297,13 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		data.put("sceneId", sceneId.asPrimitive());
 		data.put("sceneArguments", new JsonObject(new HashMap<String, Object>(sceneArguments)));
 		this.verticle.comms.send(session, "Gui.switchToScene", data);
+	}
+
+	@Override
+	public void newWindow(final UserSession session, final String location) {
+		final JsonObject data = new JsonObject();
+		data.put("location", location);
+		this.verticle.comms.send(session, "Gui.newWindow", data);
 	}
 
 	@Override
