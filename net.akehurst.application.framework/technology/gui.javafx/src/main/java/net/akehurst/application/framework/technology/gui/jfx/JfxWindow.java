@@ -329,6 +329,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void tableClearAllColumnHeaders(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void tableAppendRow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId,
 			final Map<String, Object> rowData) {
 		// TODO Auto-generated method stub

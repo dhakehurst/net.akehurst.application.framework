@@ -238,7 +238,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
 					final User u = rc.user();
 					final String path = rc.normalisedPath();
-					System.out.println(path + " " + (null == u ? "null" : u.principal()));
+					this.logger.log(LogLevel.TRACE, "%s requested", path);
 					rc.next();
 				}, webroot, variables);
 			} else {
@@ -247,7 +247,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 					this.verticle.comms.activeSessions.put(rc.session().id(), rc.session());
 					final User u = rc.user();
 					final String path = rc.normalisedPath();
-					System.out.println(path + " " + (null == u ? "null" : u.principal()));
+					this.logger.log(LogLevel.TRACE, "%s requested by user %s", path, null == u ? "null" : u.principal());
 					rc.next();
 				}, webroot, variables);
 
@@ -460,6 +460,16 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		data.put("existingRowCellContent", existingRowCellContent);
 
 		this.verticle.comms.send(session, "Table.addColumn", data);
+	}
+
+	@Override
+	public void tableClearAllColumnHeaders(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("tableId", tableId);
+
+		this.verticle.comms.send(session, "Table.clearAllColumnHeaders", data);
 	}
 
 	@Override

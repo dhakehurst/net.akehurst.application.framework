@@ -55,6 +55,17 @@
 		}
 	}
 
+	Table.prototype.clearAllColumnHeaders = function() {
+		try {
+			//template now moved to thead
+			//$(table).find('tbody').find('tr').not('.table-row-template').remove()
+			$(this.thead).find('tr').remove()
+		} catch (err) {
+			console.log("Error: "+err.message)
+			return ""
+		}
+	}
+	
 	Table.prototype.appendRow = function(rowData) {
 		try {
 			if (this.rowTemplate.length ==0) {
@@ -77,7 +88,13 @@
 
 	Table.prototype.removeRow = function(rowId) {
 		try {
-			$(this.table).find('#'+rowId).remove()
+			let dialog = $(this.table).closest('dialog')
+			if (dialog) {
+				let dialog_id = $(dialog).attr('id')
+				$(this.table).find('#'+dialog_id+'_'+rowId).remove()
+			} else {
+				$(this.table).find('#'+rowId).remove()
+			}
 		} catch (err) {
 			console.log("Error: "+err.message)
 			return ""

@@ -16,6 +16,8 @@
 package net.akehurst.application.framework.technology.filesystem;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -43,6 +45,15 @@ abstract public class DirectoryEntry implements IDirectoryEntry {
 	@Override
 	public String getFullName() {
 		return this.path.toString().replaceAll("\\\\", "/");
+	}
+
+	@Override
+	public URL toURL() throws FilesystemException {
+		try {
+			return this.path.toUri().toURL();
+		} catch (final MalformedURLException e) {
+			throw new FilesystemException("Cannot convert to URL", e);
+		}
 	}
 
 	@Override

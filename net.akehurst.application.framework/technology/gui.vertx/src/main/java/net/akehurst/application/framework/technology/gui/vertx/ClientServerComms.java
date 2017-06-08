@@ -25,13 +25,13 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.User;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CookieHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
-import io.vertx.ext.web.handler.impl.UserHolder;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
@@ -68,12 +68,11 @@ public class ClientServerComms {
 
 	Map<String, Session> activeSessions;
 
-	UserSession createUserSession(final Session webSession) {
+	UserSession createUserSession(final Session webSession, final User webUser) {
 		this.activeSessions.put(webSession.id(), webSession);
 		UserDetails user = null;
-		final UserHolder holder = webSession.get("__vertx.userHolder");
-		if (null != holder && null != holder.user) {
-			final String n = holder.user.principal().getString("username");
+		if (null != webUser) {
+			final String n = webUser.principal().getString("username");
 			user = new UserDetails(n);
 		} else {
 			// not authenticated, leave user as null
@@ -119,7 +118,7 @@ public class ClientServerComms {
 		this.router.route(socksRoutePath).handler(sockJSHandler);
 		sockJSHandler.socketHandler(ss -> {
 			this.socks.put(ss.webSession(), ss);
-			final UserSession sess = this.createUserSession(ss.webSession());
+			final UserSession sess = this.createUserSession(ss.webSession(), ss.webUser());
 			ss.handler(b -> {
 				final String s = new String(b.getBytes());
 				System.out.println(s);

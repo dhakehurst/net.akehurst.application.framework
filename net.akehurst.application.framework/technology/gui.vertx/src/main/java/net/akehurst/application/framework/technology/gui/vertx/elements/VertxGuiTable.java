@@ -51,6 +51,11 @@ public class VertxGuiTable extends VertxGuiElement implements IGuiTable {
 	}
 
 	@Override
+	public void clearAllColumnHeaders(final UserSession session) {
+		this.getGuiRequest().tableClearAllColumnHeaders(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId());
+	}
+
+	@Override
 	public void appendRow(final UserSession session, final Map<String, Object> rowData) {
 		this.getGuiRequest().tableAppendRow(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), rowData);
 	}

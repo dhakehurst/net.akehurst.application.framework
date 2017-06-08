@@ -90,7 +90,7 @@ define([
 	//TODO: not sure if this is quite what we want!
 		var d1 = this.fetchPossibleRowId(el,'tr')
 		//var d2 = this.fetchEventData1(el,'fieldset') //legacy now replaced with div.event-group (mainly because browser support for fieldset css/flex is broken on some browsers)
-		var d3 = this.fetchEventData1(el,'event-group')
+		var d3 = this.fetchEventData1(el,'.event-group')
 		var data = $.extend({}, d1, d3)
 		return data
 	}
@@ -415,30 +415,18 @@ define([
 		})
 	}
 	
+	Dynamic.prototype.tableClearAllColumnHeaders = function(tableId) {
+		require(["Table"],function(Table) {
+			let t = new Table(tableId)
+			t.clearAllColumnHeaders();
+		})
+	}
+	
 	Dynamic.prototype.tableAppendRow = function(tableId, rowData) {
 		require(["Table"],function(Table) {
 			let t = new Table(tableId)
 			t.appendRow(rowData);
 		});
-		
-//		var table = $('#'+tableId)
-//		if (table.length == 0) {
-//			console.log('Error: cannot find table element with id ' + tableId)
-//		} else {
-//			var rowTemplate = $(table).find('tr.table-row-template')
-//			if (rowTemplate.length ==0) {
-//				console.log('Error: table does not define a table-row-template ' + tableId)
-//			} else {
-//				let rowTemplateHtml = $(rowTemplate)[0].outerHTML
-//				let row = rowData
-//				let tpl = eval('`'+rowTemplateHtml+'`');
-//				let tbody = $(table).find('tbody')
-//				let tr = $(tpl)
-//				$(tr).removeClass('table-row-template')
-//				$(tbody).append(tr)
-//				rowTemplate[0].cloneEventsTo(tr[0])
-//			}
-//		}
 	}
 	
 	Dynamic.prototype.tableRemoveRow = function(tableId, rowId) {
@@ -446,12 +434,6 @@ define([
 			let t = new Table(tableId)
 			t.removeRow(rowId);
 		});
-//		var table = $('#'+tableId)
-//		if (table.length == 0) {
-//			console.log('Error: cannot find table element with id ' + tableId)
-//		} else {
-//			$(table).find('#'+rowId).remove()
-//		}
 	}
 	
 	Dynamic.prototype.tableClearAllRows = function(tableId) {
@@ -459,12 +441,6 @@ define([
 			let t = new Table(tableId)
 			t.clearAllRows();
 		});
-//		var table = $('#'+tableId)
-//		if (table.length == 0) {
-//			console.log('Error: cannot find table element with id ' + tableId)
-//		} else {
-//			$(table).find('tbody').find('tr').not('.table-row-template').remove()
-//		}
 	}
 	
 	
@@ -618,6 +594,9 @@ define([
 		//Tables
 		this.serverComms.registerHandler('Table.addColumn', function(args) {
 			dynamic.tableAddColumn(args.tableId, args.colHeaderContent, args.rowTemplateCellContent, args.existingRowCellContent)
+		})
+		this.serverComms.registerHandler('Table.clearAllColumnHeaders', function(args) {
+			dynamic.tableClearAllColumnHeaders(args.tableId)
 		})
 		this.serverComms.registerHandler('Table.appendRow', function(args) {
 			dynamic.tableAppendRow(args.tableId, args.rowData)

@@ -33,4 +33,6 @@ public interface IGuiTable extends IGuiElement {
 	void removeRow(UserSession session, String rowId);
 
 	void clearAllRows(UserSession session);
+
+	void clearAllColumnHeaders(UserSession session);
 }

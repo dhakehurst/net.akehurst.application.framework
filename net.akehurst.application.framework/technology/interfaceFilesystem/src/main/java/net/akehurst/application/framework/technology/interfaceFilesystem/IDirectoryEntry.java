@@ -15,11 +15,15 @@
  */
 package net.akehurst.application.framework.technology.interfaceFilesystem;
 
+import java.net.URL;
+
 public interface IDirectoryEntry {
 
 	String getName();
 
 	String getFullName();
+
+	URL toURL() throws FilesystemException;
 
 	IDirectory getParent();
 

@@ -271,20 +271,21 @@ public class AVerticle implements Verticle {
 		this.router.route(downloadPath).handler(rc -> {
 			final String filename = rc.request().getParam("filename");
 			final Buffer buffer = Buffer.buffer();
-			this.ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(this.comms.createUserSession(rc.session()), filename, new IGuiCallback() {
+			this.ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(this.comms.createUserSession(rc.session(), rc.user()), filename,
+					new IGuiCallback() {
 
-				@Override
-				public void success(final Object result) {
-					final byte[] bytes = (byte[]) result;
-					buffer.appendBytes(bytes);
-					rc.response().end(buffer);
-				}
+						@Override
+						public void success(final Object result) {
+							final byte[] bytes = (byte[]) result;
+							buffer.appendBytes(bytes);
+							rc.response().end(buffer);
+						}
 
-				@Override
-				public void error(final Exception ex) {
-					rc.response().end(ex.getMessage());
-				}
-			});
+						@Override
+						public void error(final Exception ex) {
+							rc.response().end(ex.getMessage());
+						}
+					});
 
 			rc.response().putHeader("content-type", "download");
 		});
@@ -294,7 +295,7 @@ public class AVerticle implements Verticle {
 		this.addPostRoute(uploadPath, rc -> {
 			final FileUpload fu = rc.fileUploads().iterator().next();
 
-			this.ws.portGui().out(IGuiNotification.class).notifyUpload(this.comms.createUserSession(rc.session()), fu.uploadedFileName());
+			this.ws.portGui().out(IGuiNotification.class).notifyUpload(this.comms.createUserSession(rc.session(), rc.user()), fu.uploadedFileName());
 
 		});
 		this.ws.logger.log(LogLevel.INFO, "Upload path:  " + "http://localhost:" + this.port + uploadPath);

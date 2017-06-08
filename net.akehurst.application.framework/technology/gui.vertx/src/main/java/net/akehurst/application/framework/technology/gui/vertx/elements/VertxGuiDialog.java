@@ -89,7 +89,10 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 		final Map<String, Object> newEventData = new HashMap<>();
 		for (final Map.Entry<String, Object> me : ed.entrySet()) {
 			final String key = me.getKey();
-			if (key.startsWith(this.dialogElementPrefix)) {
+			if ("afRowId".equals(key)) {
+				final String newValue = me.getValue().toString().substring(len);
+				newEventData.put(key, newValue);
+			} else if (key.startsWith(this.dialogElementPrefix)) {
 				final String newKey = key.substring(len);
 				final Object value = me.getValue();
 				if (value instanceof List) {
@@ -110,6 +113,8 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 				} else {
 					newEventData.put(newKey, value);
 				}
+			} else {
+				// should not be any other event data for a dialog! I think
 			}
 		}
 		final GuiEvent newEvent = new GuiEvent(event.getSession(), event.getSignature(), newEventData);

@@ -131,6 +131,8 @@ public interface IGuiRequest {
 	void tableAddColumn(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String colHeaderContent,
 			String rowTemplateCellContent, String existingRowCellContent);
 
+	void tableClearAllColumnHeaders(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
+
 	void tableAppendRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, Map<String, Object> rowData);
 
 	void tableRemoveRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, String rowId);
@@ -150,4 +152,5 @@ public interface IGuiRequest {
 	void graphCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
 
 	void graphUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
+
 }
