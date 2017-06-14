@@ -15,6 +15,9 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui;
 
+import java.util.List;
+import java.util.Map;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiNotification {
@@ -23,7 +26,7 @@ public interface IGuiNotification {
 
 	void notifyEventOccured(GuiEvent event);
 
-	void notifyDowloadRequest(UserSession session, String filename, IGuiCallback callback);
+	void notifyDowloadRequest(UserSession session, Map<String, List<String>> params, IGuiCallback callback);
 
 	void notifyUpload(UserSession session, String filename);
 }

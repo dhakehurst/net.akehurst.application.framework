@@ -17,6 +17,7 @@ package net.akehurst.application.framework.technology.gui.common;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
@@ -159,7 +160,7 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 	}
 
 	@Override
-	public void notifyDowloadRequest(final UserSession session, final String filename, final IGuiCallback callback) {
+	public void notifyDowloadRequest(final UserSession session, final Map<String, List<String>> params, final IGuiCallback callback) {
 		// TODO Auto-generated method stub
 
 	}

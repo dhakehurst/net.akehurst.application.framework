@@ -26,8 +26,8 @@ require.config({
 		"lodash"          : "lodash/3.10.1/lodash.min",
 		"graphlib"        : "graphlib/2.1.1/dist/graphlib.min",
 		"dagre"           : "dagre/0.7.4/dist/dagre.core.min",
-		"cytoscape"       : "cytoscape/2.7.16/dist/cytoscape.min",
-		"cytoscape-dagre" : "cytoscape-dagre/1.3.0/cytoscape-dagre",
+		"cytoscape"       : "cytoscape/3.1.1/dist/cytoscape.min",
+		"cytoscape-dagre" : "cytoscape-dagre/1.6.0/cytoscape-dagre",
 		"backbone"        : "backbone/1.3.3/backbone-min",
 		"jointjs"         : "jointjs/1.0.3/dist/joint.min",
 		'jointjs-loader-hack': 'dynamic/1.0.alpha.19/jointjs-loader-hack',
@@ -71,7 +71,7 @@ require.config({
 require(['jquery','Dynamic'],function($, Dynamic){
 
 	$(document).ready(function() {
-		 new Dynamic(rootPath, stageId)
+		new Dynamic(rootPath, stageId)
 	})
 
 })

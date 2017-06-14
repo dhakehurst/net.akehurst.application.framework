@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 import com.sun.javafx.css.Selector;
 
@@ -40,6 +39,7 @@ import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
@@ -189,6 +189,12 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 	}
 
 	@Override
+	public IGuiRequest getGuiRequest() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public void notifyEventOccured(final GuiEvent event) {
 		// TODO Auto-generated method stub
 
@@ -206,24 +212,25 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 
 	}
 
-	@Override
-	public void navigateTo(final UserSession session, final String location) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void newWindow(final UserSession session, final String location) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String tokenPath,
-			final String authorisationPath, final String scopes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	// @Override
+	// public void navigateTo(final UserSession session, final String location) {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// @Override
+	// public void newWindow(final UserSession session, final String location) {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// @Override
+	// public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String
+	// tokenPath,
+	// final String authorisationPath, final String scopes) {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
 
 	@Override
 	public void onEvent(final UserSession session, final GuiEventSignature eventSignature, final OnEventHandler handler) {

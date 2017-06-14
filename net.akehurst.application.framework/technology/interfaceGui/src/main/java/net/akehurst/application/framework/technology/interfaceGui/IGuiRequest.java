@@ -69,6 +69,10 @@ public interface IGuiRequest {
 
 	void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId, Map<String, String> sceneArguments);
 
+	void download(UserSession session, String location, String filename);
+
+	void upload(final UserSession session, final String uploadLink, final String filenameElementId);
+
 	void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, GuiEventType eventType);
 
 	<T extends IGuiDialog> T dialogCreate(Class<T> dialogClass, UserSession session, IGuiScene scene, DialogIdentity dialogId, String title,

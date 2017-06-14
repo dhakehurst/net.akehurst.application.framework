@@ -16,7 +16,6 @@
 package net.akehurst.application.framework.technology.interfaceGui;
 
 import java.util.Map;
-import java.util.concurrent.Future;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
@@ -28,6 +27,8 @@ public interface IGuiScene extends IIdentifiableObject {
 
 	SceneIdentity getSceneId();
 
+	IGuiRequest getGuiRequest();
+
 	/**
 	 * called by the framework to indicate that an event has occured
 	 *
@@ -35,16 +36,16 @@ public interface IGuiScene extends IIdentifiableObject {
 	 */
 	void notifyEventOccured(GuiEvent event);
 
-	void navigateTo(UserSession session, String location);
-
-	void newWindow(UserSession session, String location);
+	// void navigateTo(UserSession session, String location);
+	//
+	// void newWindow(UserSession session, String location);
 
 	void switchTo(UserSession session);
 
 	void switchTo(UserSession session, Map<String, String> sceneArguments);
 
-	Future<String> oauthAuthorise(UserSession session, String clientId, String clientSecret, String site, String tokenPath, String authorisationPath,
-			String scopes);
+	// Future<String> oauthAuthorise(UserSession session, String clientId, String clientSecret, String site, String tokenPath, String authorisationPath,
+	// String scopes);
 
 	public interface OnEventHandler {
 		void execute(GuiEvent event);

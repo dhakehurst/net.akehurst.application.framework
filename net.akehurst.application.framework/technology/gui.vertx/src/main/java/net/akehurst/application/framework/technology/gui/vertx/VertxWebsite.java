@@ -291,6 +291,24 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void download(final UserSession session, final String location, final String filename) {
+		final String link = location.replace("${rootPath}", this.rootPath);
+		final JsonObject data = new JsonObject();
+		data.put("filename", filename);
+		data.put("link", link);
+		this.verticle.comms.send(session, "Gui.download", data);
+	}
+
+	@Override
+	public void upload(final UserSession session, final String uploadLink, final String filenameElementId) {
+		final String uploadLink1 = uploadLink.replace("${rootPath}", this.rootPath);
+		final JsonObject data = new JsonObject();
+		data.put("filenameElementId", filenameElementId);
+		data.put("uploadLink", uploadLink1);
+		this.verticle.comms.send(session, "Gui.upload", data);
+	}
+
+	@Override
 	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());

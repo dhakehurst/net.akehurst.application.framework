@@ -278,6 +278,18 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void download(final UserSession session, final String location, final String filename) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void upload(final UserSession session, final String uploadLink, final String filenameElementId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
 		// TODO Auto-generated method stub
 

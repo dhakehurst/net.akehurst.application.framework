@@ -17,7 +17,6 @@ package net.akehurst.application.framework.technology.gui.vertx.elements;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 import net.akehurst.application.framework.common.annotations.instance.IdentifiableObjectInstance;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
@@ -45,7 +44,8 @@ public class VertxGuiScene implements IGuiScene {
 
 	IGuiRequest guiRequest;
 
-	protected IGuiRequest getGuiRequest() {
+	@Override
+	public IGuiRequest getGuiRequest() {
 		return this.guiRequest;
 	}
 
@@ -77,15 +77,15 @@ public class VertxGuiScene implements IGuiScene {
 		this.guiRequest = value;
 	}
 
-	@Override
-	public void navigateTo(final UserSession session, final String location) {
-		this.guiRequest.navigateTo(session, location);
-	}
-
-	@Override
-	public void newWindow(final UserSession session, final String location) {
-		this.guiRequest.newWindow(session, location);
-	}
+	// @Override
+	// public void navigateTo(final UserSession session, final String location) {
+	// this.guiRequest.navigateTo(session, location);
+	// }
+	//
+	// @Override
+	// public void newWindow(final UserSession session, final String location) {
+	// this.guiRequest.newWindow(session, location);
+	// }
 
 	@Override
 	public void switchTo(final UserSession session) {
@@ -97,11 +97,12 @@ public class VertxGuiScene implements IGuiScene {
 		this.guiRequest.switchTo(session, this.stageId, this.sceneId, sceneArguments);
 	}
 
-	@Override
-	public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String tokenPath,
-			final String authorisationPath, final String scopes) {
-		return this.guiRequest.oauthAuthorise(session, clientId, clientSecret, site, tokenPath, authorisationPath, scopes);
-	}
+	// @Override
+	// public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String
+	// tokenPath,
+	// final String authorisationPath, final String scopes) {
+	// return this.guiRequest.oauthAuthorise(session, clientId, clientSecret, site, tokenPath, authorisationPath, scopes);
+	// }
 
 	@Override
 	public void notifyEventOccured(final GuiEvent event) {

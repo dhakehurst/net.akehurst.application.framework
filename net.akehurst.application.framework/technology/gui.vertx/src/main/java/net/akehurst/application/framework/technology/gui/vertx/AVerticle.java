@@ -15,6 +15,9 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -268,10 +271,24 @@ public class AVerticle implements Verticle {
 		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + libPath);
 
 		final String downloadPath = this.ws.getDownloadPath() + ":filename";
+
+		this.router.route(downloadPath).handler(CookieHandler.create());
+		this.router.route(downloadPath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+		this.router.route(downloadPath)
+				.handler(SessionHandler.create(LocalSessionStore.create(this.getVertx())).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
+		this.router.route(downloadPath).handler(new MyUserHandler());
 		this.router.route(downloadPath).handler(rc -> {
-			final String filename = rc.request().getParam("filename");
+			final Map<String, List<String>> params = new HashMap<>();
+			for (final Map.Entry<String, String> me : rc.request().params().entries()) {
+				List<String> list = params.get(me.getKey());
+				if (null == list) {
+					list = new ArrayList<>();
+					params.put(me.getKey(), list);
+				}
+				list.add(me.getValue());
+			}
 			final Buffer buffer = Buffer.buffer();
-			this.ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(this.comms.createUserSession(rc.session(), rc.user()), filename,
+			this.ws.portGui().out(IGuiNotification.class).notifyDowloadRequest(this.comms.createUserSession(rc.session(), rc.user()), params,
 					new IGuiCallback() {
 
 						@Override
@@ -293,10 +310,11 @@ public class AVerticle implements Verticle {
 
 		final String uploadPath = this.ws.getUploadPath();
 		this.addPostRoute(uploadPath, rc -> {
-			final FileUpload fu = rc.fileUploads().iterator().next();
-
-			this.ws.portGui().out(IGuiNotification.class).notifyUpload(this.comms.createUserSession(rc.session(), rc.user()), fu.uploadedFileName());
-
+			final UserSession session = this.comms.createUserSession(rc.session(), rc.user());
+			for (final FileUpload f : rc.fileUploads()) {
+				this.ws.portGui().out(IGuiNotification.class).notifyUpload(session, f.uploadedFileName());
+			}
+			rc.response().end();
 		});
 		this.ws.logger.log(LogLevel.INFO, "Upload path:  " + "http://localhost:" + this.port + uploadPath);
 

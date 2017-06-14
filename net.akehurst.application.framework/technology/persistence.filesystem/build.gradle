@@ -19,5 +19,5 @@ dependencies {
 	compile project(":${rootProject.name}.common.realisation")
 	compile project(":${rootProject.name}.technology.interfacePersistence")
 	compile project(":${rootProject.name}.technology.interfaceFilesystem")
-	compile 'org.hjson:hjson:1.1.3'
+ 	compile 'org.hjson:hjson:2.1.1'
 }

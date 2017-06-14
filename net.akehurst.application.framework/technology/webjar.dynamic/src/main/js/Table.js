@@ -89,11 +89,11 @@
 	Table.prototype.removeRow = function(rowId) {
 		try {
 			let dialog = $(this.table).closest('dialog')
-			if (dialog) {
+			if (dialog.length==0) {
+				$(this.table).find('#'+rowId).remove()
+			} else {
 				let dialog_id = $(dialog).attr('id')
 				$(this.table).find('#'+dialog_id+'_'+rowId).remove()
-			} else {
-				$(this.table).find('#'+rowId).remove()
 			}
 		} catch (err) {
 			console.log("Error: "+err.message)

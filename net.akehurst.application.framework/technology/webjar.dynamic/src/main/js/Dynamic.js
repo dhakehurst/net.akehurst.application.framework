@@ -283,6 +283,42 @@ define([
 		window.location.href = newRef + refArgs
 	}
 	
+	Dynamic.prototype.download = function (filename, link) {
+		  var element = document.createElement('a');
+		  element.setAttribute('href', link);
+		  element.setAttribute('download', filename);
+
+		  element.style.display = 'none';
+		  document.body.appendChild(element);
+
+		  element.click();
+
+		  document.body.removeChild(element);
+	}
+	
+	Dynamic.prototype.upload = function (filenameElementId, uploadLink) {
+		var el = $('#'+filenameElementId)
+		if (el.length == 0) {
+			console.log('Error: cannot find element with id ' + filenameElementId)
+		} else {
+			let file = el[0].files[0]
+			let data = new FormData();
+			data.append('file', file);
+			$.ajax({
+				url: uploadLink,
+				type: 'POST',
+				data : data,
+				processData: false,
+				contentType: false,
+				error : function(data) {
+					console.log(data)
+					alert(data)
+				}
+			})
+		}
+	}
+	
+	
 	Dynamic.prototype.setTitle = function(value) {
 		document.title=value
 	}
@@ -575,6 +611,12 @@ define([
 			dynamic.elementRemoveClass(args.id, args.className)
 		})
 		
+		this.serverComms.registerHandler('Gui.download', function(args) {
+			dynamic.download(args.filename, args.link)
+		})
+		this.serverComms.registerHandler('Gui.upload', function(args) {
+			dynamic.upload(args.filenameElementId, args.uploadLink)
+		})
 		this.serverComms.registerHandler('Gui.requestRecieveEvent', function(args) {
 			dynamic.requestRecieveEvent(args.elementId, args.eventType, 'IGuiNotification.notifyEventOccured')
 		})

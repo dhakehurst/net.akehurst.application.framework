@@ -38,7 +38,12 @@ define([
 				container: document.getElementById(containerId),
 				elements : data.elements,
 				style : data.style,
-				layout: data.layout
+				layout: data.layout,
+				//to increase performnce
+				hideEdgesOnViewport: true,
+				hideLabelsOnViewport: true,
+				textureOnViewport: true
+				
 			})
 			
 			this.cy.on('click', 'node', {}, function(evt) {
