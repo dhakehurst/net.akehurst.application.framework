@@ -34,6 +34,7 @@ public class GuiGraphData implements IGuiGraphViewData {
 	public GuiGraphData() {
 		this.style = "";
 		this.layout = new HashMap<>();
+		this.options = new HashMap<>();
 		this.graph = new GuiGraph();
 	}
 
@@ -56,28 +57,33 @@ public class GuiGraphData implements IGuiGraphViewData {
 		}
 		this.style = buf.toString();
 		this.layout = new HashMap<>();
+		this.options = new HashMap<>();
 		this.graph = new GuiGraph();
 	}
 
-	GuiGraph graph;
+	protected final GuiGraph graph;
+	protected final String style;
+	protected final Map<String, Object> layout;
+	protected final Map<String, Object> options;
 
 	@Override
 	public IGuiGraph getGraph() {
 		return this.graph;
 	}
 
-	protected String style;
-
 	@Override
 	public String getStyle() {
 		return this.style;
 	}
 
-	protected Map<String, Object> layout;
-
 	@Override
 	public Map<String, Object> getLayout() {
 		return this.layout;
+	}
+
+	@Override
+	public Map<String, Object> getOptions() {
+		return this.options;
 	}
 
 	public IGuiGraphNode addNode(final IGuiGraphNode parent, final String identity, final String... classes) {
@@ -88,10 +94,7 @@ public class GuiGraphData implements IGuiGraphViewData {
 
 	public IGuiGraphEdge addEdge(final String identity, final IGuiGraphNode parent, final String sourceNodeId, final String targetNodeId,
 			final String... classes) {
-		final IGuiGraphNode source = this.getGraph().getNodes().get(sourceNodeId);
-		final IGuiGraphNode target = this.getGraph().getNodes().get(targetNodeId);
-
-		final IGuiGraphEdge edge = new GuiGraphEdge(identity, parent, source, target, classes);
+		final IGuiGraphEdge edge = new GuiGraphEdge(this.getGraph(), identity, parent, sourceNodeId, targetNodeId, classes);
 		this.graph.getEdges().put(identity, edge);
 		return edge;
 	}

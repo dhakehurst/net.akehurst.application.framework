@@ -88,10 +88,7 @@ public class GuiDiagramData implements IGuiDiagramData {
 
 	public IGuiGraphEdge addEdge(final String identity, final IGuiGraphNode parent, final String sourceNodeId, final String targetNodeId,
 			final String... classes) {
-		final IGuiGraphNode source = this.getGraph().getNodes().get(sourceNodeId);
-		final IGuiGraphNode target = this.getGraph().getNodes().get(targetNodeId);
-
-		final IGuiGraphEdge edge = new GuiGraphEdge(identity, parent, source, target, classes);
+		final IGuiGraphEdge edge = new GuiGraphEdge(this.getGraph(), identity, parent, sourceNodeId, targetNodeId, classes);
 		this.graph.getEdges().put(identity, edge);
 		return edge;
 	}

@@ -66,6 +66,9 @@ public interface IPersistentStore extends IIdentifiableObject {
 	 */
 	<T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
 
-	<T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter);
+	<T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter, long rangeFrom, long rangeTo)
+			throws PersistentStoreException;
+
+	// <T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter);
 
 }

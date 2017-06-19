@@ -145,13 +145,20 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
-		final String qs = "SELECT x FROM " + itemType.getSimpleName() + " x";
-		final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
-		final TypedQuery<T> q = trans.em.createQuery(qs, itemType);
-		final List<T> res = q.getResultList();
-		return new HashSet<>(res);
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter, final long rangeFrom,
+			final long rangeTo) throws PersistentStoreException {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	// @Override
+	// public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
+	// final String qs = "SELECT x FROM " + itemType.getSimpleName() + " x";
+	// final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
+	// final TypedQuery<T> q = trans.em.createQuery(qs, itemType);
+	// final List<T> res = q.getResultList();
+	// return new HashSet<>(res);
+	// }
 
 	@Override
 	public <T> void remove(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)

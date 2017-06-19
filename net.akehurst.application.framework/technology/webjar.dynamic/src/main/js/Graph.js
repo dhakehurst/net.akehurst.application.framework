@@ -34,17 +34,14 @@ define([
 		    let parent = document.getElementById(parentId)
 		    let containerId = parentId+'-graph-container'
 		    let container = $("<div id='"+containerId+"' style='width:100%;height:100%;'></div>").appendTo(parent)
-	        this.cy = cytoscape({
-				container: document.getElementById(containerId),
-				elements : data.elements,
-				style : data.style,
-				layout: data.layout,
-				//to increase performnce
-				hideEdgesOnViewport: true,
-				hideLabelsOnViewport: true,
-				textureOnViewport: true
-				
-			})
+		    let initCy = {
+					container: document.getElementById(containerId),
+					elements : data.elements,
+					style : data.style,
+					layout: data.layout
+				}
+		    initCy = $.extend(initCy, data.options)
+	        this.cy = cytoscape(initCy)
 			
 			this.cy.on('click', 'node', {}, function(evt) {
 				var nodeId = evt.cyTarget.id()

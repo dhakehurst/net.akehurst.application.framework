@@ -38,9 +38,9 @@ public class JdoTransaction implements IPersistenceTransaction {
 		return this.manager.newQuery(enhancedType);
 	}
 
-	public Query<? extends Persistable> newQuery(final Class<? extends Persistable> enhancedType, final String language, final String filterString) {
-		final String queryString = "SELECT FROM " + enhancedType.getName() + " WHERE " + filterString;
-		return this.manager.newQuery(language, queryString);
+	public Query<? extends Persistable> newQuery(final Class<? extends Persistable> enhancedType, final String language, final String queryString) {
+		final Query<? extends Persistable> query = this.manager.newQuery(language, queryString);
+		return query;
 	}
 
 	public void deletePersistent(final Persistable pc) {

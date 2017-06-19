@@ -9,11 +9,13 @@ import net.akehurst.application.framework.common.annotations.declaration.DataTyp
 @DataType
 public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 
-	public GuiGraphEdge(final String identity, final IGuiGraphNode parent, final IGuiGraphNode source, final IGuiGraphNode target, final String... classes) {
+	public GuiGraphEdge(final IGuiGraph graph, final String identity, final IGuiGraphNode parent, final String sourceNodeId, final String targetNodeId,
+			final String... classes) {
 		super(identity);
+		this.graph = graph;
 		this.parent = parent;
-		this.source = source;
-		this.target = target;
+		this.sourceNodeId = sourceNodeId;
+		this.targetNodeId = targetNodeId;
 
 		this.classes = classes;
 		this.data = new HashMap<>();
@@ -21,9 +23,10 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 		this.data.put("identity", identity);
 	}
 
+	private final IGuiGraph graph;
 	private final IGuiGraphNode parent;
-	private final IGuiGraphNode source;
-	private final IGuiGraphNode target;
+	private final String sourceNodeId;
+	private final String targetNodeId;
 
 	private final String[] classes;
 	private final Map<String, Object> data;
@@ -40,12 +43,14 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 
 	@Override
 	public IGuiGraphNode getSource() {
-		return this.source;
+		final IGuiGraphNode source = this.graph.getNodes().get(this.sourceNodeId);
+		return source;
 	}
 
 	@Override
 	public IGuiGraphNode getTarget() {
-		return this.target;
+		final IGuiGraphNode target = this.graph.getNodes().get(this.targetNodeId);
+		return target;
 	}
 
 	@Override

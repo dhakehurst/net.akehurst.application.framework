@@ -51,13 +51,13 @@ public class StandardFilesystem extends AbstractComponent implements IFilesystem
 	@Override
 	public IFile file(final String pathName) {
 		final Path path = Paths.get(pathName);
-		return new File(this, path);
+		return new FileImpl(this, path);
 	}
 
 	@Override
 	public IDirectory directory(final String pathName) {
 		final Path path = Paths.get(pathName);
-		return new Directory(this, path);
+		return new DirectoryImpl(this, path);
 	}
 
 	// ---------- Ports ---------

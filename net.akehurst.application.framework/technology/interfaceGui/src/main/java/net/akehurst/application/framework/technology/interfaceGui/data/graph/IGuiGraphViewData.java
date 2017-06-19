@@ -8,4 +8,6 @@ public interface IGuiGraphViewData {
 	String getStyle();
 
 	Map<String, Object> getLayout();
+
+	Map<String, Object> getOptions();
 }

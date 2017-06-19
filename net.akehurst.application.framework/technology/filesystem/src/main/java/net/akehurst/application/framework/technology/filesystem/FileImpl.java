@@ -15,27 +15,56 @@
  */
 package net.akehurst.application.framework.technology.filesystem;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import net.akehurst.application.framework.technology.interfaceFilesystem.FilesystemException;
+import net.akehurst.application.framework.technology.interfaceFilesystem.IDirectory;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesystem;
 
-public class File extends DirectoryEntry implements IFile {
+public class FileImpl extends DirectoryEntry implements IFile {
 
-	public File(final IFilesystem fs, final Path path) {
+	public FileImpl(final IFilesystem fs, final Path path) {
 		super(fs, path);
+	}
+
+	@Override
+	public byte[] readBytes() throws FilesystemException {
+		try {
+			return Files.readAllBytes(this.asPath());
+		} catch (final IOException e) {
+			throw new FilesystemException(e.getMessage(), e);
+		}
 	}
 
 	@Override
 	public Reader reader() throws FilesystemException {
 		try {
-			return Files.newBufferedReader(this.path);
+			return Files.newBufferedReader(this.asPath());
 		} catch (final Exception ex) {
 			throw new FilesystemException("Failed to create Reader", ex);
 		}
+	}
+
+	@Override
+	public BufferedReader bufferedReader() throws FilesystemException {
+		try {
+			final Reader r = Files.newBufferedReader(this.asPath());
+			final BufferedReader br = new BufferedReader(r);
+			return br;
+		} catch (final Exception ex) {
+			throw new FilesystemException("Failed to create Reader", ex);
+		}
+	}
+
+	@Override
+	public IFile relativeTo(final IDirectory directory) {
+		final Path path = directory.asPath().relativize(this.asPath());
+		return new FileImpl(this.getFilesystem(), path);
 	}
 
 }

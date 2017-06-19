@@ -101,6 +101,79 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 		}
 	}
 
+	private <T> T convertJsonTo(final JsonValue value, final Class<T> itemType) throws PersistentStoreException {
+		try {
+			if (null == value) {
+				return null;
+			} else if (value.isString()) {
+				final T t = this.af.createDatatype(itemType, value.asString());
+				return t;
+			} else if (value.isNumber()) {
+				final T t = this.af.createDatatype(itemType, value.asDouble());
+				return t;
+			} else if (value.isBoolean()) {
+				final T t = this.af.createDatatype(itemType, value.asBoolean());
+				return t;
+			} else if (value.isArray()) {
+				if (List.class.isAssignableFrom(itemType)) {
+					final List list = new ArrayList<>();
+					for (final JsonValue av : value.asArray()) {
+						final Object o = this.convertJsonToJava(av);
+						list.add(o);
+					}
+					return (T) list;
+				} else {
+					throw new PersistentStoreException("Cannot convert JSON Array to List.", null);
+				}
+			} else if (value.isObject()) {
+				if (Map.class.isAssignableFrom(itemType)) {
+					final Map<String, Object> map = new HashMap<>();
+					for (final String k : value.asObject().names()) {
+						final JsonValue jv = value.asObject().get(k);
+						final Object v = this.convertJsonToJava(jv);
+						map.put(k, v);
+					}
+					return (T) map;
+				} else {
+					throw new PersistentStoreException("Cannot convert JSON Object to Map.", null);
+				}
+			} else {
+				throw new PersistentStoreException("Unknown JSON type.", null);
+			}
+		} catch (final ApplicationFrameworkException e) {
+			throw new PersistentStoreException(e.getMessage(), e);
+		}
+	}
+
+	private Object convertJsonToJava(final JsonValue value) throws PersistentStoreException {
+		if (null == value) {
+			return null;
+		} else if (value.isString()) {
+			return value.asString();
+		} else if (value.isNumber()) {
+			return value.asDouble();
+		} else if (value.isBoolean()) {
+			return value.asBoolean();
+		} else if (value.isArray()) {
+			final List<Object> list = new ArrayList<>();
+			for (final JsonValue av : value.asArray()) {
+				final Object o = this.convertJsonToJava(av);
+				list.add(o);
+			}
+			return list;
+		} else if (value.isObject()) {
+			final Map<String, Object> map = new HashMap<>();
+			for (final String k : value.asObject().names()) {
+				final JsonValue jv = value.asObject().get(k);
+				final Object v = this.convertJsonToJava(jv);
+				map.put(k, v);
+			}
+			return map;
+		} else {
+			throw new PersistentStoreException("Unknown JSON type.", null);
+		}
+	}
+
 	// --------- IPersistentStore ---------
 	@Override
 	public void connect(final Map<String, Object> properties) {
@@ -146,79 +219,6 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 		}
 	}
 
-	<T> T convertJsonTo(final JsonValue value, final Class<T> itemType) throws PersistentStoreException {
-		try {
-			if (null == value) {
-				return null;
-			} else if (value.isString()) {
-				final T t = this.af.createDatatype(itemType, value.asString());
-				return t;
-			} else if (value.isNumber()) {
-				final T t = this.af.createDatatype(itemType, value.asDouble());
-				return t;
-			} else if (value.isBoolean()) {
-				final T t = this.af.createDatatype(itemType, value.asBoolean());
-				return t;
-			} else if (value.isArray()) {
-				if (List.class.isAssignableFrom(itemType)) {
-					final List list = new ArrayList<>();
-					for (final JsonValue av : value.asArray()) {
-						final Object o = this.convertJsonToJava(av);
-						list.add(o);
-					}
-					return (T) list;
-				} else {
-					throw new PersistentStoreException("Cannot convert JSON Array to List.", null);
-				}
-			} else if (value.isObject()) {
-				if (Map.class.isAssignableFrom(itemType)) {
-					final Map<String, Object> map = new HashMap<>();
-					for (final String k : value.asObject().names()) {
-						final JsonValue jv = value.asObject().get(k);
-						final Object v = this.convertJsonToJava(jv);
-						map.put(k, v);
-					}
-					return (T) map;
-				} else {
-					throw new PersistentStoreException("Cannot convert JSON Object to Map.", null);
-				}
-			} else {
-				throw new PersistentStoreException("Unknown JSON type.", null);
-			}
-		} catch (final ApplicationFrameworkException e) {
-			throw new PersistentStoreException(e.getMessage(), e);
-		}
-	}
-
-	Object convertJsonToJava(final JsonValue value) throws PersistentStoreException {
-		if (null == value) {
-			return null;
-		} else if (value.isString()) {
-			return value.asString();
-		} else if (value.isNumber()) {
-			return value.asDouble();
-		} else if (value.isBoolean()) {
-			return value.asBoolean();
-		} else if (value.isArray()) {
-			final List<Object> list = new ArrayList<>();
-			for (final JsonValue av : value.asArray()) {
-				final Object o = this.convertJsonToJava(av);
-				list.add(o);
-			}
-			return list;
-		} else if (value.isObject()) {
-			final Map<String, Object> map = new HashMap<>();
-			for (final String k : value.asObject().names()) {
-				final JsonValue jv = value.asObject().get(k);
-				final Object v = this.convertJsonToJava(jv);
-				map.put(k, v);
-			}
-			return map;
-		} else {
-			throw new PersistentStoreException("Unknown JSON type.", null);
-		}
-	}
-
 	@Override
 	public <T> void remove(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
 			throws PersistentStoreException {
@@ -234,9 +234,16 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	}
 
 	@Override
-	public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter, final long rangeFrom,
+			final long rangeTo) throws PersistentStoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	// @Override
+	// public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
 
 }

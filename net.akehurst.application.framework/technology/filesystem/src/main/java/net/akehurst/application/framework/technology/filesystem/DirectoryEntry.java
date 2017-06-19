@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.technology.filesystem;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,24 +34,36 @@ abstract public class DirectoryEntry implements IDirectoryEntry {
 		this.path = path;
 	}
 
-	IFilesystem fs;
+	private final IFilesystem fs;
 
-	Path path;
+	private final Path path;
+
+	public IFilesystem getFilesystem() {
+		return this.fs;
+	}
+
+	public Path asPath() {
+		return this.path;
+	}
+
+	public File asFile() {
+		return this.asPath().toFile();
+	}
 
 	@Override
 	public String getName() {
-		return this.path.getFileName().toString();
+		return this.asPath().getFileName().toString();
 	}
 
 	@Override
 	public String getFullName() {
-		return this.path.toString().replaceAll("\\\\", "/");
+		return this.asPath().toString().replaceAll("\\\\", "/");
 	}
 
 	@Override
 	public URL toURL() throws FilesystemException {
 		try {
-			return this.path.toUri().toURL();
+			return this.asPath().toUri().toURL();
 		} catch (final MalformedURLException e) {
 			throw new FilesystemException("Cannot convert to URL", e);
 		}
@@ -58,32 +71,33 @@ abstract public class DirectoryEntry implements IDirectoryEntry {
 
 	@Override
 	public IDirectory getParent() {
-		return new Directory(this.fs, this.path.getParent());
+		return new DirectoryImpl(this.getFilesystem(), this.asPath().getParent());
 	}
 
 	@Override
 	public boolean exists() {
-		return Files.exists(this.path);
+		return Files.exists(this.asPath());
 	}
 
 	@Override
 	public void delete() throws FilesystemException {
 		try {
-			Files.delete(this.path);
+			Files.delete(this.asPath());
 		} catch (final IOException e) {
 			throw new FilesystemException(e.getMessage(), e);
 		}
 	}
 
+	// --- Object ---
 	@Override
 	public int hashCode() {
-		return this.path.hashCode();
+		return this.asPath().hashCode();
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj instanceof DirectoryEntry) {
-			return this.path.equals(((DirectoryEntry) obj).path);
+			return this.asPath().equals(((DirectoryEntry) obj).asPath());
 		} else {
 			return false;
 		}

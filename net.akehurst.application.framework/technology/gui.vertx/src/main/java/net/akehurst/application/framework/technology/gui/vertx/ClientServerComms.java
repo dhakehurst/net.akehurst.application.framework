@@ -67,6 +67,9 @@ public class ClientServerComms {
 	EventBus eventbus;
 
 	Map<String, Session> activeSessions;
+	Map<String, SockJSSocket> socks;
+	List<String> outbound;
+	List<String> inbound;
 
 	UserSession createUserSession(final Session webSession, final User webUser) {
 		this.activeSessions.put(webSession.id(), webSession);
@@ -117,7 +120,7 @@ public class ClientServerComms {
 		final SockJSHandler sockJSHandler = SockJSHandler.create(this.vertx);
 		this.router.route(socksRoutePath).handler(sockJSHandler);
 		sockJSHandler.socketHandler(ss -> {
-			this.socks.put(ss.webSession(), ss);
+			this.socks.put(ss.webSession().id(), ss);
 			final UserSession sess = this.createUserSession(ss.webSession(), ss.webUser());
 			ss.handler(b -> {
 				final String s = new String(b.getBytes());
@@ -131,19 +134,14 @@ public class ClientServerComms {
 		});
 	}
 
-	Map<Session, SockJSSocket> socks;
-
 	public void send(final UserSession session, final String channelId, final JsonObject data) {
 		final JsonObject msg = new JsonObject();
 		msg.put("channelId", channelId);
 		msg.put("data", data);
 		final Session sess = this.getSession(session.getId());
-		final SockJSSocket ss = this.socks.get(sess);
+		final SockJSSocket ss = this.socks.get(sess.id());
 		ss.write(Buffer.factory.buffer(msg.encode()));
 	}
-
-	List<String> outbound;
-	List<String> inbound;
 
 	void addOutboundAddress(final String address) {
 		this.outbound.add(address);

@@ -15,13 +15,19 @@
  */
 package net.akehurst.application.framework.technology.interfaceFilesystem;
 
+import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 
 public interface IDirectoryEntry {
 
 	String getName();
 
 	String getFullName();
+
+	Path asPath();
+
+	File asFile();
 
 	URL toURL() throws FilesystemException;
 

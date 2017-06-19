@@ -15,10 +15,16 @@
  */
 package net.akehurst.application.framework.technology.interfaceFilesystem;
 
+import java.io.BufferedReader;
 import java.io.Reader;
 
 public interface IFile extends IDirectoryEntry {
 
+	byte[] readBytes() throws FilesystemException;
+
 	Reader reader() throws FilesystemException;
 
+	BufferedReader bufferedReader() throws FilesystemException;
+
+	IFile relativeTo(IDirectory directory);
 }

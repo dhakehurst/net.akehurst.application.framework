@@ -59,6 +59,7 @@ public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 		json.put("elements", this.createElements(graphData.getGraph()));
 		json.put("style", graphData.getStyle());
 		json.put("layout", new JsonObject(graphData.getLayout()));
+		json.put("options", new JsonObject(graphData.getOptions()));
 
 		return json.encode();
 	}
@@ -101,8 +102,8 @@ public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 
 	private JsonObject createEdge(final IGuiGraphEdge edge) {
 		final String edgeId = edge.getIdentity();
-		final String srcId = edge.getSource().getIdentity();
-		final String tgtId = edge.getTarget().getIdentity();
+		final String srcId = null == edge.getSource() ? "unknown" : edge.getSource().getIdentity();
+		final String tgtId = null == edge.getTarget() ? "unknown" : edge.getTarget().getIdentity();
 		final JsonObject jedge = new JsonObject();
 		jedge.put("group", "edges");
 		final JsonObject data = new JsonObject();
