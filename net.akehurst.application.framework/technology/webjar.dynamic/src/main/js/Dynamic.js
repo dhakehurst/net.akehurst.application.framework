@@ -199,9 +199,9 @@ define([
 	}
 	
 	Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChannelId) {
-		var dyn = this
+		let dyn = this
 		//first try element identity
-		var el = $('#'+elementId)
+		let el = $('#'+elementId)
 		//if not found, try find an element with attribute data-ref=elementId
 		// used in cases where multiple elements take the same ref/id (e.g. table rows)
 		if (el.length == 0) {
@@ -216,9 +216,17 @@ define([
 		if (el.length == 0) {
 			console.log('Error: cannot find element with id or data-ref equal to ' + elementId)
 		}
-		var dy = this
-		var sceneId = this.sceneId
-		$(el).on(eventType, function(event) {
+		let dy = this
+		let sceneId = this.sceneId
+		let mappedEventType = eventType
+		if ($(el).is("select")) {
+			if ("oninput"==eventType) {
+				mappedEventType = "change"
+			}
+		}
+		//remove previous event handler
+		$(el).off(mappedEventType)
+		$(el).on(mappedEventType, function(event) {
 			try {
 				event.stopPropagation()
 				let data = dy.fetchEventData(this)

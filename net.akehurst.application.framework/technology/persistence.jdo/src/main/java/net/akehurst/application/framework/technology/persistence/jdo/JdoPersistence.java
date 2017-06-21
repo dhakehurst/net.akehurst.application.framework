@@ -580,7 +580,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			throws PersistentStoreException {
 		try {
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-			final List<? extends Persistable> res = this.execute(transaction, enhancedType, filter, 0, Long.MAX_VALUE);
+			final List<? extends Persistable> res = this.execute(transaction, enhancedType, filter, 0, Integer.MAX_VALUE);
 			if (res.isEmpty()) {
 				this.logger.log(LogLevel.WARN, "Nothing to remove for type %s with filter %s", itemType.getSimpleName(), filter);
 			} else {
@@ -622,7 +622,8 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			throws PersistentStoreException {
 		try {
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-			final List<? extends Persistable> res = this.execute(transaction, enhancedType, filter, 0, Long.MAX_VALUE);
+			// Postgres doen't support long values for the limit!
+			final List<? extends Persistable> res = this.execute(transaction, enhancedType, filter, 0, Integer.MAX_VALUE);
 			if (res.isEmpty()) {
 				return null;
 			} else {
