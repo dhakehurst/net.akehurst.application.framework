@@ -2,6 +2,8 @@ build/
 bin/
 target/
 .gradle/
+node_modules/
+.vertx/
 
 .project
 .classpath

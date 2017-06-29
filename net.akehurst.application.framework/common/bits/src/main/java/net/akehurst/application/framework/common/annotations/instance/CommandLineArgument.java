@@ -20,12 +20,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Assign a value in the class definition to get a default value
+ *
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandLineArgument {
 	String group() default "";
+
 	String name() default "";
+
 	boolean required() default false;
+
 	boolean hasValue() default true;
+
 	String description();
 }

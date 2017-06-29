@@ -17,6 +17,7 @@ package net.akehurst.application.framework.service.configuration.file;
 
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.IApplicationFramework;
+import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.realisation.AbstractPersistentStoreConfigurationService;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
@@ -32,6 +33,9 @@ public class HJsonConfigurationService extends AbstractPersistentStoreConfigurat
 	@ServiceReference
 	ILogger logger;
 
+	@CommandLineArgument(description = "name of a folder in which the configuration file can be found")
+	String folder = "configuration";
+
 	public HJsonConfigurationService(final String afId) {
 		super(afId);
 
@@ -43,7 +47,8 @@ public class HJsonConfigurationService extends AbstractPersistentStoreConfigurat
 	protected IPersistentStore getStore() {
 		if (null == this.store) {
 			try {
-				this.store = new HJsonFile(this.afId());
+				final String path = this.folder.isEmpty() ? "" : this.folder + "/" + this.afId();
+				this.store = new HJsonFile(path);
 				this.af.injectIntoSimpleObject(this.store);
 			} catch (final ApplicationFrameworkException e) {
 				this.logger.log(LogLevel.ERROR, e.getMessage());

@@ -18,8 +18,10 @@ define([
 	"jquery",
 	"ServerComms",
 	"crypto.pbkdf2",
-	"crypto.aes"
-], function($, ServerComms, cryptoPBK, cryptoAES) {
+	"crypto.aes",
+	"Dialog",
+	"Table"
+], function($, ServerComms, cryptoPBK, cryptoAES, Dialog, Table) {
  
 	Element.prototype.cloneEventsTo = function(clone) {
 	
@@ -88,10 +90,10 @@ define([
 	
 	Dynamic.prototype.fetchEventData = function(el) {
 	//TODO: not sure if this is quite what we want!
-		var d1 = this.fetchPossibleRowId(el,'tr')
+		let d1 = this.fetchPossibleRowId(el,'tr')
 		//var d2 = this.fetchEventData1(el,'fieldset') //legacy now replaced with div.event-group (mainly because browser support for fieldset css/flex is broken on some browsers)
-		var d3 = this.fetchEventData1(el,'.event-group')
-		var data = $.extend({}, d1, d3)
+		let d3 = this.fetchEventData1(el,'.event-group')
+		let data = $.extend({}, d1, d3)
 		return data
 	}
 	Dynamic.prototype.fetchPossibleRowId = function(el, type) {
@@ -104,87 +106,139 @@ define([
 		}
 	}
 	
+	Dynamic.prototype.fetchInputData = function(el) {
+		let data = {}
+		let inTableTemplate = $(el).find('.table-row-template input')
+		let childs = $(el).find('input')
+		let inputs = $(childs).not(inTableTemplate)
+		for(i=0; i< inputs.length; i++) {
+			let input = inputs[i]
+			let id = input.id
+			let value = input.value
+			if ($(input).attr('type') == 'password') {
+				//TODO: need better hiding of passwords than this really
+				let v = "1234567890abcdef1234567890abcdef"
+				let bv = CryptoJS.enc.Hex.parse(v);
+				let key = CryptoJS.PBKDF2(v, bv, { keySize: 128/32, iterations: 100 });
+				let encrypted = CryptoJS.AES.encrypt(value, key, { iv: bv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7  })
+				data[id] = encrypted.toString()
+			} else {
+				data[id] = value
+			}						
+		}
+		return data
+	}
+	
+	Dynamic.prototype.fetchTableData = function(el) {
+		let data = {}
+		let inTableTemplate = $(el).find('.table-row-template table.input')
+		let childs = $(el).find('table.input')
+		let inputs = $(childs).not(inTableTemplate)
+		//var ts = $(p).find('table.input')
+		for(i=0; i< inputs.length; i++) {
+			let tbl = inputs[i]
+			let entries = []
+			for(var r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
+				var row = tbl.rows[r]
+				if ($(row).hasClass('table-row-template')) {
+					// don't add the template
+				} else {
+					var e = {}
+					for(var c=0; c<row.cells.length; c++) {
+						var cell = row.cells[c]
+						var th = $(tbl).find('th').eq($(cell).index())
+						if(th[0].hasAttribute('id')) {
+							var key = th.attr('id')
+							var value = this.fetchData(cell)
+							e[key] = value
+						} else {
+							//don't add vlaue if can't get an id/key
+						}
+					}
+					entries.push(e)
+				}
+			}
+			let id = tbl.id
+			data[id] = entries
+		}
+		return data
+	}
+	
+	Dynamic.prototype.fetchTextAreaData = function(el) {
+		let data = {}
+		let inTableTemplate = $(el).find('.table-row-template textarea.input')
+		let childs = $(el).find('textarea.input')
+		let inputs = $(childs).not(inTableTemplate)
+		for(i=0; i< inputs.length; i++) {
+			let ta = inputs[i]
+			let id = ta.id
+			let value = $(ta).val()
+			data[id] = value
+		}
+		return data
+	}
+	
+	Dynamic.prototype.fetchSelectData = function(el) {
+		let data = {}
+		let inTableTemplate = $(el).find('.table-row-template select.input')
+		let childs = $(el).find('select.input')
+		let inputs = $(childs).not(inTableTemplate)
+		//var selects = $(p).find('select.input')
+		for(i=0; i< inputs.length; i++) {
+			let select = inputs[i]
+//			if ($(select).closest('table-row-template')) {
+//				//do nothing
+//			} else {
+				let id = select.id
+				let value = $('#'+id+' option:selected').val()
+				data[id] = value					
+//			}
+		}
+		return data
+	}
+	
+	Dynamic.prototype.fetchEditorData = function(el) {
+		let data = {}
+		//handle textarea not in a table-row-template
+		let inTableTemplate = $(el).find('.table-row-template .editor.input')
+		let childs = $(el).find('.editor.input')
+		let inputs = $(childs).not(inTableTemplate)
+		//let eds = $(p).find('.editor.input')
+		for(i=0; i< inputs.length; i++) {
+			let ed = inputs[i]
+			let id = ed.id
+			if (id in this.editors) {
+				let value = this.editors[id].getText()
+				data[id] = value
+			}
+		}
+		return data
+	}
+	
+	Dynamic.prototype.fetchData = function(el) {
+		let d1 = this.fetchInputData(el)
+		let d2 = this.fetchTextAreaData(el)
+		let d3 = this.fetchSelectData(el)
+		let d4 = this.fetchEditorData(el)
+		let d5 = this.fetchTableData(el)
+		let data = $.extend({}, d1,d2,d3,d4,d5)
+		return data
+	}
+	
 	Dynamic.prototype.fetchEventData1 = function(el, cls) {
 		let data = {}
-		let p = el.closest(cls)
+		let ancestorEl = el.closest(cls)
 		if (null!=this.form) {
+			//TODO: handle forms!
 			for(i=0; i< this.form.length; i++) {
 				let id = this.form[i].id
 				let value = this.form[i].value
 				data[id] = value
 			}
-		} else if (null!=p) {
-			var childs = $(p).find('input')
-			for(i=0; i< childs.length; i++) {
-				let id = childs[i].id
-				let value = childs[i].value
-				if ($(childs[i]).attr('type') == 'password') {
-					//TODO: need better hiding of passwords than this really
-					let v = "1234567890abcdef1234567890abcdef"
-					let bv = CryptoJS.enc.Hex.parse(v);
-					let key = CryptoJS.PBKDF2(v, bv, { keySize: 128/32, iterations: 100 });
-					let encrypted = CryptoJS.AES.encrypt(value, key, { iv: bv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7  })
-					data[id] = encrypted.toString()
-				} else {
-					data[id] = value
-				}						
-			}
-			var ts = $(p).find('table.input')
-			for(i=0; i< ts.length; i++) {
-				let tbl = ts[i]
-				let entries = []
-				for(var r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
-					var row = tbl.rows[r]
-					if ($(row).hasClass('table-row-template')) {
-						// don't add the template
-					} else {
-						var e = {}
-						for(var c=0; c<row.cells.length; c++) {
-							var cell = row.cells[c]
-							var th = $(tbl).find('th').eq($(cell).index())
-							if(th[0].hasAttribute('id')) {
-								var key = th.attr('id')
-								var value = $(cell).text()
-								e[key] = value
-							} else {
-								//don't add vlaue if can't get an id/key
-							}
-						}
-						entries.push(e)
-					}
-				}
-				let id = tbl.id
-				data[id] = entries
-			}
-			// input from textareas
-			var tas = $(p).find('textarea.input')
-			for(i=0; i< tas.length; i++) {
-				let ta = tas[i]
-				let id = ta.id
-				let value = $(ta).val()
-				data[id] = value
-			}
-			//input from select dropdowns
-			var selects = $(p).find('select.input')
-			for(i=0; i< selects.length; i++) {
-				let select = selects[i]
-				let id = select.id
-				let value = $('#'+id+' option:selected').val()
-				data[id] = value
-			}
-			
-			//check for input from editors
-			let eds = $(p).find('.editor.input')
-			for(i=0; i< eds.length; i++) {
-				let ed = eds[i]
-				let id = ed.id
-				if (id in this.editors) {
-					let value = this.editors[id].getText()
-					data[id] = value
-				}
-			}
+			return data
+		} else if (null!=ancestorEl) {
+			return this.fetchData(ancestorEl)
 		}
-		return data
 	}
 	
 	Dynamic.prototype.fetchDialogId = function(el) {
@@ -200,22 +254,24 @@ define([
 	
 	Dynamic.prototype.requestRecieveEvent = function(elementId, eventType, eventChannelId) {
 		let dyn = this
+		let selector = '#'+elementId +','+'[data-ref='+elementId+']'
+		let el = $(selector)
 		//first try element identity
-		let el = $('#'+elementId)
+//		let el = $('#'+elementId)
 		//if not found, try find an element with attribute data-ref=elementId
 		// used in cases where multiple elements take the same ref/id (e.g. table rows)
-		if (el.length == 0) {
-			el = $('[data-ref='+elementId+']')
-		}
+//		if (el.length == 0) {
+//			el = $('[data-ref='+elementId+']')
+//		}
 		//if not found, try a class name
 		//depricate this...use data-ref instead
-		if (el.length == 0) {
-			el = $('.'+elementId)
-		}
+//		if (el.length == 0) {
+//			el = $('.'+elementId)
+//		}
 		//if still not found then error
-		if (el.length == 0) {
-			console.log('Error: cannot find element with id or data-ref equal to ' + elementId)
-		}
+//		if (el.length == 0) {
+//			console.log('Error: cannot find element with id or data-ref equal to ' + elementId)
+//		}
 		let dy = this
 		let sceneId = this.sceneId
 		let mappedEventType = eventType
@@ -225,12 +281,12 @@ define([
 			}
 		}
 		//remove previous event handler
-		$(el).off(mappedEventType)
-		$(el).on(mappedEventType, function(event) {
+		$(document.body).off(mappedEventType, selector)
+		$(document.body).on(mappedEventType, selector, function(event) {
 			try {
 				event.stopPropagation()
-				let data = dy.fetchEventData(this)
-				let dialogId = dy.fetchDialogId(this)
+				let data = dy.fetchEventData(event.target)
+				let dialogId = dy.fetchDialogId(event.target)
 				var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, dialogId:dialogId, elementId:elementId, eventType:eventType, eventData:data}
 				console.log("event: "+JSON.stringify(outData))
 				dyn.commsSend(eventChannelId, outData)
@@ -345,17 +401,19 @@ define([
 		el.attr(property, value)
 	}
 	
-	Dynamic.prototype.showDialog = function(parentId, dialogId, content) {
-		let dialog = document.createElement('dialog')
-		if (null!=dialogId) {
-			dialog.id = dialogId
-		}
-
-		document.body.appendChild(dialog)
-		if (null != content) {
-			dialog.insertAdjacentHTML('beforeend', content)
-		}
-
+	Dynamic.prototype.dialogCreate = function(dialogId, content) {
+		let dialog = new Dialog(dialogId)
+		dialog.create(content)
+	}
+	
+	Dynamic.prototype.dialogOpen = function(dialogId) {
+		let dialog = new Dialog(dialogId)
+		dialog.open()
+	}
+	
+	Dynamic.prototype.dialogClose = function(dialogId) {
+		let dialog = new Dialog(dialogId)
+		dialog.close()
 	}
 	
 	Dynamic.prototype.addElement = function(parentId, newElementId, type, attributes, content) {
@@ -453,38 +511,38 @@ define([
 	}
 	
 	Dynamic.prototype.tableAddColumn = function(tableId, colHeaderContent, rowTemplateCellContent, existingRowCellContent) {
-		require(["Table"],function(Table) {
+
 			let t = new Table(tableId)
 			t.addColumn(colHeaderContent, rowTemplateCellContent, existingRowCellContent);
-		})
+
 	}
 	
 	Dynamic.prototype.tableClearAllColumnHeaders = function(tableId) {
-		require(["Table"],function(Table) {
+
 			let t = new Table(tableId)
 			t.clearAllColumnHeaders();
-		})
+
 	}
 	
 	Dynamic.prototype.tableAppendRow = function(tableId, rowData) {
-		require(["Table"],function(Table) {
+
 			let t = new Table(tableId)
 			t.appendRow(rowData);
-		});
+
 	}
 	
 	Dynamic.prototype.tableRemoveRow = function(tableId, rowId) {
-		require(["Table"],function(Table) {
+
 			let t = new Table(tableId)
 			t.removeRow(rowId);
-		});
+
 	}
 	
 	Dynamic.prototype.tableClearAllRows = function(tableId) {
-		require(["Table"],function(Table) {
+
 			let t = new Table(tableId)
 			t.clearAllRows();
-		});
+
 	}
 	
 	
@@ -637,10 +695,15 @@ define([
 		this.serverComms.registerHandler('Gui.newWindow', function(args) {
 			dynamic.newWindow(args.location)
 		})
-		this.serverComms.registerHandler('Gui.showDialog', function(args) {
-			dynamic.showDialog(args.parentId, args.dialogId, args.content)
+		this.serverComms.registerHandler('Dialog.create', function(args) {
+			dynamic.dialogCreate(args.dialogId, args.content)
 		})
-		
+		this.serverComms.registerHandler('Dialog.open', function(args) {
+			dynamic.dialogOpen(args.dialogId)
+		})
+		this.serverComms.registerHandler('Dialog.close', function(args) {
+			dynamic.dialogClose(args.dialogId)
+		})
 		//Tables
 		this.serverComms.registerHandler('Table.addColumn', function(args) {
 			dynamic.tableAddColumn(args.tableId, args.colHeaderContent, args.rowTemplateCellContent, args.existingRowCellContent)

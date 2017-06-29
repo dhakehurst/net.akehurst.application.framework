@@ -24,9 +24,14 @@ import javafx.collections.ObservableList;
 import javafx.scene.chart.Chart;
 import javafx.scene.chart.XYChart;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChartData;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChartDataSeries;
+import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraphViewer;
+import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTable;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
 public class JfxChart<X, Y> implements IGuiChart<X, Y> {
 
@@ -155,6 +160,98 @@ public class JfxChart<X, Y> implements IGuiChart<X, Y> {
 			};
 		}
 
+	}
+
+	@Override
+	public String getElementId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object get(final UserSession session, final String propertyName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void set(final UserSession session, final String propertyName, final Object value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addClass(final UserSession session, final String className) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeClass(final UserSession session, final String className) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onEvent(final UserSession session, final GuiEventType eventType, final OnEventHandler handler) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void clear(final UserSession session) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setDisabled(final UserSession session, final boolean value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setLoading(final UserSession session, final boolean value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
+			final Object content) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeSubElement(final UserSession session, final String subElementId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public IGuiText createText(final UserSession session, final String textId, final String content) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IGuiTable createTable(final UserSession session, final String tableId, final String content) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IGuiGraphViewer createGraph(final UserSession session, final String graphId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <X, Y> IGuiChart<X, Y> createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
+			final String jsonChartOptions) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

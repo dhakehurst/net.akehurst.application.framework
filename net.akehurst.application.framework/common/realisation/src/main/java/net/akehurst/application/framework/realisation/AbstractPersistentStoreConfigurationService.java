@@ -15,10 +15,13 @@
  */
 package net.akehurst.application.framework.realisation;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
-import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 
 abstract public class AbstractPersistentStoreConfigurationService extends AbstractConfigurationService {
@@ -38,8 +41,10 @@ abstract public class AbstractPersistentStoreConfigurationService extends Abstra
 	public <T> T fetchValue(final Class<T> itemType, final String idPath, final String defaultValueString) {
 		try {
 			final IPersistenceTransaction trans = this.getStore().startTransaction();
-			final PersistentItemQuery pid = new PersistentItemQuery("", idPath);
-			final T value = this.getStore().retrieve(trans, itemType, pid);
+			final Map<String, Object> filter = new HashMap<>();
+			filter.put("path", idPath);
+			final Set<T> values = this.getStore().retrieve(trans, itemType, filter);
+			final T value = values.iterator().next();
 			this.getStore().commitTransaction(trans);
 			if (null != value) {
 				this.logger.log(LogLevel.TRACE,

@@ -18,6 +18,9 @@ package net.akehurst.application.framework.technology.interfaceGui.elements;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
+import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
+import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraphViewer;
+import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTable;
 
 public interface IGuiElement {
 
@@ -39,9 +42,26 @@ public interface IGuiElement {
 
 	void setLoading(UserSession session, boolean value);
 
-	void addSubElement(UserSession session, String newElementId, String newElementType, String attributes, Object content);
-
 	void removeSubElement(UserSession session, String subElementId);
 
-	void createChart(UserSession session, String chartId, String chartType, String jsonChartData, String jsonChartOptions);
+	IGuiText createText(final UserSession session, String textId, String content);
+
+	IGuiTable createTable(final UserSession session, String tableId, String content);
+
+	IGuiGraphViewer createGraph(final UserSession session, String graphId);
+
+	<X, Y> IGuiChart<X, Y> createChart(UserSession session, String chartId, String chartType, String jsonChartData, String jsonChartOptions);
+
+	/**
+	 * adds sub elements for which the content is expected to be html.
+	 * <p>
+	 * should not really be used as it is html specific.
+	 *
+	 * @param session
+	 * @param newElementId
+	 * @param newElementType
+	 * @param attributes
+	 * @param content
+	 */
+	void addSubElement(UserSession session, String newElementId, String newElementType, String attributes, Object content);
 }

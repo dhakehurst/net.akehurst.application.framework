@@ -25,6 +25,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import net.akehurst.application.framework.common.IPort;
@@ -105,11 +106,12 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> T retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final PersistentItemQuery location, final Object... params) {
+	public <T> List<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Map<String, Object> params) {
 		try {
 			final JpaPersistenceTransaction trans = (JpaPersistenceTransaction) transaction;
-			final T t = trans.em.find(itemType, location.getValue());
-			return t;
+			final Query q = trans.em.createQuery(query.getValue());
+			final List<?> res = q.getResultList();
+			return (List<T>) res;
 		} catch (final Exception ex) {
 			System.err.println(ex.getMessage());
 		}

@@ -19,4 +19,5 @@ dependencies {
 	compile project(":${rootProject.name}.common.realisation")
 
 	compile project(":${rootProject.name}.technology.interfaceGui")
+	compile 'org.hjson:hjson:2.1.1'
 }

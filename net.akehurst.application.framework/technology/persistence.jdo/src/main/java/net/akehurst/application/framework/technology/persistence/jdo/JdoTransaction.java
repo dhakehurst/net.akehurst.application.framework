@@ -53,8 +53,8 @@ public class JdoTransaction implements IPersistenceTransaction {
 		return this.manager.newQuery(enhancedType);
 	}
 
-	public Query<? extends Persistable> newQuery(final Class<? extends Persistable> enhancedType, final String language, final String queryString) {
-		final Query<? extends Persistable> query = this.manager.newQuery(language, queryString);
+	public Query<?> newQuery(final String language, final String queryString) {
+		final Query<?> query = this.manager.newQuery(language, queryString);
 		return query;
 	}
 

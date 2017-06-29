@@ -78,7 +78,11 @@ public interface IGuiRequest {
 	<T extends IGuiDialog> T dialogCreate(Class<T> dialogClass, UserSession session, IGuiScene scene, DialogIdentity dialogId, String title,
 			String dialogContent);
 
-	void dialogShow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId, String dialogContent);
+	void dialogCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId, String dialogContent);
+
+	void dialogOpen(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId);
+
+	void dialogClose(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId);
 
 	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type);
 

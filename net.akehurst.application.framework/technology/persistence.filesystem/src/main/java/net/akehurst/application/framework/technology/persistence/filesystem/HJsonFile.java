@@ -17,7 +17,9 @@ package net.akehurst.application.framework.technology.persistence.filesystem;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -209,14 +211,9 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	}
 
 	@Override
-	public <T> T retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final PersistentItemQuery query, final Object... params)
+	public <T> List<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Map<String, Object> params)
 			throws PersistentStoreException {
-		try {
-			final JsonValue value = this.fetchJson(this.getJson(), query.getValue());
-			return this.convertJsonTo(value, itemType);
-		} catch (final Exception ex) {
-			throw new PersistentStoreException("Failed to retrieve item from location " + query, ex);
-		}
+		return null;
 	}
 
 	@Override
@@ -229,8 +226,15 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	@Override
 	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
 			throws PersistentStoreException {
-		// TODO Auto-generated method stub
-		return null;
+		final String path = (String) filter.get("path");
+		try {
+
+			final JsonValue value = this.fetchJson(this.getJson(), path);
+			final T t = this.convertJsonTo(value, itemType);
+			return new HashSet<>(Arrays.asList(t));
+		} catch (final Exception ex) {
+			throw new PersistentStoreException("Failed to retrieve item from location " + path, ex);
+		}
 	}
 
 	@Override

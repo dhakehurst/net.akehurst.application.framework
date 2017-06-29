@@ -18,6 +18,7 @@ package net.akehurst.application.framework.technology.gui.vertx.elements;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +55,9 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 		this.dialogContent = dialogContent;
 	}
 
+	private static final String[] PROPERTIES_TO_PREFIX_ARR = { "id", "data-ref", "for", "list" };
+	private static final List<String> PROPERTIES_TO_PREFIX = Arrays.asList(VertxGuiDialog.PROPERTIES_TO_PREFIX_ARR);
+
 	@ServiceReference
 	ILogger logger;
 
@@ -68,16 +72,26 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 	}
 
 	@Override
-	public void show(final UserSession session) {
+	public void create(final UserSession session) {
 		final InputStream is = this.getClass().getClassLoader().getResourceAsStream(this.dialogContent + ".html");
 		final String content = this.readAndPrefixIds(is);
-		this.getGuiRequest().dialogShow(session, this.stageId, this.sceneId, this.getId(), content);
+		this.getGuiRequest().dialogCreate(session, this.stageId, this.sceneId, this.getId(), content);
+	}
+
+	@Override
+	public void open(final UserSession session) {
+		this.getGuiRequest().dialogOpen(session, this.stageId, this.sceneId, this.dialogId);
 	}
 
 	@Override
 	public void close(final UserSession session) {
-		this.getGuiRequest().removeElement(session, this.stageId, this.sceneId, this.dialogId.asPrimitive());
+		this.getGuiRequest().dialogClose(session, this.stageId, this.sceneId, this.dialogId);
 	}
+
+	// @Override
+	// public void delete(final UserSession session) {
+	// this.getGuiRequest().dialogDelete(session, this.stageId, this.sceneId, this.dialogId.asPrimitive());
+	// }
 
 	// TODO: create own set of event handlers, must unregister them when dialog closes
 
@@ -142,7 +156,7 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 					while (itt.hasNext()) {
 						final Attribute att = itt.next();
 						final String localName = att.getName().getLocalPart();
-						if ("id".equals(localName) || "for".equals(localName) || "data-ref".equals(localName)) {
+						if (VertxGuiDialog.PROPERTIES_TO_PREFIX.contains(localName)) {
 							final String value = this.dialogElementPrefix + att.getValue();
 							final Attribute newAtt = eventFactory.createAttribute(localName, value);
 							newAtts.add(newAtt);

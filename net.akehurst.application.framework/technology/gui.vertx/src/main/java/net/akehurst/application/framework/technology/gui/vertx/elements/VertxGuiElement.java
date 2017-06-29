@@ -23,7 +23,11 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
+import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
+import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraphViewer;
+import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTable;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
 public class VertxGuiElement implements IGuiElement {
 
@@ -117,9 +121,28 @@ public class VertxGuiElement implements IGuiElement {
 	}
 
 	@Override
-	public void createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
+	public IGuiText createText(final UserSession session, final String textId, final String content) {
+		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, textId, "p", "", content);
+		return new VertxGuiText(this.guiRequest, this.scene, this.dialog, textId);
+	}
+
+	@Override
+	public IGuiTable createTable(final UserSession session, final String tableId, final String content) {
+		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, tableId, "table", "", content);
+		return new VertxGuiTable(this.guiRequest, this.scene, this.dialog, tableId);
+	}
+
+	@Override
+	public IGuiGraphViewer createGraph(final UserSession session, final String graphId) {
+		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, graphId, "div", "{class:'graph'}", "");
+		return new VertxGuiGraph(this.guiRequest, this.scene, this.dialog, graphId);
+	}
+
+	@Override
+	public <X, Y> IGuiChart<X, Y> createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
 			final String jsonChartOptions) {
 		this.guiRequest.chartCreate(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, chartId, chartType, jsonChartData,
 				jsonChartOptions);
+		return new VertxGuiChart<>(this.guiRequest, this.scene, this.dialog, chartId);
 	}
 }

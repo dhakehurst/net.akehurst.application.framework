@@ -24,7 +24,9 @@ public interface IGuiDialog extends IIdentifiableObject {
 	 */
 	void notifyEventOccured(GuiEvent event);
 
-	void show(UserSession session);
+	void create(UserSession session);
+
+	void open(UserSession session);
 
 	void close(UserSession session);
 

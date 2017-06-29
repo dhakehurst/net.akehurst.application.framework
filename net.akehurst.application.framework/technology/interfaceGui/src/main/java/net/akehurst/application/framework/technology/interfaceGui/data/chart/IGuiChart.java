@@ -16,8 +16,9 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.chart;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 
-public interface IGuiChart<X, Y> {
+public interface IGuiChart<X, Y> extends IGuiElement {
 
 	enum Type {
 		Line, Bar, Pie, Doughnut, Radar, PolarArea, Bubble, XY

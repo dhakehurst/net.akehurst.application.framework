@@ -34,6 +34,7 @@ require.config({
 		"crypto.pbkdf2"   : "cryptojs/3.1.2/rollups/pbkdf2",
 		"crypto.aes"      : "cryptojs/3.1.2/rollups/aes",
 		"Table"         : "dynamic/1.0.alpha.19/Table",
+		"Dialog"         : "dynamic/1.0.alpha.19/Dialog",
 		"Diagram"         : "dynamic/1.0.alpha.19/Diagram",
 		"Graph"         : "dynamic/1.0.alpha.19/Graph",
 		"Editor"         : "dynamic/1.0.alpha.19/EditorMonaco",

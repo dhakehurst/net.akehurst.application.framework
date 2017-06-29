@@ -325,15 +325,32 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void dialogShow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
+	public void dialogCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
 			final String content) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
-		data.put("parentId", "dialogs");
 		data.put("dialogId", dialogId.asPrimitive());
 		data.put("content", content);
-		this.verticle.comms.send(session, "Gui.showDialog", data);
+		this.verticle.comms.send(session, "Dialog.create", data);
+	}
+
+	@Override
+	public void dialogOpen(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("dialogId", dialogId.asPrimitive());
+		this.verticle.comms.send(session, "Dialog.open", data);
+	}
+
+	@Override
+	public void dialogClose(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("dialogId", dialogId.asPrimitive());
+		this.verticle.comms.send(session, "Dialog.close", data);
 	}
 
 	@Override
@@ -369,7 +386,10 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		data.put("newElementId", newElementId);
 		data.put("type", type);
 		data.put("content", content);
-		final String jsonStr = attributes.replaceAll("'", "\"");
+
+		final org.hjson.JsonValue hjson = org.hjson.JsonValue.readHjson(attributes.replaceAll("'", "\""));
+
+		final String jsonStr = hjson.toString();// attributes.replaceAll("'", "\"");
 		final JsonObject atts = new JsonObject(jsonStr);
 		data.put("attributes", atts);
 

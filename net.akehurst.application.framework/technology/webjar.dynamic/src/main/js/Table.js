@@ -78,7 +78,7 @@
 				$(tr).removeAttr('hidden')
 				$(tr).removeClass('table-row-template')
 				$(tr).appendTo($(this.tbody))
-				this.rowTemplate[0].cloneEventsTo(tr[0])
+//				this.rowTemplate[0].cloneEventsTo(tr[0])
 			}
 		} catch (err) {
 			console.log("Error: "+err.message)

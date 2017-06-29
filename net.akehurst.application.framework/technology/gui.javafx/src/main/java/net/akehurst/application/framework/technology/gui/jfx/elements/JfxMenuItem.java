@@ -23,7 +23,11 @@ import javafx.scene.control.MenuItem;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
+import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
+import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGuiGraphViewer;
+import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTable;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiMenuItem;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 import net.akehurst.holser.reflect.BetterMethodFinder;
 
 // can't extend JfxGuiElement because menuItems are not JfxNodes
@@ -137,10 +141,28 @@ public class JfxMenuItem implements IGuiMenuItem {
 	}
 
 	@Override
-	public void createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
+	public IGuiText createText(final UserSession session, final String textId, final String content) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IGuiTable createTable(final UserSession session, final String tableId, final String content) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <X, Y> IGuiChart<X, Y> createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
 			final String jsonChartOptions) {
 		// TODO Auto-generated method stub
+		return null;
+	}
 
+	@Override
+	public IGuiGraphViewer createGraph(final UserSession session, final String graphId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

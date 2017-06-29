@@ -41,8 +41,12 @@
 		if (null==h) {
 			console.log('no handler for '+channelId)
 		} else {
-			console.log(channelId+' '+JSON.stringify(data))
-			h(data)
+			//add the call to the javascript event loop,
+			//to ensure things are executed in order
+			setTimeout(function() {
+				console.log(channelId+' '+JSON.stringify(data))
+				h(data)
+			},0)
 		}
 	}
 

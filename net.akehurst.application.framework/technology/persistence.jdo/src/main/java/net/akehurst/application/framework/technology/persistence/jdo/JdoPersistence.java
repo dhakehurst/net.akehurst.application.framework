@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.security.ProtectionDomain;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -516,7 +517,8 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 		} else {
 			queryString += " WHERE " + filterString;
 		}
-		final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType, "javax.jdo.query.JDOQL", queryString);
+		final Query<? extends Persistable> jdoquery = (Query<? extends Persistable>) ((JdoTransaction) transaction).newQuery("javax.jdo.query.JDOQL",
+				queryString);
 		jdoquery.setRange(rangeFrom, rangeTo);
 
 		final List<? extends Persistable> res = (List<? extends Persistable>) jdoquery.executeWithMap(params);
@@ -594,26 +596,36 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
-	public <T> T retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final PersistentItemQuery query, final Object... params)
+	public <T> List<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Map<String, Object> params)
 			throws PersistentStoreException {
 		try {
 			final JdoTransaction tx = (JdoTransaction) transaction;
-			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-			final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType, query.getLanguage(), query.getValue());
-			final List<? extends Persistable> res = (List<? extends Persistable>) jdoquery.executeWithArray(params);
-			if (res.isEmpty()) {
+			final Query<?> jdoquery = ((JdoTransaction) transaction).newQuery(query.getLanguage(), query.getValue());
+			final Object res = jdoquery.executeWithMap(params);
+			if (null == res) {
 				return null;
-			} else {
-				final Object o = res.iterator().next();
-				if (itemType.isInstance(o)) {
-					return (T) o;
+			} else if (res instanceof List) {
+				final List<T> list = (List<T>) res;
+				if (list.isEmpty()) {
+					return list;
 				} else {
-					final T item = (T) this.convertFromEnhanced(tx, enhancedType, o, itemType);
-					return item;
+					final List<T> result = new ArrayList<>();
+					for (final Object o : list) {
+						if (o instanceof Object[]) {
+							result.add((T) Arrays.asList((Object[]) o));
+						} else {
+							result.add((T) o);
+						}
+
+					}
+					return result;
 				}
+			} else {
+				return Arrays.asList((T) res);
 			}
+
 		} catch (final Exception ex) {
-			throw new PersistentStoreException("", ex);
+			throw new PersistentStoreException(ex.getMessage(), ex);
 		}
 	}
 

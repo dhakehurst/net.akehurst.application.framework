@@ -195,8 +195,20 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void dialogShow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
+	public void dialogCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
 			final String dialogContent) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void dialogOpen(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void dialogClose(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
 		// TODO Auto-generated method stub
 
 	}
