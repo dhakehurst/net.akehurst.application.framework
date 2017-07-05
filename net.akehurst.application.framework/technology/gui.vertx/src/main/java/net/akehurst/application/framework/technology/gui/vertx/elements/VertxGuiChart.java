@@ -109,6 +109,11 @@ public class VertxGuiChart<X, Y> extends VertxGuiElement implements IGuiChart<X,
 			for (final Y item : s.getItems()) {
 				dataArray.add(item);
 			}
+			final JsonArray colourArray = new JsonArray();
+			jsonSeries.put("backgroundColor", colourArray);
+			for (final String item : s.getColours()) {
+				colourArray.add(item);
+			}
 		}
 		return arr;
 	}

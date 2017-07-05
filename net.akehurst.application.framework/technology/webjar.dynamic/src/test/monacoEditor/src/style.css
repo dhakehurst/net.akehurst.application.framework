@@ -1,0 +1,7 @@
+.dialog-backdrop {
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.editor {
+    border: 1px solid blue;
+}

@@ -1,0 +1,98 @@
+<div class='event-group'>
+	<header>
+		<h2>Please Edit Query</h2>
+	</header>
+	<main>
+		<div>
+			<div class='tabs'>
+
+					<input type='radio' id='form' name='grp' checked='checked' ></input>
+					<label for='form'>Form</label>
+					<article class='event-group'>
+						<section>
+							<div>
+								<label for='selectContext'>Context</label>
+								<select id='selectContext' class='input' value='Snapshot'>
+									<option>Project</option>
+									<option>Snapshot</option>
+								</select>
+							</div>
+							<div>
+								<label for='selectSnapshot'>Snapshot</label>
+								<select id='selectSnapshot' class='input' value='LATEST'>
+									<option>LATEST</option>
+								</select>
+							</div>
+							<div>
+								<table id='tableArtefactSelectors' class='input'>
+								    <thead>
+								      <tr>
+								        <th class='size-min'><button id='actionCreateArtefactSelector' class='add'><span></span></button></th>
+								        <th id='label'></th>
+								        <th id='type'><p>Select</p></th>
+								        <th id='with'><p>With</p></th>
+								      </tr>
+								      <tr id='${row.id}' class='table-row-template'>
+									        <td><button data-ref='actionDeleteArtefactSelector' class='remove'><span></span></button></td>
+									        <td>
+									        	<p id='label'></p>
+									        </td>
+									        <td>
+												<select id='selectArtefactType_${row.id}' class='input'>
+												</select>
+									        </td>
+											<td>
+												<table id='tableWithClause_${row.id}' class='input'>
+													<thead>
+													  <tr>
+														<th class='size-min'><button id='actionCreateWithClause' class='add'><span></span></button></th>
+												        <th id='type' class='size-min'><p>Property</p></th>
+												        <th id='with'><p>Value</p></th>
+												      </tr>
+												      <tr id='${row.id}' class='table-row-template'>
+												      </tr>
+													</thead>
+												</table>
+											</td>
+								      </tr>
+								    </thead>
+								</table>
+							</div>
+						</section>
+					</article>
+
+					<input type='radio' id='diagram' name='grp' ></input>
+					<label for='diagram'>Diagram</label>
+					<article>
+						<div id='diagramQuery' class='diagram input' style='height:300px;width:400px;display:block'></div>
+
+					</article>
+
+
+					<input type='radio' id='text' name='grp'></input>
+					<label for='text'>Text</label>
+					<article>
+						<div id='editorSimpleQuery' class='editor input' style='height:300px;width:400px'></div>
+
+					</article>
+
+					<input type='radio' id='advanced' name='grp'></input>
+					<label for='advanced'>Advanced</label>
+					<article>
+						<div id='editorAdvancedQuery' class='editor input' style='height:300px;width:400px'></div>
+					</article>
+
+			</div>
+		</div>
+	<footer>
+		<article>
+			<button id='actionTest'>Test</button>
+			<button id='actionOk'>OK</button>
+			<button id='actionCancel'>Cancel</button>
+		</article>
+		<section id='sectionResult'>
+			<table id='tableResult'>
+			</table>
+		</section>
+	</footer>
+</div>

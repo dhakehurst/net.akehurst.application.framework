@@ -133,6 +133,12 @@ public class JfxChart<X, Y> implements IGuiChart<X, Y> {
 				}
 
 				@Override
+				public List<String> getColours() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
 				public List<Y> getItems() {
 					return new AbstractList<Y>() {
 						@Override

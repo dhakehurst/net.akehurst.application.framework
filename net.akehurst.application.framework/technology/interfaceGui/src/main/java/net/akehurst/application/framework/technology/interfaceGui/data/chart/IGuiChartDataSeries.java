@@ -25,4 +25,6 @@ public interface IGuiChartDataSeries<Y> {
 
 	List<Y> getItems();
 
+	List<String> getColours();
+
 }

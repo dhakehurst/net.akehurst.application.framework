@@ -135,31 +135,42 @@ define([
 		let childs = $(el).find('table.input')
 		let inputs = $(childs).not(inTableTemplate)
 		//var ts = $(p).find('table.input')
-		for(i=0; i< inputs.length; i++) {
+		for(let i=0; i< inputs.length; i++) {
 			let tbl = inputs[i]
-			let entries = []
-			for(var r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
-				var row = tbl.rows[r]
+			
+			let headers = []
+			let hrow = tbl.rows[0] //row 0 should contain the table headers
+			let unnamedCount = 0;
+			for(let c=0; c<hrow.cells.length; c++) { 
+				let cell = hrow.cells[c]
+				let th = $(tbl).find('th').eq($(cell).index())
+				if(th[0].hasAttribute('id')) {
+					let key = th.attr('id')
+					headers.push(key)
+				} else {
+					headers.push('unnamed_'+unnamedCount)
+					unnamedCount++
+				}
+			}
+			
+			let rowsData = []
+			for(let r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
+				let row = tbl.rows[r]
 				if ($(row).hasClass('table-row-template')) {
 					// don't add the template
 				} else {
-					var e = {}
-					for(var c=0; c<row.cells.length; c++) {
-						var cell = row.cells[c]
-						var th = $(tbl).find('th').eq($(cell).index())
-						if(th[0].hasAttribute('id')) {
-							var key = th.attr('id')
-							var value = this.fetchData(cell)
-							e[key] = value
-						} else {
-							//don't add vlaue if can't get an id/key
-						}
+					var rowData = []
+					for(let c=0; c<row.cells.length; c++) {
+						let cell = row.cells[c]
+						let th = $(tbl).find('th').eq($(cell).index())
+						let value = this.fetchData(cell)
+						rowData.push(value)
 					}
-					entries.push(e)
+					rowsData.push(rowData)
 				}
 			}
 			let id = tbl.id
-			data[id] = entries
+			data[id] = { afHeaders:headers, afRows:rowsData }
 		}
 		return data
 	}

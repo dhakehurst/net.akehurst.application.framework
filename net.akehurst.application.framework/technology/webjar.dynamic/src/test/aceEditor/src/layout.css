@@ -1,0 +1,100 @@
+html {
+	/*layout-self*/
+	height: 100%;
+	width: 100%;
+	
+	/*layout-children*/
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: stretch;
+}
+
+body {
+
+	/*layout-self*/
+	order: 0;
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: 0;
+
+	/*layout-children*/
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: stretch;
+}
+
+body > header {
+    order:0;
+    z-index: 0;
+    flex: 0 64px;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    
+    display: flex;
+}
+
+body > main {
+    order: 1;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+body > footer {
+    order: 3;
+	flex: 0 64px;
+    display: flex;
+
+	align-items: center;
+	justify-content: center;
+}
+
+.dialog-container {
+    order:2;
+	position: absolute;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    z-index: 1; /* Sit on top */
+
+    
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+dialog {
+    /*layout-self*/
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: center;
+    resize: both;
+	overflow: scroll;
+	
+	/*layout-children*/
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: stretch;
+}
+
+.editor {
+    min-height: 10em;
+    min-width: 15em;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+}

@@ -42,7 +42,11 @@ public class AbstractTestCase {
 	}
 
 	public interface IMockExpectation0<R> {
-		IMockExpectation0<R> andCheck();
+		interface Check {
+			void execute();
+		}
+
+		IMockExpectation0<R> andCheck(Check check);
 
 		IMockExpectation0<R> andReturn(R returnValue);
 	}
@@ -125,6 +129,24 @@ public class AbstractTestCase {
 
 	public interface Proc4<T, P1, P2, P3, P4> {
 		void call(T t, P1 p1, P2 p2, P3 p3, P4 p4);
+	}
+
+	public <TO extends T, T> IMockExpectation0<Void> expect(final TO toObj, final Proc0<T> proc) {
+		this.mocks.add(toObj);
+		EasyMock.expectLastCall().once();
+		return new IMockExpectation0<Void>() {
+			@Override
+			public IMockExpectation0<Void> andCheck(final IMockExpectation0.Check check) {
+				final FutureTask<Void> result = new FutureTask<>(() -> check.execute(), null);
+				AbstractTestCase.this.steps.add(result);
+				return this;
+			}
+
+			@Override
+			public IMockExpectation0<Void> andReturn(final Void returnValue) {
+				throw new UnsupportedOperationException();
+			}
+		};
 	}
 
 	public <TO extends T, T, P1> IMockExpectation1<Void, P1> expect(final TO toObj, final Proc1<T, P1> proc, final P1 p1) {
@@ -216,6 +238,25 @@ public class AbstractTestCase {
 		};
 	}
 
+	public <R, TO extends T, T> IMockExpectation0<R> expect(final TO toObj, final Func0<T, R> func) {
+		this.mocks.add(toObj);
+		final IExpectationSetters<R> easy = EasyMock.expectLastCall();
+		return new IMockExpectation0<R>() {
+			@Override
+			public IMockExpectation0<R> andCheck(final IMockExpectation0.Check check) {
+				final FutureTask<Void> result = new FutureTask<>(() -> check.execute(), null);
+				AbstractTestCase.this.steps.add(result);
+				return this;
+			}
+
+			@Override
+			public IMockExpectation0<R> andReturn(final R returnValue) {
+				easy.andReturn(returnValue);
+				return this;
+			}
+		};
+	}
+
 	public <R, TO extends T, T, P1> IMockExpectation1<R, P1> expect(final TO toObj, final Func1<T, R, P1> func, final P1 p1) {
 		this.mocks.add(toObj);
 		final Capture<P1> real_p1 = EasyMock.newCapture();
@@ -235,7 +276,6 @@ public class AbstractTestCase {
 				return this;
 			}
 		};
-
 	}
 
 	public <R, TO extends T, T, P1, P2> IMockExpectation2<R, P1, P2> expect(final TO toObj, final Func2<T, R, P1, P2> func, final P1 p1, final P2 p2) {

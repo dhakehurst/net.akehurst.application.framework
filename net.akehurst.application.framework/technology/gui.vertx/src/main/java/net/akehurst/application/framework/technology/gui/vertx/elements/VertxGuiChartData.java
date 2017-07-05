@@ -60,9 +60,13 @@ public class VertxGuiChartData<X, Y> implements IGuiChartData<X, Y> {
 
 		public DataSeries(final String name) {
 			this.name = name;
+			this.items = new ArrayList<>();
+			this.colours = new ArrayList<>();
 		}
 
-		String name;
+		private String name;
+		private final List<Y> items;
+		private final List<String> colours;
 
 		@Override
 		public String getName() {
@@ -74,14 +78,17 @@ public class VertxGuiChartData<X, Y> implements IGuiChartData<X, Y> {
 			this.name = value;
 		}
 
-		final List<Y> items = new ArrayList<>();
-
 		@Override
 		public List<Y> getItems() {
 			// TODO: handle dynamic adding of elements
 			return this.items;
 		}
 
+		@Override
+		public List<String> getColours() {
+			// TODO: handle dynamic adding of elements
+			return this.colours;
+		}
 	}
 
 }

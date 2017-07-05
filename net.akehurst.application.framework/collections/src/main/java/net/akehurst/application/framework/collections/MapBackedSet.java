@@ -10,6 +10,7 @@ public class MapBackedSet<K, V> implements Set<V> {
 
 	public MapBackedSet(final Map<K, V> map, final Function<V, K> keyFunction) {
 		this.map = map;
+		this.keyFunction = keyFunction;
 	}
 
 	Map<K, V> map;
