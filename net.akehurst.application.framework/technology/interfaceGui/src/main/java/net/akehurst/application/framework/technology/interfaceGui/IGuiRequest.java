@@ -73,6 +73,15 @@ public interface IGuiRequest {
 
 	void upload(final UserSession session, final String uploadLink, final String filenameElementId);
 
+	/**
+	 * register a handler for a specific message
+	 * 
+	 * @param session
+	 * @param channelId
+	 * @param func
+	 */
+	void onRequest(final UserSession session, final String channelId, final IGuiRequestMessage func);
+
 	void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, GuiEventType eventType);
 
 	<T extends IGuiDialog> T dialogCreate(Class<T> dialogClass, UserSession session, IGuiScene scene, DialogIdentity dialogId, String title,

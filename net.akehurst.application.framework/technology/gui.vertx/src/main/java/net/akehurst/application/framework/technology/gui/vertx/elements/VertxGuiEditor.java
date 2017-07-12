@@ -15,6 +15,10 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
@@ -43,6 +47,18 @@ public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
 	public void updateParseTree(final UserSession session, final String jsonParseTreeData) {
 		super.getGuiRequest().updateParseTree(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonParseTreeData);
 
+	}
+
+	@Override
+	public void onProvideCompletionItems(final UserSession session, final IGuiEditor.onProvideCompletionItems handler) {
+		super.getGuiRequest().onRequest(session, "Editor.provideCompletionItems", (session1, channelId, data) -> {
+			final String text = (String) data.get("text");
+			final int position = (int) data.get("position");
+			final List<Map<String, Object>> items = handler.provide(text, position);
+			final Map<String, Object> result = new HashMap<>();
+			result.put("result", items);
+			return result;
+		});
 	}
 
 }

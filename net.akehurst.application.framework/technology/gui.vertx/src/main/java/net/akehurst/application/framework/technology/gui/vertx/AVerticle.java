@@ -44,15 +44,9 @@ import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
-import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
-import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
-import net.akehurst.application.framework.technology.interfaceGui.GuiEventType;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiCallback;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
-import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
-import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class AVerticle implements Verticle {
@@ -60,6 +54,7 @@ public class AVerticle implements Verticle {
 	public AVerticle(final VertxWebsite ws, final int port) {
 		this.port = port;
 		this.ws = ws;
+		this.register = new HashMap<>();
 	}
 
 	int port;
@@ -69,30 +64,47 @@ public class AVerticle implements Verticle {
 	Router router;
 	ClientServerComms comms;
 
+	Map<String, IReceiveMessage> register;
+
+	public void register(final String channelId, final IReceiveMessage func) {
+		this.register.put(channelId, func);
+	}
+
 	void addRoute(final boolean authenticated, final String authenticationRedirect, final String stagePath, final Handler<RoutingContext> requestHandler,
 			final String webroot, final Map<String, String> variables) {
 		final String routePath = stagePath + "*";
 
 		this.comms.addSocksChannel(authenticated, authenticationRedirect, stagePath, this.ws.getSockjsPath(), (session, channelId, data) -> {
-			try {
-				if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-					String stageIdStr = data.getString("stageId");
-					stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
-					final StageIdentity stageId = new StageIdentity(stageIdStr);
-					final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
-					final String dialogIdStr = data.getString("dialogId");
-					final DialogIdentity dialogId = null == dialogIdStr ? null : new DialogIdentity(dialogIdStr);
-					final GuiEventType eventType = this.ws.convertToGuiEvent(data.getString("eventType"));
-					final String elementId = data.getString("elementId");
-					final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
-					this.ws.portGui().out(IGuiNotification.class)
-							.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, dialogId, elementId, eventType), eventData));
-				} else {
-					// ??
-				}
-			} catch (final GuiException e) {
-				this.ws.logger.log(LogLevel.ERROR, e.getMessage(), e);
+			// try {
+			final IReceiveMessage func = this.register.get(channelId);
+			if (null == func) {
+				this.ws.logger.log(LogLevel.WARN, "received message on unknown channel - " + channelId);
+			} else {
+				final Map<String, Object> data1 = data.getMap();
+				// FIXME: should use a signal processing object, this should be one
+				final Thread t = new Thread(() -> {
+					func.receive(session, channelId, data1);
+				});
+				t.start();
 			}
+			// if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
+			// String stageIdStr = data.getString("stageId");
+			// stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
+			// final StageIdentity stageId = new StageIdentity(stageIdStr);
+			// final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
+			// final String dialogIdStr = data.getString("dialogId");
+			// final DialogIdentity dialogId = null == dialogIdStr ? null : new DialogIdentity(dialogIdStr);
+			// final GuiEventType eventType = this.ws.convertToGuiEvent(data.getString("eventType"));
+			// final String elementId = data.getString("elementId");
+			// final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
+			// this.ws.portGui().out(IGuiNotification.class)
+			// .notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, dialogId, elementId, eventType), eventData));
+			// } else {
+			// // ??
+			// }
+			// } catch (final GuiException e) {
+			// this.ws.logger.log(LogLevel.ERROR, e.getMessage(), e);
+			// }
 		});
 
 		this.router.route(routePath).handler(CookieHandler.create());

@@ -52,6 +52,7 @@ import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiRequestMessage;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
@@ -209,6 +210,12 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void dialogClose(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onRequest(final UserSession session, final String channelId, final IGuiRequestMessage func) {
 		// TODO Auto-generated method stub
 
 	}

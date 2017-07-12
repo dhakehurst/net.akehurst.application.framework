@@ -26,20 +26,61 @@ define([
 
 ) {
 
-	function Editor(parentId, languageId, initialContent) {
+	function Editor(parentId, languageId, initialContent, comms) {
 		let self = this
+		this.languageId = languageId
 		this.viewer = {}
 		this.parentEl = $('#'+parentId)
 		this.decorations = []
+		this.comms = comms
+		monaco.languages.register({ id: languageId })
+		//monaco.languages.onLanguage(function(languageId) {
+			self.initLanguage(languageId)
+		//})
+		
 		this.editor = monaco.editor.create(document.getElementById(parentId), {
+			language: languageId,
 			value: initialContent
 		})
 		this.editor.onDidChangeModelContent(function(evt) {
 			$(self.parentEl).trigger( "oninput", evt )
 		})
+
 	}
 
 	Editor.prototype = {
+		initLanguage : function(languageId) {
+			
+
+//			monaco.languages.registerDocumentFormattingEditProvider(languageId,{
+//				provideDocumentFormattingEdits: (model, options, cancellationToken) => {
+//					
+//				}
+//			})
+			
+			//this.editor.setModelLanguage(??)
+			// Register a completion item provider for the new language
+			monaco.languages.registerCompletionItemProvider(languageId, {
+				provideCompletionItems: (model, position, cancellationToken) => {
+					let promise = this.comms.call("Editor.provideCompletionItems", {text:model.getValue(), position:model.getOffsetAt(position)})
+					return promise.then((data)=>{ return data.result })
+//					return [
+//						{
+//							label: 'simpleText',
+//							kind: monaco.languages.CompletionItemKind.Text
+//						}
+//					]
+				}
+			})
+			
+//			monaco.languages.registerDefinitionProvider(languageId, {
+//				provideDefinition : function(model, position, cancellationToken) {
+//					
+//				}
+//			})
+
+		},
+		
 		getText : function() {
 			try {
 				return this.editor.getValue()
@@ -47,7 +88,6 @@ define([
 				console.log("Error: "+err.message)
 			}
 		},
-	
 
 		createDecoration : function(start, end, title, cssClass) {
 			let range = {startLineNumber:start.lineNumber, startColumn:start.column, endLineNumber:end.lineNumber,endColumn:end.column}
@@ -76,6 +116,7 @@ define([
 			let decors = this.doNode(parseTree, [])
 			this.decorations = this.editor.getModel().deltaDecorations(this.decorations, decors)
 		}
+		
 	}
 	
 	return Editor

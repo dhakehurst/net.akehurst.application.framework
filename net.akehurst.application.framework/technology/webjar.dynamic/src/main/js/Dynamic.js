@@ -563,7 +563,7 @@ define([
 			console.log('Error: cannot find element with id ' + parentId)
 		} else {
 			require(["Editor"],function(Editor) {
-				let ed = new Editor(parentId, languageId, initialContent)
+				let ed = new Editor(parentId, languageId, initialContent, dynamic.serverComms)
 				dynamic.editors[parentId] = ed
 			})
 		}
@@ -576,7 +576,7 @@ define([
 		if (null!=ed) {
 			ed.updateParseTree(parseTree)
 		} else {
-			console.log('Cannot find Editor for id = '+parentId)
+			console.log('Cannot find Editor for id = '+id)
 		}
 		
 	}
@@ -644,7 +644,7 @@ define([
 	}
 	
 	Dynamic.prototype.initComms = function(prefix) {
-		var dynamic = this
+		let dynamic = this
 		let commsPath = prefix+'sockjs'
 		console.log('server comms path = '+commsPath)
 		this.serverComms = new ServerComms(commsPath, function() {

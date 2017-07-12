@@ -46,6 +46,7 @@ import net.akehurst.application.framework.technology.interfaceGui.GuiException;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiNotification;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiRequestMessage;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
@@ -146,6 +147,24 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		this.verticle = new AVerticle(this, this.port.asPrimitive());
 		final Vertx vertx = Vertx.vertx();
 		vertx.deployVerticle(this.verticle);
+
+		this.verticle.register("IGuiNotification.notifyEventOccured", (session, channelId, data) -> {
+			try {
+				String stageIdStr = (String) data.get("stageId");
+				stageIdStr = stageIdStr.replace(this.rootPath, "");
+				final StageIdentity stageId = new StageIdentity(stageIdStr);
+				final SceneIdentity sceneId = new SceneIdentity((String) data.get("sceneId"));
+				final String dialogIdStr = (String) data.get("dialogId");
+				final DialogIdentity dialogId = null == dialogIdStr ? null : new DialogIdentity(dialogIdStr);
+				final GuiEventType eventType = this.convertToGuiEvent((String) data.get("eventType"));
+				final String elementId = (String) data.get("elementId");
+				final Map<String, Object> eventData = (Map<String, Object>) data.get("eventData");
+				this.portGui().out(IGuiNotification.class)
+						.notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, dialogId, elementId, eventType), eventData));
+			} catch (final GuiException e) {
+				this.logger.log(LogLevel.ERROR, e.getMessage(), e);
+			}
+		});
 	}
 
 	// --------- IGuiRequest ---------
@@ -163,6 +182,16 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	public java.util.concurrent.Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site,
 			final String tokenPath, final String authorisationPath, final String scopes) {
 		return this.verticle.oauthAuthorise(session, clientId, clientSecret, site, tokenPath, authorisationPath, scopes);
+	}
+
+	@Override
+	public void onRequest(final UserSession session, final String channelId, final IGuiRequestMessage func) {
+		// TODO: maybe session should be used as part of register!
+		this.verticle.register(channelId, (session1, channelId1, data) -> {
+			final Object result = func.receive(session1, channelId1, data);
+			final JsonObject jsonData = JsonObject.mapFrom(result);
+			this.verticle.comms.send(session, channelId, jsonData);
+		});
 	}
 
 	@Override

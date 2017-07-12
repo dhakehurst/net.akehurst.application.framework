@@ -44,7 +44,7 @@ require.config({
 		"orion/code_edit" : "orion/12.0/code_edit/built-codeEdit-amd",
 //		"vscode/languageclient" : "languageclient/2.5.0/main",
 		"styles/normalize" : "normalize.css/5.0.0/normalize",
-		"vs"           : "monaco-editor/0.8.3/min/vs"
+		"vs"           : "monaco-editor/0.9.0/min/vs"
     },
     shim: {
         'graphlib': ['lodash'],
