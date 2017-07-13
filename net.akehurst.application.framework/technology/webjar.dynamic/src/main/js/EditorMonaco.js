@@ -26,7 +26,7 @@ define([
 
 ) {
 
-	function Editor(parentId, languageId, initialContent, comms) {
+	function Editor(parentId, languageId, initialContent, options, comms) {
 		let self = this
 		this.languageId = languageId
 		this.viewer = {}
@@ -38,10 +38,9 @@ define([
 			self.initLanguage(languageId)
 		//})
 		
-		this.editor = monaco.editor.create(document.getElementById(parentId), {
-			language: languageId,
-			value: initialContent
-		})
+		let v = $.extend({ language: languageId, value: initialContent }, options)
+			
+		this.editor = monaco.editor.create(document.getElementById(parentId), v)
 		this.editor.onDidChangeModelContent(function(evt) {
 			$(self.parentEl).trigger( "oninput", evt )
 		})
@@ -83,12 +82,20 @@ define([
 		
 		getText : function() {
 			try {
-				return this.editor.getValue()
+				return this.editor.getModel().getValue()
 			} catch (err) {
 				console.log("Error: "+err.message)
 			}
 		},
 
+		setText : function(text) {
+			try {
+				return this.editor.getModel().setValue(text)
+			} catch (err) {
+				console.log("Error: "+err.message)
+			}
+		},
+		
 		createDecoration : function(start, end, title, cssClass) {
 			let range = {startLineNumber:start.lineNumber, startColumn:start.column, endLineNumber:end.lineNumber,endColumn:end.column}
 			let dec = { range:range, options: { inlineClassName: cssClass, hoverMessage:title } }
@@ -98,10 +105,12 @@ define([
 			if (node.isPattern) {
 				//can't use pattern name as a css-class
 			} else {
-				let start = this.editor.getModel().getPositionAt(node.start)
-				let end = this.editor.getModel().getPositionAt(node.start+node.length)
-				let dec = this.createDecoration(start, end, node.name, node.name.replace(/_/g,'-'))
-				decors.push(dec)
+				if (null != node.name) {
+					let start = this.editor.getModel().getPositionAt(node.start)
+					let end = this.editor.getModel().getPositionAt(node.start+node.length)
+					let dec = this.createDecoration(start, end, node.name, node.name.replace(/_/g,'-'))
+					decors.push(dec)
+				}
 			}
 			if (null != node.children) {
 				for(let i=0, len=node.children.length; i < len; i++) {

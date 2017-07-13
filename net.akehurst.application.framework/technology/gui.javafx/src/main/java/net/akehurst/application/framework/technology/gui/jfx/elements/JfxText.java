@@ -35,10 +35,4 @@ public class JfxText extends JfxGuiElement implements IGuiText {
 		super.set(session, "text", value);
 	}
 
-	@Override
-	public void onTextChange(final UserSession session, final EventTextChange event) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

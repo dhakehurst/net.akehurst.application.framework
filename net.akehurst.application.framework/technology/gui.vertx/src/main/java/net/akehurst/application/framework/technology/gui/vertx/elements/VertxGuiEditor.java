@@ -25,7 +25,7 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiEditor;
 
-public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
+public class VertxGuiEditor extends VertxGuiText implements IGuiEditor {
 
 	public VertxGuiEditor(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
 		super(guiRequest, scene, dialog, elementName);
@@ -37,9 +37,9 @@ public class VertxGuiEditor extends VertxGuiElement implements IGuiEditor {
 	 * this.getElementId(), jsonParseTreeData); });
 	 */
 	@Override
-	public void create(final UserSession session, final String languageId, final String initialContent) {
-		super.getGuiRequest().editorCreate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), initialContent,
-				languageId);
+	public void create(final UserSession session, final String languageId, final String initialContent, final String options) {
+		super.getGuiRequest().editorCreate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), initialContent, languageId,
+				options);
 
 	}
 

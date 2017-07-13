@@ -414,7 +414,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void editorCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String initialContent, final String languageId) {
+			final String initialContent, final String languageId, final String optionsHJsonStr) {
 		// TODO Auto-generated method stub
 
 	}

@@ -75,7 +75,7 @@ public interface IGuiRequest {
 
 	/**
 	 * register a handler for a specific message
-	 * 
+	 *
 	 * @param session
 	 * @param channelId
 	 * @param func
@@ -156,7 +156,8 @@ public interface IGuiRequest {
 
 	void tableClearAllRows(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
 
-	void editorCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent, String languageId);
+	void editorCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent, String languageId,
+			String optionsHJsonStr);
 
 	void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
 			final String jsonParseTreeData);

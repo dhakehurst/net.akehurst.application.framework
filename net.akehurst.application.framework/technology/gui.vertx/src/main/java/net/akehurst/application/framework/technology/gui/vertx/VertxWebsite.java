@@ -649,7 +649,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
 	@Override
 	public void editorCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String initialContent, final String languageId) {
+			final String initialContent, final String languageId, final String optionsHJsonStr) {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
@@ -667,7 +667,10 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
 		data.put("languageId", languageId);
 
-		this.verticle.comms.send(session, "Editor.addEditor", data);
+		final org.hjson.JsonValue hjson = org.hjson.JsonValue.readHjson(optionsHJsonStr.replaceAll("'", "\""));
+		final JsonObject opts = new JsonObject(hjson.toString());
+		data.put("options", opts);
+		this.verticle.comms.send(session, "Editor.create", data);
 	}
 
 	@Override

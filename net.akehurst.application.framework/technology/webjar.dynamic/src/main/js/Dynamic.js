@@ -399,9 +399,11 @@ define([
 	}
 	
 	Dynamic.prototype.setText = function(id, value) {
-		var el = $('#'+id)
+		let el = $('#'+id)
 		if (el.is('input') || el.is('textarea') || el.is('select')) {
 			el.val(value)
+		} else if(el.is('.editor')) {
+			this.editorSetText(id, value)
 		} else {
 			el.text(value)	
 		}
@@ -557,19 +559,31 @@ define([
 	}
 	
 	
-	Dynamic.prototype.createEditor = function(parentId, languageId, initialContent) {
+	Dynamic.prototype.editorCreate = function(parentId, languageId, initialContent, options) {
 		let dynamic = this
 		if ($('#'+parentId).length == 0) {
 			console.log('Error: cannot find element with id ' + parentId)
 		} else {
 			require(["Editor"],function(Editor) {
-				let ed = new Editor(parentId, languageId, initialContent, dynamic.serverComms)
+				let ed = new Editor(parentId, languageId, initialContent, options, dynamic.serverComms)
 				dynamic.editors[parentId] = ed
 			})
 		}
 	}
 	
-	Dynamic.prototype.updateParseTree = function(id, parseTree) {
+	Dynamic.prototype.editorSetText = function(id, text) {
+		var dynamic = this
+		
+		let ed = this.editors[id]
+		if (null!=ed) {
+			ed.setText(text)
+		} else {
+			console.log('Cannot find Editor for id = '+id)
+		}
+		
+	}
+	
+	Dynamic.prototype.editorUpdateParseTree = function(id, parseTree) {
 		var dynamic = this
 		
 		let ed = this.editors[id]
@@ -733,11 +747,11 @@ define([
 		})
 		
 		//Editors
-		this.serverComms.registerHandler('Editor.addEditor', function(args) {
-			dynamic.createEditor(args.parentId, args.languageId, args.initialContent)
+		this.serverComms.registerHandler('Editor.create', function(args) {
+			dynamic.editorCreate(args.parentId, args.languageId, args.initialContent, args.options)
 		})
 		this.serverComms.registerHandler('Editor.updateParseTree', function(args) {
-			dynamic.updateParseTree(args.editorId, args.parseTree)
+			dynamic.editorUpdateParseTree(args.editorId, args.parseTree)
 		})
 		
 		//Charts

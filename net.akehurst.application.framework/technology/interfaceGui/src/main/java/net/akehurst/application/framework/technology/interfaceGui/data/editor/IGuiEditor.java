@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
-public interface IGuiEditor extends IGuiElement {
-	void create(UserSession session, String languageId, String initialContent);
+public interface IGuiEditor extends IGuiText {
+	void create(UserSession session, String languageId, String initialContent, String optionsHJsonStr);
 
 	void updateParseTree(final UserSession session, final String jsonParseTreeData);
 

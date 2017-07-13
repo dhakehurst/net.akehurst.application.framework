@@ -21,10 +21,4 @@ public interface IGuiText extends IGuiElement {
 
 	void setText(UserSession session, String value);
 
-	interface EventTextChange {
-		void execute();
-	}
-
-	void onTextChange(UserSession session, EventTextChange event);
-
 }
