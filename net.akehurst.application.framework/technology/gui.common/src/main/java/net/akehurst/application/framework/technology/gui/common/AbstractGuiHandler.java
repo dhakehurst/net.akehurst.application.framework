@@ -136,7 +136,7 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 				break;
 
 				case CLICK:
-				case TEXT_CHANGE:
+				case CHANGE:
 				default: {
 					final SceneIdentity currentSceneId = event.getSignature().getSceneId();
 					final IGuiScene scene = this.getScene(currentSceneId);

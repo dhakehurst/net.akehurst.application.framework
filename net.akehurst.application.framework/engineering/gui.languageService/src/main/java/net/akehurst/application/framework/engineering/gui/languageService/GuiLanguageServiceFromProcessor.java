@@ -22,11 +22,11 @@ import javax.json.Json;
 import javax.json.JsonObject;
 
 import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiLanguageService;
-import net.akehurst.language.core.ILanguageProcessor;
+import net.akehurst.language.core.grammar.RuleNotFoundException;
 import net.akehurst.language.core.parser.IParseTree;
 import net.akehurst.language.core.parser.ParseFailedException;
 import net.akehurst.language.core.parser.ParseTreeException;
-import net.akehurst.language.core.parser.RuleNotFoundException;
+import net.akehurst.language.core.processor.ILanguageProcessor;
 
 public class GuiLanguageServiceFromProcessor implements IGuiLanguageService {
 

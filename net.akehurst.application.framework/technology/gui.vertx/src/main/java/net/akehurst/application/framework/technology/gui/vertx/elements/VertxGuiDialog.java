@@ -42,6 +42,7 @@ import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
@@ -49,20 +50,22 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 
 	public VertxGuiDialog(final String afId, final IGuiRequest guiRequest, final IGuiScene scene, final DialogIdentity dialogId, final String dialogContent) {
 		super(afId, guiRequest, scene.getStageId(), scene.getSceneId());
-		// this.scene = scene;
+		this.scene = scene;
 		this.dialogId = dialogId;
 		this.dialogElementPrefix = this.dialogId.asPrimitive() + "_";
 		this.prefixLength = this.dialogElementPrefix.length();
 		this.dialogContent = dialogContent;
 	}
 
+	private static final String[] PROPERTIES_TO_UNPREFIX_ARR = { "afRowId", "afDeselected", "afSelected" };
+	private static final List<String> PROPERTIES_TO_UNPREFIX = Arrays.asList(VertxGuiDialog.PROPERTIES_TO_UNPREFIX_ARR);
 	private static final String[] PROPERTIES_TO_PREFIX_ARR = { "id", "data-ref", "for", "list" };
 	private static final List<String> PROPERTIES_TO_PREFIX = Arrays.asList(VertxGuiDialog.PROPERTIES_TO_PREFIX_ARR);
 
 	@ServiceReference
 	ILogger logger;
 
-	// private final IGuiScene scene;
+	private final IGuiScene scene;
 	private final DialogIdentity dialogId;
 	private final String dialogElementPrefix;
 	private final int prefixLength;
@@ -108,6 +111,11 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 		super.notifyEventOccured(newEvent);
 	}
 
+	@Override
+	public IGuiElement getElement(final String elementId) {
+		return new VertxGuiElement(this.guiRequest, this.scene, this, this.dialogElementPrefix + elementId);
+	}
+
 	private Object removePrefix(final Object value) {
 		if (value instanceof List<?>) {
 			final List<Object> oldList = (List<Object>) value;
@@ -130,7 +138,7 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 			final Map<String, Object> result = new HashMap<>();
 			for (final Map.Entry<String, Object> me : map.entrySet()) {
 				final String key = me.getKey();
-				if ("afRowId".equals(key)) {
+				if (VertxGuiDialog.PROPERTIES_TO_UNPREFIX.contains(key)) {
 					final String newValue = me.getValue().toString().substring(this.prefixLength);
 					result.put(key, newValue);
 				} else if (key.startsWith(this.dialogElementPrefix)) {

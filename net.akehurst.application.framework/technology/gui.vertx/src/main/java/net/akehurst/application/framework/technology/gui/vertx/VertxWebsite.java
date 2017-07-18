@@ -140,7 +140,8 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
 	// --- Component ---
 	@Override
-	public void afConnectParts() {}
+	public void afConnectParts() {
+	}
 
 	@Override
 	public void afRun() {
@@ -212,8 +213,8 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		switch (eventType) {
 			case "click":
 				return GuiEventType.CLICK;
-			case "oninput":
-				return GuiEventType.TEXT_CHANGE;
+			case "change":
+				return GuiEventType.CHANGE;
 			case EVENT_SCENE_LOADED:
 				return GuiEventType.SCENE_LOADED;
 			case EVENT_STAGE_CLOSED:
@@ -230,8 +231,8 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		switch (eventType) {
 			case CLICK:
 				return "click";
-			case TEXT_CHANGE:
-				return "oninput";
+			case CHANGE:
+				return "change";
 			case SCENE_LOADED:
 				return VertxWebsite.EVENT_SCENE_LOADED;
 			case STAGE_CLOSED:

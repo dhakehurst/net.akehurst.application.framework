@@ -3,6 +3,7 @@ package net.akehurst.application.framework.technology.interfaceGui;
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 
 public interface IGuiDialog extends IIdentifiableObject {
 
@@ -29,5 +30,7 @@ public interface IGuiDialog extends IIdentifiableObject {
 	void open(UserSession session);
 
 	void close(UserSession session);
+
+	IGuiElement getElement(String elementId);
 
 }

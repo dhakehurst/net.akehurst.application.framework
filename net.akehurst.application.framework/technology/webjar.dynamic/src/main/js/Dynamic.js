@@ -253,7 +253,7 @@ define([
 	}
 	
 	Dynamic.prototype.fetchDialogId = function(el) {
-		let dialog = el.closest('dialog')
+		let dialog = $(el).closest('dialog')
 		if (null==dialog) {
 			return null
 		} else {
@@ -267,37 +267,37 @@ define([
 		let dyn = this
 		let selector = '#'+elementId +','+'[data-ref='+elementId+']'
 		let el = $(selector)
-		//first try element identity
-//		let el = $('#'+elementId)
-		//if not found, try find an element with attribute data-ref=elementId
-		// used in cases where multiple elements take the same ref/id (e.g. table rows)
-//		if (el.length == 0) {
-//			el = $('[data-ref='+elementId+']')
-//		}
-		//if not found, try a class name
-		//depricate this...use data-ref instead
-//		if (el.length == 0) {
-//			el = $('.'+elementId)
-//		}
-		//if still not found then error
-//		if (el.length == 0) {
-//			console.log('Error: cannot find element with id or data-ref equal to ' + elementId)
-//		}
-		let dy = this
 		let sceneId = this.sceneId
 		let mappedEventType = eventType
-		if ($(el).is("select")) {
-			if ("oninput"==eventType) {
-				mappedEventType = "change"
+		if ($(el).is("input")) {
+			if ("change"==eventType) {
+				mappedEventType = "oninput"
 			}
+		}
+		if ($(el).is("div.tabs")) {
+			//set current elected tab
+			let curr = $(el).children('input[type=radio]:checked')
+			$(el).data('previous', $(curr).attr('id'))
+			//register event for every radio button
+			//let dialogId = dyn.fetchDialogId(el)
+			let children = $(el).children('input[type=radio]')
+			$(children).change(function(ev) {   //might need to be 'click', some forums comments say change is not supported on all browsers
+				let selfId = $(ev.target).attr('id')
+				let triggerData = {}
+				triggerData['afSelected'] = selfId
+				triggerData['afDeselected'] = $(el).data('previous')
+				$(el).trigger("change", triggerData)
+				$(el).data('previous', selfId)
+			})
 		}
 		//remove previous event handler
 		$(document.body).off(mappedEventType, selector)
-		$(document.body).on(mappedEventType, selector, function(event) {
+		$(document.body).on(mappedEventType, selector, function(event, triggerData) {
 			try {
 				event.stopPropagation()
-				let data = dy.fetchEventData(event.target)
-				let dialogId = dy.fetchDialogId(event.target)
+				let fetchedData = dyn.fetchEventData(event.target)
+				let data = $.extend(fetchedData, triggerData)
+				let dialogId = dyn.fetchDialogId(event.target)
 				var outData = {stageId: dyn.stageId, sceneId: dyn.sceneId, dialogId:dialogId, elementId:elementId, eventType:eventType, eventData:data}
 				console.log("event: "+JSON.stringify(outData))
 				dyn.commsSend(eventChannelId, outData)
@@ -309,8 +309,8 @@ define([
 	
 	Dynamic.prototype.navigateTo = function(location) {
 		if (location.startsWith('/')) {
-			var myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-			var newRef = myLocation + location
+			let myLocation = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+			let newRef = myLocation + location
 	
 			window.location.href = newRef
 		} else {

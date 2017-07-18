@@ -37,7 +37,7 @@
             let dialog = document.createElement('dialog')
             dialog.id = this.dialogId
             container.appendChild(dialog)
-            $(this.dialogElement).attr('open','false')
+            $(this.dialogElement).removeAttr('open')
             dialog.insertAdjacentHTML('beforeend',dialogContent)
         } else {
         	console.log('Error: already created this dialog element')
@@ -49,7 +49,7 @@
 			console.log('Error: must create the dialog before calling open')
         } else {
         	//this.dialogElement.showModal()
-        	$(this.dialogElement).attr('open','true')
+        	$(this.dialogElement).attr('open','open')
         }
 	}
 	
