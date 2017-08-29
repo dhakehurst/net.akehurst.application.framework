@@ -8,5 +8,5 @@ public interface IGuiDiagram extends IGuiElement {
 
 	void update(UserSession session, IGuiDiagramData newContent);
 
-	void remove(UserSession session, IGuiDiagramData content);
+	void remove(UserSession session);
 }

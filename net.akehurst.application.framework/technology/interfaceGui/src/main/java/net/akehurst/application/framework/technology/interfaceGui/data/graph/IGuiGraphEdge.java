@@ -1,5 +1,6 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.graph;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IGuiGraphEdge {
@@ -12,7 +13,7 @@ public interface IGuiGraphEdge {
 
 	IGuiGraphNode getTarget();
 
-	String[] getClasses();
+	List<String> getClasses();
 
 	Map<String, Object> getData();
 

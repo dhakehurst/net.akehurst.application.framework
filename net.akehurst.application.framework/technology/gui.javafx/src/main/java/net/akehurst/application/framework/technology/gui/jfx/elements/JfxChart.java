@@ -260,4 +260,10 @@ public class JfxChart<X, Y> implements IGuiChart<X, Y> {
 		return null;
 	}
 
+	@Override
+	public void remove(final UserSession session) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

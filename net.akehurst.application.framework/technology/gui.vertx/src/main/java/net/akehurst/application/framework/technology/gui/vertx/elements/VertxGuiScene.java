@@ -120,6 +120,12 @@ public class VertxGuiScene implements IGuiScene {
 	}
 
 	@Override
+	public void onUpload(final UserSession session, final String uploadLink, final String filenameElementId, final OnEventHandler handler) {
+		this.guiRequest.upload(session, this.stageId, this.sceneId, uploadLink, filenameElementId, handler);
+
+	}
+
+	@Override
 	public IGuiElement getElement(final String elementName) {
 		return new VertxGuiElement(this.guiRequest, this, null, elementName);
 	}

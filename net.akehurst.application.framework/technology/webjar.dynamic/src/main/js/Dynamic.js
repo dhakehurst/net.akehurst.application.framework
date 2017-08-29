@@ -82,10 +82,21 @@ define([
 		this.initComms(expectedStart);
 		
 		// cache created editors so we can find them again
+		this.tables = {}
 		this.editors = {}
+		this.charts = {}
 		this.diagrams = {}
 		this.graphs = {}
 		this.highlighter = {}
+	}
+	
+	Dynamic.prototype.getTable = function(tableId) {
+		let tbl = this.tables[tableId]
+		if (null==tbl) {
+			throw 'No table has been created with id '+tableId
+		} else {
+			return tbl
+		}
 	}
 	
 	Dynamic.prototype.fetchEventData = function(el) {
@@ -106,6 +117,20 @@ define([
 		}
 	}
 	
+	Dynamic.prototype.fetchPData = function(el) {
+		let data = {}
+		let inTableTemplate = $(el).find('.table-row-template p.input')
+		let childs = $(el).find('p.input')
+		let inputs = $(childs).not(inTableTemplate)
+		for(i=0; i< inputs.length; i++) {
+			let ta = inputs[i]
+			let id = ta.id
+			let value = $(ta).text()
+			data[id] = value
+		}
+		return data
+	}
+	
 	Dynamic.prototype.fetchInputData = function(el) {
 		let data = {}
 		let inTableTemplate = $(el).find('.table-row-template input')
@@ -115,7 +140,10 @@ define([
 			let input = inputs[i]
 			let id = input.id
 			let value = input.value
-			if ($(input).attr('type') == 'password') {
+			if ($(input).attr('type') == 'checkbox') {
+				value = $(input).prop('checked')
+				data[id] = value
+			} else if ($(input).attr('type') == 'password') {
 				//TODO: need better hiding of passwords than this really
 				let v = "1234567890abcdef1234567890abcdef"
 				let bv = CryptoJS.enc.Hex.parse(v);
@@ -154,12 +182,14 @@ define([
 			}
 			
 			let rowsData = []
+			let rowIds = []
 			for(let r=1; r<tbl.rows.length; r++) { //row 0 should contain the table headers
 				let row = tbl.rows[r]
 				if ($(row).hasClass('table-row-template')) {
 					// don't add the template
 				} else {
-					var rowData = []
+					let rowData = []
+					rowIds.push($(row).attr('id'))
 					for(let c=0; c<row.cells.length; c++) {
 						let cell = row.cells[c]
 						let th = $(tbl).find('th').eq($(cell).index())
@@ -170,7 +200,7 @@ define([
 				}
 			}
 			let id = tbl.id
-			data[id] = { afHeaders:headers, afRows:rowsData }
+			data[id] = { afHeaders:headers, afRowIds:rowIds, afRows:rowsData }
 		}
 		return data
 	}
@@ -227,12 +257,13 @@ define([
 	}
 	
 	Dynamic.prototype.fetchData = function(el) {
+		let d0 = this.fetchPData(el)
 		let d1 = this.fetchInputData(el)
 		let d2 = this.fetchTextAreaData(el)
 		let d3 = this.fetchSelectData(el)
 		let d4 = this.fetchEditorData(el)
 		let d5 = this.fetchTableData(el)
-		let data = $.extend({}, d1,d2,d3,d4,d5)
+		let data = $.extend({}, d0,d1,d2,d3,d4,d5)
 		return data
 	}
 	
@@ -398,9 +429,12 @@ define([
 		document.title=value
 	}
 	
+	//TODO: maybe this should be setValue!
 	Dynamic.prototype.setText = function(id, value) {
 		let el = $('#'+id)
-		if (el.is('input') || el.is('textarea') || el.is('select')) {
+		if (el.is('input') && $(el).attr('type') == 'checkbox') {
+			$(el).prop('checked',value=='true')
+		} else if (el.is('input') || el.is('textarea') || el.is('select')) {
 			el.val(value)
 		} else if(el.is('.editor')) {
 			this.editorSetText(id, value)
@@ -470,6 +504,7 @@ define([
 			console.log('Error: cannot find element with id ' + elementId)
 		} else {
 			$(el).prop('disabled', value)
+			$(el).find('*').prop('disabled', value)
 			return 'ok'
 		}
 	}
@@ -513,7 +548,7 @@ define([
 		}
 	}
 	
-	Dynamic.prototype.removeElement = function(elementId) {
+	Dynamic.prototype.elementRemove = function(elementId) {
 		var el = $('#'+elementId)
 		if (el.length == 0) {
 			console.log('Error: cannot find element with id ' + elementId)
@@ -523,41 +558,34 @@ define([
 		}
 	}
 	
+	Dynamic.prototype.tableCreate = function(tableId) {
+		let tbl = new Table(tableId)
+		this.tables[tableId] = tbl
+	}
 	Dynamic.prototype.tableAddColumn = function(tableId, colHeaderContent, rowTemplateCellContent, existingRowCellContent) {
-
-			let t = new Table(tableId)
-			t.addColumn(colHeaderContent, rowTemplateCellContent, existingRowCellContent);
-
+		let t = this.getTable(tableId)
+		t.addColumn(colHeaderContent, rowTemplateCellContent, existingRowCellContent);
 	}
-	
 	Dynamic.prototype.tableClearAllColumnHeaders = function(tableId) {
-
-			let t = new Table(tableId)
-			t.clearAllColumnHeaders();
-
+		let t = this.getTable(tableId)
+		t.clearAllColumnHeaders();
 	}
-	
 	Dynamic.prototype.tableAppendRow = function(tableId, rowData) {
-
-			let t = new Table(tableId)
-			t.appendRow(rowData);
-
+		let t = this.getTable(tableId)
+		t.appendRow(rowData);
 	}
-	
 	Dynamic.prototype.tableRemoveRow = function(tableId, rowId) {
-
-			let t = new Table(tableId)
-			t.removeRow(rowId);
-
+		let t = this.getTable(tableId)
+		t.removeRow(rowId);
 	}
-	
 	Dynamic.prototype.tableClearAllRows = function(tableId) {
-
-			let t = new Table(tableId)
-			t.clearAllRows();
-
+		let t = this.getTable(tableId)
+		t.clearAllRows();
 	}
-	
+	Dynamic.prototype.tableRemove = function(tableId) {
+		this.elementRemove(tableId)
+		this.tables[tableId] = null
+	}
 	
 	Dynamic.prototype.editorCreate = function(parentId, languageId, initialContent, options) {
 		let dynamic = this
@@ -570,7 +598,6 @@ define([
 			})
 		}
 	}
-	
 	Dynamic.prototype.editorSetText = function(id, text) {
 		var dynamic = this
 		
@@ -582,7 +609,6 @@ define([
 		}
 		
 	}
-	
 	Dynamic.prototype.editorUpdateParseTree = function(id, parseTree) {
 		var dynamic = this
 		
@@ -592,23 +618,36 @@ define([
 		} else {
 			console.log('Cannot find Editor for id = '+id)
 		}
-		
 	}
-		
+	Dynamic.prototype.editorDefineTextColourTheme = function(name, rules) {
+		require(["Editor"],function(Editor) {
+			Editor.defineTheme(name, rules)
+		})
+	}
+	Dynamic.prototype.editorRemove = function(parentId) {
+		this.elementClear(parentId)
+		this.editors[parentId] = null
+	}
 	
-	Dynamic.prototype.addChart = function(parentId, chartId, chartType, chartData, chartOptions) {
+	Dynamic.prototype.chartCreate = function(parentId, chartId, chartType, chartData, chartOptions) {
 		require(["chartjs"],function(){
 			let parent = document.getElementById(parentId)
 			let width = $(parent).width()
 			let height = $(parent).height()
-			$(parent).append("<canvas id='"+chartId+"' width='"+width+"' height='"+height+"'></canvas>")
+			//$(parent).append("<canvas id='"+chartId+"' width='"+width+"' height='"+height+"'></canvas>")
+			$(parent).append("<canvas id='"+chartId+"'></canvas>")
 			let chartContext = document.getElementById(chartId).getContext("2d")
-			let chart = new Chart(chartContext, {type:chartType, data: chartData, options:chartOptions})
+			let chatOpts = $.extend(chartOptions, {responsive:true}) //maintainAspectRatio?
+			let chart = new Chart(chartContext, {type:chartType, data: chartData, options:chatOpts})
 			//chart[chartType](chartData, chartOptions)
 		})
 	}
+	Dynamic.prototype.chartRemove = function(parentId) {
+		this.elementClear(parentId)
+		this.charts[parentId] = null
+	}
 	
-	Dynamic.prototype.createDiagram = function(parentId, data) {
+	Dynamic.prototype.diagramCreate = function(parentId, data) {
 		var dynamic = this
 		if ($('#'+parentId).length == 0) {
 			console.log('Error: cannot find element with id ' + parentId)
@@ -620,7 +659,7 @@ define([
 		}
 	}
 
-	Dynamic.prototype.updateDiagram = function(parentId, data) {
+	Dynamic.prototype.diagramUpdate = function(parentId, data) {
 		var dynamic = this
 		
 		let d = this.diagrams[parentId]
@@ -629,6 +668,11 @@ define([
 		} else {
 			console.log('Cannot find Diagram for id = '+parentId)
 		}
+	}
+	
+	Dynamic.prototype.diagramRemove = function(parentId) {
+		this.elementClear(parentId)
+		this.diagrams[parentId] = null
 	}
 	
 	Dynamic.prototype.graphCreate = function(parentId, data) {
@@ -651,6 +695,11 @@ define([
 		} else {
 			console.log('Cannot find Graph for id = '+parentId)
 		}
+	}
+	
+	Dynamic.prototype.graphRemove = function(parentId) {
+		this.elementClear(parentId)
+		this.graphs[parentId] = null
 	}
 	
 	Dynamic.prototype.commsSend = function(name, data) {
@@ -684,7 +733,7 @@ define([
 			dynamic.addElement(args.parentId, args.newElementId, args.type, args.attributes, args.content)
 		})
 		this.serverComms.registerHandler('Element.remove', function(args) {
-			dynamic.removeElement(args.id)
+			dynamic.elementRemove(args.id)
 		})
 		this.serverComms.registerHandler('Element.clear', function(args) {
 			dynamic.elementClear(args.id)
@@ -730,6 +779,12 @@ define([
 			dynamic.dialogClose(args.dialogId)
 		})
 		//Tables
+		this.serverComms.registerHandler('Table.create', function(args) {
+			dynamic.tableCreate(args.tableId)
+		})
+		this.serverComms.registerHandler('Table.remove', function(args) {
+			dynamic.tableRemove(args.tableId)
+		})
 		this.serverComms.registerHandler('Table.addColumn', function(args) {
 			dynamic.tableAddColumn(args.tableId, args.colHeaderContent, args.rowTemplateCellContent, args.existingRowCellContent)
 		})
@@ -753,26 +808,41 @@ define([
 		this.serverComms.registerHandler('Editor.updateParseTree', function(args) {
 			dynamic.editorUpdateParseTree(args.editorId, args.parseTree)
 		})
+		this.serverComms.registerHandler('Editor.defineTextColourTheme', function(args) {
+			dynamic.editorDefineTextColourTheme(args.name, args.rules)
+		})
+		this.serverComms.registerHandler('Editor.remove', function(args) {
+			dynamic.editorRemove(args.parentId)
+		})
 		
 		//Charts
-		this.serverComms.registerHandler('Gui.addChart', function(args) {
-			dynamic.addChart(args.parentId, args.chartId, args.chartType, args.chartData, args.chartOptions)
+		this.serverComms.registerHandler('Chart.create', function(args) {
+			dynamic.chartCreate(args.parentId, args.chartId, args.chartType, args.chartData, args.chartOptions)
+		})
+		this.serverComms.registerHandler('Chart.remove', function(args) {
+			dynamic.chartRemove(args.parentId, args.chartId)
 		})
 		
 		//Diagram
 		this.serverComms.registerHandler('Diagram.create', function(args) {
-			dynamic.createDiagram(args.parentId, args.data)
+			dynamic.diagramCreate(args.parentId, args.data)
 		})
 		this.serverComms.registerHandler('Diagram.update', function(args) {
-			dynamic.updateDiagram(args.parentId, args.data)
+			dynamic.diagramUpdate(args.parentId, args.data)
+		})
+		this.serverComms.registerHandler('Diagram.remove', function(args) {
+			dynamic.diagramRemove(args.parentId)
 		})
 		
-		//Diagram
+		//Graph
 		this.serverComms.registerHandler('Graph.create', function(args) {
 			dynamic.graphCreate(args.parentId, args.data)
 		})
 		this.serverComms.registerHandler('Graph.update', function(args) {
 			dynamic.graphUpdate(args.parentId, args.data)
+		})
+		this.serverComms.registerHandler('Graph.remove', function(args) {
+			dynamic.graphRemove(args.parentId)
 		})
 		
 		//2d Canvas

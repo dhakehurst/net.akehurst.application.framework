@@ -16,13 +16,17 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.table;
 
 import java.util.List;
-import java.util.Map;
 
-public interface IGuiTableData<C, R> {
+public interface IGuiTableData {
+
+	List<String> getColumnIds();
 
 	int getNumberOfRows();
 
-	List<IGuiTableRow<C, R>> getRows();
+	List<String> getRowIds();
 
-	Map<String, Object> getRowData(int index);
+	List<IGuiTableRow> getRows();
+
+	IGuiTableRow getRowData(String rowId);
+
 }

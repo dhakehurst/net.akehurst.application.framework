@@ -16,7 +16,6 @@
 package net.akehurst.application.framework.service.configuration.file;
 
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
-import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.realisation.AbstractPersistentStoreConfigurationService;
@@ -27,32 +26,36 @@ import net.akehurst.application.framework.technology.persistence.filesystem.HJso
 
 public class HJsonConfigurationService extends AbstractPersistentStoreConfigurationService {
 
-	@ServiceReference
-	IApplicationFramework af;
+	@CommandLineArgument(description = "name of a directory in which the configuration file can be found")
+	protected String directory = "configuration";
 
 	@ServiceReference
-	ILogger logger;
-
-	@CommandLineArgument(description = "name of a folder in which the configuration file can be found")
-	String folder = "configuration";
+	private ILogger logger;
 
 	public HJsonConfigurationService(final String afId) {
 		super(afId);
 
 	}
 
-	IPersistentStore store;
+	private IPersistentStore store;
 
 	@Override
 	protected IPersistentStore getStore() {
 		if (null == this.store) {
 			try {
-				final String path = this.folder.isEmpty() ? "" : this.folder + "/" + this.afId();
+				// re inject stuff into this service, because otherwise we don't get the commandline args injected
+				// services are injected before connadline args are parsed.
+				super.af.injectIntoService(this);
+
+				final String path = this.directory.isEmpty() ? "" : this.directory + "/" + this.afId();
 				this.store = new HJsonFile(path);
-				this.af.injectIntoSimpleObject(this.store);
+				super.af.injectIntoSimpleObject(this.store);
+
+				this.logger.log(LogLevel.DEBUG, "Using configuration file " + ((HJsonFile) this.store).getFile().getFullName());
+
 			} catch (final ApplicationFrameworkException e) {
-				this.logger.log(LogLevel.ERROR, e.getMessage());
-				this.logger.log(LogLevel.DEBUG, e.getMessage(), e);
+				super.logger.log(LogLevel.ERROR, e.getMessage());
+				super.logger.log(LogLevel.DEBUG, e.getMessage(), e);
 			}
 		}
 		return this.store;

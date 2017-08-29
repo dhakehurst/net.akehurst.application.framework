@@ -239,6 +239,12 @@ public class JfxGuiScene implements IGuiScene, InvocationHandler {
 	}
 
 	@Override
+	public void onUpload(final UserSession session, final String uploadLink, final String filenameElementId, final OnEventHandler handler) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public IGuiElement getElement(final String elementName) {
 		// TODO Auto-generated method stub
 		return null;

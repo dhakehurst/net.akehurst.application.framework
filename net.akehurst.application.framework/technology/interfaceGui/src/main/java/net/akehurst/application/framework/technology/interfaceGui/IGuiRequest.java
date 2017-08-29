@@ -19,7 +19,10 @@ import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import org.jooq.lambda.tuple.Tuple3;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 
 public interface IGuiRequest {
 
@@ -71,7 +74,8 @@ public interface IGuiRequest {
 
 	void download(UserSession session, String location, String filename);
 
-	void upload(final UserSession session, final String uploadLink, final String filenameElementId);
+	void upload(final UserSession session, StageIdentity stageId, SceneIdentity sceneId, final String uploadLink, final String filenameElementId,
+			OnEventHandler handler);
 
 	/**
 	 * register a handler for a specific message
@@ -145,6 +149,12 @@ public interface IGuiRequest {
 
 	void diagramUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 
+	void diagramRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
+
+	void tableCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
+
+	void tableRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
+
 	void tableAddColumn(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String colHeaderContent,
 			String rowTemplateCellContent, String existingRowCellContent);
 
@@ -159,16 +169,23 @@ public interface IGuiRequest {
 	void editorCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent, String languageId,
 			String optionsHJsonStr);
 
-	void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
+	void editorDefineTextColourTheme(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String themeName,
+			Map<String, Tuple3<String, String, String>> colourMap);
+
+	void editorUpdateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
 			final String jsonParseTreeData);
 
 	void chartCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, String chartType, String jsonChartData,
 			String jsonChartOptions);
+
+	void chartRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
 
 	<X, Y> void chartAddDataItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId, String seriesName, X x, Y y);
 
 	void graphCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
 
 	void graphUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
+
+	void graphRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
 
 }

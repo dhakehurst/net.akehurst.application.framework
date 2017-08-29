@@ -57,14 +57,17 @@ public class AVerticle implements Verticle {
 		this.register = new HashMap<>();
 	}
 
-	int port;
-	VertxWebsite ws;
-	MyAuthProvider authProvider;
-	Vertx vertx;
-	Router router;
-	ClientServerComms comms;
+	private final int port;
+	private final VertxWebsite ws;
+	private MyAuthProvider authProvider;
+	private Vertx vertx;
+	private Router router;
+	private ClientServerComms comms;
+	private final Map<String, IReceiveMessage> register;
 
-	Map<String, IReceiveMessage> register;
+	public ClientServerComms getComms() {
+		return this.comms;
+	}
 
 	public void register(final String channelId, final IReceiveMessage func) {
 		this.register.put(channelId, func);
@@ -75,10 +78,10 @@ public class AVerticle implements Verticle {
 		final String routePath = stagePath + "*";
 
 		this.comms.addSocksChannel(authenticated, authenticationRedirect, stagePath, this.ws.getSockjsPath(), (session, channelId, data) -> {
-			// try {
+			this.ws.logger.log(LogLevel.DEBUG, "received socks message %s %s", channelId, data);
 			final IReceiveMessage func = this.register.get(channelId);
 			if (null == func) {
-				this.ws.logger.log(LogLevel.WARN, "received message on unknown channel - " + channelId);
+				this.ws.logger.log(LogLevel.WARN, "received message on unknown channel %s", channelId);
 			} else {
 				final Map<String, Object> data1 = data.getMap();
 				// FIXME: should use a signal processing object, this should be one
@@ -87,24 +90,6 @@ public class AVerticle implements Verticle {
 				});
 				t.start();
 			}
-			// if ("IGuiNotification.notifyEventOccured".equals(channelId)) {
-			// String stageIdStr = data.getString("stageId");
-			// stageIdStr = stageIdStr.replace(this.ws.rootPath, "");
-			// final StageIdentity stageId = new StageIdentity(stageIdStr);
-			// final SceneIdentity sceneId = new SceneIdentity(data.getString("sceneId"));
-			// final String dialogIdStr = data.getString("dialogId");
-			// final DialogIdentity dialogId = null == dialogIdStr ? null : new DialogIdentity(dialogIdStr);
-			// final GuiEventType eventType = this.ws.convertToGuiEvent(data.getString("eventType"));
-			// final String elementId = data.getString("elementId");
-			// final Map<String, Object> eventData = data.getJsonObject("eventData").getMap();
-			// this.ws.portGui().out(IGuiNotification.class)
-			// .notifyEventOccured(new GuiEvent(session, new GuiEventSignature(stageId, sceneId, dialogId, elementId, eventType), eventData));
-			// } else {
-			// // ??
-			// }
-			// } catch (final GuiException e) {
-			// this.ws.logger.log(LogLevel.ERROR, e.getMessage(), e);
-			// }
 		});
 
 		this.router.route(routePath).handler(CookieHandler.create());
@@ -139,36 +124,6 @@ public class AVerticle implements Verticle {
 		if (null != details) {
 			final String username = details.getName();
 			this.authProvider.addAuthentication(session.getId(), username);
-
-			// final Session sess = this.comms.getSession(session.getId());
-			// UserHolder holder = sess.get("__vertx.userHolder");
-			// if (null == holder) {
-			// holder = new UserHolder(null);
-			// }
-			// final User user = new AbstractUser() {
-			//
-			// @Override
-			// public void setAuthProvider(final AuthProvider authProvider) {
-			// // TODO Auto-generated method stub
-			//
-			// }
-			//
-			// @Override
-			// public JsonObject principal() {
-			// return new JsonObject().put("username", username);
-			// }
-			//
-			// @Override
-			// protected void doIsPermitted(final String permission, final Handler<AsyncResult<Boolean>> resultHandler) {
-			// // TODO Auto-generated method stub
-			//
-			// }
-			// };
-			// holder.user = user;
-			// if (null != holder.context) {
-			// holder.context.setUser(user);
-			// }
-
 		} else {
 			throw new GuiException("Cannot authenticate", null);
 		}
@@ -176,11 +131,6 @@ public class AVerticle implements Verticle {
 
 	public void clearAuthentication(final UserSession session) throws GuiException {
 		this.authProvider.clearAuthentication(session.getId());
-		// final Session sess = this.comms.getSession(session.getId());
-		// final UserHolder holder = sess.get("__vertx.userHolder");
-		// if (null != holder) {
-		// sess.remove("__vertx.userHolder");
-		// }
 	}
 
 	public java.util.concurrent.Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site,
@@ -252,35 +202,25 @@ public class AVerticle implements Verticle {
 	public void start(final Future<Void> startFuture) throws Exception {
 
 		this.router = Router.router(this.getVertx());
-		// this.router.route(this.ws.getTestPath()).handler(CookieHandler.create());
-		// this.router.route(this.ws.getTestPath()).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
-		// this.router.route(this.ws.getTestPath()).handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-		// this.router.route(this.ws.getTestPath()).handler(UserSessionHandler.create(this.authProvider));
 		final String testPath = this.ws.getTestPath();
 		this.router.route(testPath).handler(rc -> {
 			rc.response().putHeader("content-type", "text/html").end("<h1>Test</h1>");
 		});
 		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + testPath);
 
-		// final ShiroAuthOptions authOpts = new ShiroAuthOptions();
-		// final JsonObject config = new JsonObject();
-		// config.put("properties_path", "classpath:auth.properties");
-		// authOpts.setConfig(config);
-		// authOpts.setType(ShiroAuthRealmType.PROPERTIES);
-		// this.authProvider = authOpts.createProvider(this.getVertx());
 		this.authProvider = new MyAuthProvider();
 
 		this.comms = new ClientServerComms(this.getVertx(), this.router, this.authProvider, this.ws.rootPath, "/eventbus");
 
 		final String jsPath = this.ws.getJsPath() + "/*";
 		this.router.route(jsPath).handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("js"));
-		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + jsPath);
+		this.ws.logger.log(LogLevel.INFO, "JS path:  " + "http://localhost:" + this.port + jsPath);
 
 		// TODO: replace jsPath with this once all my js code is ported
 		final String libPath = this.ws.getLibPath() + "/*";
 		final String libClassPath = this.ws.getLibClassPath();
 		this.router.route(libPath).handler(StaticHandler.create(libClassPath));
-		this.ws.logger.log(LogLevel.INFO, "Test path:  " + "http://localhost:" + this.port + libPath);
+		this.ws.logger.log(LogLevel.INFO, "Lib path:  " + "http://localhost:" + this.port + libPath);
 
 		final String downloadPath = this.ws.getDownloadPath() + ":filename";
 
@@ -323,19 +263,16 @@ public class AVerticle implements Verticle {
 		final String uploadPath = this.ws.getUploadPath();
 		this.addPostRoute(uploadPath, rc -> {
 			final UserSession session = this.comms.createUserSession(rc.session(), rc.user());
+			final IReceiveMessage rec = this.register.get("upload");
 			for (final FileUpload f : rc.fileUploads()) {
-				this.ws.portGui().out(IGuiNotification.class).notifyUpload(session, f.uploadedFileName());
+				final Map<String, Object> data = new HashMap<>();
+				data.put("uploadedFilename", f.uploadedFileName());
+				rec.receive(session, "upload", data);
+				// this.ws.portGui().out(IGuiNotification.class).notifyUpload(session, f.uploadedFileName());
 			}
 			rc.response().end();
 		});
 		this.ws.logger.log(LogLevel.INFO, "Upload path:  " + "http://localhost:" + this.port + uploadPath);
-
-		// final String oauthCallbackPath = this.ws.getOAuthCallbckPath();
-		// this.router.route(oauthCallbackPath).handler(rc -> {
-		// final Session webSession = rc.session();
-		// rc.pathParams().get("");
-		// });
-		// this.ws.logger.log(LogLevel.INFO, "OAuth Callback path: " + "http://localhost:" + this.port + oauthCallbackPath);
 
 		final HttpServer server = this.getVertx().createHttpServer();
 		server.requestHandler(this.router::accept).listen(this.port);

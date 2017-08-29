@@ -41,6 +41,11 @@ public class VertxGuiChart<X, Y> extends VertxGuiElement implements IGuiChart<X,
 		this.createChartContent(session, chartType);
 	}
 
+	@Override
+	public void remove(final UserSession session) {
+		this.getGuiRequest().chartRemove(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getChartId());
+	}
+
 	IGuiChartData<X, Y> data;
 
 	@Override

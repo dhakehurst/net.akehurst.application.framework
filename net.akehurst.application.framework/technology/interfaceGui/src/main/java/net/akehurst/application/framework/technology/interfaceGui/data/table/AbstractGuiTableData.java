@@ -1,26 +1,40 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.table;
 
-import java.util.AbstractList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-abstract public class AbstractGuiTableData<C, R> implements IGuiTableData<C, R> {
+abstract public class AbstractGuiTableData implements IGuiTableData {
 
-	@Override
-	public List<IGuiTableRow<C, R>> getRows() {
-		return new AbstractList<IGuiTableRow<C, R>>() {
+	protected IGuiTableRow createRow(final String rowId, final List<Map<String, Object>> rowData) {
+		return new IGuiTableRow() {
 
 			@Override
-			public IGuiTableRow<C, R> get(final int index) {
-
-				return () -> AbstractGuiTableData.this.getRowData(index);
+			public String getId() {
+				return rowId;
 			}
 
 			@Override
-			public int size() {
-				return AbstractGuiTableData.this.getNumberOfRows();
+			public List<Map<String, Object>> getRowData() {
+				return rowData;
+			}
+
+			@Override
+			public Map<String, Object> getDataForColumn(final String columnId) {
+				final int index = AbstractGuiTableData.this.getColumnIds().indexOf(columnId);
+				return rowData.get(index);
 			}
 		};
+	}
 
+	@Override
+	public int getNumberOfRows() {
+		return this.getRowIds().size();
+	}
+
+	@Override
+	public List<IGuiTableRow> getRows() {
+		return this.getRowIds().stream().map(rowId -> this.getRowData(rowId)).collect(Collectors.toList());
 	}
 
 }

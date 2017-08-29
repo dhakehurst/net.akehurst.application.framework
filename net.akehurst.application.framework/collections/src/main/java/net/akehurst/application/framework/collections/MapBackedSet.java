@@ -71,7 +71,11 @@ public class MapBackedSet<K, V> implements Set<V> {
 
 	@Override
 	public boolean addAll(final Collection<? extends V> c) {
-		return this.map.values().addAll(c);
+		boolean res = false;
+		for (final V e : c) {
+			res |= this.add(e);
+		}
+		return res;
 	}
 
 	@Override

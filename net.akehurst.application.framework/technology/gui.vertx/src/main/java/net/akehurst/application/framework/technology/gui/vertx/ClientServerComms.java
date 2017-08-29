@@ -124,7 +124,6 @@ public class ClientServerComms {
 			final UserSession sess = this.createUserSession(ss.webSession(), ss.webUser());
 			ss.handler(b -> {
 				final String s = new String(b.getBytes());
-				System.out.println(s);
 				final JsonObject json = new JsonObject(s);
 				final String channelId = json.getString("channelId");
 				final JsonObject data = json.getJsonObject("data");

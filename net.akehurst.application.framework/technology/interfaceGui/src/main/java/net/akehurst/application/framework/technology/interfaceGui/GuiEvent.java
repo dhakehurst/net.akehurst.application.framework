@@ -15,9 +15,13 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui;
 
+import java.util.List;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
+import net.akehurst.application.framework.technology.interfaceGui.data.table.AbstractGuiTableData;
+import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTableData;
+import net.akehurst.application.framework.technology.interfaceGui.data.table.IGuiTableRow;
 
 public class GuiEvent {
 
@@ -47,5 +51,34 @@ public class GuiEvent {
 
 	public <T> T getDataItem(final String key) {
 		return (T) this.eventData.get(key);
+	}
+
+	public IGuiTableData getTableData(final String key) {
+
+		final Map<String, Object> tableData = this.getDataItem(key);
+		final List<String> headerData = (List<String>) tableData.get("afHeaders");
+		final List<String> rowIds = (List<String>) tableData.get("afRowIds");
+		final List<List<Map<String, Object>>> rowData = (List<List<Map<String, Object>>>) tableData.get("afRows");
+
+		final IGuiTableData td = new AbstractGuiTableData() {
+			@Override
+			public List<String> getColumnIds() {
+				return headerData;
+			}
+
+			@Override
+			public List<String> getRowIds() {
+				return rowIds;
+			}
+
+			@Override
+			public IGuiTableRow getRowData(final String rowId) {
+				final int index = this.getRowIds().indexOf(rowId);
+				return this.createRow(rowId, rowData.get(index));
+			}
+
+		};
+
+		return td;
 	}
 }

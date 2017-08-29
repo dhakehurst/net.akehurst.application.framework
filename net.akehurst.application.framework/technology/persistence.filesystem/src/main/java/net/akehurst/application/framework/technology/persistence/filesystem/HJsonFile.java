@@ -50,23 +50,22 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	@ServiceReference
 	IFilesystem fs;
 
-	@Override
-	public Object createReference(final String locationId) {
-		return this;
-	}
-
 	public HJsonFile(final String afId) {
 		this.afId = afId;
 	}
 
-	String afId;
+	private final String afId;
+	private JsonValue json_cache;
 
 	@Override
 	public String afId() {
 		return this.afId;
 	}
 
-	JsonValue json_cache;
+	@Override
+	public Object createReference(final String locationId) {
+		return this;
+	}
 
 	public IFile getFile() {
 		final String fileName = this.afId() + ".hjson";

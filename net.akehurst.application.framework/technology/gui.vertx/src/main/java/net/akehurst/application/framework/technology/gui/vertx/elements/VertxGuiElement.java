@@ -111,38 +111,77 @@ public class VertxGuiElement implements IGuiElement {
 	@Override
 	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
 			final Object content) {
-		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, newElementId, newElementType, attributes,
-				content);
+		String childId = null;
+		if (null == this.dialog) {
+			childId = newElementId;
+		} else {
+			childId = this.dialog.getId().asPrimitive() + "_" + newElementId;
+		}
+		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, childId, newElementType, attributes, content);
 	}
 
 	@Override
 	public void removeSubElement(final UserSession session, final String subElementId) {
-		this.guiRequest.removeElement(session, this.scene.getStageId(), this.scene.getSceneId(), subElementId);
+		String childId = null;
+		if (null == this.dialog) {
+			childId = subElementId;
+		} else {
+			childId = this.dialog.getId().asPrimitive() + "_" + subElementId;
+		}
+		this.guiRequest.removeElement(session, this.scene.getStageId(), this.scene.getSceneId(), childId);
 	}
 
 	@Override
 	public IGuiText createText(final UserSession session, final String textId, final String content) {
-		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, textId, "p", "", content);
-		return new VertxGuiText(this.guiRequest, this.scene, this.dialog, textId);
+		String childId = null;
+		if (null == this.dialog) {
+			childId = textId;
+		} else {
+			childId = this.dialog.getId().asPrimitive() + "_" + textId;
+		}
+		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, childId, "p", "", content);
+		return new VertxGuiText(this.guiRequest, this.scene, this.dialog, childId);
 	}
 
 	@Override
 	public IGuiTable createTable(final UserSession session, final String tableId, final String content) {
-		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, tableId, "table", "", content);
-		return new VertxGuiTable(this.guiRequest, this.scene, this.dialog, tableId);
+		String childId = null;
+		if (null == this.dialog) {
+			childId = tableId;
+		} else {
+			childId = this.dialog.getId().asPrimitive() + "_" + tableId;
+		}
+		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, childId, "table", "", content);
+		final VertxGuiTable tbl = new VertxGuiTable(this.guiRequest, this.scene, this.dialog, childId);
+		tbl.create(session);
+		return tbl;
 	}
 
 	@Override
 	public IGuiGraphViewer createGraph(final UserSession session, final String graphId) {
-		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, graphId, "div", "{class:'graph'}", "");
-		return new VertxGuiGraph(this.guiRequest, this.scene, this.dialog, graphId);
+		String childId = null;
+		if (null == this.dialog) {
+			childId = graphId;
+		} else {
+			childId = this.dialog.getId().asPrimitive() + "_" + graphId;
+		}
+		this.guiRequest.addElement(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, childId, "div", "{class:'graph'}", "");
+		final VertxGuiGraph grph = new VertxGuiGraph(this.guiRequest, this.scene, this.dialog, childId);
+		// grph.create(session, initialContent);
+		return grph;
 	}
 
 	@Override
 	public <X, Y> IGuiChart<X, Y> createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
 			final String jsonChartOptions) {
-		this.guiRequest.chartCreate(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, chartId, chartType, jsonChartData,
+		String childId = null;
+		if (null == this.dialog) {
+			childId = chartId;
+		} else {
+			childId = this.dialog.getId().asPrimitive() + "_" + chartId;
+		}
+		this.guiRequest.chartCreate(session, this.scene.getStageId(), this.scene.getSceneId(), this.elementName, childId, chartType, jsonChartData,
 				jsonChartOptions);
-		return new VertxGuiChart<>(this.guiRequest, this.scene, this.dialog, chartId);
+		return new VertxGuiChart<>(this.guiRequest, this.scene, this.dialog, childId);
 	}
 }

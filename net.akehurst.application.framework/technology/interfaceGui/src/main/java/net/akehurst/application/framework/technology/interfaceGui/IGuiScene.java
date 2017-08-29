@@ -60,6 +60,8 @@ public interface IGuiScene extends IIdentifiableObject {
 	 */
 	void onEvent(UserSession session, GuiEventSignature eventSignature, OnEventHandler handler);
 
+	void onUpload(UserSession session, String uploadLink, String filenameElementId, OnEventHandler handler);
+
 	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, DialogIdentity dialogId, String title, String dialogContent);
 
 	/**

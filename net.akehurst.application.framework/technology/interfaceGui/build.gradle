@@ -17,4 +17,5 @@
 dependencies {
 	compile project(':net.akehurst.application.framework.technology.interfaceAuthentication')
 //	compile project(':net.akehurst.application.framework.technology.commsInterface')
+
 }

@@ -205,6 +205,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		try {
 			this.injectServiceReferences(obj.getClass(), obj);
 			this.injectParts(obj);
+			this.injectCommandLineArgs(obj.getClass(), obj);
 			return obj;
 		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Service", ex);
@@ -485,6 +486,52 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 			}
 		});
 
+	}
+
+	protected void injectCommandLineArgs(final Class<?> class_, final IIdentifiableObject obj) {
+		final String objId = obj.afId();
+		try {
+			final AnnotationNavigator an = new AnnotationNavigator(obj);
+
+			for (final AnnotationDetailsList<CommandLineGroup> ad : an.getList(CommandLineGroupContainer.class, CommandLineGroup.class)) {
+				if (ad.getField().getType().isAssignableFrom(List.class)) {
+					final List<String> list = new ArrayList<>();
+					for (final CommandLineGroup clg : ad.getAnnotations()) {
+						if (this.commandLineHandler.hasGroup(clg.name())) {
+							list.add(clg.name());
+						}
+					}
+					ad.getField().set(obj, list);
+				}
+			}
+
+			for (final AnnotationDetails<CommandLineArgument> ad : an.get(CommandLineArgument.class)) {
+				String argName = obj.afId() + ".";
+				// remove the 'application.' first bit of the path
+				argName = argName.substring(argName.indexOf('.') + 1);
+
+				String name = ad.getAnnotation().name();
+				if (name.isEmpty()) {
+					name = ad.getField().getName();
+					argName += name;
+				} else {
+					argName = name;
+				}
+
+				Object argValue = this.commandLineHandler.getArgumentValue(ad.getAnnotation().group(), argName); //
+				if (null == argValue && Boolean.class.isAssignableFrom(ad.getField().getType())) {
+					argValue = this.commandLineHandler.hasArgument(ad.getAnnotation().group(), name);
+				}
+				if (null != argValue) {
+					final Object value = this.createDatatype(ad.getField().getType(), argValue);
+					ad.getField().set(obj, value);
+				}
+			}
+
+			// this.injectCommandLineArgs(obj.getClass(), obj);
+		} catch (final Throwable t) {
+			this.logError("Failed to inject Configuratioon Values into " + objId, t);
+		}
 	}
 
 	protected void injectCommandLineArgs(final IApplication applicationObject)

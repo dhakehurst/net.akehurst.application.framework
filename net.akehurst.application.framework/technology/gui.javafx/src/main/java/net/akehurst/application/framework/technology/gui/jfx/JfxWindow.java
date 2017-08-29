@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import org.jooq.lambda.tuple.Tuple3;
+
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.Event;
@@ -54,6 +56,7 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiNotificati
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequestMessage;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
@@ -71,7 +74,8 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	Map<StageIdentity, Stage> stages;
 
 	@Override
-	public void afConnectParts() {}
+	public void afConnectParts() {
+	}
 
 	@Override
 	public void afRun() {
@@ -303,7 +307,8 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void upload(final UserSession session, final String uploadLink, final String filenameElementId) {
+	public void upload(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String uploadLink,
+			final String filenameElementId, final OnEventHandler handler) {
 		// TODO Auto-generated method stub
 
 	}
@@ -420,7 +425,14 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
-	public void updateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
+	public void editorDefineTextColourTheme(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String themeName,
+			final Map<String, Tuple3<String, String, String>> colourMap) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void editorUpdateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
 			final String jsonParseTreeData) {
 		// TODO Auto-generated method stub
 
@@ -447,6 +459,36 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	public IPort portGui() {
 		return this.portGui;
+	}
+
+	@Override
+	public void diagramRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void tableCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void tableRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void chartRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void graphRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

@@ -49,8 +49,7 @@ public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 
 	@Override
 	public void remove(final UserSession session, final IGuiGraphViewData content) {
-		// TODO Auto-generated method stub
-
+		super.getGuiRequest().diagramRemove(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId());
 	}
 
 	String createJsonString(final IGuiGraphViewData graphData) {
@@ -116,7 +115,11 @@ public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 		}
 
 		jedge.put("data", data);
-
+		String classes = "";
+		for (final String c : edge.getClasses()) {
+			classes += c + " ";
+		}
+		jedge.put("classes", classes);
 		return jedge;
 	}
 }

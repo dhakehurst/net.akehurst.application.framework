@@ -40,6 +40,7 @@
 			this.rowTemplate = $(this.table).find('tr.table-row-template')
 		}
 		$(this.rowTemplate).attr('hidden', true)
+		this.rowCount = 0
 	}
 
 	Table.prototype.addColumn = function(colHeaderContent, rowTemplateCellContent, existingRowCellContent) {
@@ -73,11 +74,37 @@
 			} else {
 				let rowTemplateHtml = $(this.rowTemplate).get(0).outerHTML
 				let row = rowData
+				//TODO: find a better way to do this!
+				// but sometimes the id of an element in the template needs to be set by something in rowData!
 				let tpl = eval('`'+rowTemplateHtml+'`');
 				let tr = $(tpl)
+				//let tr = $(this.rowTemplate).clone()
 				$(tr).removeAttr('hidden')
 				$(tr).removeClass('table-row-template')
+				let dialogId = ''
+				let dialog = $(this.table).closest('dialog')
+				if (dialog.length == 0) {
+				} else {
+					dialogId = $(dialog).attr('id')+'_'
+				}
+				//default row id is the builtin table row count, it can be explicitly set using 'afRowId'
+				$(tr).attr('id',dialogId+'row_'+this.rowCount)
+				Object.keys(rowData).forEach((key,index)=>{
+				  let value = rowData[key]
+				  if ('afRowId'==key) {
+				    $(tr).attr('id',dialogId+value)
+				  } else {
+				    let el = $(tr).find('#'+dialogId+key)
+				    if ($(el).is('input,select,textarea.input')) {
+				      $(el).val(value)
+				    } else {
+				      $(el).text(value)
+				    }
+				  }
+				})
+				
 				$(tr).appendTo($(this.tbody))
+				this.rowCount++
 //				this.rowTemplate[0].cloneEventsTo(tr[0])
 			}
 		} catch (err) {
@@ -106,6 +133,7 @@
 			//template now moved to thead
 			//$(table).find('tbody').find('tr').not('.table-row-template').remove()
 			$(this.tbody).find('tr').remove()
+			this.rowCount=0
 		} catch (err) {
 			console.log("Error: "+err.message)
 			return ""

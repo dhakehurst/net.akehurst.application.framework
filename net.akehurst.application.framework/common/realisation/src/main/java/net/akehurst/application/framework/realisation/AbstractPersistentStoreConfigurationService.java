@@ -55,7 +55,7 @@ abstract public class AbstractPersistentStoreConfigurationService extends Abstra
 				// do nothing, use default from below
 			}
 		} catch (final PersistentStoreException e) {
-			this.logger.log(LogLevel.DEBUG, e.getMessage());
+			this.logger.log(LogLevel.DEBUG, "Failed to fetch value", e);
 		}
 
 		final T defaultValue = super.createValueFromDefault(itemType, defaultValueString);

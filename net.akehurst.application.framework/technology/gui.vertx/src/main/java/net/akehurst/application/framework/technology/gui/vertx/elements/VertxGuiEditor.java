@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jooq.lambda.tuple.Tuple3;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
@@ -44,9 +46,14 @@ public class VertxGuiEditor extends VertxGuiText implements IGuiEditor {
 	}
 
 	@Override
-	public void updateParseTree(final UserSession session, final String jsonParseTreeData) {
-		super.getGuiRequest().updateParseTree(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonParseTreeData);
+	public void defineTextColourTheme(final UserSession session, final String themeName, final Map<String, Tuple3<String, String, String>> theme) {
+		super.getGuiRequest().editorDefineTextColourTheme(session, this.getScene().getStageId(), this.getScene().getSceneId(), themeName, theme);
+	}
 
+	@Override
+	public void updateParseTree(final UserSession session, final String jsonParseTreeData) {
+		super.getGuiRequest().editorUpdateParseTree(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(),
+				jsonParseTreeData);
 	}
 
 	@Override

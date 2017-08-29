@@ -59,7 +59,7 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 
 	private static final String[] PROPERTIES_TO_UNPREFIX_ARR = { "afRowId", "afDeselected", "afSelected" };
 	private static final List<String> PROPERTIES_TO_UNPREFIX = Arrays.asList(VertxGuiDialog.PROPERTIES_TO_UNPREFIX_ARR);
-	private static final String[] PROPERTIES_TO_PREFIX_ARR = { "id", "data-ref", "for", "list" };
+	private static final String[] PROPERTIES_TO_PREFIX_ARR = { "id", "data-ref", "for", "list", "name" };
 	private static final List<String> PROPERTIES_TO_PREFIX = Arrays.asList(VertxGuiDialog.PROPERTIES_TO_PREFIX_ARR);
 
 	@ServiceReference
@@ -131,7 +131,7 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 	}
 
 	private Map<String, Object> removePrefix(final Map<String, Object> map) {
-		if (map.size() == 2 && map.containsKey("afHeaders") && map.containsKey("afRows")) {
+		if (map.size() == 3 && map.containsKey("afHeaders") && map.containsKey("afRowIds") && map.containsKey("afRows")) {
 			final Map<String, Object> newMapData = this.removePrefixFromTableData(map);
 			return newMapData;
 		} else {
@@ -176,12 +176,25 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 				newHeaders.add(h);
 			}
 		}
+
+		final List<String> rowIds = (List<String>) tableData.get("afRowIds");
+		final List<String> newRowIds = new ArrayList<>();
+		for (final String rId : rowIds) {
+			if (rId.startsWith(this.dialogElementPrefix)) {
+				final String newId = rId.substring(this.prefixLength);
+				newRowIds.add(newId);
+			} else {
+				newRowIds.add(rId);
+			}
+		}
+
 		final List<List<Object>> rows = (List<List<Object>>) tableData.get("afRows");
 		final List<List<Object>> newRows = new ArrayList<>();
 		for (final List<Object> row : rows) {
 			newRows.add(this.removePrefix(row));
 		}
 		result.put("afHeaders", newHeaders);
+		result.put("afRowIds", newRowIds);
 		result.put("afRows", newRows);
 		return result;
 	}

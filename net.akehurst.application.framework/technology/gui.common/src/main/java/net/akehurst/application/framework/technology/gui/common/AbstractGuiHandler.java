@@ -134,7 +134,8 @@ abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingO
 				case STAGE_CREATED:
 					this.onStageCreated(event);
 				break;
-
+				case UPLOAD:
+				break;
 				case CLICK:
 				case CHANGE:
 				default: {

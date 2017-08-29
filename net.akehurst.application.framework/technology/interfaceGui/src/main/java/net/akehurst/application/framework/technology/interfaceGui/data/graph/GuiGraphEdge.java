@@ -1,6 +1,8 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.graph;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.AbstractDataType;
@@ -17,7 +19,7 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 		this.sourceNodeId = sourceNodeId;
 		this.targetNodeId = targetNodeId;
 
-		this.classes = classes;
+		this.classes = Arrays.asList(classes);
 		this.data = new HashMap<>();
 		// add to data do they can be used in the styling
 		this.data.put("identity", identity);
@@ -28,7 +30,7 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 	private final String sourceNodeId;
 	private final String targetNodeId;
 
-	private final String[] classes;
+	private final List<String> classes;
 	private final Map<String, Object> data;
 
 	@Override
@@ -54,7 +56,7 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 	}
 
 	@Override
-	public String[] getClasses() {
+	public List<String> getClasses() {
 		return this.classes;
 	}
 

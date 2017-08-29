@@ -22,9 +22,11 @@ import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiE
 
 public interface IGuiTable extends IGuiElement {
 
-	// <C, R> IGuiTableData<C, R> getData(UserSession session);
+	void create(UserSession session);
 
-	<C, R> void setData(UserSession session, IGuiTableData<C, R> data);
+	void remove(UserSession session);
+
+	void setData(UserSession session, IGuiTableData data);
 
 	void addColumn(UserSession session, String colHeaderContent, String rowTemplateCellContent, String existingRowCellContent);
 

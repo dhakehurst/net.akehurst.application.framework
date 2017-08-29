@@ -30,7 +30,7 @@ subprojects {
 	apply plugin: 'checkstyle'
 
 	group 'net.akehurst.application.framework'
-	version '1.0.alpha.20'
+	version '1.0.0-SNAPSHOT'
 
 	sourceCompatibility = '1.8'
 	targetCompatibility = '1.8'
@@ -45,10 +45,22 @@ subprojects {
 	}
 
 	publishing {
+	
+		repositories {
+			maven {
+			    name "snapshot"
+				url ="https://oss.jfrog.org/artifactory/oss-snapshot-local"
+				credentials {
+                		username project.property('bintrayUser')
+                		password project.property('bintrayApiKey')
+            		}
+			}
+		}
+	
 	    publications {
 	        mavenJava(MavenPublication) {
-	        	groupId "${group}"
-	        	artifactId "${project.name}"
+	        	    groupId "${group}"
+	        	    artifactId "${project.name}"
 				version "${version}"
 	        
 	            from components.java
@@ -61,11 +73,13 @@ subprojects {
 
 	repositories {
 		mavenCentral()
-    	mavenLocal()
-    	jcenter()
+        mavenLocal()
+    	    jcenter()
 	}
 
 	dependencies {
+		compile "org.jooq:jool:0.9.12"
+	
        	testCompile 'junit:junit:+'
 	}
 

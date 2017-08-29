@@ -47,9 +47,8 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 	}
 
 	@Override
-	public void remove(final UserSession session, final IGuiDiagramData content) {
-		// TODO Auto-generated method stub
-
+	public void remove(final UserSession session) {
+		super.getGuiRequest().diagramRemove(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId());
 	}
 
 	String createJsonString(final IGuiDiagramData diagramData) {

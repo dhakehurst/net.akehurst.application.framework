@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx.elements;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
@@ -31,15 +32,24 @@ public class VertxGuiTable extends VertxGuiElement implements IGuiTable {
 		super(guiRequest, scene, dialog, elementName);
 	}
 
-	// @Override
-	// public <C, R> IGuiTableData<C, R> getData(final UserSession session) {
-	// this.getGuiRequest().
-	// }
+	@Override
+	public void create(final UserSession session) {
+		this.getGuiRequest().tableCreate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId());
+	}
 
 	@Override
-	public <C, R> void setData(final UserSession session, final IGuiTableData<C, R> data) {
-		for (final IGuiTableRow<C, R> row : data.getRows()) {
-			final Map<String, Object> rowData = row.getData();
+	public void remove(final UserSession session) {
+		this.getGuiRequest().tableRemove(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId());
+	}
+
+	@Override
+	public void setData(final UserSession session, final IGuiTableData data) {
+		for (final IGuiTableRow row : data.getRows()) {
+			// final List<Map<String, Object>> row = row.getRowData();
+			final Map<String, Object> rowData = new HashMap<>();
+			for (final String columnId : data.getColumnIds()) {
+				rowData.put(columnId, row.getDataForColumn(columnId));
+			}
 			this.appendRow(session, rowData);
 		}
 	}

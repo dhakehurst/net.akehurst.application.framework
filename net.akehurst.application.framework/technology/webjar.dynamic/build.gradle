@@ -1,3 +1,8 @@
+plugins {
+  id "com.moowork.node" version "1.2.0"
+//  id "de.richsource.gradle.plugins.typescript" version "1.8.0"
+}
+
 dependencies {
 	compile 'org.webjars.bower:cytoscape:3.1.1'
 	compile 'org.webjars.bower:cytoscape-dagre:1.6.0'
@@ -15,11 +20,10 @@ dependencies {
  	compile 'org.webjars:sockjs-client:1.1.1'
 	compile 'org.webjars:cryptojs:3.1.2'
 	compile project(":${rootProject.name}.technology.webjar.orion")
-	compile 'org.webjars.npm:monaco-editor:0.9.0'
+	compile 'org.webjars.npm:monaco-editor:0.10.0'
 	//compile 'org.webjars:vscode-languageserver-node:2.5.0'
 
 	compile project(":${rootProject.name}.technology.webjar.languageclient")
-	//compile project(":${rootProject.name}.technology.webjar.cytoscape")
 
 }
 
@@ -29,5 +33,31 @@ jar {
 		into "META-INF/resources/webjars/dynamic/${version}"
 		include "**/*.js"
 	})
-
+//	from (compileTypeScript.outputs, {
+//		into "META-INF/resources/webjars/dynamic/${version}"
+//	})
 }
+
+import com.moowork.gradle.node.NodeExtension
+import com.moowork.gradle.node.variant.VariantBuilder
+
+node {
+  download = true
+  nodeModulesDir = file("build")
+}
+
+String nodeExecutable() {
+  NodeExtension nodeExt = NodeExtension.get(project)
+  return new VariantBuilder(nodeExt).build().nodeExec
+}
+
+//compileTypeScript {
+//  compilerExecutable "${nodeExecutable()} node_modules/typescript/lib/tsc.js"
+//  dependsOn "npmInstall"
+//}
+
+//task compileTypeScript(type:NodeTask) {
+///  dependsOn "npmInstall"
+//  script = file("${projectDir}/node_modules/typescript/lib/tsc.js")
+//  args = ["--project", "src/main/ts"]
+//}

@@ -30,21 +30,23 @@ require.config({
 		"cytoscape-dagre" : "cytoscape-dagre/1.6.0/cytoscape-dagre",
 		"backbone"        : "backbone/1.3.3/backbone-min",
 		"jointjs"         : "jointjs/1.0.3/dist/joint.min",
-		'jointjs-loader-hack': 'dynamic/1.0.alpha.20/jointjs-loader-hack',
+		'jointjs-loader-hack': 'dynamic/1.0.0-SNAPSHOT/jointjs-loader-hack',
 		"crypto.pbkdf2"   : "cryptojs/3.1.2/rollups/pbkdf2",
 		"crypto.aes"      : "cryptojs/3.1.2/rollups/aes",
-		"Table"         : "dynamic/1.0.alpha.20/Table",
-		"Dialog"         : "dynamic/1.0.alpha.20/Dialog",
-		"Diagram"         : "dynamic/1.0.alpha.20/Diagram",
-		"Graph"         : "dynamic/1.0.alpha.20/Graph",
-		"Editor"         : "dynamic/1.0.alpha.20/EditorMonaco",
-		"Dynamic"         : "dynamic/1.0.alpha.20/Dynamic",
-		"ServerComms"     : "dynamic/1.0.alpha.20/ServerComms",
-		"Highlighter"     : "dynamic/1.0.alpha.20/Highlighter",
+		"Table"         : "dynamic/1.0.0-SNAPSHOT/Table",
+		"Dialog"         : "dynamic/1.0.0-SNAPSHOT/Dialog",
+		"Diagram"         : "dynamic/1.0.0-SNAPSHOT/Diagram",
+		"Graph"         : "dynamic/1.0.0-SNAPSHOT/Graph",
+		"Editor"         : "dynamic/1.0.0-SNAPSHOT/EditorMonaco",
+		"Dynamic"         : "dynamic/1.0.0-SNAPSHOT/Dynamic",
+		"ServerComms"     : "dynamic/1.0.0-SNAPSHOT/ServerComms",
+		"Highlighter"     : "dynamic/1.0.0-SNAPSHOT/Highlighter",
 		"orion/code_edit" : "orion/12.0/code_edit/built-codeEdit-amd",
 //		"vscode/languageclient" : "languageclient/2.5.0/main",
 		"styles/normalize" : "normalize.css/5.0.0/normalize",
-		"vs"           : "monaco-editor/0.9.0/min/vs"
+		"vs"           : "monaco-editor/0.10.0/min/vs"
+//override vs tokenisation support
+//		"vs/editor/common/modes/supports/tokenization" : "dynamic/1.0.0-SNAPSHOT/tokenization"
     },
     shim: {
         'graphlib': ['lodash'],

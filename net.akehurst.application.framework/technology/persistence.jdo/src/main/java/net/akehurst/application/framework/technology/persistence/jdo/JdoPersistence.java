@@ -26,6 +26,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,17 +93,17 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 		}
 	}
 
+	@ServiceReference
+	private ILogger logger;
+
 	public JdoPersistence(final String id) {
 		super(id);
 		this.cl = new DynClassloader(this.getClass().getClassLoader());
 	}
 
-	@ServiceReference
-	ILogger logger;
+	private PersistenceManagerFactory factory;
 
-	PersistenceManagerFactory factory;
-
-	DynClassloader cl;
+	private final DynClassloader cl;
 
 	<T> Class<? extends Persistable> fetchEnhanced(final Class<T> class_) {
 		final String enhancedName = class_.getName(); // has to match for transform to work
@@ -522,6 +523,9 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 		jdoquery.setRange(rangeFrom, rangeTo);
 
 		final List<? extends Persistable> res = (List<? extends Persistable>) jdoquery.executeWithMap(params);
+
+		this.logger.log(LogLevel.DEBUG, "Query %s returned %d items ", queryString, res.size());
+
 		return res;
 	}
 
@@ -571,6 +575,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			}
 
 			((JdoTransaction) transaction).makePersistent((Persistable) toPersist);
+			this.logger.log(LogLevel.DEBUG, "Item has been made persistent %s", item.toString());
 
 		} catch (final Throwable ex) {
 			this.logger.log(LogLevel.ERROR, "Failed to store persistent item", ex);
@@ -637,7 +642,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			// Postgres doen't support long values for the limit!
 			final List<? extends Persistable> res = this.execute(transaction, enhancedType, filter, 0, Integer.MAX_VALUE);
 			if (res.isEmpty()) {
-				return null;
+				return new HashSet<>();
 			} else {
 				final Set<T> result = res.stream().map((el) -> {
 					try {
@@ -662,7 +667,7 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 			final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
 			final List<? extends Persistable> res = this.execute(transaction, enhancedType, filter, rangeFrom, rangeTo);
 			if (res.isEmpty()) {
-				return null;
+				return new HashSet<>();
 			} else {
 				final Set<T> result = res.stream().map((el) -> {
 					try {
@@ -679,31 +684,10 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 		}
 	}
 
-	// @Override
-	// public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
-	// final JdoTransaction tx = (JdoTransaction) transaction;
-	// final Class<? extends Persistable> enhancedType = this.fetchEnhanced(itemType);
-	// final Query<? extends Persistable> jdoquery = ((JdoTransaction) transaction).newQuery(enhancedType);
-	// final List<? extends Persistable> res = jdoquery.executeList();
-	// if (res.isEmpty()) {
-	// return Collections.emptySet();
-	// } else {
-	// final Set<T> result = res.stream().map((el) -> {
-	// try {
-	// final T item = (T) this.convertFromEnhanced(tx, enhancedType, el, itemType);
-	// return item;
-	// } catch (final Exception ex) {
-	// throw new RuntimeException("Error mapping JDO enhanced object to un-enhanced", ex);
-	// }
-	// }).collect(Collectors.toSet());
-	// return result;
-	// }
-	// }
-
 	// ---------- Ports ---------
 	@PortInstance
 	@PortContract(provides = IPersistentStore.class)
-	IPort portPersist;
+	private IPort portPersist;
 
 	public IPort portPersist() {
 		return this.portPersist;

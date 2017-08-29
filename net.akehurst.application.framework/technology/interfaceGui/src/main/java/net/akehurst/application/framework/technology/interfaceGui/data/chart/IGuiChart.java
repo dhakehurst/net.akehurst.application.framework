@@ -26,6 +26,8 @@ public interface IGuiChart<X, Y> extends IGuiElement {
 
 	void create(UserSession session, Type chartType);
 
+	void remove(UserSession session);
+
 	IGuiChartData<X, Y> getData();
 
 }
