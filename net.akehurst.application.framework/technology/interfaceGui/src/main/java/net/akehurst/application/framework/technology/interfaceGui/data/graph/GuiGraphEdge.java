@@ -1,5 +1,6 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.graph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
 		this.sourceNodeId = sourceNodeId;
 		this.targetNodeId = targetNodeId;
 
-		this.classes = Arrays.asList(classes);
+		this.classes = new ArrayList<>(Arrays.asList(classes));
 		this.data = new HashMap<>();
 		// add to data do they can be used in the styling
 		this.data.put("identity", identity);

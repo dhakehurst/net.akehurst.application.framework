@@ -1,5 +1,6 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.graph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,7 @@ public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
 	public GuiGraphNode(final String identity, final IGuiGraphNode parent, final String... classes) {
 		super(identity);
 		this.parent = parent;
-		this.classes = Arrays.asList(classes);
+		this.classes = new ArrayList<>(Arrays.asList(classes));
 		this.data = new HashMap<>();
 		// add to data do they can be used in the styling
 		this.data.put("identity", identity);
