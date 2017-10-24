@@ -35,6 +35,7 @@ import net.akehurst.application.framework.technology.interfaceGui.data.table.IGu
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiContainer;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
+import net.akehurst.application.framework.technology.interfaceGui.grid.IGuiGrid;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
@@ -112,6 +113,8 @@ public class VertxGuiSceneProxy implements InvocationHandler, IIdentifiableObjec
 					return new VertxGuiDiagram(this.guiRequest, this.getHandler(), null, elementName);
 				} else if (IGuiGraphViewer.class == returnType) {
 					return new VertxGuiGraph(this.guiRequest, this.getHandler(), null, elementName);
+				} else if (IGuiGrid.class == returnType) {
+					return new VertxGuiGrid(this.guiRequest, this.getHandler(), null, elementName);
 				} else {
 					return null;
 				}

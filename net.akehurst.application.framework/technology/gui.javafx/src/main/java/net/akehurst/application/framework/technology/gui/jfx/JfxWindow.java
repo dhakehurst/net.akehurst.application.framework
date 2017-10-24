@@ -491,4 +491,30 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
 	}
 
+	@Override
+	public void gridCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final String jsonOptions) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void gridRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void gridAppendItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final Map<String, Object> data, final Map<String, Integer> location) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void gridRemoveItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String gridId,
+			final String elementId) {
+		// TODO Auto-generated method stub
+
+	}
 }

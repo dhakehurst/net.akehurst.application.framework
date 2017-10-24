@@ -20,8 +20,9 @@ define([
 	"crypto.pbkdf2",
 	"crypto.aes",
 	"Dialog",
-	"Table"
-], function($, ServerComms, cryptoPBK, cryptoAES, Dialog, Table) {
+	"Table",
+	"Grid"
+], function($, ServerComms, cryptoPBK, cryptoAES, Dialog, Table, Grid) {
  
 	Element.prototype.cloneEventsTo = function(clone) {
 	
@@ -48,7 +49,7 @@ define([
 	}
  
 	function Dynamic(rootPath, stageId) {
-	
+		let self=this
 		if (typeof stageId === 'undefined' || null===stageId) { //may have an empty ("") stage id
 			alert("var stageId must be given a value")
 		}
@@ -87,7 +88,9 @@ define([
 		this.charts = {}
 		this.diagrams = {}
 		this.graphs = {}
+		this.grids = {}
 		this.highlighter = {}
+		
 	}
 	
 	Dynamic.prototype.getTable = function(tableId) {
@@ -101,13 +104,14 @@ define([
 	
 	Dynamic.prototype.fetchEventData = function(el) {
 	//TODO: not sure if this is quite what we want!
-		let d1 = this.fetchPossibleRowId(el,'tr')
+		let d1 = this.fetchPossibleRowId(el)
+		let d2 = this.fetchPossibleGridItemId(el)
 		//var d2 = this.fetchEventData1(el,'fieldset') //legacy now replaced with div.event-group (mainly because browser support for fieldset css/flex is broken on some browsers)
 		let d3 = this.fetchEventData1(el,'.event-group')
-		let data = $.extend({}, d1, d3)
+		let data = $.extend({}, d1, d2, d3)
 		return data
 	}
-	Dynamic.prototype.fetchPossibleRowId = function(el, type) {
+	Dynamic.prototype.fetchPossibleRowId = function(el) {
 		let p = el.closest('tr')
 		if (null!=p) {
 			let id = $(p).attr('id')
@@ -116,7 +120,15 @@ define([
 			return {}
 		}
 	}
-	
+	Dynamic.prototype.fetchPossibleGridItemId = function(el) {
+		let p = el.closest('.grid-item')
+		if (null!=p) {
+			let id = $(p).attr('id')
+			return {afGridItemId:id}
+		} else {
+			return {}
+		}
+	}
 	Dynamic.prototype.fetchPData = function(el) {
 		let data = {}
 		let inTableTemplate = $(el).find('.table-row-template p.input')
@@ -629,22 +641,25 @@ define([
 		this.editors[parentId] = null
 	}
 	
-	Dynamic.prototype.chartCreate = function(parentId, chartId, chartType, chartData, chartOptions) {
-		require(["chartjs"],function(){
-			let parent = document.getElementById(parentId)
-			let width = $(parent).width()
-			let height = $(parent).height()
-			//$(parent).append("<canvas id='"+chartId+"' width='"+width+"' height='"+height+"'></canvas>")
-			$(parent).append("<canvas id='"+chartId+"'></canvas>")
-			let chartContext = document.getElementById(chartId).getContext("2d")
-			let chatOpts = $.extend(chartOptions, {responsive:true}) //maintainAspectRatio?
-			let chart = new Chart(chartContext, {type:chartType, data: chartData, options:chatOpts})
-			//chart[chartType](chartData, chartOptions)
+	Dynamic.prototype.chartCreate = function(elementId, data) {
+		let self = this
+		require(["AFChart"],function(AFChart){
+			self.charts[elementId] = new AFChart(elementId, data)
+			
+//			let parent = document.getElementById(parentId)
+//			let width = $(parent).width()
+//			let height = $(parent).height()
+//			//$(parent).append("<canvas id='"+chartId+"' width='"+width+"' height='"+height+"'></canvas>")
+//			$(parent).append("<canvas id='"+chartId+"'></canvas>")
+//			let chartContext = document.getElementById(chartId).getContext("2d")
+//			let chatOpts = $.extend(chartOptions, {responsive:true}) //maintainAspectRatio?
+//			let chart = new Chart(chartContext, {type:chartType, data: chartData, options:chatOpts})
+//			//chart[chartType](chartData, chartOptions)
 		})
 	}
-	Dynamic.prototype.chartRemove = function(parentId) {
-		this.elementClear(parentId)
-		this.charts[parentId] = null
+	Dynamic.prototype.chartRemove = function(elementId) {
+		this.elementClear(elementId)
+		this.charts[elementId] = null
 	}
 	
 	Dynamic.prototype.diagramCreate = function(parentId, data) {
@@ -702,6 +717,40 @@ define([
 		this.graphs[parentId] = null
 	}
 	
+	Dynamic.prototype.gridCreate = function(parentId, data) {
+		var dynamic = this
+		if ($('#'+parentId).length == 0) {
+			console.log('Error: cannot find element with id ' + parentId)
+		} else {		
+			let d = new Grid(parentId, data.options)
+			dynamic.grids[parentId] = d
+		}
+	}
+
+	Dynamic.prototype.gridAppendItem = function(parentId, data) {
+		var dynamic = this
+		let d = this.grids[parentId]
+		if (null!=d) {
+			d.appendItem(data.data, data.x, data.x, data.w, data.h)
+		} else {
+			console.log('Cannot find Grid for id = '+parentId)
+		}
+	}
+	Dynamic.prototype.gridRemoveItem = function(parentId, data) {
+		var dynamic = this
+		let d = this.grids[parentId]
+		if (null!=d) {
+			d.removeItem(data.itemId)
+		} else {
+			console.log('Cannot find Grid for id = '+parentId)
+		}
+	}
+	Dynamic.prototype.gridRemove = function(parentId) {
+		this.elementClear(parentId)
+		this.grids[parentId] = null
+	}
+	
+	//---
 	Dynamic.prototype.commsSend = function(name, data) {
 		this.serverComms.send(name,data)
 	}
@@ -817,10 +866,10 @@ define([
 		
 		//Charts
 		this.serverComms.registerHandler('Chart.create', function(args) {
-			dynamic.chartCreate(args.parentId, args.chartId, args.chartType, args.chartData, args.chartOptions)
+			dynamic.chartCreate(args.elementId, args.data)
 		})
 		this.serverComms.registerHandler('Chart.remove', function(args) {
-			dynamic.chartRemove(args.parentId, args.chartId)
+			dynamic.chartRemove(args.elementId)
 		})
 		
 		//Diagram
@@ -843,6 +892,20 @@ define([
 		})
 		this.serverComms.registerHandler('Graph.remove', function(args) {
 			dynamic.graphRemove(args.parentId)
+		})
+		
+		//Grid
+		this.serverComms.registerHandler('Grid.create', function(args) {
+			dynamic.gridCreate(args.elementId, args.data)
+		})
+		this.serverComms.registerHandler('Grid.appendItem', function(args) {
+			dynamic.gridAppendItem(args.elementId, args.data)
+		})
+		this.serverComms.registerHandler('Grid.removeItem', function(args) {
+			dynamic.gridRemoveItem(args.elementId, args.data)
+		})
+		this.serverComms.registerHandler('Grid.remove', function(args) {
+			dynamic.gridRemove(args.elementId, args.data)
 		})
 		
 		//2d Canvas

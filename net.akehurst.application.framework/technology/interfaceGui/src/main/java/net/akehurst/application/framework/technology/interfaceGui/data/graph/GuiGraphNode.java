@@ -1,9 +1,6 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.graph;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.AbstractDataType;
@@ -12,18 +9,18 @@ import net.akehurst.application.framework.common.annotations.declaration.DataTyp
 @DataType
 public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
 
-	public GuiGraphNode(final String identity, final IGuiGraphNode parent, final String... classes) {
+	public GuiGraphNode(final String identity, final IGuiGraphNode parent) {
 		super(identity);
 		this.parent = parent;
-		this.classes = new ArrayList<>(Arrays.asList(classes));
 		this.data = new HashMap<>();
-		// add to data do they can be used in the styling
+		this.properties = new HashMap<>();
+		// add to data so they can be used in the styling
 		this.data.put("identity", identity);
 	}
 
 	private final IGuiGraphNode parent;
-	private final List<String> classes;
 	private final Map<String, Object> data;
+	private final Map<String, Object> properties;
 
 	@Override
 	public String getIdentity() {
@@ -36,8 +33,8 @@ public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
 	}
 
 	@Override
-	public List<String> getClasses() {
-		return this.classes;
+	public Map<String, Object> getProperties() {
+		return this.properties;
 	}
 
 	@Override

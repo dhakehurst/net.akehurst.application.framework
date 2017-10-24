@@ -178,14 +178,23 @@ public interface IGuiRequest {
 	void chartCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, String chartType, String jsonChartData,
 			String jsonChartOptions);
 
-	void chartRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
+	void chartRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId);
 
 	<X, Y> void chartAddDataItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId, String seriesName, X x, Y y);
 
-	void graphCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
+	void graphCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId, String jsonGraphData);
 
-	void graphUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonGraphData);
+	void graphUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId, String jsonGraphData);
 
-	void graphRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
+	void graphRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId);
+
+	void gridCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, String jsonOptions);
+
+	void gridRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId);
+
+	void gridAppendItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, Map<String, Object> data,
+			Map<String, Integer> location);
+
+	void gridRemoveItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, String elementId);
 
 }

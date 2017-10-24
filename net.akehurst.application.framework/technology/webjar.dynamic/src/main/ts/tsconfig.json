@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "system",
+    "moduleResolution":"node",
+    "outDir": "build/ts/dist",
+    "sourceMap": true,
+    "baseUrl":"../../../node_modules",
+    "paths": {
+      "vs":["monaco-editor/min/vs"]
+    }
+  },
+  "files": [
+
+  ],
+  "include": [
+    "src/main/ts/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

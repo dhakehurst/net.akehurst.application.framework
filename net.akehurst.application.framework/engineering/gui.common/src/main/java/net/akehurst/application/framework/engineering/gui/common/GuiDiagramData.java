@@ -81,7 +81,12 @@ public class GuiDiagramData implements IGuiDiagramData {
 	}
 
 	public IGuiGraphNode addNode(final IGuiGraphNode parent, final String identity, final String... classes) {
-		final IGuiGraphNode node = new GuiGraphNode(identity, parent, classes);
+		final IGuiGraphNode node = new GuiGraphNode(identity, parent);
+		String classesStr = "";
+		for (final String s : classes) {
+			classesStr += s + " ";
+		}
+		node.getProperties().put("classes", classesStr);
 		this.graph.getNodes().put(identity, node);
 		return node;
 	}

@@ -113,6 +113,8 @@ public class VertxGuiDialogProxy implements InvocationHandler, IIdentifiableObje
 					return new VertxGuiDiagram(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiGraphViewer.class == returnType) {
 					return new VertxGuiGraph(this.guiRequest, this.scene, this.getHandler(), elementName);
+				} else if (IGuiGraphViewer.class == returnType) {
+					return new VertxGuiGrid(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else {
 					return null;
 				}

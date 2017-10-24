@@ -89,11 +89,10 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 		}
 
 		jnode.put("data", data);
-		String classes = "";
-		for (final String c : node.getClasses()) {
-			classes += c + " ";
+		for (final Map.Entry<String, Object> me : node.getProperties().entrySet()) {
+			final Object value = me.getValue();
+			jnode.put(me.getKey(), value);
 		}
-		jnode.put("classes", classes);
 		return jnode;
 	}
 

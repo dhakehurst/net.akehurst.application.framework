@@ -608,16 +608,17 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
-		data.put("parentId", parentId);
-		data.put("chartId", chartId);
-		data.put("chartType", chartType);
+		data.put("elementId", parentId);
+		final JsonObject ddata = new JsonObject();
+		data.put("data", ddata);
+		ddata.put("type", chartType);
 
 		if (jsonChartData.startsWith("[")) {
-			data.put("chartData", new JsonArray(jsonChartData));
+			ddata.put("data", new JsonArray(jsonChartData));
 		} else {
-			data.put("chartData", new JsonObject(jsonChartData));
+			ddata.put("data", new JsonObject(jsonChartData));
 		}
-		data.put("chartOptions", new JsonObject(jsonChartOptions));
+		ddata.put("options", new JsonObject(jsonChartOptions));
 
 		this.verticle.getComms().send(session, "Chart.create", data);
 	}
@@ -627,7 +628,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		final JsonObject data = new JsonObject();
 		data.put("stageId", stageId.asPrimitive());
 		data.put("sceneId", sceneId.asPrimitive());
-		data.put("parentId", parentId);
+		data.put("elementId", parentId);
 
 		this.verticle.getComms().send(session, "Chart.remove", data);
 	}
@@ -795,6 +796,61 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 		this.verticle.getComms().send(session, "Graph.remove", data);
 	}
 
+	@Override
+	public void gridCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final String jsonOptions) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("elementId", elementId);
+		final JsonObject ddata = new JsonObject();
+		data.put("data", ddata);
+		ddata.put("options", new JsonObject(jsonOptions));
+
+		this.verticle.getComms().send(session, "Grid.create", data);
+	}
+
+	@Override
+	public void gridRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+		final JsonObject data = new JsonObject();
+		data.put("stageId", stageId.asPrimitive());
+		data.put("sceneId", sceneId.asPrimitive());
+		data.put("elementId", elementId);
+
+		this.verticle.getComms().send(session, "Grid.remove", data);
+	}
+
+	@Override
+	public void gridAppendItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+			final Map<String, Object> data, final Map<String, Integer> location) {
+		final JsonObject argData = new JsonObject();
+		argData.put("stageId", stageId.asPrimitive());
+		argData.put("sceneId", sceneId.asPrimitive());
+		argData.put("elementId", elementId);
+		final JsonObject ddata = new JsonObject();
+		argData.put("data", ddata);
+		ddata.put("data", new JsonObject(data));
+		ddata.put("x", location.get("x"));
+		ddata.put("y", location.get("y"));
+		ddata.put("w", location.get("w"));
+		ddata.put("h", location.get("h"));
+
+		this.verticle.getComms().send(session, "Grid.appendItem", argData);
+	}
+
+	@Override
+	public void gridRemoveItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String gridId, final String itemId) {
+		final JsonObject argData = new JsonObject();
+		argData.put("stageId", stageId.asPrimitive());
+		argData.put("sceneId", sceneId.asPrimitive());
+		argData.put("elementId", gridId);
+		final JsonObject ddata = new JsonObject();
+		argData.put("data", ddata);
+		ddata.put("itemId", itemId);
+
+		this.verticle.getComms().send(session, "Grid.removeItem", argData);
+	}
+
 	// --------- Ports ---------
 	@PortInstance
 	@PortContract(provides = IGuiRequest.class, requires = IGuiNotification.class)
@@ -804,4 +860,5 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	public IPort portGui() {
 		return this.portGui;
 	}
+
 }

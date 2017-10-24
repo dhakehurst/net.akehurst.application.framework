@@ -44,12 +44,12 @@ public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 	@Override
 	public void update(final UserSession session, final IGuiGraphViewData newContent) {
 		final String jsonDiagramData = this.createJsonString(newContent);
-		super.getGuiRequest().diagramUpdate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
+		super.getGuiRequest().graphUpdate(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), jsonDiagramData);
 	}
 
 	@Override
 	public void remove(final UserSession session, final IGuiGraphViewData content) {
-		super.getGuiRequest().diagramRemove(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId());
+		super.getGuiRequest().graphRemove(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId());
 	}
 
 	String createJsonString(final IGuiGraphViewData graphData) {
@@ -89,13 +89,11 @@ public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 		for (final Map.Entry<String, Object> me : node.getData().entrySet()) {
 			data.put(me.getKey(), me.getValue());
 		}
-
 		jnode.put("data", data);
-		String classes = "";
-		for (final String c : node.getClasses()) {
-			classes += c + " ";
+		for (final Map.Entry<String, Object> me : node.getProperties().entrySet()) {
+			jnode.put(me.getKey(), me.getValue());
 		}
-		jnode.put("classes", classes);
+
 		return jnode;
 	}
 
