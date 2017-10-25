@@ -37,7 +37,25 @@ define([
 		    this.grid=$("<div class='grid-stack'></div>").appendTo($(parent))
 		    $(this.grid).gridstack(options);
 			this.itemTemplate = $(this.grid).parent().find('.grid-item-template')
-		    
+		    $(this.grid).on('change', function(event, items){
+		    		event.stopPropagation()
+		    		let changedItems = []
+		    		for (let i = 0, len = items.length; i < len; i++) {
+			    		let item = items[i]
+		    			let chItem = {
+		    				itemId:$(item.el).find('.grid-item').attr('id'),
+		    				x:item.x,
+		    				y:item.y,
+		    				w:item.width,
+		    				h:item.height
+		    			}
+		    			changedItems.push(chItem)
+		    		}
+		    		let evt = {
+		    			items: changedItems
+		    		}
+		    		$(parent).trigger( "change", evt )
+		    })
 		} catch (err) {
 			console.log("Error: "+err.message)
 			return ""

@@ -37,6 +37,7 @@ define([
 			this.chartContext = canvas[0].getContext("2d")
 			let chatOpts = $.extend(data.options, {
 				responsive:true,
+				//maintainAspectRatio: false,
 				onResize: function(chart, size) {
 					chart.update()
 				}

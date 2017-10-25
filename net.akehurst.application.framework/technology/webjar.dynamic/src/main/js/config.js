@@ -41,7 +41,7 @@ require.config({
 		"Diagram"         : "dynamic/1.0.0-SNAPSHOT/Diagram",
 		"Graph"           : "dynamic/1.0.0-SNAPSHOT/Graph",
 		"Editor"          : "dynamic/1.0.0-SNAPSHOT/EditorMonaco",
-		"Grid"            : "dynamic/1.0.0-SNAPSHOT/GridCss",
+		"Grid"            : "dynamic/1.0.0-SNAPSHOT/Grid",
 		"AFChart"         : "dynamic/1.0.0-SNAPSHOT/AFChart",
 		"Dynamic"         : "dynamic/1.0.0-SNAPSHOT/Dynamic",
 		"ServerComms"     : "dynamic/1.0.0-SNAPSHOT/ServerComms",

@@ -731,7 +731,7 @@ define([
 		var dynamic = this
 		let d = this.grids[parentId]
 		if (null!=d) {
-			d.appendItem(data.data, data.x, data.x, data.w, data.h)
+			d.appendItem(data.data, data.x, data.y, data.w, data.h)
 		} else {
 			console.log('Cannot find Grid for id = '+parentId)
 		}

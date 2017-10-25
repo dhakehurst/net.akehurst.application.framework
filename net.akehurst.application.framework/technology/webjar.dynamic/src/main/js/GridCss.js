@@ -52,8 +52,9 @@ define([
 				let el = $(elt)
 				$(el).removeAttr('hidden')
 				$(el).removeClass('grid-item-template')
-				let itemEl = $("<div></div>")
-				$(el).appendTo($(itemEl))
+				$(el).addClass('grid-item')
+				let itemEl = el //$("<div></div>")
+				//$(el).appendTo($(itemEl))
 				if (null == x || null==y || null==w || null==h) {
 					$(this.grid).append(itemEl)
 				} else {
