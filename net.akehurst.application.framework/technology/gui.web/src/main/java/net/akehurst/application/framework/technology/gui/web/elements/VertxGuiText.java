@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.gui.vertx.elements;
+package net.akehurst.application.framework.technology.gui.web.elements;
 
+import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
-import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiContainer;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
-public class VertxGuiContainer extends VertxGuiElement implements IGuiContainer {
+public class VertxGuiText extends VertxGuiElement implements IGuiText {
 
-	public VertxGuiContainer(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
+	public VertxGuiText(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
 		super(guiRequest, scene, dialog, elementName);
 	}
 
 	@Override
-	public void addElement() {
-		// TODO Auto-generated method stub
-
+	public void setText(final UserSession session, final String value) {
+		this.getGuiRequest().textSetValue(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), value);
 	}
 
 }

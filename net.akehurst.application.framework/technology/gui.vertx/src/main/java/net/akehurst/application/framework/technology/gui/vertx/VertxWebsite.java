@@ -36,8 +36,8 @@ import net.akehurst.application.framework.common.annotations.instance.PortInstan
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.realisation.AbstractComponent;
-import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiDialogProxy;
-import net.akehurst.application.framework.technology.gui.vertx.elements.VertxGuiSceneProxy;
+import net.akehurst.application.framework.technology.gui.web.elements.VertxGuiDialogProxy;
+import net.akehurst.application.framework.technology.gui.web.elements.VertxGuiSceneProxy;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
@@ -255,10 +255,17 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 			final SceneIdentity authenticationSceneId) {
 		try {
 			final Map<String, String> variables = new HashMap<>();
-			variables.put("rootPath", this.rootPath);
+			variables.put("af.rootPath", this.rootPath);
 			final String js = this.getJsPath().startsWith("/") ? this.getJsPath().substring(1) : this.getJsPath();
-			variables.put("jsPath", js);
-			variables.put("stageId", stageId.asPrimitive());
+			variables.put("af.jsPath", js);
+			variables.put("af.stageId", stageId.asPrimitive());
+			String AF_SCRIPT = "<script>" + System.lineSeparator();
+			AF_SCRIPT += "  let rootPath = '${af.rootPath}'" + System.lineSeparator();
+			AF_SCRIPT += "  let stageId = '${af.stageId}'" + System.lineSeparator();
+			AF_SCRIPT += "</script>" + System.lineSeparator();
+			AF_SCRIPT += "<script data-main='${af.rootPath}/lib/dynamic/1.0.0-SNAPSHOT/config.js' src='${af.rootPath}/lib/requirejs/2.3.5/require.js' type='text/javascript' charset='utf-8'></script>"
+					+ System.lineSeparator();
+			variables.put("af.script", AF_SCRIPT);
 
 			final String stagePath = stageId.asPrimitive().isEmpty() ? "" : stageId.asPrimitive() + "/";
 

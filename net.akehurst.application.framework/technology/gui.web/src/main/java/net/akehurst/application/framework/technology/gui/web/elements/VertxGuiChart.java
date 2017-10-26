@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.gui.vertx.elements;
+package net.akehurst.application.framework.technology.gui.web.elements;
 
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
+import org.hjson.JsonArray;
+import org.hjson.JsonObject;
+import org.hjson.JsonValue;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
@@ -96,8 +100,9 @@ public class VertxGuiChart<X, Y> extends VertxGuiElement implements IGuiChart<X,
 
 	private JsonObject createJsonData() {
 		final JsonObject data = new JsonObject();
-		data.put("datasets", this.getDatasets());
-		data.put("labels", new JsonArray(this.getData().getXs()));
+		data.add("datasets", this.getDatasets());
+
+		data.add("labels", JsonValue.readJSON(new JSONArray(this.getData().getXs()).toString()));
 		// data.put("xLabels", new JsonArray(Arrays.asList("A", "B", "C", "D", "E")));
 		// data.put("yLabels", new JsonArray());
 		return data;
@@ -108,14 +113,14 @@ public class VertxGuiChart<X, Y> extends VertxGuiElement implements IGuiChart<X,
 		for (final IGuiChartDataSeries<Y> s : this.getData().getSeries()) {
 			final JsonObject jsonSeries = new JsonObject();
 			arr.add(jsonSeries);
-			jsonSeries.put("label", s.getName());
+			jsonSeries.add("label", s.getName());
 			final JsonArray dataArray = new JsonArray();
-			jsonSeries.put("data", dataArray);
+			jsonSeries.add("data", dataArray);
 			for (final Y item : s.getItems()) {
-				dataArray.add(item);
+				dataArray.add(JsonValue.readJSON(JSONObject.wrap(item).toString()));
 			}
 			final JsonArray colourArray = new JsonArray();
-			jsonSeries.put("backgroundColor", colourArray);
+			jsonSeries.add("backgroundColor", colourArray);
 			for (final String item : s.getColours()) {
 				colourArray.add(item);
 			}

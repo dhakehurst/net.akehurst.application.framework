@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.gui.vertx.elements;
+package net.akehurst.application.framework.technology.gui.web.elements;
 
 import java.util.Map;
 
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
+import org.hjson.JsonArray;
+import org.hjson.JsonObject;
+import org.hjson.JsonValue;
+import org.json.JSONObject;
+
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
@@ -54,11 +57,11 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 	String createJsonString(final IGuiDiagramData diagramData) {
 		final JsonObject json = new JsonObject();
 
-		json.put("elements", this.createElements(diagramData));
-		json.put("style", diagramData.getStyle());
-		json.put("layout", new JsonObject(diagramData.getLayout()));
+		json.add("elements", this.createElements(diagramData));
+		json.add("style", diagramData.getStyle());
+		json.add("layout", JsonValue.readJSON(JSONObject.wrap(diagramData.getLayout()).toString()));
 
-		return json.encode();
+		return json.toString();
 	}
 
 	private JsonArray createElements(final IGuiDiagramData diagramData) {
@@ -78,20 +81,20 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 	private JsonObject createNode(final IGuiGraphNode node) {
 		final String nodeId = node.getIdentity();
 		final JsonObject jnode = new JsonObject();
-		jnode.put("group", "nodes");
+		jnode.add("group", "nodes");
 		final JsonObject data = new JsonObject();
-		data.put("id", nodeId);
+		data.add("id", nodeId);
 		if (null != node.getParent()) {
-			data.put("parent", node.getParent().getIdentity());
+			data.add("parent", node.getParent().getIdentity());
 		}
 		for (final Map.Entry<String, Object> me : node.getData().entrySet()) {
-			data.put(me.getKey(), me.getValue());
+			data.add(me.getKey(), JsonValue.readJSON(JSONObject.wrap(me.getValue()).toString()));
 		}
 
-		jnode.put("data", data);
+		jnode.add("data", data);
 		for (final Map.Entry<String, Object> me : node.getProperties().entrySet()) {
 			final Object value = me.getValue();
-			jnode.put(me.getKey(), value);
+			jnode.add(me.getKey(), JsonValue.readJSON(JSONObject.wrap(value).toString()));
 		}
 		return jnode;
 	}
@@ -101,17 +104,17 @@ public class VertxGuiDiagram extends VertxGuiElement implements IGuiDiagram {
 		final String srcId = edge.getSource().getIdentity();
 		final String tgtId = edge.getTarget().getIdentity();
 		final JsonObject jedge = new JsonObject();
-		jedge.put("group", "edges");
+		jedge.add("group", "edges");
 		final JsonObject data = new JsonObject();
-		data.put("id", edgeId);
-		data.put("source", srcId);
-		data.put("target", tgtId);
+		data.add("id", edgeId);
+		data.add("source", srcId);
+		data.add("target", tgtId);
 
 		for (final Map.Entry<String, Object> me : edge.getData().entrySet()) {
-			data.put(me.getKey(), me.getValue());
+			data.add(me.getKey(), JsonValue.readJSON(JSONObject.wrap(me.getValue()).toString()));
 		}
 
-		jedge.put("data", data);
+		jedge.add("data", data);
 
 		return jedge;
 	}

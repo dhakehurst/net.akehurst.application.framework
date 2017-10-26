@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.gui.vertx.elements;
+package net.akehurst.application.framework.technology.gui.web.elements;
 
 import java.util.HashMap;
 import java.util.List;

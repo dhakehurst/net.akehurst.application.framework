@@ -14,32 +14,20 @@
  * limitations under the License.
  */
 
-repositories {
-	//for orion editor
-    ivy {
-		url 'http://download.eclipse.org'
-		layout 'pattern', {
-			artifact '/[organisation]/drops/[revision]/[module].[ext]'
-		}
-    }
-}
-
 dependencies {
 	compile project(":${rootProject.name}.common.realisation")
 	compile project(":${rootProject.name}.technology.gui.common")
-	compile project(":${rootProject.name}.technology.gui.web")
 	compile project(":${rootProject.name}.technology.interfaceGui")
-	compile project(":${rootProject.name}.technology.interfaceAuthentication")
-	compile project(":${rootProject.name}.technology.interfaceComms")
+//	compile project(":${rootProject.name}.technology.interfaceAuthentication")
+//	compile project(":${rootProject.name}.technology.interfaceComms")
 	
-	compile 'org.apache.commons:commons-lang3:3.4'
-	compile "io.vertx:vertx-core:3.4.1"
-	compile "io.vertx:vertx-web:3.4.1"
-	compile "io.vertx:vertx-auth-shiro:3.4.1"
-	compile "io.vertx:vertx-auth-oauth2:3.4.1"
+	compile 'org.json:json:+'
 	
-	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
+//	compile 'org.apache.commons:commons-lang3:3.4'
 	
-	testCompile project(":${rootProject.name}.common.test")
-	testCompile project(":${rootProject.name}.engineering.gui.common")
+//	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
+	
+//	testCompile project(":${rootProject.name}.common.test")
+//	testCompile project(":${rootProject.name}.engineering.gui.common")
+
 }

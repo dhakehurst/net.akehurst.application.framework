@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.technology.gui.vertx.elements;
+package net.akehurst.application.framework.technology.gui.web.elements;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -23,10 +23,10 @@ import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
+import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
+import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
-import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
-import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.data.chart.IGuiChart;
 import net.akehurst.application.framework.technology.interfaceGui.data.diagram.IGuiDiagram;
 import net.akehurst.application.framework.technology.interfaceGui.data.editor.IGuiEditor;
@@ -35,23 +35,24 @@ import net.akehurst.application.framework.technology.interfaceGui.data.table.IGu
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiContainer;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
-import net.akehurst.application.framework.technology.interfaceGui.grid.IGuiGrid;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class VertxGuiSceneProxy implements InvocationHandler, IIdentifiableObject {
+public class VertxGuiDialogProxy implements InvocationHandler, IIdentifiableObject {
 
-	public VertxGuiSceneProxy(final String afId, final IGuiRequest guiRequest, final StageIdentity stageId, final SceneIdentity sceneId) {
-		this.handler = null;
-		this.guiRequest = guiRequest;
+	public VertxGuiDialogProxy(final String afId, final IGuiRequest guiRequest, final IGuiScene scene, final DialogIdentity dialogId, final String content) {
 		this.afId = afId;
-		this.stageId = stageId;
-		this.sceneId = sceneId;
+		this.guiRequest = guiRequest;
+		this.scene = scene;
+		this.dialogId = dialogId;
+		this.content = content;
 	}
 
-	String afId;
-	StageIdentity stageId;
-	SceneIdentity sceneId;
+	final private String afId;
+	final private IGuiRequest guiRequest;
+	final private IGuiScene scene;
+	final private DialogIdentity dialogId;
+	final private String content;
 
 	@ServiceReference
 	IApplicationFramework af;
@@ -59,20 +60,18 @@ public class VertxGuiSceneProxy implements InvocationHandler, IIdentifiableObjec
 	@ServiceReference
 	ILogger logger;
 
-	IGuiScene handler;
+	IGuiDialog handler;
 
-	IGuiScene getHandler() {
+	IGuiDialog getHandler() {
 		if (null == this.handler) {
 			try {
-				this.handler = this.af.createObject(VertxGuiScene.class, this.afId, this.guiRequest, this.stageId, this.sceneId);
+				this.handler = this.af.createObject(VertxGuiDialog.class, this.afId, this.guiRequest, this.scene, this.dialogId, this.content);
 			} catch (final ApplicationFrameworkException e) {
 				this.logger.log(LogLevel.ERROR, e.getMessage(), e);
 			}
 		}
 		return this.handler;
 	}
-
-	IGuiRequest guiRequest;
 
 	@Override
 	public String afId() {
@@ -81,13 +80,14 @@ public class VertxGuiSceneProxy implements InvocationHandler, IIdentifiableObjec
 
 	@Override
 	public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-		if (Arrays.asList(IGuiScene.class.getMethods()).contains(method)) {
+		if (Arrays.asList(IGuiDialog.class.getMethods()).contains(method)) {
 			return method.invoke(this.getHandler(), args);
 		} else {
 
 			final Class<?> returnType = method.getReturnType();
 			if (method.getName().startsWith("get")) {
 				String elementName = method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4);
+				elementName = this.dialogId.asPrimitive() + "_" + elementName;
 
 				if (method.getParameterTypes().length == 1) {
 					final Class<?> pt = method.getParameterTypes()[0];
@@ -98,23 +98,23 @@ public class VertxGuiSceneProxy implements InvocationHandler, IIdentifiableObjec
 				}
 
 				if (IGuiElement.class == returnType) {
-					return new VertxGuiElement(this.guiRequest, this.getHandler(), null, elementName);
+					return new VertxGuiElement(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiContainer.class == returnType) {
-					return new VertxGuiContainer(this.guiRequest, this.getHandler(), null, elementName);
+					return new VertxGuiContainer(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiText.class == returnType) {
-					return new VertxGuiText(this.guiRequest, this.getHandler(), null, elementName);
+					return new VertxGuiText(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiChart.class == returnType) {
-					return new VertxGuiChart(this.guiRequest, this.getHandler(), null, elementName);
+					return new VertxGuiChart(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiTable.class == returnType) {
-					return new VertxGuiTable(this.guiRequest, this.getHandler(), null, elementName);
+					return new VertxGuiTable(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiEditor.class == returnType) {
-					return new VertxGuiEditor(this.guiRequest, this.getHandler(), null, elementName);
+					return new VertxGuiEditor(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiDiagram.class == returnType) {
-					return new VertxGuiDiagram(this.guiRequest, this.getHandler(), null, elementName);
+					return new VertxGuiDiagram(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else if (IGuiGraphViewer.class == returnType) {
-					return new VertxGuiGraph(this.guiRequest, this.getHandler(), null, elementName);
-				} else if (IGuiGrid.class == returnType) {
-					return new VertxGuiGrid(this.guiRequest, this.getHandler(), null, elementName);
+					return new VertxGuiGraph(this.guiRequest, this.scene, this.getHandler(), elementName);
+				} else if (IGuiGraphViewer.class == returnType) {
+					return new VertxGuiGrid(this.guiRequest, this.scene, this.getHandler(), elementName);
 				} else {
 					return null;
 				}
