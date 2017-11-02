@@ -37,21 +37,26 @@ public class MyAuthHandler extends AuthHandlerImpl {
 
 	@Override
 	public void handle(final RoutingContext context) {
-
-		User user = context.user();
-		if (user != null) {
-			// Already logged in, just authorise
-			this.authorise(user, context);
-		} else {
-			this.getProvider().authenticate(context);
-			user = context.user();
-			if (user == null) {
-				// Now redirect to the login url - we'll get redirected back here after successful login
-				this.decodeOriginalUrl(context.session(), context.request().absoluteURI());
-				context.response().putHeader("location", this.loginRedirectURL).setStatusCode(302).end();
-			} else {
+		try {
+			User user = context.user();
+			if (user != null) {
+				// Already logged in, just authorise
 				this.authorise(user, context);
+			} else {
+				this.getProvider().authenticate(context);
+				user = context.user();
+				if (user == null) {
+					// Now redirect to the login url - we'll get redirected back here after successful login
+					this.decodeOriginalUrl(context.session(), context.request().absoluteURI());
+					context.response().putHeader("location", this.loginRedirectURL).setStatusCode(302).end();
+				} else {
+					this.authorise(user, context);
+				}
 			}
+		} catch (final Exception e) {
+			// TODO: this should really be logged !
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 	}

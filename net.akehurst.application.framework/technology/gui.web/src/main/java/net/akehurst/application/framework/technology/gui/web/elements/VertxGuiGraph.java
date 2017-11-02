@@ -15,8 +15,6 @@
  */
 package net.akehurst.application.framework.technology.gui.web.elements;
 
-import java.util.Map;
-
 import org.hjson.JsonArray;
 import org.hjson.JsonObject;
 import org.hjson.JsonValue;
@@ -82,20 +80,14 @@ public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 
 	private JsonObject createNode(final IGuiGraphNode node) {
 		final String nodeId = node.getIdentity();
-		final JsonObject jnode = new JsonObject();
+		final JsonObject jnode = JsonValue.readJSON(JSONObject.wrap(node.getProperties()).toString()).asObject();
 		jnode.add("group", "nodes");
-		final JsonObject data = new JsonObject();
+		final JsonObject data = JsonValue.readJSON(JSONObject.wrap(node.getData()).toString()).asObject();
 		data.add("id", nodeId);
 		if (null != node.getParent()) {
 			data.add("parent", node.getParent().getIdentity());
 		}
-		for (final Map.Entry<String, Object> me : node.getData().entrySet()) {
-			data.add(me.getKey(), JsonValue.readJSON(JSONObject.wrap(me.getValue()).toString()));
-		}
 		jnode.add("data", data);
-		for (final Map.Entry<String, Object> me : node.getProperties().entrySet()) {
-			jnode.add(me.getKey(), JsonValue.readJSON(JSONObject.wrap(me.getValue()).toString()));
-		}
 
 		return jnode;
 	}
@@ -106,14 +98,10 @@ public class VertxGuiGraph extends VertxGuiElement implements IGuiGraphViewer {
 		final String tgtId = null == edge.getTarget() ? "unknown" : edge.getTarget().getIdentity();
 		final JsonObject jedge = new JsonObject();
 		jedge.add("group", "edges");
-		final JsonObject data = new JsonObject();
+		final JsonObject data = JsonValue.readJSON(JSONObject.wrap(edge.getData()).toString()).asObject();
 		data.add("id", edgeId);
 		data.add("source", srcId);
 		data.add("target", tgtId);
-
-		for (final Map.Entry<String, Object> me : edge.getData().entrySet()) {
-			data.add(me.getKey(), JsonValue.readJSON(JSONObject.wrap(me.getValue()).toString()));
-		}
 
 		jedge.add("data", data);
 		String classes = "";

@@ -21,19 +21,20 @@ define([
 	"dagre"
 ], function($, cytoscape, cydagre, dagre) {
 
-	function Graph(parentId, initData) {
+	function Graph(elementId, initData) {
 		cydagre( cytoscape, dagre )
 		this.cy = {}
-		this.create(parentId, initData)
+		this.create(elementId, initData)
 
 	}
 
-	Graph.prototype.create = function(parentId, data) {
+	Graph.prototype.create = function(elementId, data) {
 		let self = this
 		try {
-		    let parent = document.getElementById(parentId)
-		    let containerId = parentId+'-graph-container'
-		    let container = $("<div id='"+containerId+"' style='width:100%;height:100%;'></div>").appendTo(parent)
+		    let el = document.getElementById(elementId)
+		    $(el).empty()
+		    let containerId = elementId+'-graph-container'
+		    let container = $("<div id='"+containerId+"' style='width:100%;height:100%;'></div>").appendTo(el)
 		    let initCy = {
 					container: document.getElementById(containerId),
 					elements : data.elements,
@@ -44,16 +45,17 @@ define([
 	        this.cy = cytoscape(initCy)
 			
 			this.cy.on('click', 'node', {}, function(evt) {
-				var nodeId = evt.cyTarget.id()
-				var data = dynamic.fetchEventData(parent)
+				let nodeId = evt.cyTarget.id()
+				let data = dynamic.fetchEventData(el)
 				data['nodeId'] = nodeId
-				var outData = {stageId: dynamic.stageId, sceneId: dynamic.sceneId, elementId:parentId, eventType:'click', eventData:data}
+				let outData = {stageId: dynamic.stageId, sceneId: dynamic.sceneId, elementId:elementId, eventType:'click', eventData:data}
 				dynamic.commsSend('IGuiNotification.notifyEventOccured', outData)
 			})
 			
 			return "ok"
 		} catch (err) {
 			console.log("Error: "+err.message)
+			console.log("Error: "+err.stack)
 			return "error"
 		}
 	}
@@ -62,24 +64,5 @@ define([
 		
 	}
 
-	
-	//	require(["cytoscape", "cytoscape-dagre", "dagre"],function(cytoscape, cydagre, dagre) {
-	//	cydagre( cytoscape, dagre )
-	//	var parent = document.getElementById(parentId)
-	//	var cy = cytoscape({
-	//		container : parent,
-	//		elements : data.elements,
-	//		style : data.style,
-	//		layout: data.layout
-	//	})
-	//
-	//	cy.on('tap', 'node', {}, function(evt) {
-	//		var nodeId = evt.cyTarget.id()
-	//		var data = dynamic.fetchEventData(parent)
-	//		data['nodeId'] = nodeId
-	//		var outData = {stageId: dynamic.stageId, sceneId: dynamic.sceneId, elementId:parentId, eventType:'tap', eventData:data}
-	//		dynamic.commsSend('IGuiNotification.notifyEventOccured', outData)
-	//	})
-	//})
 	return Graph
 })

@@ -1,0 +1,64 @@
+<!DOCTYPE>
+
+<html>
+
+  <head>
+    <title>cytoscape-dagre.js demo</title>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+    <script src="./graphlib.core.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.7.4/dagre.core.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.5/cytoscape.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.1.0/cytoscape-dagre.min.js"></script>
+
+    <style>
+      body {
+        font-family: helvetica;
+        font-size: 14px;
+      }
+      #cy {
+        width: 500px;
+        height: 500px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 999;
+      }
+      h1 {
+        opacity: 0.5;
+        font-size: 1em;
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <h1>cytoscape-dagre demo</h1>
+
+    <div id="cy"></div>
+
+    <script>
+      $(function(){
+        var cy = window.cy = cytoscape({
+          container: document.getElementById('cy'),
+          boxSelectionEnabled: false,
+          autounselectify: true,
+          layout: {
+            name: 'dagre',
+            rankDir: 'BT'
+          },
+          elements: {
+            nodes: [
+              { data: { id: 'a1' } }
+            ]
+          }
+        });
+      });
+    </script>
+
+  </body>
+
+</html>

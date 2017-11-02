@@ -155,6 +155,11 @@ define([
 			if ($(input).attr('type') == 'checkbox') {
 				value = $(input).prop('checked')
 				data[id] = value
+			} else if ($(input).attr('type') == 'radio') {
+					value = $(input).prop('checked')
+					if ($(input)[0].checked) {
+						data[$(input).prop('name')] = id
+					}
 			} else if ($(input).attr('type') == 'password') {
 				//TODO: need better hiding of passwords than this really
 				let v = "1234567890abcdef1234567890abcdef"
@@ -180,6 +185,10 @@ define([
 			
 			let headers = []
 			let hrow = tbl.rows[0] //row 0 should contain the table headers
+			if (undefined==hrow) {
+				console.log("Warn: Cannot get data from table, no headers defined")
+				return data;
+			}
 			let unnamedCount = 0;
 			for(let c=0; c<hrow.cells.length; c++) { 
 				let cell = hrow.cells[c]

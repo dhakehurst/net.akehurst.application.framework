@@ -125,6 +125,14 @@ public class VertxGuiDialog extends VertxGuiScene implements IGuiDialog {
 			final Map<String, Object> mapV = (Map<String, Object>) value;
 			final Map<String, Object> newMap = this.removePrefix(mapV);
 			return newMap;
+		} else if (value instanceof String) {
+			final String strVal = (String) value;
+			if (strVal.startsWith(this.dialogElementPrefix)) {
+				final String newValue = strVal.substring(this.prefixLength);
+				return newValue;
+			} else {
+				return value;
+			}
 		} else {
 			return value;
 		}

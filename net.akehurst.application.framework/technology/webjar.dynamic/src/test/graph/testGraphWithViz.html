@@ -1,0 +1,35 @@
+<!DOCTYPE>
+
+<html>
+
+  <head>
+    <title>Viz.js demo</title>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/1.8.0/viz.js"></script>
+
+
+
+  </head>
+
+  <body>
+  
+    <div id='svg'></div>
+    <code id='text'></code>
+  
+    <script src="./viz.js"></script>
+    <script>
+    
+    	 document.getElementById('svg').innerHTML+=Viz("digraph { a -> b; }", {format:'svg'})
+    
+     let json = JSON.parse(Viz("digraph { a -> b; }", {format:'json'}));
+     let str = JSON.stringify(json, null, 4)
+     
+     document.getElementById('text').textContent += str
+     
+    </script>
+
+  </body>
+
+</html>
