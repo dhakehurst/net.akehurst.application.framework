@@ -52,10 +52,10 @@
 
 	<footer> </footer>
 
-	<script>
-		var rootPath = '${rootPath}'
-		var stageId = '${stageId}'
+    ${af.script}
 
+
+	<script>
 		$(document).ready(function() {
 			$("input").keypress(function(e) {
 				if (e.which == 13) {
@@ -66,11 +66,6 @@
 			});
 		});
 	</script>
-
-	<script data-main='${rootPath}/lib/dynamic/1.0.0-SNAPSHOT/config.js'
-		src='${rootPath}/lib/requirejs/2.3.1/require.min.js'
-		type='text/javascript' charset='utf-8'></script>
-
 </body>
 
 </html>

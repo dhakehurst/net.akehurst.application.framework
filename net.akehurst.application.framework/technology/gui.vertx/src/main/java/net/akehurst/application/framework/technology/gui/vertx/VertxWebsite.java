@@ -325,6 +325,13 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void sendData(final UserSession session, final String channelId, final String jsonStrData) {
+		final JsonObject data = new JsonObject(jsonStrData);
+		this.verticle.getComms().send(session, channelId, data);
+		this.logger.log(LogLevel.TRACE, "send to channelId %s - %s", channelId, jsonStrData);
+	}
+
+	@Override
 	public void navigateTo(final UserSession session, final String location) {
 		final JsonObject data = new JsonObject();
 		data.put("location", location);

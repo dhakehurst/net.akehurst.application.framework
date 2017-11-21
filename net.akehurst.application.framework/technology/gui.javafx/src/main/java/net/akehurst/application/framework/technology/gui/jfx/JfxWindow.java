@@ -249,6 +249,11 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 	}
 
 	@Override
+	public void sendData(final UserSession session, final String channelId, final String jsonStrData) {
+
+	}
+
+	@Override
 	public void addElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
 			final String newElementId, final String type) {
 		// TODO Auto-generated method stub

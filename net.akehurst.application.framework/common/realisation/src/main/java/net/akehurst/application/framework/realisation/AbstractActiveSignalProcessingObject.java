@@ -34,19 +34,20 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract public class AbstractActiveSignalProcessingObject extends AbstractActiveObject {
 
+	@ConfiguredValue(defaultValue = "1")
+	Integer numThreads;
+
+	private boolean terminateRequested;
+	private ExecutorService executor;
+	private final BlockingQueue<NamedSignal<?>> signals;
+
 	public AbstractActiveSignalProcessingObject(final String afId) {
 		super(afId);
 		this.terminateRequested = false;
 		this.signals = new LinkedBlockingQueue<>();
 	}
 
-	@ConfiguredValue(defaultValue = "1")
-	Integer numThreads;
-
-	boolean terminateRequested;
-	ExecutorService executor;
-
-	class NamedSignal<R> {
+	private class NamedSignal<R> {
 		public NamedSignal(final String name, final ISignalR<R> signal) {
 			this.name = name;
 			this.signal = signal;
@@ -64,8 +65,6 @@ abstract public class AbstractActiveSignalProcessingObject extends AbstractActiv
 		ISignalR<R> signal;
 		FutureTask<R> future;
 	}
-
-	BlockingQueue<NamedSignal<?>> signals;
 
 	static class NamedThreadFactory implements ThreadFactory {
 		private static final AtomicInteger poolNumber = new AtomicInteger(1);

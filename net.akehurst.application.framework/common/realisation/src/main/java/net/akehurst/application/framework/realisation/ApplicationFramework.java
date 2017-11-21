@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		return null;
 	}
 
-	static final String DEFAULT_CONFIGURATION_SERVICE = "configuration";
+	public static final String DEFAULT_CONFIGURATION_SERVICE = "configuration";
+
+	private final String afId;
+	protected ICommandLineHandler commandLineHandler;
 
 	/**
 	 * Other parts of the FW expect the ApplicationFramework to have a serviceName == 'af. e.g. ...persistence.filesystem.HJsonFile
@@ -72,18 +76,15 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	 * @param id
 	 * @param serviceName
 	 */
-	public ApplicationFramework(final String id, final String serviceName) {
-		this.afId = id;
+	public ApplicationFramework(final String afId, final String serviceName) {
+		this.afId = afId;
 		this.services = new HashMap<>();
 		this.services.put(serviceName, this);
 		this.commandLineHandler = new CommandLineHandler("[a-zA-Z0-9_-]+", "--");
 		// this.commandLineOptionGroups = new HashMap<>();
 	}
 
-	protected ICommandLineHandler commandLineHandler;
-
 	// --------- IIdentifiable ---------
-	String afId;
 
 	@Override
 	public String afId() {
@@ -191,10 +192,100 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 	@Override
 	public <T> T createDatatype(final Class<T> class_, final Object... constructorArgs) throws ApplicationFrameworkException {
 		try {
-			final BetterMethodFinder bmf = new BetterMethodFinder(class_);
-			final Constructor<T> cons = bmf.findConstructor(constructorArgs);
-			final T obj = cons.newInstance(constructorArgs);
-			return obj;
+			if (class_.isPrimitive()) {
+				final Object value = constructorArgs[0];
+				if (Boolean.class == class_ || class_ == Boolean.TYPE) {
+					if (value instanceof String) {
+						return (T) Boolean.valueOf((String) value);
+					} else if (value instanceof Boolean) {
+						return (T) (Boolean) value;
+					} else {
+						throw new ApplicationFrameworkException("Failed to create Datatype, cannot convert value to Boolean " + value, null);
+					}
+				} else if (Byte.class == class_ || class_ == Byte.TYPE) {
+					if (value instanceof String) {
+						return (T) Byte.valueOf((String) value);
+					} else if (value instanceof Byte) {
+						return (T) (Byte) value;
+					} else {
+						throw new ApplicationFrameworkException("Failed to create Datatype, cannot convert value to Byte " + value, null);
+					}
+				} else if (Short.class == class_ || class_ == Short.TYPE) {
+					if (value instanceof String) {
+						return (T) Short.valueOf((String) value);
+					} else if (value instanceof Short) {
+						return (T) (Short) value;
+					} else {
+						throw new ApplicationFrameworkException("Failed to create Datatype, cannot convert value to Short " + value, null);
+					}
+				} else if (Integer.class == class_ || class_ == Integer.TYPE) {
+					if (value instanceof String) {
+						return (T) Integer.valueOf((String) value);
+					} else if (value instanceof Integer) {
+						return (T) (Integer) value;
+					} else {
+						throw new ApplicationFrameworkException("Failed to create Datatype, cannot convert value to Integer " + value, null);
+					}
+				} else if (Long.class == class_ || class_ == Long.TYPE) {
+					if (value instanceof String) {
+						return (T) Long.valueOf((String) value);
+					} else if (value instanceof Long) {
+						return (T) (Long) value;
+					} else {
+						throw new ApplicationFrameworkException("Failed to create Datatype, cannot convert value to Long " + value, null);
+					}
+				} else if (Float.class == class_ || class_ == Float.TYPE) {
+					if (value instanceof String) {
+						return (T) Float.valueOf((String) value);
+					} else if (value instanceof Float) {
+						return (T) (Float) value;
+					} else {
+						throw new ApplicationFrameworkException("Failed to create Datatype, cannot convert value to Float " + value, null);
+					}
+				} else if (Double.class == class_ || class_ == Double.TYPE) {
+					if (value instanceof String) {
+						return (T) Double.valueOf((String) value);
+					} else if (value instanceof Double) {
+						return (T) (Double) value;
+					} else {
+						throw new ApplicationFrameworkException("Failed to create Datatype, cannot convert value to Double " + value, null);
+					}
+				} else {
+					throw new ApplicationFrameworkException("Failed to create Datatype, unknown primitive type " + class_, null);
+				}
+			} else if (class_.isEnum()) {
+				final Object value = constructorArgs[0];
+				if (value instanceof String) {
+					return (T) Enum.valueOf((Class<? extends Enum>) class_, (String) value);
+				} else if (class_.isInstance(value)) {
+					return (T) value;
+				} else {
+					throw new ApplicationFrameworkException("Failed to create Datatype, cannot convert value to Enum " + value, null);
+				}
+			} else if (List.class.isAssignableFrom(class_)) {
+				if (1 == constructorArgs.length) {
+					final Object value = constructorArgs[0];
+					if (value instanceof String) {
+						final String strValue = (String) value;
+						if (strValue.isEmpty()) {
+							return (T) new ArrayList<>();
+						} else {
+							// TODO parse the string
+							throw new UnsupportedOperationException("TODO");
+						}
+					} else {
+						return (T) Arrays.asList(constructorArgs);
+					}
+				} else {
+					return (T) Arrays.asList(constructorArgs);
+				}
+			} else {
+
+				final BetterMethodFinder bmf = new BetterMethodFinder(class_);
+				final Constructor<T> cons = bmf.findConstructor(constructorArgs);
+				final T obj = cons.newInstance(constructorArgs);
+				return obj;
+			}
 		} catch (final Exception ex) {
 			throw new ApplicationFrameworkException("Failed to create Datatype", ex);
 		}

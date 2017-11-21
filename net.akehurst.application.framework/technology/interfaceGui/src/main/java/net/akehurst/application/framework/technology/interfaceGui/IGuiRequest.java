@@ -56,6 +56,8 @@ public interface IGuiRequest {
 	Future<String> oauthAuthorise(UserSession session, String clientId, String clientSecret, String site, String tokenPath, String authorisationPath,
 			String scopes);
 
+	void sendData(UserSession session, String channelId, String jsonStrData);
+
 	/**
 	 * if location starts with '/' then navigate to a location relative to the root of this site
 	 *
