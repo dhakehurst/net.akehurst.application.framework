@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.realisation;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -38,17 +39,18 @@ abstract public class AbstractPersistentStoreConfigurationService extends Abstra
 	}
 
 	@Override
-	public <T> T fetchValue(final Class<T> itemType, final String idPath, final String defaultValueString) {
+	public <T> T fetchValue(final Type itemType, final String idPath, final String defaultValueString) {
 		try {
+			final Class<?> class_ = ApplicationFramework.getClass(itemType);
 			final IPersistenceTransaction trans = this.getStore().startTransaction();
 			final Map<String, Object> filter = new HashMap<>();
 			filter.put("path", idPath);
-			final Set<T> values = this.getStore().retrieve(trans, itemType, filter);
+			final Set<T> values = (Set<T>) this.getStore().retrieve(trans, itemType, filter);
 			final T value = values.iterator().next();
 			this.getStore().commitTransaction(trans);
 			if (null != value) {
 				this.logger.log(LogLevel.TRACE,
-						String.format("%s.fetchValue(%s,%s) = %s", this.afId(), itemType.getName(), idPath, null == value ? "null" : value.toString()));
+						String.format("%s.fetchValue(%s,%s) = %s", this.afId(), itemType.getTypeName(), idPath, null == value ? "null" : value.toString()));
 
 				return value;
 			} else {
@@ -59,7 +61,7 @@ abstract public class AbstractPersistentStoreConfigurationService extends Abstra
 		}
 
 		final T defaultValue = super.createValueFromDefault(itemType, defaultValueString);
-		this.logger.log(LogLevel.TRACE, String.format("%s.fetchValue(%s,%s) = default %s", this.afId(), itemType.getName(), idPath,
+		this.logger.log(LogLevel.TRACE, String.format("%s.fetchValue(%s,%s) = default %s", this.afId(), itemType.getTypeName(), idPath,
 				null == defaultValue ? "null" : defaultValue.toString()));
 
 		return defaultValue;

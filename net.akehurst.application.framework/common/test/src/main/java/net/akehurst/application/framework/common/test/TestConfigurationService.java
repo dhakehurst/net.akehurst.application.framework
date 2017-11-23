@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.common.test;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,13 +36,13 @@ public class TestConfigurationService extends AbstractConfigurationService {
 	}
 
 	@Override
-	public <T> T fetchValue(final Class<T> itemType, final String idPath, final String defaultValueString) {
+	public <T> T fetchValue(final Type itemType, final String idPath, final String defaultValueString) {
 		T value = (T) this.testValues.get(idPath);
 		if (null == value) {
 			value = super.createValueFromDefault(itemType, defaultValueString);
 		}
 		this.logger.log(LogLevel.TRACE,
-				String.format("%s.fetchValue(%s,%s) = %s", this.afId(), itemType.getName(), idPath, null == value ? "null" : value.toString()));
+				String.format("%s.fetchValue(%s,%s) = %s", this.afId(), itemType.getTypeName(), idPath, null == value ? "null" : value.toString()));
 		return value;
 	}
 

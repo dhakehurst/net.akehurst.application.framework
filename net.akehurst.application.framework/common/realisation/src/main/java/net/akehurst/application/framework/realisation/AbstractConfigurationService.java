@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.realisation;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -43,14 +44,15 @@ abstract public class AbstractConfigurationService extends AbstractIdentifiableO
 		return this;
 	}
 
-	protected <T> T createValueFromDefault(final Class<T> itemType, final String defaultValueString) {
+	protected <T> T createValueFromDefault(final Type itemType, final String defaultValueString) {
 		try {
 			Object value;
+			final Class<?> class_ = ApplicationFramework.getClass(itemType);
 			// TODO: implement default values for list and map
 
-			if (itemType.isAssignableFrom(ArrayList.class)) {
+			if (class_.isAssignableFrom(ArrayList.class)) {
 				value = new ArrayList<>();
-			} else if (itemType.isAssignableFrom(HashMap.class)) {
+			} else if (class_.isAssignableFrom(HashMap.class)) {
 				value = new HashMap<>();
 			} else {
 				value = this.af.createDatatype(itemType, defaultValueString);

@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.technology.persistence.objectDb;
 
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -112,6 +113,13 @@ public class ObjectDbDatabasePersistence extends AbstractComponent implements IP
 		} catch (final Exception ex) {
 			System.err.println(ex.getMessage());
 		}
+		return null;
+	}
+
+	@Override
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Type itemType, final Map<String, Object> filter)
+			throws PersistentStoreException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

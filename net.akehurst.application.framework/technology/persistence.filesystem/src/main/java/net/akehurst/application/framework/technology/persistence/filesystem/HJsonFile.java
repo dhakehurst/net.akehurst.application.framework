@@ -16,6 +16,8 @@
 package net.akehurst.application.framework.technology.persistence.filesystem;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +35,7 @@ import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.common.annotations.declaration.SimpleObject;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
+import net.akehurst.application.framework.realisation.ApplicationFramework;
 import net.akehurst.application.framework.technology.interfaceFilesystem.FilesystemException;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesystem;
@@ -102,24 +105,37 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 		}
 	}
 
-	private <T> T convertJsonTo(final JsonValue value, final Class<T> itemType) throws PersistentStoreException {
+	private <T> T convertJsonTo(final JsonValue value, final Type itemType) throws PersistentStoreException {
 		try {
+			final Class<?> class_ = ApplicationFramework.getClass(itemType);
 			if (null == value) {
 				return null;
 			} else if (value.isString()) {
 				final T t = this.af.createDatatype(itemType, value.asString());
 				return t;
 			} else if (value.isNumber()) {
-				final T t = this.af.createDatatype(itemType, value.asDouble());
-				return t;
+				if (itemType == Double.TYPE || itemType == Double.class) {
+					return this.af.createDatatype(itemType, value.asDouble());
+				} else if (itemType == Float.TYPE || itemType == Float.class) {
+					return this.af.createDatatype(itemType, value.asFloat());
+				} else if (itemType == Integer.TYPE || itemType == Integer.class) {
+					return this.af.createDatatype(itemType, value.asInt());
+				} else if (itemType == Long.TYPE || itemType == Long.class) {
+					return this.af.createDatatype(itemType, value.asLong());
+				} else if (itemType == Short.TYPE || itemType == Short.class) {
+					return this.af.createDatatype(itemType, (short) value.asInt());
+				} else {
+					throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
+				}
 			} else if (value.isBoolean()) {
 				final T t = this.af.createDatatype(itemType, value.asBoolean());
 				return t;
 			} else if (value.isArray()) {
-				if (List.class.isAssignableFrom(itemType)) {
+				if (List.class.isAssignableFrom(class_)) {
+					final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[0];
 					final List list = new ArrayList<>();
 					for (final JsonValue av : value.asArray()) {
-						final Object o = this.convertJsonToJava(av);
+						final Object o = this.convertJsonToJava(av, elType);
 						list.add(o);
 					}
 					return (T) list;
@@ -127,11 +143,11 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 					throw new PersistentStoreException("Cannot convert JSON Array to List.", null);
 				}
 			} else if (value.isObject()) {
-				if (Map.class.isAssignableFrom(itemType)) {
+				if (Map.class.isAssignableFrom(class_)) {
 					final Map<String, Object> map = new HashMap<>();
 					for (final String k : value.asObject().names()) {
 						final JsonValue jv = value.asObject().get(k);
-						final Object v = this.convertJsonToJava(jv);
+						final Object v = this.convertJsonToJava(jv, itemType);
 						map.put(k, v);
 					}
 					return (T) map;
@@ -146,30 +162,55 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 		}
 	}
 
-	private Object convertJsonToJava(final JsonValue value) throws PersistentStoreException {
+	private <T> T convertJsonToJava(final JsonValue value, final Type itemType) throws PersistentStoreException {
+		final Class<?> class_ = ApplicationFramework.getClass(itemType);
 		if (null == value) {
 			return null;
 		} else if (value.isString()) {
-			return value.asString();
+			if (itemType == String.class) {
+				return (T) value.asString();
+			} else if (class_.isEnum()) {
+				return (T) Enum.valueOf((Class<? extends Enum>) itemType, value.asString());
+			} else {
+				throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
+			}
 		} else if (value.isNumber()) {
-			return value.asDouble();
+			if (itemType == Double.TYPE || itemType == Double.class) {
+				return (T) Double.valueOf(value.asDouble());
+			} else if (itemType == Float.TYPE || itemType == Float.class) {
+				return (T) Float.valueOf(value.asFloat());
+			} else if (itemType == Integer.TYPE || itemType == Integer.class) {
+				return (T) Integer.valueOf(value.asInt());
+			} else if (itemType == Long.TYPE || itemType == Long.class) {
+				return (T) Long.valueOf(value.asLong());
+			} else if (itemType == Short.TYPE || itemType == Short.class) {
+				return (T) Short.valueOf((short) value.asInt());
+			} else {
+				throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
+			}
 		} else if (value.isBoolean()) {
-			return value.asBoolean();
+			return (T) Boolean.valueOf(value.asBoolean());
 		} else if (value.isArray()) {
+			final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[0];
 			final List<Object> list = new ArrayList<>();
 			for (final JsonValue av : value.asArray()) {
-				final Object o = this.convertJsonToJava(av);
+				final Object o = this.convertJsonToJava(av, elType);
 				list.add(o);
 			}
-			return list;
+			return (T) list;
 		} else if (value.isObject()) {
-			final Map<String, Object> map = new HashMap<>();
-			for (final String k : value.asObject().names()) {
-				final JsonValue jv = value.asObject().get(k);
-				final Object v = this.convertJsonToJava(jv);
-				map.put(k, v);
+			if (Map.class.isAssignableFrom(class_)) {
+				final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[1];
+				final Map<String, Object> map = new HashMap<>();
+				for (final String k : value.asObject().names()) {
+					final JsonValue jv = value.asObject().get(k);
+					final Object v = this.convertJsonToJava(jv, elType);
+					map.put(k, v);
+				}
+				return (T) map;
+			} else {
+				throw new PersistentStoreException("Cannot convert JSON Object to Map.", null);
 			}
-			return map;
 		} else {
 			throw new PersistentStoreException("Unknown JSON type.", null);
 		}
@@ -225,6 +266,13 @@ public class HJsonFile implements IService, IIdentifiableObject, IPersistentStor
 	@Override
 	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
 			throws PersistentStoreException {
+		return null;
+	}
+
+	@Override
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Type itemType, final Map<String, Object> filter)
+			throws PersistentStoreException {
+
 		final String path = (String) filter.get("path");
 		try {
 

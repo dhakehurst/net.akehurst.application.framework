@@ -635,6 +635,13 @@ public class JdoPersistence extends AbstractComponent implements IPersistentStor
 	}
 
 	@Override
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Type itemType, final Map<String, Object> filter)
+			throws PersistentStoreException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
 			throws PersistentStoreException {
 		try {

@@ -15,7 +15,9 @@
  */
 package net.akehurst.application.framework.common;
 
+import java.lang.reflect.Type;
+
 public interface IConfiguration {
 
-	<T> T fetchValue(Class<T> itemType, String idPath, String defaultValueString);
+	<T> T fetchValue(Type itemType, String idPath, String defaultValueString);
 }

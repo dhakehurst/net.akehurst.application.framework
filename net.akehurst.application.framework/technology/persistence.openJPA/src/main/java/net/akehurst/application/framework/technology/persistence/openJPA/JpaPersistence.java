@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.technology.persistence.openJPA;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -115,6 +116,13 @@ public class JpaPersistence extends AbstractComponent implements IPersistentStor
 		} catch (final Exception ex) {
 			System.err.println(ex.getMessage());
 		}
+		return null;
+	}
+
+	@Override
+	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Type itemType, final Map<String, Object> filter)
+			throws PersistentStoreException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

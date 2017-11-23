@@ -15,6 +15,8 @@
  */
 package net.akehurst.application.framework.common.test;
 
+import java.lang.reflect.Type;
+
 import net.akehurst.application.framework.common.IConfiguration;
 import net.akehurst.application.framework.realisation.AbstractIdentifiableObject;
 
@@ -25,7 +27,7 @@ public class AbstractMockConfigurationService extends AbstractIdentifiableObject
 	}
 
 	@Override
-	public <T> T fetchValue(final Class<T> itemType, final String idPath, final String defaultValueString) {
+	public <T> T fetchValue(final Type itemType, final String idPath, final String defaultValueString) {
 		// TODO Auto-generated method stub
 		return null;
 	}

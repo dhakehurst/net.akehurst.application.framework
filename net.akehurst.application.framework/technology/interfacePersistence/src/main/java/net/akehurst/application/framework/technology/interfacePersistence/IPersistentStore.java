@@ -15,6 +15,7 @@
  */
 package net.akehurst.application.framework.technology.interfacePersistence;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,6 +66,8 @@ public interface IPersistentStore extends IIdentifiableObject {
 	 * @return
 	 */
 	<T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
+
+	<T> Set<T> retrieve(IPersistenceTransaction transaction, Type itemType, Map<String, Object> filter) throws PersistentStoreException;
 
 	<T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter, long rangeFrom, long rangeTo)
 			throws PersistentStoreException;

@@ -15,12 +15,16 @@
  */
 package net.akehurst.application.framework.realisation;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -189,9 +193,28 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 		}
 	}
 
+	public static Class<?> getClass(final Type type) {
+		if (type instanceof Class) {
+			return (Class) type;
+		} else if (type instanceof ParameterizedType) {
+			return ApplicationFramework.getClass(((ParameterizedType) type).getRawType());
+		} else if (type instanceof GenericArrayType) {
+			final Type componentType = ((GenericArrayType) type).getGenericComponentType();
+			final Class<?> componentClass = ApplicationFramework.getClass(componentType);
+			if (componentClass != null) {
+				return Array.newInstance(componentClass, 0).getClass();
+			} else {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
 	@Override
-	public <T> T createDatatype(final Class<T> class_, final Object... constructorArgs) throws ApplicationFrameworkException {
+	public <T> T createDatatype(final Type type, final Object... constructorArgs) throws ApplicationFrameworkException {
 		try {
+			final Class<?> class_ = ApplicationFramework.getClass(type);
 			if (class_.isPrimitive()) {
 				final Object value = constructorArgs[0];
 				if (Boolean.class == class_ || class_ == Boolean.TYPE) {
@@ -543,7 +566,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 						}
 						f.set(obj, value);
 					} else {
-						final Class<? extends Object> itemType = f.getType();
+						final Type itemType = f.getGenericType();
 						String idPath = obj.afId() + "." + itemId;
 						// TODO: get rid of 'application' start over all
 						// remove the 'application.' first bit of the path

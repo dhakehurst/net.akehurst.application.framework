@@ -15,6 +15,8 @@
  */
 package net.akehurst.application.framework.common;
 
+import java.lang.reflect.Type;
+
 public interface IApplicationFramework {
 
 	<T extends IApplication> T createApplication(Class<T> class_, String id, String[] arguments) throws ApplicationFrameworkException;
@@ -27,7 +29,7 @@ public interface IApplicationFramework {
 
 	<T extends IActiveObject> T createActiveObject(Class<T> class_, String id) throws ApplicationFrameworkException;
 
-	<T> T createDatatype(Class<T> class_, Object... constructorArgs) throws ApplicationFrameworkException;
+	<T> T createDatatype(Type class_, Object... constructorArgs) throws ApplicationFrameworkException;
 
 	<T extends IIdentifiableObject> T createObject(Class<T> class_, Object... constructorArgs) throws ApplicationFrameworkException;
 
