@@ -81,6 +81,8 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 		super.submit("requestLogin", () -> {
 
 			try {
+			    this.logger.log(LogLevel.WARN, "Unsecure implementation, please fix it");
+			
 				// authenticate admin
 				final Hashtable<String, String> adminProps = new Hashtable<>();
 				adminProps.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -132,6 +134,7 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 
 	private String decrypt(final String encrypted) {
 		try {
+        //TODO: unsecure dirty hack, please fix this, don't use constant salt
 			final byte[] bytes = DatatypeConverter.parseHexBinary(AuthenticationHandler.V);
 			final SecretKeySpec key = this.createKey(AuthenticationHandler.V, bytes);
 			final IvParameterSpec iv = new IvParameterSpec(bytes);
@@ -144,7 +147,7 @@ public class AuthenticationHandler extends AbstractActiveSignalProcessingObject 
 	}
 
 	SecretKeySpec createKey(final String password, final byte[] saltBytes) throws GeneralSecurityException {
-
+        //TODO: unsecure dirty hack, please fix this,  use more iterations
 		final KeySpec keySpec = new PBEKeySpec(password.toCharArray(), saltBytes, 100, 128);
 		final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		final SecretKey secretKey = keyFactory.generateSecret(keySpec);
