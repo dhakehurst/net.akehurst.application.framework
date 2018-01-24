@@ -20,7 +20,7 @@ require.config({
 	baseUrl: rootPath+"/lib",
     paths: {
         "text"            : "requirejs-text/3.2.1/text",
-        "jquery"          : "jquery/3.2.1/dist/jquery.min",
+        "jquery"          : "jquery/3.3.1/dist/jquery.min",
         "jquery.ui"       : "jquery-ui/1.12.1/jquery-ui.min",
 		"sockjs"          : "sockjs-client/1.1.4/dist/sockjs.min",
 		"chartjs"         : "chartjs/2.7.0/Chart.min",
