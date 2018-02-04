@@ -23,5 +23,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ComponentInstance {
-	String id() default "";
+    String id() default "";
 }

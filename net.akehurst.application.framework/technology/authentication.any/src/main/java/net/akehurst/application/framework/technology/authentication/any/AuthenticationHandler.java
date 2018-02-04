@@ -26,33 +26,33 @@ import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 
 public class AuthenticationHandler extends AbstractActiveSignalProcessingObject implements IAuthenticatorRequest {
 
-	@ServiceReference
-	ILogger logger;
+    @ServiceReference
+    ILogger logger;
 
-	public AuthenticationHandler(final String afId) {
-		super(afId);
-	}
+    public AuthenticationHandler(final String afId) {
+        super(afId);
+    }
 
-	@ExternalConnection
-	public IAuthenticatorNotification authenticationNotification;
+    @ExternalConnection
+    public IAuthenticatorNotification authenticationNotification;
 
-	@Override
-	public void requestLogin(final UserSession session, final String username, final String password) {
-		super.submit("requestLogin", () -> {
+    @Override
+    public void requestLogin(final UserSession session, final String username, final String password) {
+        super.submit("requestLogin", () -> {
 
-			final UserSession authenticatedSession = new UserSession(session.getId(), new UserDetails(username), session.getData());
+            final UserSession authenticatedSession = new UserSession(session.getId(), new UserDetails(username), session.getData());
 
-			this.authenticationNotification.notifyAuthenticationSuccess(authenticatedSession);
+            this.authenticationNotification.notifyAuthenticationSuccess(authenticatedSession);
 
-		});
-	}
+        });
+    }
 
-	@Override
-	public void requestLogout(final UserSession session) {
-		super.submit("requestLogout", () -> {
-			final UserSession clearedSession = new UserSession(session.getId(), null, null);
-			this.authenticationNotification.notifyAuthenticationCleared(clearedSession);
-		});
-	}
+    @Override
+    public void requestLogout(final UserSession session) {
+        super.submit("requestLogout", () -> {
+            final UserSession clearedSession = new UserSession(session.getId(), null, null);
+            this.authenticationNotification.notifyAuthenticationCleared(clearedSession);
+        });
+    }
 
 }

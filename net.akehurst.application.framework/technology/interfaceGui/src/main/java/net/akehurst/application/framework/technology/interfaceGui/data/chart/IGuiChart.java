@@ -20,14 +20,14 @@ import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiE
 
 public interface IGuiChart<X, Y> extends IGuiElement {
 
-	enum Type {
-		Line, Bar, Pie, Doughnut, Radar, PolarArea, Bubble, XY
-	}
+    enum Type {
+        Line, Bar, Pie, Doughnut, Radar, PolarArea, Bubble, XY
+    }
 
-	void create(UserSession session, Type chartType);
+    void create(UserSession session, Type chartType);
 
-	void remove(UserSession session);
+    void remove(UserSession session);
 
-	IGuiChartData<X, Y> getData();
+    IGuiChartData<X, Y> getData();
 
 }

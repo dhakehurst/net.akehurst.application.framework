@@ -24,54 +24,54 @@ import net.akehurst.application.framework.common.IIdentifiableObject;
 
 public interface IPersistentStore extends IIdentifiableObject {
 
-	void connect(Map<String, Object> properties);
+    void connect(Map<String, Object> properties);
 
-	void disconnect();
+    void disconnect();
 
-	IPersistenceTransaction startTransaction();
+    IPersistenceTransaction startTransaction();
 
-	void commitTransaction(IPersistenceTransaction transaction);
+    void commitTransaction(IPersistenceTransaction transaction);
 
-	void rollbackTransaction(IPersistenceTransaction transaction);
+    void rollbackTransaction(IPersistenceTransaction transaction);
 
-	/**
-	 *
-	 * @param transaction
-	 * @param item
-	 *            the item to store, must be a DataType
-	 * @param itemType
-	 *            (optional) class that defines the datatype of the item
-	 */
-	<T> void store(IPersistenceTransaction transaction, T item, Class<T> itemType) throws PersistentStoreException;
+    /**
+     *
+     * @param transaction
+     * @param item
+     *            the item to store, must be a DataType
+     * @param itemType
+     *            (optional) class that defines the datatype of the item
+     */
+    <T> void store(IPersistenceTransaction transaction, T item, Class<T> itemType) throws PersistentStoreException;
 
-	<T> void remove(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
+    <T> void remove(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
 
-	/**
-	 * @param T
-	 *            type of the result objects
-	 * @param query
-	 *            defines the items to retrieve
-	 * @return
-	 * @throws PersistentStoreException
-	 */
-	<T> List<T> retrieve(IPersistenceTransaction transaction, PersistentItemQuery query, Map<String, Object> params) throws PersistentStoreException;
+    /**
+     * @param T
+     *            type of the result objects
+     * @param query
+     *            defines the items to retrieve
+     * @return
+     * @throws PersistentStoreException
+     */
+    <T> List<T> retrieve(IPersistenceTransaction transaction, PersistentItemQuery query, Map<String, Object> params) throws PersistentStoreException;
 
-	/**
-	 *
-	 * @param transaction
-	 * @param itemType
-	 *            class that defines the datatype of the item
-	 * @param filter
-	 *            filters out objects with the given property-value pairs
-	 * @return
-	 */
-	<T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
+    /**
+     *
+     * @param transaction
+     * @param itemType
+     *            class that defines the datatype of the item
+     * @param filter
+     *            filters out objects with the given property-value pairs
+     * @return
+     */
+    <T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter) throws PersistentStoreException;
 
-	<T> Set<T> retrieve(IPersistenceTransaction transaction, Type itemType, Map<String, Object> filter) throws PersistentStoreException;
+    <T> Set<T> retrieve(IPersistenceTransaction transaction, Type itemType, Map<String, Object> filter) throws PersistentStoreException;
 
-	<T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter, long rangeFrom, long rangeTo)
-			throws PersistentStoreException;
+    <T> Set<T> retrieve(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter, long rangeFrom, long rangeTo)
+            throws PersistentStoreException;
 
-	// <T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter);
+    // <T> Set<T> retrieveAll(IPersistenceTransaction transaction, Class<T> itemType, Map<String, Object> filter);
 
 }

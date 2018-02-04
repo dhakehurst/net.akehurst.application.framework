@@ -25,41 +25,41 @@ import net.akehurst.application.framework.technology.interfacePersistence.IPersi
 
 public class JdoTransaction implements IPersistenceTransaction {
 
-	public JdoTransaction(final PersistenceManager manager) {
-		this.manager = manager;
-		this.tx = manager.currentTransaction();
-	}
+    public JdoTransaction(final PersistenceManager manager) {
+        this.manager = manager;
+        this.tx = manager.currentTransaction();
+    }
 
-	PersistenceManager manager;
-	Transaction tx;
+    PersistenceManager manager;
+    Transaction tx;
 
-	public void begin() {
-		this.tx.begin();
-	}
+    public void begin() {
+        this.tx.begin();
+    }
 
-	public void commit() {
-		this.tx.commit();
-	}
+    public void commit() {
+        this.tx.commit();
+    }
 
-	public void rollback() {
-		this.tx.rollback();
-	}
+    public void rollback() {
+        this.tx.rollback();
+    }
 
-	public void makePersistent(final Persistable pc) {
-		this.manager.makePersistent(pc);
-	}
+    public void makePersistent(final Persistable pc) {
+        this.manager.makePersistent(pc);
+    }
 
-	public Query<? extends Persistable> newQuery(final Class<? extends Persistable> enhancedType) {
-		return this.manager.newQuery(enhancedType);
-	}
+    public Query<? extends Persistable> newQuery(final Class<? extends Persistable> enhancedType) {
+        return this.manager.newQuery(enhancedType);
+    }
 
-	public Query<?> newQuery(final String language, final String queryString) {
-		final Query<?> query = this.manager.newQuery(language, queryString);
-		return query;
-	}
+    public Query<?> newQuery(final String language, final String queryString) {
+        final Query<?> query = this.manager.newQuery(language, queryString);
+        return query;
+    }
 
-	public void deletePersistent(final Persistable pc) {
-		this.manager.deletePersistent(pc);
-	}
+    public void deletePersistent(final Persistable pc) {
+        this.manager.deletePersistent(pc);
+    }
 
 }

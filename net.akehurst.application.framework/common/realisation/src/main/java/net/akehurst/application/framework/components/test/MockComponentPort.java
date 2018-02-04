@@ -19,14 +19,13 @@ import java.lang.reflect.Method;
 
 import net.akehurst.application.framework.common.IPort;
 
-
 public class MockComponentPort {
-	
-	public void connect(IPort port) {
 
-	}
+    public void connect(IPort port) {
 
-	public void expect(Class<?> intefaceType, String methodName, Object...expectedArgumentValues) {
+    }
 
-	}
+    public void expect(Class<?> intefaceType, String methodName, Object... expectedArgumentValues) {
+
+    }
 }

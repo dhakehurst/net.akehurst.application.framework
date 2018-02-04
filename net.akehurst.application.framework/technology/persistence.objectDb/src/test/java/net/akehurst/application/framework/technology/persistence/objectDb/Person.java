@@ -23,7 +23,7 @@ import javax.persistence.Id;
 @Entity
 public class Person {
 
-	@Id
-	public String name;
-	
+    @Id
+    public String name;
+
 }

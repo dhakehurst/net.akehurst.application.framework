@@ -19,13 +19,13 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiXYChart<X, Y> {
 
-	enum Type {
-		Line, Bar, Pie, Doughnut, Radar, PolarArea, Bubble, XY
-	}
+    enum Type {
+        Line, Bar, Pie, Doughnut, Radar, PolarArea, Bubble, XY
+    }
 
-	void create(UserSession session, Type chartType);
+    void create(UserSession session, Type chartType);
 
-	IGuiXYChartDataSeries<X, Y> getSeries(String id);
+    IGuiXYChartDataSeries<X, Y> getSeries(String id);
 
-	IGuiXYChartDataSeries<X, Y> addSeries(String id);
+    IGuiXYChartDataSeries<X, Y> addSeries(String id);
 }

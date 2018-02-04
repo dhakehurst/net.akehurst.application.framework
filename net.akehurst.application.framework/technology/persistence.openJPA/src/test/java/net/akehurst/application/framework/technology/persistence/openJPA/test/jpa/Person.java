@@ -22,25 +22,25 @@ import javax.persistence.Id;
 @Entity
 public class Person {
 
-	String name;
-	
-	@Id
-	public String getName() {
-		return this.name;
-	};
-	
-	public void setName(String value) {
-		this.name = value;
-	}
-	
-	String hairColour;
-	
-	@Basic
-	public String getHairColour() {
-		return this.hairColour;
-	}
-	
-	public void setHairColour(String value) {
-		this.hairColour = value;
-	}
+    String name;
+
+    @Id
+    public String getName() {
+        return this.name;
+    };
+
+    public void setName(String value) {
+        this.name = value;
+    }
+
+    String hairColour;
+
+    @Basic
+    public String getHairColour() {
+        return this.hairColour;
+    }
+
+    public void setHairColour(String value) {
+        this.hairColour = value;
+    }
 }

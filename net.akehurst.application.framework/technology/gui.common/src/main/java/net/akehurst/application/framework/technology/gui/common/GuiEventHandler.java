@@ -28,27 +28,27 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class GuiEventHandler extends AbstractIdentifiableObject {
 
-	public GuiEventHandler(final String afId) {
-		super(afId);
-		this.handlers = new HashMap<>();
-	}
+    public GuiEventHandler(final String afId) {
+        super(afId);
+        this.handlers = new HashMap<>();
+    }
 
-	@ServiceReference
-	ILogger logger;
+    @ServiceReference
+    ILogger logger;
 
-	Map<GuiEventSignature, OnEventHandler> handlers;
+    Map<GuiEventSignature, OnEventHandler> handlers;
 
-	public void register(final GuiEventSignature signature, final OnEventHandler handler) {
-		this.handlers.put(signature, handler);
-	}
+    public void register(final GuiEventSignature signature, final OnEventHandler handler) {
+        this.handlers.put(signature, handler);
+    }
 
-	public void handle(final GuiEvent event) {
-		final OnEventHandler handler = this.handlers.get(event.getSignature());
-		if (null == handler) {
-			this.logger.log(LogLevel.WARN, "Unhandled event, " + event.getSignature());
-		} else {
-			handler.execute(event);
-		}
-	}
+    public void handle(final GuiEvent event) {
+        final OnEventHandler handler = this.handlers.get(event.getSignature());
+        if (null == handler) {
+            this.logger.log(LogLevel.WARN, "Unhandled event, " + event.getSignature());
+        } else {
+            handler.execute(event);
+        }
+    }
 
 }

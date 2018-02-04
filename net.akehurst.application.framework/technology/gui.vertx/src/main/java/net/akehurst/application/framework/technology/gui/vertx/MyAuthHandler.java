@@ -22,53 +22,53 @@ import io.vertx.ext.web.handler.impl.AuthHandlerImpl;
 
 public class MyAuthHandler extends AuthHandlerImpl {
 
-	private final String loginRedirectURL;
-	private final String rootPath;
+    private final String loginRedirectURL;
+    private final String rootPath;
 
-	public MyAuthHandler(final MyAuthProvider authProvider, final String loginRedirectURL, final String rootPath) {
-		super(authProvider);
-		this.loginRedirectURL = loginRedirectURL;
-		this.rootPath = rootPath;
-	}
+    public MyAuthHandler(final MyAuthProvider authProvider, final String loginRedirectURL, final String rootPath) {
+        super(authProvider);
+        this.loginRedirectURL = loginRedirectURL;
+        this.rootPath = rootPath;
+    }
 
-	public MyAuthProvider getProvider() {
-		return (MyAuthProvider) super.authProvider;
-	}
+    public MyAuthProvider getProvider() {
+        return (MyAuthProvider) super.authProvider;
+    }
 
-	@Override
-	public void handle(final RoutingContext context) {
-		try {
-			User user = context.user();
-			if (user != null) {
-				// Already logged in, just authorise
-				this.authorise(user, context);
-			} else {
-				this.getProvider().authenticate(context);
-				user = context.user();
-				if (user == null) {
-					// Now redirect to the login url - we'll get redirected back here after successful login
-					this.decodeOriginalUrl(context.session(), context.request().absoluteURI());
-					context.response().putHeader("location", this.loginRedirectURL).setStatusCode(302).end();
-				} else {
-					this.authorise(user, context);
-				}
-			}
-		} catch (final Exception e) {
-			// TODO: this should really be logged !
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
+    @Override
+    public void handle(final RoutingContext context) {
+        try {
+            User user = context.user();
+            if (user != null) {
+                // Already logged in, just authorise
+                this.authorise(user, context);
+            } else {
+                this.getProvider().authenticate(context);
+                user = context.user();
+                if (user == null) {
+                    // Now redirect to the login url - we'll get redirected back here after successful login
+                    this.decodeOriginalUrl(context.session(), context.request().absoluteURI());
+                    context.response().putHeader("location", this.loginRedirectURL).setStatusCode(302).end();
+                } else {
+                    this.authorise(user, context);
+                }
+            }
+        } catch (final Exception e) {
+            // TODO: this should really be logged !
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	private void decodeOriginalUrl(final Session session, final String originalUrlStr) {
-		session.put("originalUrl", originalUrlStr);
-		// TODO: find a way to decode the url into a stage,scene pair ??
-		// String stageSceneStr = originalUrlStr.replace(this.rootPath, "");
-		// int sepIndex = stageSceneStr.indexOf('/');
-		// String stageIdStr =stageSceneStr.substring(stageSceneStr.inde);
-		// session.put("originalStageId", stageIdStr);
-		// session.put("originalSceneId", sceneIdStr);
-	}
+    private void decodeOriginalUrl(final Session session, final String originalUrlStr) {
+        session.put("originalUrl", originalUrlStr);
+        // TODO: find a way to decode the url into a stage,scene pair ??
+        // String stageSceneStr = originalUrlStr.replace(this.rootPath, "");
+        // int sepIndex = stageSceneStr.indexOf('/');
+        // String stageIdStr =stageSceneStr.substring(stageSceneStr.inde);
+        // session.put("originalStageId", stageIdStr);
+        // session.put("originalSceneId", sceneIdStr);
+    }
 
 }

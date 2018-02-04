@@ -29,63 +29,63 @@ import net.akehurst.application.framework.realisation.AbstractComponent;
 @Component
 public class AuthenticationDelegator extends AbstractComponent implements IUserAuthenticationRequest, ICAuthenticatorNotification {
 
-	public AuthenticationDelegator(final String afId) {
-		super(afId);
-	}
+    public AuthenticationDelegator(final String afId) {
+        super(afId);
+    }
 
-	// public ICAuthenticatorRequest authRequest;
-	// public IUserAuthenticationNotification userAuthNotification;
+    // public ICAuthenticatorRequest authRequest;
+    // public IUserAuthenticationNotification userAuthNotification;
 
-	// public void setAuthRequest(final ICAuthenticatorRequest value) {
-	// this.port() = value;
-	// }
-	//
-	// public void setUserAuthNotification(final IUserAuthenticationNotification value) {
-	// this.userAuthNotification = value;
-	// }
+    // public void setAuthRequest(final ICAuthenticatorRequest value) {
+    // this.port() = value;
+    // }
+    //
+    // public void setUserAuthNotification(final IUserAuthenticationNotification value) {
+    // this.userAuthNotification = value;
+    // }
 
-	// --- IUserAuthenticationRequest ---
-	@Override
-	public void requestLogin(final UserSession session, final String username, final String password) {
-		this.portProvider().out(ICAuthenticatorRequest.class).requestLogin(session, username, password);
-	}
+    // --- IUserAuthenticationRequest ---
+    @Override
+    public void requestLogin(final UserSession session, final String username, final String password) {
+        this.portProvider().out(ICAuthenticatorRequest.class).requestLogin(session, username, password);
+    }
 
-	@Override
-	public void requestLogout(final UserSession session) {
-		this.portProvider().out(ICAuthenticatorRequest.class).requestLogout(session);
-	}
+    @Override
+    public void requestLogout(final UserSession session) {
+        this.portProvider().out(ICAuthenticatorRequest.class).requestLogout(session);
+    }
 
-	// --- ICAuthenticatorNotification ---
-	@Override
-	public void notifyAuthenticationSuccess(final UserSession session) {
-		this.portUser().out(IUserAuthenticationNotification.class).notifyAuthenticationSuccess(session);
-	};
+    // --- ICAuthenticatorNotification ---
+    @Override
+    public void notifyAuthenticationSuccess(final UserSession session) {
+        this.portUser().out(IUserAuthenticationNotification.class).notifyAuthenticationSuccess(session);
+    };
 
-	@Override
-	public void notifyAuthenticationFailure(final UserSession session, final String message) {
-		this.portUser().out(IUserAuthenticationNotification.class).notifyAuthenticationFailure(session, message);
-	}
+    @Override
+    public void notifyAuthenticationFailure(final UserSession session, final String message) {
+        this.portUser().out(IUserAuthenticationNotification.class).notifyAuthenticationFailure(session, message);
+    }
 
-	@Override
-	public void notifyAuthenticationCleared(final UserSession session) {
-		this.portUser().out(IUserAuthenticationNotification.class).notifyAuthenticationCleared(session);
-	}
+    @Override
+    public void notifyAuthenticationCleared(final UserSession session) {
+        this.portUser().out(IUserAuthenticationNotification.class).notifyAuthenticationCleared(session);
+    }
 
-	// --- Ports ---
+    // --- Ports ---
 
-	@PortInstance
-	@PortContract(provides = IUserAuthenticationRequest.class, requires = IUserAuthenticationNotification.class)
-	IPort portUser;
+    @PortInstance
+    @PortContract(provides = IUserAuthenticationRequest.class, requires = IUserAuthenticationNotification.class)
+    IPort portUser;
 
-	public IPort portUser() {
-		return this.portUser;
-	}
+    public IPort portUser() {
+        return this.portUser;
+    }
 
-	@PortInstance
-	@PortContract(provides = ICAuthenticatorNotification.class, requires = ICAuthenticatorRequest.class)
-	IPort portProvider;
+    @PortInstance
+    @PortContract(provides = ICAuthenticatorNotification.class, requires = ICAuthenticatorRequest.class)
+    IPort portProvider;
 
-	public IPort portProvider() {
-		return this.portProvider;
-	}
+    public IPort portProvider() {
+        return this.portProvider;
+    }
 }

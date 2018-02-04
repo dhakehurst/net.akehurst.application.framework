@@ -17,6 +17,4 @@ package net.akehurst.application.framework.technology.interfaceGui.canvas2d;
 
 public interface ICanvas {
 
-
-	
 }

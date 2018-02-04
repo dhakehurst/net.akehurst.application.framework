@@ -17,6 +17,6 @@ package net.akehurst.application.framework.technology.interfaceGui.elements;
 
 public interface IGuiContainer {
 
-	public void addElement();
+    public void addElement();
 
 }

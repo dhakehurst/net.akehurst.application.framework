@@ -28,214 +28,214 @@ import net.akehurst.application.framework.technology.persistence.openJPA.test.jp
 import net.akehurst.application.framework.technology.persistence.openJPA.test.jpa.Person;
 
 public class test_JpaPersistence {
-	@Test
-	public void connect() {
-		try {
-			final IApplicationFramework os = new ApplicationFramework("os", "os");
-			final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
+    @Test
+    public void connect() {
+        try {
+            final IApplicationFramework os = new ApplicationFramework("os", "os");
+            final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
-			final Map<String, Object> props = new HashMap<>();
-			// props.put("javax.jdo.PersistenceManagerFactoryClass", "org.apache.openjpa.persistence.PersistenceProviderImpl ");
-			props.put("openjpa.ConnectionDriverName", "org.apache.derby.jdbc.EmbeddedDriver");
-			props.put("openjpa.ConnectionURL", "jdbc:derby:db/Test;create=true");
-			props.put("openjpa.jdbc.SynchronizeMappings", "buildSchema(ForeignKeys=true)");
-			// sut.portPersist().getProvided(IPersistentStore.class).connect(props);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-	}
+            final Map<String, Object> props = new HashMap<>();
+            // props.put("javax.jdo.PersistenceManagerFactoryClass", "org.apache.openjpa.persistence.PersistenceProviderImpl ");
+            props.put("openjpa.ConnectionDriverName", "org.apache.derby.jdbc.EmbeddedDriver");
+            props.put("openjpa.ConnectionURL", "jdbc:derby:db/Test;create=true");
+            props.put("openjpa.jdbc.SynchronizeMappings", "buildSchema(ForeignKeys=true)");
+            // sut.portPersist().getProvided(IPersistentStore.class).connect(props);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Test
-	public void store_Person() {
-		try {
-			final IApplicationFramework os = new ApplicationFramework("os", "os");
-			final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
+    @Test
+    public void store_Person() {
+        try {
+            final IApplicationFramework os = new ApplicationFramework("os", "os");
+            final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
-			final Map<String, Object> props = new HashMap<>();
-			props.put("persistenceUnitName", "openjpa");
-			// props.put("javax.jdo.PersistenceManagerFactoryClass", "org.apache.openjpa.persistence.PersistenceProviderImpl ");
-			// props.put("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.EmbeddedDriver");
-			// props.put("javax.persistence.jdbc.url", "jdbc:derby:db/Test;create=true");
-			// props.put("openjpa.jdbc.SynchronizeMappings","buildSchema(ForeignKeys=true)");
-			// props.put("openjpa.Log","DefaultLevel=TRACE,SQL=TRACE");
-			// props.put("javax.persistence.schema-generation.database.action","create");
-			// props.put("openjpa.DynamicEnhancementAgent", true);
-			// sut.portPersist().getProvided(IPersistentStore.class).connect(props);
+            final Map<String, Object> props = new HashMap<>();
+            props.put("persistenceUnitName", "openjpa");
+            // props.put("javax.jdo.PersistenceManagerFactoryClass", "org.apache.openjpa.persistence.PersistenceProviderImpl ");
+            // props.put("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.EmbeddedDriver");
+            // props.put("javax.persistence.jdbc.url", "jdbc:derby:db/Test;create=true");
+            // props.put("openjpa.jdbc.SynchronizeMappings","buildSchema(ForeignKeys=true)");
+            // props.put("openjpa.Log","DefaultLevel=TRACE,SQL=TRACE");
+            // props.put("javax.persistence.schema-generation.database.action","create");
+            // props.put("openjpa.DynamicEnhancementAgent", true);
+            // sut.portPersist().getProvided(IPersistentStore.class).connect(props);
 
-			final PersistentItemQuery location = new PersistentItemQuery("", "");
-			final Person item = new Person();
-			item.setName("Test");
+            final PersistentItemQuery location = new PersistentItemQuery("", "");
+            final Person item = new Person();
+            item.setName("Test");
 
-			// Class<?> c = Class.forName("net.akehurst.application.framework.technology.persistence.openJPA.test.Person");
-			// Object o = c.newInstance();
-			// c.getField("name").set(o, "Test");
-			// IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+            // Class<?> c = Class.forName("net.akehurst.application.framework.technology.persistence.openJPA.test.Person");
+            // Object o = c.newInstance();
+            // c.getField("name").set(o, "Test");
+            // IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
 
-			// sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
-		} catch (final Throwable e) {
-			e.printStackTrace();
-		}
+            // sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
+        } catch (final Throwable e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	@Test
-	public void store_Contacts() {
-		try {
-			final IApplicationFramework os = new ApplicationFramework("os", "os");
-			final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
+    @Test
+    public void store_Contacts() {
+        try {
+            final IApplicationFramework os = new ApplicationFramework("os", "os");
+            final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
-			final Map<String, Object> props = new HashMap<>();
-			// sut.portPersist().getProvided(IPersistentStore.class).connect(props);
+            final Map<String, Object> props = new HashMap<>();
+            // sut.portPersist().getProvided(IPersistentStore.class).connect(props);
 
-			final PersistentItemQuery location = new PersistentItemQuery("", "");
+            final PersistentItemQuery location = new PersistentItemQuery("", "");
 
-			final Person p = new Person();
-			p.setName("Owner");
+            final Person p = new Person();
+            p.setName("Owner");
 
-			final Person p1 = new Person();
-			p1.setName("Test2");
+            final Person p1 = new Person();
+            p1.setName("Test2");
 
-			final Contacts contacts = new Contacts();
-			contacts.id = "myContacts";
-			contacts.owner = p;
-			contacts.people.add(p1);
-			// IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+            final Contacts contacts = new Contacts();
+            contacts.id = "myContacts";
+            contacts.owner = p;
+            contacts.people.add(p1);
+            // IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
 
-			// sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+            // sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	@Test
-	public void retrieve_Person() {
-		try {
-			final IApplicationFramework os = new ApplicationFramework("os", "os");
-			final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
+    @Test
+    public void retrieve_Person() {
+        try {
+            final IApplicationFramework os = new ApplicationFramework("os", "os");
+            final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
-			final Map<String, Object> props = new HashMap<>();
-			props.put("persistenceUnitName", "openjpa");
-			// sut.portPersist().getProvided(IPersistentStore.class).connect(props);
+            final Map<String, Object> props = new HashMap<>();
+            props.put("persistenceUnitName", "openjpa");
+            // sut.portPersist().getProvided(IPersistentStore.class).connect(props);
 
-			final PersistentItemQuery location = new PersistentItemQuery("", "Test");
-			final Person item = new Person();
-			item.setName("Test");
-			// IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+            final PersistentItemQuery location = new PersistentItemQuery("", "Test");
+            final Person item = new Person();
+            item.setName("Test");
+            // IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
 
-			// sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
+            // sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
 
-			// Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Person.class);
-			// sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction);
+            // Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Person.class);
+            // sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction);
 
-			// Person p = (Person)o;
-			// Assert.assertNotNull(p);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+            // Person p = (Person)o;
+            // Assert.assertNotNull(p);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	@Test
-	public void modify_Person() {
-		try {
-			final IApplicationFramework os = new ApplicationFramework("os", "os");
-			final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
+    @Test
+    public void modify_Person() {
+        try {
+            final IApplicationFramework os = new ApplicationFramework("os", "os");
+            final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
-			final Map<String, Object> props = new HashMap<>();
-			props.put("persistenceUnitName", "openjpa");
-			// sut.portPersist().getProvided(IPersistentStore.class).connect(props);
+            final Map<String, Object> props = new HashMap<>();
+            props.put("persistenceUnitName", "openjpa");
+            // sut.portPersist().getProvided(IPersistentStore.class).connect(props);
 
-			final PersistentItemQuery location = new PersistentItemQuery("", "Test");
-			final Person item = new Person();
-			item.setName("Test");
-			item.setHairColour("black");
-			// IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+            final PersistentItemQuery location = new PersistentItemQuery("", "Test");
+            final Person item = new Person();
+            item.setName("Test");
+            item.setHairColour("black");
+            // IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
 
-			// sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
+            // sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item, Person.class);
 
-			// Person p = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Person.class);
-			// Assert.assertNotNull(p);
-			// p.setHairColour("brown");
-			// sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction);
+            // Person p = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Person.class);
+            // Assert.assertNotNull(p);
+            // p.setHairColour("brown");
+            // sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction);
 
-			// IPersistenceTransaction transaction2 = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
-			//
-			// Person p2 = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction2,location, Person.class);
-			// Assert.assertNotNull(p2);
-			// Assert.assertTrue(p2.getHairColour().equals("brown"));
-			// sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction2);
+            // IPersistenceTransaction transaction2 = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+            //
+            // Person p2 = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction2,location, Person.class);
+            // Assert.assertNotNull(p2);
+            // Assert.assertTrue(p2.getHairColour().equals("brown"));
+            // sut.portPersist().getProvided(IPersistentStore.class).commitTransaction(transaction2);
 
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	@Test
-	public void retrieveAll_Person() {
-		try {
-			final IApplicationFramework os = new ApplicationFramework("os", "os");
-			final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
+    @Test
+    public void retrieveAll_Person() {
+        try {
+            final IApplicationFramework os = new ApplicationFramework("os", "os");
+            final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
-			final Map<String, Object> props = new HashMap<>();
-			// sut.portPersist().getProvided(IPersistentStore.class).connect(props);
-			//
-			// PersistentItemLocation location = new PersistentItemLocation("Test");
-			// Person item1 = new Person();
-			// item1.setName("Test1");
-			// Person item2 = new Person();
-			// item2.setName("Test2");
-			// IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
-			//
-			// sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item1, Person.class);
-			// sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item2, Person.class);
-			//
-			// Set<Person> set = sut.portPersist().getProvided(IPersistentStore.class).retrieveAll(transaction,Person.class);
-			//
-			// Assert.assertTrue(set.size() > 0);
-			// for(Person p: set) {
-			// System.out.println(p.getName());
-			// }
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+            final Map<String, Object> props = new HashMap<>();
+            // sut.portPersist().getProvided(IPersistentStore.class).connect(props);
+            //
+            // PersistentItemLocation location = new PersistentItemLocation("Test");
+            // Person item1 = new Person();
+            // item1.setName("Test1");
+            // Person item2 = new Person();
+            // item2.setName("Test2");
+            // IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+            //
+            // sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item1, Person.class);
+            // sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, item2, Person.class);
+            //
+            // Set<Person> set = sut.portPersist().getProvided(IPersistentStore.class).retrieveAll(transaction,Person.class);
+            //
+            // Assert.assertTrue(set.size() > 0);
+            // for(Person p: set) {
+            // System.out.println(p.getName());
+            // }
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	@Test
-	public void retrieve_Contacts() {
-		try {
-			final IApplicationFramework os = new ApplicationFramework("os", "os");
-			final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
+    @Test
+    public void retrieve_Contacts() {
+        try {
+            final IApplicationFramework os = new ApplicationFramework("os", "os");
+            final JpaPersistence sut = os.createComponent(JpaPersistence.class, "test");
 
-			final Map<String, Object> props = new HashMap<>();
-			// sut.portPersist().getProvided(IPersistentStore.class).connect(props);
-			//
-			// PersistentItemLocation location = new PersistentItemLocation("myContacts");
-			//
-			// Person p = new Person();
-			// p.setName("Owner");
-			//
-			// Person p1 = new Person();
-			// p1.setName("Test2");
-			//
-			// Contacts contacts = new Contacts();
-			// contacts.id = "myContacts";
-			// contacts.owner = p;
-			// contacts.people.add(p1);
-			// IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
-			//
-			// sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
-			//
-			//
-			// Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Contacts.class);
-			//
-			// Contacts c = (Contacts)o;
-			// Assert.assertNotNull(c);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+            final Map<String, Object> props = new HashMap<>();
+            // sut.portPersist().getProvided(IPersistentStore.class).connect(props);
+            //
+            // PersistentItemLocation location = new PersistentItemLocation("myContacts");
+            //
+            // Person p = new Person();
+            // p.setName("Owner");
+            //
+            // Person p1 = new Person();
+            // p1.setName("Test2");
+            //
+            // Contacts contacts = new Contacts();
+            // contacts.id = "myContacts";
+            // contacts.owner = p;
+            // contacts.people.add(p1);
+            // IPersistenceTransaction transaction = sut.portPersist().getProvided(IPersistentStore.class).startTransaction();
+            //
+            // sut.portPersist().getProvided(IPersistentStore.class).store(transaction,location, contacts, Contacts.class);
+            //
+            //
+            // Object o = sut.portPersist().getProvided(IPersistentStore.class).retrieve(transaction,location, Contacts.class);
+            //
+            // Contacts c = (Contacts)o;
+            // Assert.assertNotNull(c);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 }

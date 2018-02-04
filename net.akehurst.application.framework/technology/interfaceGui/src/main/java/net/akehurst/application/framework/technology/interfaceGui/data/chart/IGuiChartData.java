@@ -19,12 +19,12 @@ import java.util.List;
 
 public interface IGuiChartData<X, Y> {
 
-	List<X> getXs();
+    List<X> getXs();
 
-	List<IGuiChartDataSeries<Y>> getSeries();
+    List<IGuiChartDataSeries<Y>> getSeries();
 
-	IGuiChartDataSeries<Y> getSeries(String name);
+    IGuiChartDataSeries<Y> getSeries(String name);
 
-	IGuiChartDataSeries<Y> addSeries(String name);
+    IGuiChartDataSeries<Y> addSeries(String name);
 
 }

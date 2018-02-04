@@ -17,6 +17,6 @@ package net.akehurst.application.framework.technology.interfaceGui.data.tree;
 
 public interface IGuiTreeChild<T> {
 
-	IGuiTreeParent<T> getParent();
+    IGuiTreeParent<T> getParent();
 
 }

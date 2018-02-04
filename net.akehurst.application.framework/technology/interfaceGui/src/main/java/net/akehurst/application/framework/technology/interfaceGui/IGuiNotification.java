@@ -22,11 +22,11 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiNotification {
 
-	void notifyReady();
+    void notifyReady();
 
-	void notifyEventOccured(GuiEvent event);
+    void notifyEventOccured(GuiEvent event);
 
-	void notifyDowloadRequest(UserSession session, Map<String, List<String>> params, IGuiCallback callback);
+    void notifyDowloadRequest(UserSession session, Map<String, List<String>> params, IGuiCallback callback);
 
-	void notifyUpload(UserSession session, String filename);
+    void notifyUpload(UserSession session, String filename);
 }

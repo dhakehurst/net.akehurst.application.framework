@@ -4,9 +4,9 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiElement;
 
 public interface IGuiDiagram extends IGuiElement {
-	void create(UserSession session, IGuiDiagramData initialContent);
+    void create(UserSession session, IGuiDiagramData initialContent);
 
-	void update(UserSession session, IGuiDiagramData newContent);
+    void update(UserSession session, IGuiDiagramData newContent);
 
-	void remove(UserSession session);
+    void remove(UserSession session);
 }

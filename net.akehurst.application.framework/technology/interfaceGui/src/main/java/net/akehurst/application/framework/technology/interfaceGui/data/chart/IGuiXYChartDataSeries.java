@@ -19,10 +19,10 @@ import java.util.List;
 
 public interface IGuiXYChartDataSeries<X, Y> {
 
-	String getName();
+    String getName();
 
-	void setName(String value);
+    void setName(String value);
 
-	List<IGuiXYChartDataItem<X, Y>> getData();
+    List<IGuiXYChartDataItem<X, Y>> getData();
 
 }

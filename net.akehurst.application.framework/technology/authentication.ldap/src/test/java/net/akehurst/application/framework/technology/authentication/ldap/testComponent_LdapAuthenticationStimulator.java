@@ -10,24 +10,24 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 
 public class testComponent_LdapAuthenticationStimulator extends AbstractComponent {
 
-	public testComponent_LdapAuthenticationStimulator(final String afId) {
-		super(afId);
-	}
+    public testComponent_LdapAuthenticationStimulator(final String afId) {
+        super(afId);
+    }
 
-	@MockPassiveObjectInstance
-	testHandler handler;
+    @MockPassiveObjectInstance
+    testHandler handler;
 
-	@Override
-	public void afConnectParts() {
-		this.portAuth().connectInternal(this.handler);
-	}
+    @Override
+    public void afConnectParts() {
+        this.portAuth().connectInternal(this.handler);
+    }
 
-	@PortInstance
-	@PortContract(provides = IAuthenticatorNotification.class, requires = IAuthenticatorRequest.class)
-	private IPort portAuth;
+    @PortInstance
+    @PortContract(provides = IAuthenticatorNotification.class, requires = IAuthenticatorRequest.class)
+    private IPort portAuth;
 
-	public IPort portAuth() {
-		return this.portAuth;
-	}
+    public IPort portAuth() {
+        return this.portAuth;
+    }
 
 }

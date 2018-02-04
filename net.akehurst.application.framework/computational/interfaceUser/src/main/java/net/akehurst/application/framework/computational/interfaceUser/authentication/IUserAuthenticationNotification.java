@@ -18,10 +18,10 @@ package net.akehurst.application.framework.computational.interfaceUser.authentic
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IUserAuthenticationNotification {
-	void notifyAuthenticationSuccess(UserSession session);
+    void notifyAuthenticationSuccess(UserSession session);
 
-	void notifyAuthenticationFailure(UserSession session, String message);
+    void notifyAuthenticationFailure(UserSession session, String message);
 
-	void notifyAuthenticationCleared(UserSession session);
+    void notifyAuthenticationCleared(UserSession session);
 
 }

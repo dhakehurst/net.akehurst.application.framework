@@ -17,6 +17,6 @@ package net.akehurst.application.framework.common;
 
 public interface IServiceAwareObject {
 
-	<T> T fetchService(String name);
-	
+    <T> T fetchService(String name);
+
 }

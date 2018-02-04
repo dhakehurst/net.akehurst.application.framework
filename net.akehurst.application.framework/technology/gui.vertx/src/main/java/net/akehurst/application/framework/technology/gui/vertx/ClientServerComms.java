@@ -42,139 +42,139 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public class ClientServerComms {
 
-	public ClientServerComms(final Vertx vertx, final Router router, final MyAuthProvider authProvider, final String rootPath, final String busPath) {
-		this.vertx = vertx;
-		this.router = router;
-		this.rootPath = rootPath;
-		this.authProvider = authProvider;
-		// for session comms
-		this.socks = new HashMap<>();
-		this.activeSessions = new HashMap<>();
+    public ClientServerComms(final Vertx vertx, final Router router, final MyAuthProvider authProvider, final String rootPath, final String busPath) {
+        this.vertx = vertx;
+        this.router = router;
+        this.rootPath = rootPath;
+        this.authProvider = authProvider;
+        // for session comms
+        this.socks = new HashMap<>();
+        this.activeSessions = new HashMap<>();
 
-		// for publication to all
-		this.busPath = busPath;
-		this.eventbus = vertx.eventBus();
-		this.outbound = new ArrayList<>();
-		this.inbound = new ArrayList<>();
-	}
+        // for publication to all
+        this.busPath = busPath;
+        this.eventbus = vertx.eventBus();
+        this.outbound = new ArrayList<>();
+        this.inbound = new ArrayList<>();
+    }
 
-	Vertx vertx;
-	Router router;
-	String rootPath;
-	MyAuthProvider authProvider;
+    Vertx vertx;
+    Router router;
+    String rootPath;
+    MyAuthProvider authProvider;
 
-	String busPath;
-	EventBus eventbus;
+    String busPath;
+    EventBus eventbus;
 
-	Map<String, Session> activeSessions;
-	Map<String, SockJSSocket> socks;
-	List<String> outbound;
-	List<String> inbound;
+    Map<String, Session> activeSessions;
+    Map<String, SockJSSocket> socks;
+    List<String> outbound;
+    List<String> inbound;
 
-	UserSession createUserSession(final Session webSession, final User webUser) {
-		this.activeSessions.put(webSession.id(), webSession);
-		UserDetails user = null;
-		if (null != webUser) {
-			final String n = webUser.principal().getString("username");
-			user = new UserDetails(n);
-		} else {
-			// not authenticated, leave user as null
-		}
-		final UserSession us = new UserSession(webSession.id(), user, webSession.data());
-		return us;
-	}
+    UserSession createUserSession(final Session webSession, final User webUser) {
+        this.activeSessions.put(webSession.id(), webSession);
+        UserDetails user = null;
+        if (null != webUser) {
+            final String n = webUser.principal().getString("username");
+            user = new UserDetails(n);
+        } else {
+            // not authenticated, leave user as null
+        }
+        final UserSession us = new UserSession(webSession.id(), user, webSession.data());
+        return us;
+    }
 
-	Session getSession(final String sessionId) {
-		final Session session = this.activeSessions.get(sessionId);
-		if (null == session) {
-			return null;
-		} else {
-			if (session.isDestroyed()) {
-				session.remove(sessionId);
-				return null;
-			} else {
-				return session;
-			}
-		}
-	}
+    Session getSession(final String sessionId) {
+        final Session session = this.activeSessions.get(sessionId);
+        if (null == session) {
+            return null;
+        } else {
+            if (session.isDestroyed()) {
+                session.remove(sessionId);
+                return null;
+            } else {
+                return session;
+            }
+        }
+    }
 
-	@FunctionalInterface
-	public interface F3<T1, T2, T3> {
-		void apply(T1 o1, T2 o2, T3 o3);
-	}
+    @FunctionalInterface
+    public interface F3<T1, T2, T3> {
+        void apply(T1 o1, T2 o2, T3 o3);
+    }
 
-	public void addSocksChannel(final boolean authenticated, final String authenticationRedirect, final String stagePath, final String sockjsPath,
-			final F3<UserSession, String, JsonObject> handler) {
-		final String socksRoutePath = stagePath + sockjsPath + "*";
+    public void addSocksChannel(final boolean authenticated, final String authenticationRedirect, final String stagePath, final String sockjsPath,
+            final F3<UserSession, String, JsonObject> handler) {
+        final String socksRoutePath = stagePath + sockjsPath + "*";
 
-		this.router.route(socksRoutePath).handler(CookieHandler.create());
-		this.router.route(socksRoutePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
-		this.router.route(socksRoutePath)
-				.handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-		this.router.route(socksRoutePath).handler(UserSessionHandler.create(this.authProvider));
-		if (authenticated) {
-			final String loginRedirectURL = this.rootPath.isEmpty() ? authenticationRedirect : this.rootPath + authenticationRedirect;
-			this.router.route(socksRoutePath).handler(new MyAuthHandler(this.authProvider, loginRedirectURL, this.rootPath));
-		}
+        this.router.route(socksRoutePath).handler(CookieHandler.create());
+        this.router.route(socksRoutePath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
+        this.router.route(socksRoutePath)
+                .handler(SessionHandler.create(LocalSessionStore.create(this.vertx)).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
+        this.router.route(socksRoutePath).handler(UserSessionHandler.create(this.authProvider));
+        if (authenticated) {
+            final String loginRedirectURL = this.rootPath.isEmpty() ? authenticationRedirect : this.rootPath + authenticationRedirect;
+            this.router.route(socksRoutePath).handler(new MyAuthHandler(this.authProvider, loginRedirectURL, this.rootPath));
+        }
 
-		final SockJSHandler sockJSHandler = SockJSHandler.create(this.vertx);
-		this.router.route(socksRoutePath).handler(sockJSHandler);
-		sockJSHandler.socketHandler(ss -> {
-			this.socks.put(ss.webSession().id(), ss);
-			final UserSession sess = this.createUserSession(ss.webSession(), ss.webUser());
-			ss.handler(b -> {
-				final String s = new String(b.getBytes());
-				final JsonObject json = new JsonObject(s);
-				final String channelId = json.getString("channelId");
-				final JsonObject data = json.getJsonObject("data");
-				final UserSession us = sess;
-				handler.apply(us, channelId, data);
-			});
-		});
-	}
+        final SockJSHandler sockJSHandler = SockJSHandler.create(this.vertx);
+        this.router.route(socksRoutePath).handler(sockJSHandler);
+        sockJSHandler.socketHandler(ss -> {
+            this.socks.put(ss.webSession().id(), ss);
+            final UserSession sess = this.createUserSession(ss.webSession(), ss.webUser());
+            ss.handler(b -> {
+                final String s = new String(b.getBytes());
+                final JsonObject json = new JsonObject(s);
+                final String channelId = json.getString("channelId");
+                final JsonObject data = json.getJsonObject("data");
+                final UserSession us = sess;
+                handler.apply(us, channelId, data);
+            });
+        });
+    }
 
-	public void send(final UserSession session, final String channelId, final JsonObject data) {
-		final JsonObject msg = new JsonObject();
-		msg.put("channelId", channelId);
-		msg.put("data", data);
-		final Session sess = this.getSession(session.getId());
-		final SockJSSocket ss = this.socks.get(sess.id());
-		ss.write(Buffer.factory.buffer(msg.encode()));
-	}
+    public void send(final UserSession session, final String channelId, final JsonObject data) {
+        final JsonObject msg = new JsonObject();
+        msg.put("channelId", channelId);
+        msg.put("data", data);
+        final Session sess = this.getSession(session.getId());
+        final SockJSSocket ss = this.socks.get(sess.id());
+        ss.write(Buffer.factory.buffer(msg.encode()));
+    }
 
-	void addOutboundAddress(final String address) {
-		this.outbound.add(address);
-		this.refreshEventBus();
-	}
+    void addOutboundAddress(final String address) {
+        this.outbound.add(address);
+        this.refreshEventBus();
+    }
 
-	void addInboundAddress(final String address) {
-		this.inbound.add(address);
-		this.refreshEventBus();
-	}
+    void addInboundAddress(final String address) {
+        this.inbound.add(address);
+        this.refreshEventBus();
+    }
 
-	void refreshEventBus() {
-		if (null == this.router) {
+    void refreshEventBus() {
+        if (null == this.router) {
 
-		} else {
-			final BridgeOptions options = new BridgeOptions();
-			for (final String a : this.outbound) {
-				options.addOutboundPermitted(new PermittedOptions().setAddress(a));
-			}
-			for (final String a : this.inbound) {
-				options.addInboundPermitted(new PermittedOptions().setAddress(a));
-			}
-			this.router.clear();
-			this.router.route(this.busPath + "/*").handler(SockJSHandler.create(this.vertx).bridge(options));
-		}
-	}
+        } else {
+            final BridgeOptions options = new BridgeOptions();
+            for (final String a : this.outbound) {
+                options.addOutboundPermitted(new PermittedOptions().setAddress(a));
+            }
+            for (final String a : this.inbound) {
+                options.addInboundPermitted(new PermittedOptions().setAddress(a));
+            }
+            this.router.clear();
+            this.router.route(this.busPath + "/*").handler(SockJSHandler.create(this.vertx).bridge(options));
+        }
+    }
 
-	void send(final String user, final String address, final JsonObject data) {
-		final DeliveryOptions options = new DeliveryOptions();
-		options.addHeader("user", user);
-		this.eventbus.publish(address, data, options);
-	}
+    void send(final String user, final String address, final JsonObject data) {
+        final DeliveryOptions options = new DeliveryOptions();
+        options.addHeader("user", user);
+        this.eventbus.publish(address, data, options);
+    }
 
-	void publish(final String address, final JsonObject data) {
-		this.eventbus.publish(address, data);
-	}
+    void publish(final String address, final JsonObject data) {
+        this.eventbus.publish(address, data);
+    }
 }

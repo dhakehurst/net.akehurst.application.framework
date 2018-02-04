@@ -28,31 +28,31 @@ import net.akehurst.application.framework.technology.interfaceGui.console.IConso
 @Component
 public class StandardStreams extends AbstractComponent implements IConsoleRequest {
 
-	public StandardStreams(final String id) {
-		super(id);
-	}
+    public StandardStreams(final String id) {
+        super(id);
+    }
 
-	@Override
-	public void afRun() {
-		final UserSession session = new UserSession(null, new UserDetails(System.getProperty("user.name")), null);
-		this.portOutput().out(IConsoleNotification.class).notifyReady(session);
-	}
+    @Override
+    public void afRun() {
+        final UserSession session = new UserSession(null, new UserDetails(System.getProperty("user.name")), null);
+        this.portOutput().out(IConsoleNotification.class).notifyReady(session);
+    }
 
-	@Override
-	public void requestOutput(final String str) {
-		System.out.println(str);
-	}
+    @Override
+    public void requestOutput(final String str) {
+        System.out.println(str);
+    }
 
-	@Override
-	public void requestError(final String str) {
-		System.err.println(str);
-	}
+    @Override
+    public void requestError(final String str) {
+        System.err.println(str);
+    }
 
-	@PortInstance
-	@PortContract(provides = IConsoleRequest.class, requires = IConsoleNotification.class)
-	IPort portOutput;
+    @PortInstance
+    @PortContract(provides = IConsoleRequest.class, requires = IConsoleNotification.class)
+    IPort portOutput;
 
-	public IPort portOutput() {
-		return this.portOutput;
-	}
+    public IPort portOutput() {
+        return this.portOutput;
+    }
 }

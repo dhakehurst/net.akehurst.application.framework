@@ -30,302 +30,330 @@ import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IPort;
+import net.akehurst.application.framework.common.annotations.declaration.ExternalConnection;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class Port implements IPort {
 
-	public Port(final String id, final IComponent owner) {
-		this.id = id;
-		this.owner = owner;
+    public Port(final String id, final IComponent owner) {
+        this.id = id;
+        this.owner = owner;
 
-		this.owner.afAddPort(this);
-		this.provided = new HashMap<>();
-		this.required = new HashMap<>();
-	}
+        this.owner.afAddPort(this);
+        this.provided = new HashMap<>();
+        this.required = new HashMap<>();
+    }
 
-	String id;
-	IComponent owner;
+    String id;
+    IComponent owner;
 
-	@ServiceReference
-	ILogger logger;
+    @ServiceReference
+    ILogger logger;
 
-	@Override
-	public String afId() {
-		return this.id;
-	}
+    @Override
+    public String afId() {
+        return this.id;
+    }
 
-	Map<Class<?>, Set<Object>> provided;
+    Map<Class<?>, Set<Object>> provided;
 
-	public <T> void provideProvided(final Class<T> interfaceType, final T provider) {
-		Set<Object> set = this.provided.get(interfaceType);
-		if (null == set) {
-			set = new HashSet<>();
-			this.provided.put(interfaceType, set);
-		}
-		if (null != provider) {
-			set.add(provider);
-		}
-	}
+    private Set<Field> getAllExternalConnection(final Class<?> cls) {
+        final Set<Field> set = new HashSet<>();
+        Class<?> c = cls;
+        while (c != null) {
+            for (final Field field : c.getDeclaredFields()) {
+                if (field.isAnnotationPresent(ExternalConnection.class)) {
+                    set.add(field);
+                }
+            }
+            c = c.getSuperclass();
+        }
+        return set;
+    }
 
-	@Override
-	public <T> Set<T> getProvided(final Class<T> interfaceType) {
-		final Set<T> res = (Set<T>) this.provided.get(interfaceType);
-		if (null == res) {
-			return new HashSet<>();
-		} else {
-			return res;
-		}
-	}
+    public <T> void provideProvided(final Class<T> interfaceType, final T provider) {
+        Set<Object> set = this.provided.get(interfaceType);
+        if (null == set) {
+            set = new HashSet<>();
+            this.provided.put(interfaceType, set);
+        }
+        if (null != provider) {
+            set.add(provider);
+        }
+    }
 
-	public Set<Class<?>> getProvided() {
-		return this.provided.keySet();
-	}
+    @Override
+    public <T> Set<T> getProvided(final Class<T> interfaceType) {
+        final Set<T> res = (Set<T>) this.provided.get(interfaceType);
+        if (null == res) {
+            return new HashSet<>();
+        } else {
+            return res;
+        }
+    }
 
-	Map<Class<?>, Set<Object>> required;
+    public Set<Class<?>> getProvided() {
+        return this.provided.keySet();
+    }
 
-	public <T> Port requires(final Class<T> interfaceType) {
-		this.required.put(interfaceType, null);
-		return this;
-	}
+    Map<Class<?>, Set<Object>> required;
 
-	@Override
-	public Set<Class<?>> getRequired() {
-		return this.required.keySet();
-	}
+    public <T> Port requires(final Class<T> interfaceType) {
+        this.required.put(interfaceType, null);
+        return this;
+    }
 
-	@Override
-	public <T> void provideRequired(final Class<T> interfaceType, final T provider) {
-		Set<Object> set = this.required.get(interfaceType);
-		if (null == set) {
-			set = new HashSet<>();
-			this.required.put(interfaceType, set);
-		}
-		set.add(provider);
-	}
+    @Override
+    public Set<Class<?>> getRequired() {
+        return this.required.keySet();
+    }
 
-	static class PortIn<T> implements InvocationHandler {
+    @Override
+    public <T> void provideRequired(final Class<T> interfaceType, final T provider) {
+        Set<Object> set = this.required.get(interfaceType);
+        if (null == set) {
+            set = new HashSet<>();
+            this.required.put(interfaceType, set);
+        }
+        set.add(provider);
+    }
 
-		public PortIn(final Port port, final Class<T> interfaceType) {
-			this.port = port;
-			this.interfaceType = interfaceType;
-		}
+    static class PortIn<T> implements InvocationHandler {
 
-		Port port;
-		Class<T> interfaceType;
+        public PortIn(final Port port, final Class<T> interfaceType) {
+            this.port = port;
+            this.interfaceType = interfaceType;
+        }
 
-		@Override
-		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-			if (Arrays.asList(Object.class.getMethods()).contains(method)) {
-				return method.invoke(this, args);
-			} else {
-				return this.invokeProxy(proxy, method, args);
-			}
+        Port port;
+        Class<T> interfaceType;
 
-		}
+        @Override
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+            if (Arrays.asList(Object.class.getMethods()).contains(method)) {
+                return method.invoke(this, args);
+            } else {
+                return this.invokeProxy(proxy, method, args);
+            }
 
-		private Object invokeProxy(final Object proxy, final Method method, final Object[] args) throws Throwable {
-			try {
-				this.port.logger.log(LogLevel.TRACE, method.getName());
-				Object result = null;
-				// get these here to delay resolving the object until moment of call
-				final Set<T> set = this.port.getProvided(this.interfaceType);
-				if (null == set) {
-					throw new ApplicationFrameworkException("Port " + this.port.afId() + " does not provide interface " + this.interfaceType, null);
-				}
-				for (final Object provider : set) {
-					if (null == provider) {
-						throw new ApplicationFrameworkException("Port " + this.port.afId() + " does not provide interface " + this.interfaceType, null);
-					} else {
-						result = method.invoke(provider, args);
-					}
-				}
-				return result;
-			} catch (final InvocationTargetException ex) {
-				throw ex.getCause();
-			}
-		}
+        }
 
-		@Override
-		public int hashCode() {
-			return this.toString().hashCode();
-		}
+        private Object invokeProxy(final Object proxy, final Method method, final Object[] args) throws Throwable {
+            try {
+                this.port.logger.log(LogLevel.TRACE, method.getName());
+                Object result = null;
+                // get these here to delay resolving the object until moment of call
+                final Set<T> set = this.port.getProvided(this.interfaceType);
+                if (null == set) {
+                    throw new ApplicationFrameworkException("Port " + this.port.afId() + " does not provide interface " + this.interfaceType, null);
+                }
+                for (final Object provider : set) {
+                    if (null == provider) {
+                        throw new ApplicationFrameworkException("Port " + this.port.afId() + " does not provide interface " + this.interfaceType, null);
+                    } else {
+                        result = method.invoke(provider, args);
+                    }
+                }
+                return result;
+            } catch (final InvocationTargetException ex) {
+                throw ex.getCause();
+            }
+        }
 
-		@Override
-		public boolean equals(final Object other) {
-			return this == other;
-		}
+        @Override
+        public int hashCode() {
+            return this.toString().hashCode();
+        }
 
-		@Override
-		public String toString() {
-			return this.port.toString() + ".in(" + this.interfaceType.getName() + ")";
-		}
-	}
+        @Override
+        public boolean equals(final Object other) {
+            return this == other;
+        }
 
-	@Override
-	public <T> T in(final Class<T> interfaceType) {
+        @Override
+        public String toString() {
+            return this.port.toString() + ".in(" + this.interfaceType.getName() + ")";
+        }
+    }
 
-		final InvocationHandler h = new PortIn<>(this, interfaceType);
+    @Override
+    public <T> T in(final Class<T> interfaceType) {
 
-		final Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { interfaceType }, h);
-		return (T) proxy;
-	}
+        final InvocationHandler h = new PortIn<>(this, interfaceType);
 
-	static class PortOut<T> implements InvocationHandler {
+        final Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { interfaceType }, h);
+        return (T) proxy;
+    }
 
-		public PortOut(final Port port, final Class<T> interfaceType) {
-			this.port = port;
-			this.interfaceType = interfaceType;
-		}
+    static class PortOut<T> implements InvocationHandler {
 
-		Port port;
-		Class<T> interfaceType;
+        public PortOut(final Port port, final Class<T> interfaceType) {
+            this.port = port;
+            this.interfaceType = interfaceType;
+        }
 
-		@Override
-		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-			if (Arrays.asList(Object.class.getMethods()).contains(method)) {
-				return method.invoke(this, args);
-			} else {
-				return this.invokeProxy(proxy, method, args);
-			}
+        Port port;
+        Class<T> interfaceType;
 
-		}
+        @Override
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+            if (Arrays.asList(Object.class.getMethods()).contains(method)) {
+                return method.invoke(this, args);
+            } else {
+                return this.invokeProxy(proxy, method, args);
+            }
 
-		private Object invokeProxy(final Object proxy, final Method method, final Object[] args) throws Throwable {
-			try {
-				this.port.logger.log(LogLevel.TRACE, method.getName());
-				Object result = null;
-				// get these here to delay resolving the object until moment of call
-				final Set<Object> set = this.port.required.get(this.interfaceType);
-				if (null == set) {
-					throw new ApplicationFrameworkException(
-							"Port " + this.port.afId() + " requires interface " + this.interfaceType + " and it has not been provided", null);
-				}
-				for (final Object provider : set) {
-					if (null == provider) {
-						throw new ApplicationFrameworkException(
-								"Port " + this.port.afId() + " requires interface " + this.interfaceType + " and it has not been provided", null);
-					} else {
-						result = method.invoke(provider, args);
-					}
-				}
-				return result;
-			} catch (final InvocationTargetException ex) {
-				throw ex.getCause();
-			}
-		}
+        }
 
-		@Override
-		public int hashCode() {
-			return this.toString().hashCode();
-		}
+        private Object invokeProxy(final Object proxy, final Method method, final Object[] args) throws Throwable {
+            try {
+                this.port.logger.log(LogLevel.TRACE, method.getName());
+                Object result = null;
+                // get these here to delay resolving the object until moment of call
+                final Set<Object> set = this.port.required.get(this.interfaceType);
+                if (null == set) {
+                    throw new ApplicationFrameworkException(
+                            "Port " + this.port.afId() + " requires interface " + this.interfaceType + " and it has not been provided", null);
+                }
+                for (final Object provider : set) {
+                    if (null == provider) {
+                        throw new ApplicationFrameworkException(
+                                "Port " + this.port.afId() + " requires interface " + this.interfaceType + " and it has not been provided", null);
+                    } else {
+                        result = method.invoke(provider, args);
+                    }
+                }
+                return result;
+            } catch (final InvocationTargetException ex) {
+                throw ex.getCause();
+            }
+        }
 
-		@Override
-		public boolean equals(final Object other) {
-			return this == other;
-		}
+        @Override
+        public int hashCode() {
+            return this.toString().hashCode();
+        }
 
-		@Override
-		public String toString() {
-			return this.port.toString() + ".out(" + this.interfaceType.getName() + ")";
-		}
-	}
+        @Override
+        public boolean equals(final Object other) {
+            return this == other;
+        }
 
-	@Override
-	public <T> T out(final Class<T> interfaceType) {
+        @Override
+        public String toString() {
+            return this.port.toString() + ".out(" + this.interfaceType.getName() + ")";
+        }
+    }
 
-		final InvocationHandler h = new PortOut<>(this, interfaceType);
+    @Override
+    public <T> T out(final Class<T> interfaceType) {
 
-		final Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { interfaceType }, h);
-		return (T) proxy;
-	}
+        final InvocationHandler h = new PortOut<>(this, interfaceType);
 
-	@Override
-	public void connect(final IPort other) {
+        final Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { interfaceType }, h);
+        return (T) proxy;
+    }
 
-		for (final Class<?> req : this.getRequired()) {
-			final Class<Object> t = (Class<Object>) req;
-			final Set<Object> objs = (Set<Object>) other.getProvided(req);
-			for (final Object o : objs) {
-				this.provideRequired(t, o);
-				this.logger.log(LogLevel.TRACE, "Connected %s[%s] to %s.", this.afId(), t.getName(), o.toString());
-			}
-		}
+    @Override
+    public void connect(final IPort other) {
 
-		for (final Class<?> req : other.getRequired()) {
-			final Class<Object> t = (Class<Object>) req;
-			final Set<Object> objs = (Set<Object>) this.getProvided(req);
-			for (final Object o : objs) {
-				other.provideRequired(t, o);
-				this.logger.log(LogLevel.TRACE, "Connected %s[%s] to %s.", other.afId(), t.getName(), o.toString());
-			}
-		}
+        for (final Class<?> req : this.getRequired()) {
+            final Class<Object> t = (Class<Object>) req;
+            final Set<Object> objs = (Set<Object>) other.getProvided(req);
+            for (final Object o : objs) {
+                this.provideRequired(t, o);
+                this.logger.log(LogLevel.TRACE, "Connected %s[%s] to %s.", this.afId(), t.getName(), o.toString());
+            }
+        }
 
-	}
+        for (final Class<?> req : other.getRequired()) {
+            final Class<Object> t = (Class<Object>) req;
+            final Set<Object> objs = (Set<Object>) this.getProvided(req);
+            for (final Object o : objs) {
+                other.provideRequired(t, o);
+                this.logger.log(LogLevel.TRACE, "Connected %s[%s] to %s.", other.afId(), t.getName(), o.toString());
+            }
+        }
 
-	@Override
-	public void connectInternal(final IPort internalPort) {
-		for (final Class<?> intf : this.getProvided()) {
-			final Set<Object> providers = (Set<Object>) internalPort.getProvided(intf);
-			for (final Object provider : providers) {
-				final Class<Object> t = (Class<Object>) intf;
-				this.provideProvided(t, provider);
-				this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.afId(), t.getName(), provider.toString());
-			}
-		}
+    }
 
-		for (final Class<?> intf : internalPort.getRequired()) {
-			final Class<Object> t = (Class<Object>) intf;
-			final Object provider = this.out(intf);
-			internalPort.provideRequired(t, provider);
-			this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.afId(), t.getName(), provider.toString());
-		}
+    @Override
+    public void connectInternal(final IPort internalPort) {
+        for (final Class<?> intf : this.getProvided()) {
+            final Set<Object> providers = (Set<Object>) internalPort.getProvided(intf);
+            for (final Object provider : providers) {
+                final Class<Object> t = (Class<Object>) intf;
+                this.provideProvided(t, provider);
+                this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.afId(), t.getName(), provider.toString());
+            }
+        }
 
-	}
+        for (final Class<?> intf : internalPort.getRequired()) {
+            final Class<Object> t = (Class<Object>) intf;
+            final Object provider = this.out(intf);
+            internalPort.provideRequired(t, provider);
+            this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.afId(), t.getName(), provider.toString());
+        }
 
-	@Override
-	public void connectInternal(final IIdentifiableObject internalProvider) {
-		for (final Class<?> req : this.getRequired()) {
-			try {
-				for (final Field f : internalProvider.getClass().getFields()) {
-					if (f.getType().isAssignableFrom(req)) {
-						final Class<Object> t = (Class<Object>) req;
-						final Object o = this.out(req);
-						f.set(internalProvider, o);
-						this.logger.log(LogLevel.TRACE, "Internally connected %s.%s to %s.", internalProvider.toString(), f.getName(), o.toString());
-					}
-				}
-			} catch (final Exception ex) {
-			}
-		}
+    }
 
-		for (final Class<?> prov : this.getProvided()) {
-			final Class<Object> t = (Class<Object>) prov;
-			if (t.isAssignableFrom(internalProvider.getClass())) {
-				this.provideProvided(t, internalProvider);
-				this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.toString(), t.getName(), internalProvider.toString());
-			}
-		}
-	}
+    @Override
+    public void connectInternal(final IIdentifiableObject internalProvider) {
+        for (final Class<?> req : this.getRequired()) {
+            for (final Field f : this.getAllExternalConnection(internalProvider.getClass())) {
+                try {
+                    // for (final Field f : internalProvider.getClass().getFields()) {
+                    // if (f.getType().isAssignableFrom(req)) {
+                    // final Class<Object> t = (Class<Object>) req;
+                    // final Object o = this.out(req);
+                    // f.set(internalProvider, o);
+                    // this.logger.log(LogLevel.TRACE, "Internally connected %s.%s to %s.", internalProvider.toString(), f.getName(), o.toString());
+                    // }
+                    // }
 
-	@Override
-	public int hashCode() {
-		return this.afId().hashCode();
-	}
+                    if (f.getType().isAssignableFrom(req)) {
+                        final Class<Object> t = (Class<Object>) req;
+                        final Object o = this.out(req);
+                        f.setAccessible(true);
+                        f.set(internalProvider, o);
+                        this.logger.log(LogLevel.TRACE, "Internally connected %s.%s to %s.", internalProvider.toString(), f.getName(), o.toString());
+                    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj instanceof Port) {
-			final Port other = (Port) obj;
-			return this.afId().equals(other.afId());
-		} else {
-			return false;
-		}
-	}
+                } catch (final Exception ex) {
+                    this.logger.log(LogLevel.ERROR, "Trying to connected %s.%s to %s.", internalProvider.toString(), f.getName(), "port proxy");
 
-	@Override
-	public String toString() {
-		return this.afId();
-	}
+                }
+            }
+        }
+
+        for (final Class<?> prov : this.getProvided()) {
+            final Class<Object> t = (Class<Object>) prov;
+            if (t.isAssignableFrom(internalProvider.getClass())) {
+                this.provideProvided(t, internalProvider);
+                this.logger.log(LogLevel.TRACE, "Internally connected %s[%s] to %s.", this.toString(), t.getName(), internalProvider.toString());
+            }
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return this.afId().hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Port) {
+            final Port other = (Port) obj;
+            return this.afId().equals(other.afId());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return this.afId();
+    }
 }

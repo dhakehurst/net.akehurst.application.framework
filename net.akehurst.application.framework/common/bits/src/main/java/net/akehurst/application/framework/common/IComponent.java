@@ -17,10 +17,10 @@ package net.akehurst.application.framework.common;
 
 public interface IComponent extends IActiveObject {
 
-	String afId();
+    String afId();
 
-	void afAddPort(IPort value);
+    void afAddPort(IPort value);
 
-	void afConnectParts();
-	
+    void afConnectParts();
+
 }

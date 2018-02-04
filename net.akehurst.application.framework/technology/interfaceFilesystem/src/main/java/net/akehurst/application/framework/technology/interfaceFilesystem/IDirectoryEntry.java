@@ -21,19 +21,19 @@ import java.nio.file.Path;
 
 public interface IDirectoryEntry {
 
-	String getName();
+    String getName();
 
-	String getFullName();
+    String getFullName();
 
-	Path asPath();
+    Path asPath();
 
-	File asFile();
+    File asFile();
 
-	URL toURL() throws FilesystemException;
+    URL toURL() throws FilesystemException;
 
-	IDirectory getParent();
+    IDirectory getParent();
 
-	boolean exists();
+    boolean exists();
 
-	void delete() throws FilesystemException;
+    void delete() throws FilesystemException;
 }

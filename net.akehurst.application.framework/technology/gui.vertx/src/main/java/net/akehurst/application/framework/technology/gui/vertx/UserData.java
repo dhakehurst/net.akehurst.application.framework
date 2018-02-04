@@ -22,25 +22,27 @@ import net.akehurst.application.framework.common.IUser;
 
 public class UserData extends AbstractDataType implements IUser {
 
-	public UserData(Session session) {
-		this.session = session;
-	}
-	Session session;
-	
-	public UserData(String name) {
-		super(name);
-		this.name = name;
-	}
-	
-	String name;
-	@Override
-	public String getName() {
-		if (null==this.session) {
-			return this.name;
-		}else{
-			UserHolder holder = this.session.get("__vertx.userHolder");
-			return (null==holder.user) ? null : holder.user.principal().getString("username");
-		}	
-	}
-	
+    public UserData(Session session) {
+        this.session = session;
+    }
+
+    Session session;
+
+    public UserData(String name) {
+        super(name);
+        this.name = name;
+    }
+
+    String name;
+
+    @Override
+    public String getName() {
+        if (null == this.session) {
+            return this.name;
+        } else {
+            UserHolder holder = this.session.get("__vertx.userHolder");
+            return (null == holder.user) ? null : holder.user.principal().getString("username");
+        }
+    }
+
 }

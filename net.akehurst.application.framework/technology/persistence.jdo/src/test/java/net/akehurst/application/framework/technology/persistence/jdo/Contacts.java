@@ -24,13 +24,13 @@ import javax.jdo.annotations.Persistent;
 @PersistenceCapable
 public class Contacts {
 
-	@Persistent
-	public String id;
+    @Persistent
+    public String id;
 
-	@Persistent
-	public Person owner;
+    @Persistent
+    public Person owner;
 
-	@Persistent
-	@Element(column = "id")
-	public List<Person> people;
+    @Persistent
+    @Element(column = "id")
+    public List<Person> people;
 }

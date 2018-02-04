@@ -63,463 +63,462 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
-	public JfxWindow(final String objectId) {
-		super(objectId);
-		this.stages = new HashMap<>();
-	}
-
-	@ServiceReference
-	IApplicationFramework af;
-
-	Map<StageIdentity, Stage> stages;
-
-	@Override
-	public void afConnectParts() {
-	}
-
-	@Override
-	public void afRun() {
-		// ensure the Jfx library is initialised
-		new JFXPanel();
-
-		// This gui component is ready and started.
-		this.portGui().out(IGuiNotification.class).notifyReady();
-	}
-
-	@Override
-	public void afTerminate() {
-		Platform.runLater(() -> {
-			Platform.exit();
-		});
-	}
-
-	@Override
-	public void createStage(final StageIdentity stageId, final String rootPath, final StageIdentity authenticationStageId,
-			final SceneIdentity authenticationSceneId) {
-		Platform.runLater(() -> {
-			final Stage primary = new Stage();
-			primary.setTitle(stageId.asPrimitive());
-			this.stages.put(stageId, primary);
-
-			final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")), null);
-
-			primary.setOnCloseRequest((e) -> {
-				final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CLOSED);
-				final Map<String, Object> eventData = new HashMap<>();
-				final GuiEvent event = new GuiEvent(session, signature, eventData);
-				this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
-			});
-
-			final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CREATED);
-			final Map<String, Object> eventData = new HashMap<>();
-			final GuiEvent event = new GuiEvent(session, signature, eventData);
-			this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
-		});
-	}
-
-	@Override
-	public <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content) {
-		// try {
-		// T sceneObj = af.createObject(sceneClass, afId() + "." + sceneId);
-		final T sceneObj = this.createGuiScene(sceneClass, this.afId() + "." + sceneId.asPrimitive());
-		Parent root = null;
-		try {
-
-			if (null == content) {
-				root = new Group();
-			} else {
-
-				final FXMLLoader fxmlLoader = new FXMLLoader(content);
-				// fxmlLoader.setRoot(sceneObj);
-				fxmlLoader.setController(sceneObj);
-				fxmlLoader.load();
-				root = fxmlLoader.getRoot();
-			}
-		} catch (final Throwable t) {
-			this.logger.log(LogLevel.ERROR, "Failed to create Scene " + sceneId.asPrimitive(), t);
-		}
-		((JfxGuiScene) Proxy.getInvocationHandler(sceneObj)).setRoot(root);
-
-		final Parent finalRoot = root;
-		Platform.runLater(() -> {
-			try {
-				final Scene scene = new Scene(finalRoot);
-				final Stage primary = this.stages.get(stageId);
-				primary.setScene(scene);
-				primary.sizeToScene();
-
-				primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev) -> {
-					final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")), null);
-					final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, null, GuiEventType.SCENE_LOADED);
-					final Map<String, Object> eventData = new HashMap<>();
-					final GuiEvent event = new GuiEvent(session, signature, eventData);
-					this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
-				});
-
-				primary.show();
-
-			} catch (final Throwable t) {
-				this.logger.log(LogLevel.ERROR, "Failed to create Scene " + sceneId.asPrimitive(), t);
-			}
-		});
-		return sceneObj;
-	}
-
-	<T extends IGuiScene> T createGuiScene(final Class<T> sceneClass, final String afId) {
-		final ClassLoader loader = this.getClass().getClassLoader();
-		final Class<?>[] interfaces = new Class<?>[] { sceneClass };
-		final InvocationHandler h = new JfxGuiScene(afId);
-		final Object proxy = Proxy.newProxyInstance(loader, interfaces, h);
-		return (T) proxy;
-	}
+    public JfxWindow(final String objectId) {
+        super(objectId);
+        this.stages = new HashMap<>();
+    }
+
+    @ServiceReference
+    IApplicationFramework af;
+
+    Map<StageIdentity, Stage> stages;
+
+    @Override
+    public void afConnectParts() {}
+
+    @Override
+    public void afRun() {
+        // ensure the Jfx library is initialised
+        new JFXPanel();
+
+        // This gui component is ready and started.
+        this.portGui().out(IGuiNotification.class).notifyReady();
+    }
+
+    @Override
+    public void afTerminate() {
+        Platform.runLater(() -> {
+            Platform.exit();
+        });
+    }
+
+    @Override
+    public void createStage(final StageIdentity stageId, final String rootPath, final StageIdentity authenticationStageId,
+            final SceneIdentity authenticationSceneId) {
+        Platform.runLater(() -> {
+            final Stage primary = new Stage();
+            primary.setTitle(stageId.asPrimitive());
+            this.stages.put(stageId, primary);
+
+            final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")), null);
+
+            primary.setOnCloseRequest((e) -> {
+                final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CLOSED);
+                final Map<String, Object> eventData = new HashMap<>();
+                final GuiEvent event = new GuiEvent(session, signature, eventData);
+                this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
+            });
+
+            final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, null, GuiEventType.STAGE_CREATED);
+            final Map<String, Object> eventData = new HashMap<>();
+            final GuiEvent event = new GuiEvent(session, signature, eventData);
+            this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
+        });
+    }
+
+    @Override
+    public <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, final URL content) {
+        // try {
+        // T sceneObj = af.createObject(sceneClass, afId() + "." + sceneId);
+        final T sceneObj = this.createGuiScene(sceneClass, this.afId() + "." + sceneId.asPrimitive());
+        Parent root = null;
+        try {
+
+            if (null == content) {
+                root = new Group();
+            } else {
+
+                final FXMLLoader fxmlLoader = new FXMLLoader(content);
+                // fxmlLoader.setRoot(sceneObj);
+                fxmlLoader.setController(sceneObj);
+                fxmlLoader.load();
+                root = fxmlLoader.getRoot();
+            }
+        } catch (final Throwable t) {
+            this.logger.log(LogLevel.ERROR, "Failed to create Scene " + sceneId.asPrimitive(), t);
+        }
+        ((JfxGuiScene) Proxy.getInvocationHandler(sceneObj)).setRoot(root);
+
+        final Parent finalRoot = root;
+        Platform.runLater(() -> {
+            try {
+                final Scene scene = new Scene(finalRoot);
+                final Stage primary = this.stages.get(stageId);
+                primary.setScene(scene);
+                primary.sizeToScene();
+
+                primary.addEventHandler(WindowEvent.WINDOW_SHOWN, (ev) -> {
+                    final UserSession session = new UserSession("desktopSession", new UserDetails(System.getProperty("user.name")), null);
+                    final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, null, GuiEventType.SCENE_LOADED);
+                    final Map<String, Object> eventData = new HashMap<>();
+                    final GuiEvent event = new GuiEvent(session, signature, eventData);
+                    this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
+                });
+
+                primary.show();
+
+            } catch (final Throwable t) {
+                this.logger.log(LogLevel.ERROR, "Failed to create Scene " + sceneId.asPrimitive(), t);
+            }
+        });
+        return sceneObj;
+    }
+
+    <T extends IGuiScene> T createGuiScene(final Class<T> sceneClass, final String afId) {
+        final ClassLoader loader = this.getClass().getClassLoader();
+        final Class<?>[] interfaces = new Class<?>[] { sceneClass };
+        final InvocationHandler h = new JfxGuiScene(afId);
+        final Object proxy = Proxy.newProxyInstance(loader, interfaces, h);
+        return (T) proxy;
+    }
 
-	@Override
-	public void addAuthentication(final UserSession session) throws GuiException {
-		// TODO Auto-generated method stub
+    @Override
+    public void addAuthentication(final UserSession session) throws GuiException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void clearAuthentication(final UserSession session) throws GuiException {
-		// TODO Auto-generated method stub
+    @Override
+    public void clearAuthentication(final UserSession session) throws GuiException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String tokenPath,
-			final String authorisationPath, final String scopes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String tokenPath,
+            final String authorisationPath, final String scopes) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public <T extends IGuiDialog> T dialogCreate(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
-			final String title, final String dialogContent) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public <T extends IGuiDialog> T dialogCreate(final Class<T> dialogClass, final UserSession session, final IGuiScene scene, final DialogIdentity dialogId,
+            final String title, final String dialogContent) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void dialogCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
-			final String dialogContent) {
-		// TODO Auto-generated method stub
+    @Override
+    public void dialogCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId,
+            final String dialogContent) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void dialogOpen(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void dialogOpen(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void dialogClose(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void dialogClose(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void onRequest(final UserSession session, final String channelId, final IGuiRequestMessage func) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onRequest(final UserSession session, final String channelId, final IGuiRequestMessage func) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void requestRecieveEvent(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
-			final GuiEventType eventType) {
-		Platform.runLater(() -> {
-			final Stage stage = this.stages.get(stageId);
-			final Node n = stage.getScene().lookup("#" + elementId);
+    @Override
+    public void requestRecieveEvent(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+            final GuiEventType eventType) {
+        Platform.runLater(() -> {
+            final Stage stage = this.stages.get(stageId);
+            final Node n = stage.getScene().lookup("#" + elementId);
 
-			final EventType<Event> jfxEventType = this.convertToJfxEvent(eventType);
+            final EventType<Event> jfxEventType = this.convertToJfxEvent(eventType);
 
-			n.addEventHandler(jfxEventType, (ev) -> {
-				final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, elementId, eventType);
-				final Map<String, Object> eventData = new HashMap<>();
-				final GuiEvent event = new GuiEvent(session, signature, eventData);
-				this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
-			});
-		});
+            n.addEventHandler(jfxEventType, (ev) -> {
+                final GuiEventSignature signature = new GuiEventSignature(stageId, null, null, elementId, eventType);
+                final Map<String, Object> eventData = new HashMap<>();
+                final GuiEvent event = new GuiEvent(session, signature, eventData);
+                this.portGui().out(IGuiNotification.class).notifyEventOccured(event);
+            });
+        });
 
-	}
+    }
 
-	private EventType<Event> convertToJfxEvent(final GuiEventType eventType) {
-		// TODO:
-		return null;
-	}
+    private EventType<Event> convertToJfxEvent(final GuiEventType eventType) {
+        // TODO:
+        return null;
+    }
 
-	@Override
-	public void sendData(final UserSession session, final String channelId, final String jsonStrData) {
+    @Override
+    public void sendData(final UserSession session, final String channelId, final String jsonStrData) {
 
-	}
+    }
 
-	@Override
-	public void addElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String newElementId, final String type) {
-		// TODO Auto-generated method stub
+    @Override
+    public void addElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+            final String newElementId, final String type) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void addElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String newElementId, final String type, final String attributes, final Object content) {
-		// TODO Auto-generated method stub
+    @Override
+    public void addElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+            final String newElementId, final String type, final String attributes, final Object content) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void removeElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String dialogId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void removeElement(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String dialogId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void elementClear(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void elementClear(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void elementSetDisabled(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
-			final boolean value) {
-		// TODO Auto-generated method stub
+    @Override
+    public void elementSetDisabled(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+            final boolean value) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void elementSetLoading(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
-			final boolean value) {
-		// TODO Auto-generated method stub
+    @Override
+    public void elementSetLoading(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+            final boolean value) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void navigateTo(final UserSession session, final String location) {
-		// TODO Auto-generated method stub
+    @Override
+    public void navigateTo(final UserSession session, final String location) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void newWindow(final UserSession session, final String location) {
-		// TODO Auto-generated method stub
+    @Override
+    public void newWindow(final UserSession session, final String location) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void download(final UserSession session, final String location, final String filename) {
-		// TODO Auto-generated method stub
+    @Override
+    public void download(final UserSession session, final String location, final String filename) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void upload(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String uploadLink,
-			final String filenameElementId, final OnEventHandler handler) {
-		// TODO Auto-generated method stub
+    @Override
+    public void upload(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String uploadLink,
+            final String filenameElementId, final OnEventHandler handler) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
-		// TODO Auto-generated method stub
+    @Override
+    public void switchTo(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final Map<String, String> sceneArguments) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void elementSetProperty(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
-			final String propertyName, final Object value) {
-		// TODO Auto-generated method stub
+    @Override
+    public void elementSetProperty(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
+            final String propertyName, final Object value) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void elementAddClass(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
-			final String className) {
-		// TODO Auto-generated method stub
+    @Override
+    public void elementAddClass(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
+            final String className) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void elementRemoveClass(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
-			final String className) {
-		// TODO Auto-generated method stub
+    @Override
+    public void elementRemoveClass(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementName,
+            final String className) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void textSetValue(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String id, final String text) {
-		final Stage primary = this.stages.get(stageId);
-		final Node n = primary.getScene().lookup("#" + id);
-		if (n instanceof TextInputControl) {
-			((TextInputControl) n).setText(text);
-		} else if (n instanceof Text) {
-			((Text) n).setText(text);
-		}
-	}
+    @Override
+    public void textSetValue(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String id, final String text) {
+        final Stage primary = this.stages.get(stageId);
+        final Node n = primary.getScene().lookup("#" + id);
+        if (n instanceof TextInputControl) {
+            ((TextInputControl) n).setText(text);
+        } else if (n instanceof Text) {
+            ((Text) n).setText(text);
+        }
+    }
 
-	@Override
-	public void setTitle(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String text) {
-		// TODO Auto-generated method stub
+    @Override
+    public void setTitle(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String text) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void tableAddColumn(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
-			final String colHeaderContent, final String rowTemplateCellContent, final String existingRowCellContent) {
-		// TODO Auto-generated method stub
+    @Override
+    public void tableAddColumn(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+            final String colHeaderContent, final String rowTemplateCellContent, final String existingRowCellContent) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void tableClearAllColumnHeaders(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void tableClearAllColumnHeaders(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void tableAppendRow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId,
-			final Map<String, Object> rowData) {
-		// TODO Auto-generated method stub
+    @Override
+    public void tableAppendRow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId,
+            final Map<String, Object> rowData) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void tableRemoveRow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId, final String rowId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void tableRemoveRow(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId, final String rowId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void tableClearAllRows(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void tableClearAllRows(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void chartCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
-			final String chartType, final String jsonChartData, final String jsonChartOptions) {
-		// TODO Auto-generated method stub
+    @Override
+    public void chartCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId, final String chartId,
+            final String chartType, final String jsonChartData, final String jsonChartOptions) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public <X, Y> void chartAddDataItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String chartId,
-			final String seriesName, final X x, final Y y) {
-		// TODO Auto-generated method stub
+    @Override
+    public <X, Y> void chartAddDataItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String chartId,
+            final String seriesName, final X x, final Y y) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void diagramCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String jsonDiagramData) {
-		// TODO Auto-generated method stub
+    @Override
+    public void diagramCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+            final String jsonDiagramData) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void diagramUpdate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String jsonDiagramData) {
-		// TODO Auto-generated method stub
+    @Override
+    public void diagramUpdate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+            final String jsonDiagramData) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void editorCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String initialContent, final String languageId, final String optionsHJsonStr) {
-		// TODO Auto-generated method stub
+    @Override
+    public void editorCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+            final String initialContent, final String languageId, final String optionsHJsonStr) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void editorDefineTextColourTheme(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String themeName,
-			final Map<String, Tuple3<String, String, String>> colourMap) {
-		// TODO Auto-generated method stub
+    @Override
+    public void editorDefineTextColourTheme(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String themeName,
+            final Map<String, Tuple3<String, String, String>> colourMap) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void editorUpdateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
-			final String jsonParseTreeData) {
-		// TODO Auto-generated method stub
+    @Override
+    public void editorUpdateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
+            final String jsonParseTreeData) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void graphCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String jsonGraphData) {
-		// TODO Auto-generated method stub
+    @Override
+    public void graphCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+            final String jsonGraphData) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void graphUpdate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
-			final String jsonGraphData) {
-		// TODO Auto-generated method stub
+    @Override
+    public void graphUpdate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId,
+            final String jsonGraphData) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	// --------- Ports ---------
-	@PortInstance
-	@PortContract(provides = IGuiRequest.class, requires = IGuiNotification.class)
-	IPort portGui;
+    // --------- Ports ---------
+    @PortInstance
+    @PortContract(provides = IGuiRequest.class, requires = IGuiNotification.class)
+    IPort portGui;
 
-	public IPort portGui() {
-		return this.portGui;
-	}
+    public IPort portGui() {
+        return this.portGui;
+    }
 
-	@Override
-	public void diagramRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void diagramRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void tableCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void tableCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void tableRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void tableRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String tableId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void chartRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void chartRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void graphRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void graphRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String parentId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void gridCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
-			final String jsonOptions) {
-		// TODO Auto-generated method stub
+    @Override
+    public void gridCreate(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+            final String jsonOptions) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void gridRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void gridRemove(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void gridAppendItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
-			final Map<String, Object> data, final Map<String, Integer> location) {
-		// TODO Auto-generated method stub
+    @Override
+    public void gridAppendItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String elementId,
+            final Map<String, Object> data, final Map<String, Integer> location) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void gridRemoveItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String gridId,
-			final String elementId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void gridRemoveItem(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String gridId,
+            final String elementId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 }

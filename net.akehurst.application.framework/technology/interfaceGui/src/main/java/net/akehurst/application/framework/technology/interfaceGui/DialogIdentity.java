@@ -21,18 +21,18 @@ import net.akehurst.application.framework.common.AbstractDataType;
 
 public class DialogIdentity extends AbstractDataType {
 
-	private static Pattern valid = Pattern.compile("[a-zA-z][a-zA-Z0-9]*");
+    private static Pattern valid = Pattern.compile("[a-zA-z][a-zA-Z0-9]*");
 
-	public DialogIdentity(final String value) throws GuiException {
-		super(value);
-		if (DialogIdentity.valid.matcher(value).matches()) {
-			// ok
-		} else {
-			throw new GuiException("Invalid DialogIdentity value - " + value, null);
-		}
-	}
+    public DialogIdentity(final String value) throws GuiException {
+        super(value);
+        if (DialogIdentity.valid.matcher(value).matches()) {
+            // ok
+        } else {
+            throw new GuiException("Invalid DialogIdentity value - " + value, null);
+        }
+    }
 
-	public String asPrimitive() {
-		return (String) super.getIdentityValues().get(0);
-	}
+    public String asPrimitive() {
+        return (String) super.getIdentityValues().get(0);
+    }
 }

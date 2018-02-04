@@ -23,34 +23,34 @@ import net.akehurst.application.framework.technology.persistence.openJPA.test.jp
 
 public class SimpleMain {
 
-	public static void main(final String[] args) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("openjpa");
-		EntityManager em = emf.createEntityManager();
+    public static void main(final String[] args) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("openjpa");
+        EntityManager em = emf.createEntityManager();
 
-		em.getTransaction().begin();
-		final Person p = new Person();
-		p.setName("t1");
-		p.setHairColour("black");
-		em.persist(p);
-		em.getTransaction().commit();
-		em.close();
+        em.getTransaction().begin();
+        final Person p = new Person();
+        p.setName("t1");
+        p.setHairColour("black");
+        em.persist(p);
+        em.getTransaction().commit();
+        em.close();
 
-		em = emf.createEntityManager();
-		em.getTransaction().begin();
-		final Person p2 = em.find(Person.class, "t1");
-		p2.setHairColour("brown");
-		em.getTransaction().commit();
-		em.close();
-		emf.close();
+        em = emf.createEntityManager();
+        em.getTransaction().begin();
+        final Person p2 = em.find(Person.class, "t1");
+        p2.setHairColour("brown");
+        em.getTransaction().commit();
+        em.close();
+        emf.close();
 
-		emf = Persistence.createEntityManagerFactory("openjpa");
-		em = emf.createEntityManager();
-		em.getTransaction().begin();
-		final Person p3 = em.find(Person.class, "t1");
+        emf = Persistence.createEntityManagerFactory("openjpa");
+        em = emf.createEntityManager();
+        em.getTransaction().begin();
+        final Person p3 = em.find(Person.class, "t1");
 
-		em.getTransaction().commit();
-		em.close();
+        em.getTransaction().commit();
+        em.close();
 
-	}
+    }
 
 }

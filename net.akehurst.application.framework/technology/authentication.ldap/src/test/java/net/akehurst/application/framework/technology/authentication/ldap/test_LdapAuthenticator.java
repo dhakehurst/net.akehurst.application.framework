@@ -18,40 +18,40 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 
 public class test_LdapAuthenticator extends AbstractTestCase {
 
-	testContext_LdapAuthenticator testContext;
+    testContext_LdapAuthenticator testContext;
 
-	@Ignore
-	@Test
-	public void test1() {
-		try {
-			final TestFramework tf = new TestFramework("af", "af");
-			final TestConfigurationService configuration = tf.createServiceInstance("configuration", TestConfigurationService.class, "test.configuration");
+    @Ignore
+    @Test
+    public void test1() {
+        try {
+            final TestFramework tf = new TestFramework("af", "af");
+            final TestConfigurationService configuration = tf.createServiceInstance("configuration", TestConfigurationService.class, "test.configuration");
 
-			configuration.set("sut.handler.url", "ldaps://filer.itemis.de:636");
-			configuration.set("sut.handler.adminNamePattern", "");
-			configuration.set("sut.handler.adminPassword", "");
-			configuration.set("sut.handler.userSearchRoot", "dc=itemis,dc=de");
-			configuration.set("sut.handler.userSecurityLevel", "simple");
+            configuration.set("sut.handler.url", "ldaps://filer.itemis.de:636");
+            configuration.set("sut.handler.adminNamePattern", "");
+            configuration.set("sut.handler.adminPassword", "");
+            configuration.set("sut.handler.userSearchRoot", "dc=itemis,dc=de");
+            configuration.set("sut.handler.userSecurityLevel", "simple");
 
-			final Map<String, IService> services = new HashMap<>();
-			services.put("configuration", configuration);
-			this.testContext = tf.createTestEnvironment(testContext_LdapAuthenticator.class, services, new String[0]);
-			this.testContext.afStart();
+            final Map<String, IService> services = new HashMap<>();
+            services.put("configuration", configuration);
+            this.testContext = tf.createTestEnvironment(testContext_LdapAuthenticator.class, services, new String[0]);
+            this.testContext.afStart();
 
-			final UserDetails user = new UserDetails("<unknown>");
-			final UserSession session = new UserSession("test-session", user, null);
+            final UserDetails user = new UserDetails("<unknown>");
+            final UserSession session = new UserSession("test-session", user, null);
 
-			super.perform(this.testContext.tc1.handler.authenticatorRequest, IAuthenticatorRequest::requestLogin, session, "username", "password");
-			super.delay(200);
-			super.expect(this.testContext.tc1.handler, IAuthenticatorNotification::notifyAuthenticationSuccess, session);
+            super.perform(this.testContext.tc1.handler.authenticatorRequest, IAuthenticatorRequest::requestLogin, session, "username", "password");
+            super.delay(200);
+            super.expect(this.testContext.tc1.handler, IAuthenticatorNotification::notifyAuthenticationSuccess, session);
 
-			super.play();
-			super.sleep(1000);
-			super.verify();
+            super.play();
+            super.sleep(1000);
+            super.verify();
 
-		} catch (final Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+        } catch (final Exception e) {
+            Assert.fail(e.getMessage());
+        }
+    }
 
 }

@@ -25,44 +25,44 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class Log4JLogger implements ILogger, IService {
 
-	public Log4JLogger(final String id) {
-		this.log4j = LogManager.getLogger(id);
-		this.id = id;
-	}
+    public Log4JLogger(final String id) {
+        this.log4j = LogManager.getLogger(id);
+        this.id = id;
+    }
 
-	String id;
+    String id;
 
-	@Override
-	public String afId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String afId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	Logger log4j;
+    Logger log4j;
 
-	// --------- IService ---------
-	@Override
-	public Object createReference(final String locationId) {
-		return new Log4JLogger(locationId);
-	}
+    // --------- IService ---------
+    @Override
+    public Object createReference(final String locationId) {
+        return new Log4JLogger(locationId);
+    }
 
-	// --------- ILogger ---------
-	@Override
-	public void log(final LogLevel level, final String message) {
-		final Level l4jlevel = Level.getLevel(level.getName());
-		this.log4j.log(l4jlevel, message);
-	}
+    // --------- ILogger ---------
+    @Override
+    public void log(final LogLevel level, final String message) {
+        final Level l4jlevel = Level.getLevel(level.getName());
+        this.log4j.log(l4jlevel, message);
+    }
 
-	@Override
-	public void log(final LogLevel level, final String message, final Throwable t) {
-		final Level l4jlevel = Level.getLevel(level.getName());
-		this.log4j.log(l4jlevel, message, t);
-	}
+    @Override
+    public void log(final LogLevel level, final String message, final Throwable t) {
+        final Level l4jlevel = Level.getLevel(level.getName());
+        this.log4j.log(l4jlevel, message, t);
+    }
 
-	@Override
-	public void log(final LogLevel level, final String format, final Object... objects) {
-		final String message = String.format(format, objects);
-		final Level l4jlevel = Level.getLevel(level.getName());
-		this.log4j.log(l4jlevel, message);
-	}
+    @Override
+    public void log(final LogLevel level, final String format, final Object... objects) {
+        final String message = String.format(format, objects);
+        final Level l4jlevel = Level.getLevel(level.getName());
+        this.log4j.log(l4jlevel, message);
+    }
 }

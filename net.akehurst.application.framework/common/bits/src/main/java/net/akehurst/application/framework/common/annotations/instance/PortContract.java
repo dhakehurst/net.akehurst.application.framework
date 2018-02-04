@@ -30,8 +30,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PortContract {
 
-	Class<?> provides() default Void.class;
+    Class<?> provides() default Void.class;
 
-	Class<?> requires() default Void.class;
+    Class<?> requires() default Void.class;
 
 }

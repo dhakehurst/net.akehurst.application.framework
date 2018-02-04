@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Reference {
 
-	String value() default "id";
-	String opposite() default "";
+    String value() default "id";
+
+    String opposite() default "";
 }

@@ -29,94 +29,94 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract public class AbstractActiveObject implements IActiveObject {
 
-	@ServiceReference
-	protected IApplicationFramework af;
+    @ServiceReference
+    protected IApplicationFramework af;
 
-	@ServiceReference
-	protected ILogger logger;
+    @ServiceReference
+    protected ILogger logger;
 
-	public AbstractActiveObject(final String afId) {
-		this.afId = afId;
-	}
+    public AbstractActiveObject(final String afId) {
+        this.afId = afId;
+    }
 
-	String afId;
+    String afId;
 
-	@Override
-	public String afId() {
-		return this.afId;
-	}
+    @Override
+    public String afId() {
+        return this.afId;
+    }
 
-	Thread thread;
+    Thread thread;
 
-	@Override
-	public void afStart() {
-		this.logger.log(LogLevel.TRACE, "AbstractActiveObject.afStart");
-		this.thread = new Thread(() -> {
-			this.afRun();
-			this.logger.log(LogLevel.TRACE, "Finished");
-		}, this.afId());
-		this.thread.start();
-	}
+    @Override
+    public void afStart() {
+        this.logger.log(LogLevel.TRACE, "AbstractActiveObject.afStart");
+        this.thread = new Thread(() -> {
+            this.afRun();
+            this.logger.log(LogLevel.TRACE, "Finished");
+        }, this.afId());
+        this.thread.start();
+    }
 
-	@Override
-	public void afJoin() throws InterruptedException {
-		this.logger.log(LogLevel.TRACE, "Waiting for %s to Finish", this.afId());
-		this.thread.join();
-	}
+    @Override
+    public void afJoin() throws InterruptedException {
+        this.logger.log(LogLevel.TRACE, "Waiting for %s to Finish", this.afId());
+        this.thread.join();
+    }
 
-	@Override
-	public void afInterrupt() {
-		this.thread.interrupt();
-	}
+    @Override
+    public void afInterrupt() {
+        this.thread.interrupt();
+    }
 
-	protected List<IActiveObject> afActiveParts() throws IllegalArgumentException, IllegalAccessException {
-		final List<IActiveObject> objects = this.afActiveParts(this.getClass());
+    protected List<IActiveObject> afActiveParts() throws IllegalArgumentException, IllegalAccessException {
+        final List<IActiveObject> objects = this.afActiveParts(this.getClass());
 
-		return objects;
-	}
+        return objects;
+    }
 
-	private List<IActiveObject> afActiveParts(final Class<?> class_) throws IllegalArgumentException, IllegalAccessException {
-		final List<IActiveObject> objects = new ArrayList<>();
+    private List<IActiveObject> afActiveParts(final Class<?> class_) throws IllegalArgumentException, IllegalAccessException {
+        final List<IActiveObject> objects = new ArrayList<>();
 
-		if (null == class_.getSuperclass()) {
-		} else {
-			final List<IActiveObject> superObjs = this.afActiveParts(class_.getSuperclass());
-			objects.addAll(superObjs);
-		}
+        if (null == class_.getSuperclass()) {
+        } else {
+            final List<IActiveObject> superObjs = this.afActiveParts(class_.getSuperclass());
+            objects.addAll(superObjs);
+        }
 
-		for (final Field f : class_.getDeclaredFields()) {
-			f.setAccessible(true);
-			final ComponentInstance annC = f.getAnnotation(ComponentInstance.class);
-			final ActiveObjectInstance annAO = f.getAnnotation(ActiveObjectInstance.class);
-			if (null == annC && null == annAO) {
-				// do nothing
-			} else {
-				final IActiveObject ao = (IActiveObject) f.get(this);
-				// TODO: support ordering of objects
-				objects.add(ao);
-			}
-		}
-		return objects;
-	}
+        for (final Field f : class_.getDeclaredFields()) {
+            f.setAccessible(true);
+            final ComponentInstance annC = f.getAnnotation(ComponentInstance.class);
+            final ActiveObjectInstance annAO = f.getAnnotation(ActiveObjectInstance.class);
+            if (null == annC && null == annAO) {
+                // do nothing
+            } else {
+                final IActiveObject ao = (IActiveObject) f.get(this);
+                // TODO: support ordering of objects
+                objects.add(ao);
+            }
+        }
+        return objects;
+    }
 
-	@Override
-	public int hashCode() {
-		return this.afId().hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return this.afId().hashCode();
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj instanceof IActiveObject) {
-			final IActiveObject other = (IActiveObject) obj;
-			return this.afId().equals(other.afId());
-		} else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof IActiveObject) {
+            final IActiveObject other = (IActiveObject) obj;
+            return this.afId().equals(other.afId());
+        } else {
+            return false;
+        }
+    }
 
-	@Override
-	public String toString() {
-		return this.afId();
-	}
+    @Override
+    public String toString() {
+        return this.afId();
+    }
 
 }

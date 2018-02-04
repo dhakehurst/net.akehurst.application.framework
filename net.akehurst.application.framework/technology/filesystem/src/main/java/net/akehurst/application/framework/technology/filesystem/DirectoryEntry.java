@@ -29,83 +29,83 @@ import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesy
 
 abstract public class DirectoryEntry implements IDirectoryEntry {
 
-	public DirectoryEntry(final IFilesystem fs, final Path path) {
-		this.fs = fs;
-		this.path = path;
-	}
+    public DirectoryEntry(final IFilesystem fs, final Path path) {
+        this.fs = fs;
+        this.path = path;
+    }
 
-	private final IFilesystem fs;
+    private final IFilesystem fs;
 
-	private final Path path;
+    private final Path path;
 
-	public IFilesystem getFilesystem() {
-		return this.fs;
-	}
+    public IFilesystem getFilesystem() {
+        return this.fs;
+    }
 
-	public Path asPath() {
-		return this.path;
-	}
+    public Path asPath() {
+        return this.path;
+    }
 
-	public File asFile() {
-		return this.asPath().toFile();
-	}
+    public File asFile() {
+        return this.asPath().toFile();
+    }
 
-	@Override
-	public String getName() {
-		return this.asPath().getFileName().toString();
-	}
+    @Override
+    public String getName() {
+        return this.asPath().getFileName().toString();
+    }
 
-	@Override
-	public String getFullName() {
-		return this.asPath().toString().replaceAll("\\\\", "/");
-	}
+    @Override
+    public String getFullName() {
+        return this.asPath().toString().replaceAll("\\\\", "/");
+    }
 
-	@Override
-	public URL toURL() throws FilesystemException {
-		try {
-			return this.asPath().toUri().toURL();
-		} catch (final MalformedURLException e) {
-			throw new FilesystemException("Cannot convert to URL", e);
-		}
-	}
+    @Override
+    public URL toURL() throws FilesystemException {
+        try {
+            return this.asPath().toUri().toURL();
+        } catch (final MalformedURLException e) {
+            throw new FilesystemException("Cannot convert to URL", e);
+        }
+    }
 
-	@Override
-	public IDirectory getParent() {
-		return new DirectoryImpl(this.getFilesystem(), this.asPath().getParent());
-	}
+    @Override
+    public IDirectory getParent() {
+        return new DirectoryImpl(this.getFilesystem(), this.asPath().getParent());
+    }
 
-	@Override
-	public boolean exists() {
-		return Files.exists(this.asPath());
-	}
+    @Override
+    public boolean exists() {
+        return Files.exists(this.asPath());
+    }
 
-	@Override
-	public void delete() throws FilesystemException {
-		try {
-			Files.delete(this.asPath());
-		} catch (final IOException e) {
-			throw new FilesystemException(e.getMessage(), e);
-		}
-	}
+    @Override
+    public void delete() throws FilesystemException {
+        try {
+            Files.delete(this.asPath());
+        } catch (final IOException e) {
+            throw new FilesystemException(e.getMessage(), e);
+        }
+    }
 
-	// --- Object ---
-	@Override
-	public int hashCode() {
-		return this.asPath().hashCode();
-	}
+    // --- Object ---
+    @Override
+    public int hashCode() {
+        return this.asPath().hashCode();
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj instanceof DirectoryEntry) {
-			return this.asPath().equals(((DirectoryEntry) obj).asPath());
-		} else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof DirectoryEntry) {
+            return this.asPath().equals(((DirectoryEntry) obj).asPath());
+        } else {
+            return false;
+        }
+    }
 
-	@Override
-	public String toString() {
-		return this.getName();
-	}
+    @Override
+    public String toString() {
+        return this.getName();
+    }
 
 }

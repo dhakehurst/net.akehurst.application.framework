@@ -3,11 +3,11 @@ package net.akehurst.application.framework.technology.interfaceGui.data.graph;
 import java.util.Map;
 
 public interface IGuiGraphViewData {
-	IGuiGraph getGraph();
+    IGuiGraph getGraph();
 
-	String getStyle();
+    String getStyle();
 
-	Map<String, Object> getLayout();
+    Map<String, Object> getLayout();
 
-	Map<String, Object> getOptions();
+    Map<String, Object> getOptions();
 }

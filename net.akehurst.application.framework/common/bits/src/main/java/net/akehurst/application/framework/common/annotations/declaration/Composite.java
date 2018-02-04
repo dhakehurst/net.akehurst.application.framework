@@ -24,5 +24,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Composite {
 
-	String opposite() default "";
+    String opposite() default "";
 }

@@ -19,5 +19,5 @@ import java.lang.reflect.Type;
 
 public interface IConfiguration {
 
-	<T> T fetchValue(Type itemType, String idPath, String defaultValueString);
+    <T> T fetchValue(Type itemType, String idPath, String defaultValueString);
 }

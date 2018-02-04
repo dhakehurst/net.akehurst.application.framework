@@ -19,7 +19,7 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IUserAuthenticationRequest {
 
-	void requestLogin(UserSession session, String username, String password);
+    void requestLogin(UserSession session, String username, String password);
 
-	void requestLogout(UserSession session);
+    void requestLogout(UserSession session);
 }

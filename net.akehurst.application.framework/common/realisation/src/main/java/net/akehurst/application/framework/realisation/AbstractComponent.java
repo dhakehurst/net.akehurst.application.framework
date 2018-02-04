@@ -26,77 +26,77 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 abstract public class AbstractComponent extends AbstractActiveObject implements IComponent {
 
-	public AbstractComponent(final String afId) {
-		super(afId);
-		this.ports = new HashSet<>();
-	}
+    public AbstractComponent(final String afId) {
+        super(afId);
+        this.ports = new HashSet<>();
+    }
 
-	Set<IPort> ports;
+    Set<IPort> ports;
 
-	@Override
-	public void afAddPort(final IPort value) {
-		this.ports.add(value);
-	}
+    @Override
+    public void afAddPort(final IPort value) {
+        this.ports.add(value);
+    }
 
-	@Override
-	public void afConnectParts() {}
+    @Override
+    public void afConnectParts() {}
 
-	@Override
-	public void afStart() {
-		this.logger.log(LogLevel.TRACE, "AbstractComponent.afStart");
-		for (final IPort p : this.ports) {
-			for (final Class<?> interfaceType : p.getRequired()) {
-				if (null == p.out(interfaceType)) {
-					System.out.println("Warn: Port " + p + " has not been provided with " + interfaceType);
-				} else {
-					// ok
-				}
-			}
-		}
+    @Override
+    public void afStart() {
+        this.logger.log(LogLevel.TRACE, "AbstractComponent.afStart");
+        for (final IPort p : this.ports) {
+            for (final Class<?> interfaceType : p.getRequired()) {
+                if (null == p.out(interfaceType)) {
+                    System.out.println("Warn: Port " + p + " has not been provided with " + interfaceType);
+                } else {
+                    // ok
+                }
+            }
+        }
 
-		super.afStart();
-	}
+        super.afStart();
+    }
 
-	@Override
-	public void afRun() {
-		this.logger.log(LogLevel.TRACE, "AbstractComponent.afRun");
-		try {
-			final List<IActiveObject> objects = super.afActiveParts();
+    @Override
+    public void afRun() {
+        this.logger.log(LogLevel.TRACE, "AbstractComponent.afRun");
+        try {
+            final List<IActiveObject> objects = super.afActiveParts();
 
-			for (final IActiveObject ao : objects) {
-				ao.afStart();
-			}
+            for (final IActiveObject ao : objects) {
+                ao.afStart();
+            }
 
-			for (final IActiveObject ao : objects) {
-				ao.afJoin();
-			}
+            for (final IActiveObject ao : objects) {
+                ao.afJoin();
+            }
 
-		} catch (final Exception ex) {
-			this.logger.log(LogLevel.ERROR, "Failed to run component " + this.afId(), ex);
-		}
-	}
+        } catch (final Exception ex) {
+            this.logger.log(LogLevel.ERROR, "Failed to run component " + this.afId(), ex);
+        }
+    }
 
-	@Override
-	public void afInterrupt() {
-		try {
-			final List<IActiveObject> objects = super.afActiveParts();
-			for (final IActiveObject ao : objects) {
-				ao.afInterrupt();
-			}
-		} catch (final Exception ex) {
-			this.logger.log(LogLevel.ERROR, "Error during Interrupt component " + this.afId(), ex);
-		}
-	}
+    @Override
+    public void afInterrupt() {
+        try {
+            final List<IActiveObject> objects = super.afActiveParts();
+            for (final IActiveObject ao : objects) {
+                ao.afInterrupt();
+            }
+        } catch (final Exception ex) {
+            this.logger.log(LogLevel.ERROR, "Error during Interrupt component " + this.afId(), ex);
+        }
+    }
 
-	@Override
-	public void afTerminate() {
-		try {
-			final List<IActiveObject> objects = super.afActiveParts();
-			for (final IActiveObject ao : objects) {
-				ao.afTerminate();
-			}
-		} catch (final Exception ex) {
-			this.logger.log(LogLevel.ERROR, "Error during Terminate component " + this.afId(), ex);
-		}
-	}
+    @Override
+    public void afTerminate() {
+        try {
+            final List<IActiveObject> objects = super.afActiveParts();
+            for (final IActiveObject ao : objects) {
+                ao.afTerminate();
+            }
+        } catch (final Exception ex) {
+            this.logger.log(LogLevel.ERROR, "Error during Terminate component " + this.afId(), ex);
+        }
+    }
 }

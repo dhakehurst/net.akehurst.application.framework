@@ -17,10 +17,10 @@ package net.akehurst.application.framework.technology.interfaceGui.data.table;
 
 public interface IGuiTableCell<C, R> {
 
-	Object getValue();
+    Object getValue();
 
-	C getColumn();
+    C getColumn();
 
-	R getRow();
+    R getRow();
 
 }

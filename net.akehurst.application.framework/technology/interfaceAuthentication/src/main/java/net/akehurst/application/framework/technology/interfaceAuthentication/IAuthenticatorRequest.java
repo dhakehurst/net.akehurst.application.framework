@@ -19,8 +19,8 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IAuthenticatorRequest {
 
-	void requestLogin(UserSession session, String username, String password);
+    void requestLogin(UserSession session, String username, String password);
 
-	void requestLogout(UserSession session);
+    void requestLogout(UserSession session);
 
 }

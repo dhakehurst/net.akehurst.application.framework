@@ -4,12 +4,12 @@ import java.util.Map;
 
 public interface IGuiGraphNode {
 
-	String getIdentity();
+    String getIdentity();
 
-	IGuiGraphNode getParent();
+    IGuiGraphNode getParent();
 
-	Map<String, Object> getData();
+    Map<String, Object> getData();
 
-	Map<String, Object> getProperties();
+    Map<String, Object> getProperties();
 
 }

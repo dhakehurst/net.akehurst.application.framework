@@ -26,39 +26,39 @@ import net.akehurst.application.framework.technology.persistence.filesystem.HJso
 
 public class HJsonConfigurationService extends AbstractPersistentStoreConfigurationService {
 
-	@CommandLineArgument(description = "name of a directory in which the configuration file can be found")
-	protected String directory = "configuration";
+    @CommandLineArgument(description = "name of a directory in which the configuration file can be found")
+    protected String directory = "configuration";
 
-	@ServiceReference
-	private ILogger logger;
+    @ServiceReference
+    private ILogger logger;
 
-	public HJsonConfigurationService(final String afId) {
-		super(afId);
+    public HJsonConfigurationService(final String afId) {
+        super(afId);
 
-	}
+    }
 
-	private IPersistentStore store;
+    private IPersistentStore store;
 
-	@Override
-	protected IPersistentStore getStore() {
-		if (null == this.store) {
-			try {
-				// re inject stuff into this service, because otherwise we don't get the commandline args injected
-				// services are injected before connadline args are parsed.
-				super.af.injectIntoService(this);
+    @Override
+    protected IPersistentStore getStore() {
+        if (null == this.store) {
+            try {
+                // re inject stuff into this service, because otherwise we don't get the commandline args injected
+                // services are injected before connadline args are parsed.
+                super.af.injectIntoService(this);
 
-				final String path = this.directory.isEmpty() ? "" : this.directory + "/" + this.afId();
-				this.store = new HJsonFile(path);
-				super.af.injectIntoSimpleObject(this.store);
+                final String path = this.directory.isEmpty() ? "" : this.directory + "/" + this.afId();
+                this.store = new HJsonFile(path);
+                super.af.injectIntoSimpleObject(this.store);
 
-				this.logger.log(LogLevel.DEBUG, "Using configuration file " + ((HJsonFile) this.store).getFile().getFullName());
+                this.logger.log(LogLevel.DEBUG, "Using configuration file " + ((HJsonFile) this.store).getFile().getFullName());
 
-			} catch (final ApplicationFrameworkException e) {
-				super.logger.log(LogLevel.ERROR, e.getMessage());
-				super.logger.log(LogLevel.DEBUG, e.getMessage(), e);
-			}
-		}
-		return this.store;
-	}
+            } catch (final ApplicationFrameworkException e) {
+                super.logger.log(LogLevel.ERROR, e.getMessage());
+                super.logger.log(LogLevel.DEBUG, e.getMessage(), e);
+            }
+        }
+        return this.store;
+    }
 
 }

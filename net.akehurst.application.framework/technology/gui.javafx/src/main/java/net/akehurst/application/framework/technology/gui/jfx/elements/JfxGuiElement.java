@@ -30,114 +30,114 @@ import net.akehurst.holser.reflect.BetterMethodFinder;
 
 public class JfxGuiElement implements IGuiElement {
 
-	public JfxGuiElement(final Node jfxNode) {
-		this.jfxNode = jfxNode;
-	}
+    public JfxGuiElement(final Node jfxNode) {
+        this.jfxNode = jfxNode;
+    }
 
-	Node jfxNode;
+    Node jfxNode;
 
-	@Override
-	public String getElementId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getElementId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Object get(final UserSession session, final String propertyName) {
-		try {
-			final BetterMethodFinder bmf = new BetterMethodFinder(this.jfxNode.getClass());
-			final String mName = "get" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
-			final Method m = bmf.findMethod(mName);
-			return m.invoke(this.jfxNode);
-		} catch (final Throwable t) {
-			throw new RuntimeException("Unknown property " + propertyName + " on " + this.jfxNode.getClass().getName(), t);
-		}
-	}
+    @Override
+    public Object get(final UserSession session, final String propertyName) {
+        try {
+            final BetterMethodFinder bmf = new BetterMethodFinder(this.jfxNode.getClass());
+            final String mName = "get" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+            final Method m = bmf.findMethod(mName);
+            return m.invoke(this.jfxNode);
+        } catch (final Throwable t) {
+            throw new RuntimeException("Unknown property " + propertyName + " on " + this.jfxNode.getClass().getName(), t);
+        }
+    }
 
-	@Override
-	public void set(final UserSession session, final String propertyName, final Object value) {
-		try {
-			final BetterMethodFinder bmf = new BetterMethodFinder(this.jfxNode.getClass());
-			final String mName = "set" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
-			final Method m = bmf.findMethod(mName, value.getClass());
-			m.invoke(this.jfxNode, value);
-		} catch (final Throwable t) {
-			throw new RuntimeException("Unknown property " + propertyName + " on " + this.jfxNode.getClass().getName(), t);
-		}
-	}
+    @Override
+    public void set(final UserSession session, final String propertyName, final Object value) {
+        try {
+            final BetterMethodFinder bmf = new BetterMethodFinder(this.jfxNode.getClass());
+            final String mName = "set" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+            final Method m = bmf.findMethod(mName, value.getClass());
+            m.invoke(this.jfxNode, value);
+        } catch (final Throwable t) {
+            throw new RuntimeException("Unknown property " + propertyName + " on " + this.jfxNode.getClass().getName(), t);
+        }
+    }
 
-	@Override
-	public void onEvent(final UserSession session, final GuiEventType eventType, final OnEventHandler handler) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onEvent(final UserSession session, final GuiEventType eventType, final OnEventHandler handler) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void clear(final UserSession session) {
-		// TODO Auto-generated method stub
+    @Override
+    public void clear(final UserSession session) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void setDisabled(final UserSession session, final boolean value) {
-		// TODO Auto-generated method stub
+    @Override
+    public void setDisabled(final UserSession session, final boolean value) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void setLoading(final UserSession session, final boolean value) {
-		// TODO Auto-generated method stub
+    @Override
+    public void setLoading(final UserSession session, final boolean value) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void addClass(final UserSession session, final String className) {
-		// TODO Auto-generated method stub
+    @Override
+    public void addClass(final UserSession session, final String className) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void removeClass(final UserSession session, final String className) {
-		// TODO Auto-generated method stub
+    @Override
+    public void removeClass(final UserSession session, final String className) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
-			final Object content) {
-		// TODO Auto-generated method stub
+    @Override
+    public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
+            final Object content) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void removeSubElement(final UserSession session, final String subElementId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void removeSubElement(final UserSession session, final String subElementId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public IGuiText createText(final UserSession session, final String textId, final String content) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiText createText(final UserSession session, final String textId, final String content) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public IGuiTable createTable(final UserSession session, final String tableId, final String content) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiTable createTable(final UserSession session, final String tableId, final String content) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public IGuiGraphViewer createGraph(final UserSession session, final String graphId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiGraphViewer createGraph(final UserSession session, final String graphId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public <X, Y> IGuiChart<X, Y> createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
-			final String jsonChartOptions) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public <X, Y> IGuiChart<X, Y> createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
+            final String jsonChartOptions) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

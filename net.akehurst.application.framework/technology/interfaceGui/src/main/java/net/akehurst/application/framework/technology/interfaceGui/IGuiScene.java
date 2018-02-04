@@ -23,54 +23,54 @@ import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiE
 
 public interface IGuiScene extends IIdentifiableObject {
 
-	StageIdentity getStageId();
+    StageIdentity getStageId();
 
-	SceneIdentity getSceneId();
+    SceneIdentity getSceneId();
 
-	IGuiRequest getGuiRequest();
+    IGuiRequest getGuiRequest();
 
-	/**
-	 * called by the framework to indicate that an event has occured
-	 *
-	 * @param event
-	 */
-	void notifyEventOccured(GuiEvent event);
+    /**
+     * called by the framework to indicate that an event has occured
+     *
+     * @param event
+     */
+    void notifyEventOccured(GuiEvent event);
 
-	// void navigateTo(UserSession session, String location);
-	//
-	// void newWindow(UserSession session, String location);
+    // void navigateTo(UserSession session, String location);
+    //
+    // void newWindow(UserSession session, String location);
 
-	void switchTo(UserSession session);
+    void switchTo(UserSession session);
 
-	void switchTo(UserSession session, Map<String, String> sceneArguments);
+    void switchTo(UserSession session, Map<String, String> sceneArguments);
 
-	// Future<String> oauthAuthorise(UserSession session, String clientId, String clientSecret, String site, String tokenPath, String authorisationPath,
-	// String scopes);
+    // Future<String> oauthAuthorise(UserSession session, String clientId, String clientSecret, String site, String tokenPath, String authorisationPath,
+    // String scopes);
 
-	public interface OnEventHandler {
-		void execute(GuiEvent event);
-	}
+    public interface OnEventHandler {
+        void execute(GuiEvent event);
+    }
 
-	/**
-	 * Register an event handler for an event.
-	 *
-	 * @param session
-	 * @param eventSignature
-	 * @param handler
-	 */
-	void onEvent(UserSession session, GuiEventSignature eventSignature, OnEventHandler handler);
+    /**
+     * Register an event handler for an event.
+     *
+     * @param session
+     * @param eventSignature
+     * @param handler
+     */
+    void onEvent(UserSession session, GuiEventSignature eventSignature, OnEventHandler handler);
 
-	void onUpload(UserSession session, String uploadLink, String filenameElementId, OnEventHandler handler);
+    void onUpload(UserSession session, String uploadLink, String filenameElementId, OnEventHandler handler);
 
-	<T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, DialogIdentity dialogId, String title, String dialogContent);
+    <T extends IGuiDialog> T createDialog(Class<T> dialogClass, UserSession session, DialogIdentity dialogId, String title, String dialogContent);
 
-	/**
-	 *
-	 * @param elementName
-	 *            the id (or class) of an element
-	 * @return
-	 */
-	IGuiElement getElement(String elementName);
+    /**
+     *
+     * @param elementName
+     *            the id (or class) of an element
+     * @return
+     */
+    IGuiElement getElement(String elementName);
 
-	IGuiDialog getDialog(DialogIdentity dialogId);
+    IGuiDialog getDialog(DialogIdentity dialogId);
 }

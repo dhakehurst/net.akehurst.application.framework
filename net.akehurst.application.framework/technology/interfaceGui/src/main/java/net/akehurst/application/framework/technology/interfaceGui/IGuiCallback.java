@@ -23,8 +23,8 @@ package net.akehurst.application.framework.technology.interfaceGui;
  */
 public interface IGuiCallback {
 
-	void success(Object result);
+    void success(Object result);
 
-	void error(Exception ex);
+    void error(Exception ex);
 
 }

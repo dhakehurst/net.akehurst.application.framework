@@ -31,70 +31,70 @@ import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGu
 
 public class GuiDiagramData implements IGuiDiagramData {
 
-	public GuiDiagramData() {
-		this.style = "";
-		this.layout = new HashMap<>();
-		this.graph = new GuiGraph();
-	}
+    public GuiDiagramData() {
+        this.style = "";
+        this.layout = new HashMap<>();
+        this.graph = new GuiGraph();
+    }
 
-	/**
-	 *
-	 * @param styleReader
-	 *            reads a .css file defining the diagram style
-	 * @param layout
-	 *            a json string defining the layout for the diagram
-	 * @throws IOException
-	 */
-	public GuiDiagramData(final Reader styleReader) throws IOException {
-		final BufferedReader br = new BufferedReader(styleReader);
-		String line = br.readLine();
-		final StringBuffer buf = new StringBuffer();
-		while (null != line) {
-			buf.append(line);
-			buf.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		this.style = buf.toString();
-		this.layout = new HashMap<>();
-		this.graph = new GuiGraph();
-	}
+    /**
+     *
+     * @param styleReader
+     *            reads a .css file defining the diagram style
+     * @param layout
+     *            a json string defining the layout for the diagram
+     * @throws IOException
+     */
+    public GuiDiagramData(final Reader styleReader) throws IOException {
+        final BufferedReader br = new BufferedReader(styleReader);
+        String line = br.readLine();
+        final StringBuffer buf = new StringBuffer();
+        while (null != line) {
+            buf.append(line);
+            buf.append(System.lineSeparator());
+            line = br.readLine();
+        }
+        this.style = buf.toString();
+        this.layout = new HashMap<>();
+        this.graph = new GuiGraph();
+    }
 
-	GuiGraph graph;
+    GuiGraph graph;
 
-	@Override
-	public IGuiGraph getGraph() {
-		return this.graph;
-	}
+    @Override
+    public IGuiGraph getGraph() {
+        return this.graph;
+    }
 
-	protected String style;
+    protected String style;
 
-	@Override
-	public String getStyle() {
-		return this.style;
-	}
+    @Override
+    public String getStyle() {
+        return this.style;
+    }
 
-	protected Map<String, Object> layout;
+    protected Map<String, Object> layout;
 
-	@Override
-	public Map<String, Object> getLayout() {
-		return this.layout;
-	}
+    @Override
+    public Map<String, Object> getLayout() {
+        return this.layout;
+    }
 
-	public IGuiGraphNode addNode(final IGuiGraphNode parent, final String identity, final String... classes) {
-		final IGuiGraphNode node = new GuiGraphNode(identity, parent);
-		String classesStr = "";
-		for (final String s : classes) {
-			classesStr += s + " ";
-		}
-		node.getProperties().put("classes", classesStr);
-		this.graph.getNodes().put(identity, node);
-		return node;
-	}
+    public IGuiGraphNode addNode(final IGuiGraphNode parent, final String identity, final String... classes) {
+        final IGuiGraphNode node = new GuiGraphNode(identity, parent);
+        String classesStr = "";
+        for (final String s : classes) {
+            classesStr += s + " ";
+        }
+        node.getProperties().put("classes", classesStr);
+        this.graph.getNodes().put(identity, node);
+        return node;
+    }
 
-	public IGuiGraphEdge addEdge(final String identity, final IGuiGraphNode parent, final String sourceNodeId, final String targetNodeId,
-			final String... classes) {
-		final IGuiGraphEdge edge = new GuiGraphEdge(this.getGraph(), identity, parent, sourceNodeId, targetNodeId, classes);
-		this.graph.getEdges().put(identity, edge);
-		return edge;
-	}
+    public IGuiGraphEdge addEdge(final String identity, final IGuiGraphNode parent, final String sourceNodeId, final String targetNodeId,
+            final String... classes) {
+        final IGuiGraphEdge edge = new GuiGraphEdge(this.getGraph(), identity, parent, sourceNodeId, targetNodeId, classes);
+        this.graph.getEdges().put(identity, edge);
+        return edge;
+    }
 }

@@ -19,6 +19,6 @@ import java.util.Map;
 
 public interface IPublishSubscribeNotification {
 
-	void notifyPublication(ChannelIdentity channelId, byte[] data);
-	
+    void notifyPublication(ChannelIdentity channelId, byte[] data);
+
 }

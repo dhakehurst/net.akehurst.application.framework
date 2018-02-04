@@ -19,7 +19,7 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IConsoleNotification {
 
-	void notifyReady(UserSession session);
+    void notifyReady(UserSession session);
 
-	void notifyKeyPress(UserSession session);
+    void notifyKeyPress(UserSession session);
 }

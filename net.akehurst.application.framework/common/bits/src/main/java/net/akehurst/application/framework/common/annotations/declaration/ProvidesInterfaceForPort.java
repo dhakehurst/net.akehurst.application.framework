@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ProvidesInterfaceForPort {
-	Class<?> provides();
-	String portId();
+    Class<?> provides();
+
+    String portId();
 }

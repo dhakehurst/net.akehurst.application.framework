@@ -19,13 +19,13 @@ import java.util.List;
 
 public interface IDirectory extends IDirectoryEntry {
 
-	IFile createFile();
+    IFile createFile();
 
-	IDirectory createDirectory();
+    IDirectory createDirectory();
 
-	List<IDirectoryEntry> getEntries() throws FilesystemException;
+    List<IDirectoryEntry> getEntries() throws FilesystemException;
 
-	List<IDirectoryEntry> findAll(List<String> includeGlobs, List<String> excludeGlobs) throws FilesystemException;
+    List<IDirectoryEntry> findAll(List<String> includeGlobs, List<String> excludeGlobs) throws FilesystemException;
 
-	List<IFile> findAllFiles(List<String> includeGlobs, List<String> excludeGlobs) throws FilesystemException;
+    List<IFile> findAllFiles(List<String> includeGlobs, List<String> excludeGlobs) throws FilesystemException;
 }

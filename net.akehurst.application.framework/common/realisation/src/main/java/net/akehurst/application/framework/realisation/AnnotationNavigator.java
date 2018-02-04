@@ -26,96 +26,96 @@ import net.akehurst.holser.reflect.BetterMethodFinder;
 
 public class AnnotationNavigator {
 
-	public AnnotationNavigator(final Object obj) {
-		this.obj = obj;
-		this.objClass = obj.getClass();
-	}
+    public AnnotationNavigator(final Object obj) {
+        this.obj = obj;
+        this.objClass = obj.getClass();
+    }
 
-	Object obj;
-	Class<?> objClass;
+    Object obj;
+    Class<?> objClass;
 
-	public <T extends Annotation> List<AnnotationDetails<T>> get(final Class<T> annotationClass) {
-		return this.findPartInfo(annotationClass, this.objClass);
-	}
+    public <T extends Annotation> List<AnnotationDetails<T>> get(final Class<T> annotationClass) {
+        return this.findPartInfo(annotationClass, this.objClass);
+    }
 
-	public <G extends Annotation, E extends Annotation> List<AnnotationDetailsList<E>> getList(final Class<G> annotationContainerClass,
-			final Class<E> annotationClass) {
-		return this.findPartInfo(annotationContainerClass, annotationClass, this.objClass);
-	}
+    public <G extends Annotation, E extends Annotation> List<AnnotationDetailsList<E>> getList(final Class<G> annotationContainerClass,
+            final Class<E> annotationClass) {
+        return this.findPartInfo(annotationContainerClass, annotationClass, this.objClass);
+    }
 
-	<G extends Annotation, E extends Annotation> List<AnnotationDetails<E>> findPartInfo(final Class<E> annotationClass, final Class<?> class_) {
-		final List<AnnotationDetails<E>> result = new ArrayList<>();
+    <G extends Annotation, E extends Annotation> List<AnnotationDetails<E>> findPartInfo(final Class<E> annotationClass, final Class<?> class_) {
+        final List<AnnotationDetails<E>> result = new ArrayList<>();
 
-		if (null == class_.getSuperclass()) {
-		} else {
-			final List<AnnotationDetails<E>> sp = this.findPartInfo(annotationClass, class_.getSuperclass());
-			result.addAll(sp);
-		}
-		for (final Field f : class_.getDeclaredFields()) {
-			final AnnotationDetails<E> pi = this.findPartInfo(annotationClass, f);
-			if (null == pi) {
-				// ignore
-			} else {
-				result.add(pi);
-			}
-		}
+        if (null == class_.getSuperclass()) {
+        } else {
+            final List<AnnotationDetails<E>> sp = this.findPartInfo(annotationClass, class_.getSuperclass());
+            result.addAll(sp);
+        }
+        for (final Field f : class_.getDeclaredFields()) {
+            final AnnotationDetails<E> pi = this.findPartInfo(annotationClass, f);
+            if (null == pi) {
+                // ignore
+            } else {
+                result.add(pi);
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	private <E extends Annotation> AnnotationDetails<E> findPartInfo(final Class<E> annotationClass, final Field f) {
-		f.setAccessible(true);
-		AnnotationDetails<E> pi = null;
-		final E ann = f.getAnnotation(annotationClass);
-		if (null == ann) {
-			// do nothing
-		} else {
-			final Class<?> fType = f.getType();
-			pi = new AnnotationDetails<>(this.obj, f, fType, ann);
-		}
-		return pi;
-	}
+    private <E extends Annotation> AnnotationDetails<E> findPartInfo(final Class<E> annotationClass, final Field f) {
+        f.setAccessible(true);
+        AnnotationDetails<E> pi = null;
+        final E ann = f.getAnnotation(annotationClass);
+        if (null == ann) {
+            // do nothing
+        } else {
+            final Class<?> fType = f.getType();
+            pi = new AnnotationDetails<>(this.obj, f, fType, ann);
+        }
+        return pi;
+    }
 
-	<G extends Annotation, E extends Annotation> List<AnnotationDetailsList<E>> findPartInfo(final Class<G> annotationContainerClass,
-			final Class<E> annotationClass, final Class<?> class_) {
-		final List<AnnotationDetailsList<E>> result = new ArrayList<>();
+    <G extends Annotation, E extends Annotation> List<AnnotationDetailsList<E>> findPartInfo(final Class<G> annotationContainerClass,
+            final Class<E> annotationClass, final Class<?> class_) {
+        final List<AnnotationDetailsList<E>> result = new ArrayList<>();
 
-		if (null == class_.getSuperclass()) {
-		} else {
-			final List<AnnotationDetailsList<E>> sp = this.findPartInfo(annotationContainerClass, annotationClass, class_.getSuperclass());
-			result.addAll(sp);
-		}
-		for (final Field f : class_.getDeclaredFields()) {
-			final AnnotationDetailsList<E> pi = this.findPartInfo(annotationContainerClass, annotationClass, f);
-			if (null == pi) {
-				// ignore
-			} else {
-				result.add(pi);
-			}
-		}
+        if (null == class_.getSuperclass()) {
+        } else {
+            final List<AnnotationDetailsList<E>> sp = this.findPartInfo(annotationContainerClass, annotationClass, class_.getSuperclass());
+            result.addAll(sp);
+        }
+        for (final Field f : class_.getDeclaredFields()) {
+            final AnnotationDetailsList<E> pi = this.findPartInfo(annotationContainerClass, annotationClass, f);
+            if (null == pi) {
+                // ignore
+            } else {
+                result.add(pi);
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	private <G extends Annotation, E extends Annotation> AnnotationDetailsList<E> findPartInfo(final Class<G> annotationContainerClass,
-			final Class<E> annotationClass, final Field f) {
-		f.setAccessible(true);
-		AnnotationDetailsList<E> pi = null;
-		final G ann = f.getAnnotation(annotationContainerClass);
-		if (null == ann) {
-			// do nothing
-		} else {
-			try {
-				final Class<?> fType = f.getType();
-				final BetterMethodFinder bmf = new BetterMethodFinder(annotationContainerClass);
-				final Method valMethod = bmf.findMethod("value");
-				final E[] values = (E[]) valMethod.invoke(ann);
-				pi = new AnnotationDetailsList<>(this.obj, f, fType, Arrays.asList(values));
-			} catch (final Exception e) {
-				// TODO:
-				e.printStackTrace();
-			}
-		}
-		return pi;
-	}
+    private <G extends Annotation, E extends Annotation> AnnotationDetailsList<E> findPartInfo(final Class<G> annotationContainerClass,
+            final Class<E> annotationClass, final Field f) {
+        f.setAccessible(true);
+        AnnotationDetailsList<E> pi = null;
+        final G ann = f.getAnnotation(annotationContainerClass);
+        if (null == ann) {
+            // do nothing
+        } else {
+            try {
+                final Class<?> fType = f.getType();
+                final BetterMethodFinder bmf = new BetterMethodFinder(annotationContainerClass);
+                final Method valMethod = bmf.findMethod("value");
+                final E[] values = (E[]) valMethod.invoke(ann);
+                pi = new AnnotationDetailsList<>(this.obj, f, fType, Arrays.asList(values));
+            } catch (final Exception e) {
+                // TODO:
+                e.printStackTrace();
+            }
+        }
+        return pi;
+    }
 }

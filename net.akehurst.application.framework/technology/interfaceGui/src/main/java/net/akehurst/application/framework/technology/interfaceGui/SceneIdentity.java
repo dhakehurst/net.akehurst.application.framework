@@ -21,18 +21,18 @@ import net.akehurst.application.framework.common.AbstractDataType;
 
 public class SceneIdentity extends AbstractDataType {
 
-	private static Pattern valid = Pattern.compile("[a-zA-z][a-zA-Z0-9/]*");
+    private static Pattern valid = Pattern.compile("[a-zA-z][a-zA-Z0-9/]*");
 
-	public SceneIdentity(final String value) throws GuiException {
-		super(value);
-		if (value.isEmpty() || SceneIdentity.valid.matcher(value).matches()) {
-			// ok
-		} else {
-			throw new GuiException("Invalid SceneIdentity value - " + value, null);
-		}
-	}
+    public SceneIdentity(final String value) throws GuiException {
+        super(value);
+        if (value.isEmpty() || SceneIdentity.valid.matcher(value).matches()) {
+            // ok
+        } else {
+            throw new GuiException("Invalid SceneIdentity value - " + value, null);
+        }
+    }
 
-	public String asPrimitive() {
-		return (String) super.getIdentityValues().get(0);
-	}
+    public String asPrimitive() {
+        return (String) super.getIdentityValues().get(0);
+    }
 }

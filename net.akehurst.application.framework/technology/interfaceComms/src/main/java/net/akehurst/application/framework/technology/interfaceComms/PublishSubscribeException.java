@@ -17,8 +17,8 @@ package net.akehurst.application.framework.technology.interfaceComms;
 
 public class PublishSubscribeException extends Exception {
 
-	public PublishSubscribeException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
+    public PublishSubscribeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

@@ -22,19 +22,19 @@ import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiE
 
 public interface IGuiTable extends IGuiElement {
 
-	void create(UserSession session);
+    void create(UserSession session);
 
-	void remove(UserSession session);
+    void remove(UserSession session);
 
-	void setData(UserSession session, IGuiTableData data);
+    void setData(UserSession session, IGuiTableData data);
 
-	void addColumn(UserSession session, String colHeaderContent, String rowTemplateCellContent, String existingRowCellContent);
+    void addColumn(UserSession session, String colHeaderContent, String rowTemplateCellContent, String existingRowCellContent);
 
-	void appendRow(UserSession session, Map<String, Object> rowData);
+    void appendRow(UserSession session, Map<String, Object> rowData);
 
-	void removeRow(UserSession session, String rowId);
+    void removeRow(UserSession session, String rowId);
 
-	void clearAllRows(UserSession session);
+    void clearAllRows(UserSession session);
 
-	void clearAllColumnHeaders(UserSession session);
+    void clearAllColumnHeaders(UserSession session);
 }

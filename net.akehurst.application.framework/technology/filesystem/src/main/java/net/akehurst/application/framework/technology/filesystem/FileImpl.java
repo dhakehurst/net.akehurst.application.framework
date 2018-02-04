@@ -28,43 +28,43 @@ import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesy
 
 public class FileImpl extends DirectoryEntry implements IFile {
 
-	public FileImpl(final IFilesystem fs, final Path path) {
-		super(fs, path);
-	}
+    public FileImpl(final IFilesystem fs, final Path path) {
+        super(fs, path);
+    }
 
-	@Override
-	public byte[] readBytes() throws FilesystemException {
-		try {
-			return Files.readAllBytes(this.asPath());
-		} catch (final IOException e) {
-			throw new FilesystemException(e.getMessage(), e);
-		}
-	}
+    @Override
+    public byte[] readBytes() throws FilesystemException {
+        try {
+            return Files.readAllBytes(this.asPath());
+        } catch (final IOException e) {
+            throw new FilesystemException(e.getMessage(), e);
+        }
+    }
 
-	@Override
-	public Reader reader() throws FilesystemException {
-		try {
-			return Files.newBufferedReader(this.asPath());
-		} catch (final Exception ex) {
-			throw new FilesystemException("Failed to create Reader", ex);
-		}
-	}
+    @Override
+    public Reader reader() throws FilesystemException {
+        try {
+            return Files.newBufferedReader(this.asPath());
+        } catch (final Exception ex) {
+            throw new FilesystemException("Failed to create Reader", ex);
+        }
+    }
 
-	@Override
-	public BufferedReader bufferedReader() throws FilesystemException {
-		try {
-			final Reader r = Files.newBufferedReader(this.asPath());
-			final BufferedReader br = new BufferedReader(r);
-			return br;
-		} catch (final Exception ex) {
-			throw new FilesystemException("Failed to create Reader", ex);
-		}
-	}
+    @Override
+    public BufferedReader bufferedReader() throws FilesystemException {
+        try {
+            final Reader r = Files.newBufferedReader(this.asPath());
+            final BufferedReader br = new BufferedReader(r);
+            return br;
+        } catch (final Exception ex) {
+            throw new FilesystemException("Failed to create Reader", ex);
+        }
+    }
 
-	@Override
-	public IFile relativeTo(final IDirectory directory) {
-		final Path path = directory.asPath().relativize(this.asPath());
-		return new FileImpl(this.getFilesystem(), path);
-	}
+    @Override
+    public IFile relativeTo(final IDirectory directory) {
+        final Path path = directory.asPath().relativize(this.asPath());
+        return new FileImpl(this.getFilesystem(), path);
+    }
 
 }

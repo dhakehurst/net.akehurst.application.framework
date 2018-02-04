@@ -17,6 +17,6 @@ package net.akehurst.application.framework.common;
 
 public interface ISignalR<R> {
 
-	R execute() throws Throwable;
+    R execute() throws Throwable;
 
 }

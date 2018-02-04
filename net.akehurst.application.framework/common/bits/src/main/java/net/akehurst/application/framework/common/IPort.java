@@ -19,40 +19,40 @@ import java.util.Set;
 
 public interface IPort extends IIdentifiableObject {
 
-	/**
-	 * Set of objects internal to the component that provide the interface
-	 *
-	 * @param interfaceType
-	 * @return
-	 */
-	<T> Set<T> getProvided(Class<T> interfaceType);
+    /**
+     * Set of objects internal to the component that provide the interface
+     *
+     * @param interfaceType
+     * @return
+     */
+    <T> Set<T> getProvided(Class<T> interfaceType);
 
-	Set<Class<?>> getRequired();
+    Set<Class<?>> getRequired();
 
-	<T> void provideRequired(Class<T> interfaceType, T provider);
+    <T> void provideRequired(Class<T> interfaceType, T provider);
 
-	/**
-	 * returns a proxy object that implements the providedInterfaceType by calling methods on all the internal connections to the port that 'provide' the
-	 * required interface
-	 *
-	 * @param interfaceType
-	 * @return
-	 */
-	<T> T in(final Class<T> providedInterfaceType);
+    /**
+     * returns a proxy object that implements the providedInterfaceType by calling methods on all the internal connections to the port that 'provide' the
+     * required interface
+     *
+     * @param interfaceType
+     * @return
+     */
+    <T> T in(final Class<T> providedInterfaceType);
 
-	/**
-	 * returns a proxy object that implements the requiredInterfaceType by calling methods on all the external connections to the port that 'provide' the
-	 * required interface
-	 *
-	 * @param requiredInterfaceType
-	 * @return
-	 */
-	<T> T out(Class<T> requiredInterfaceType);
+    /**
+     * returns a proxy object that implements the requiredInterfaceType by calling methods on all the external connections to the port that 'provide' the
+     * required interface
+     *
+     * @param requiredInterfaceType
+     * @return
+     */
+    <T> T out(Class<T> requiredInterfaceType);
 
-	void connect(IPort other);
+    void connect(IPort other);
 
-	void connectInternal(IPort other);
+    void connectInternal(IPort other);
 
-	void connectInternal(IIdentifiableObject other);
+    void connectInternal(IIdentifiableObject other);
 
 }

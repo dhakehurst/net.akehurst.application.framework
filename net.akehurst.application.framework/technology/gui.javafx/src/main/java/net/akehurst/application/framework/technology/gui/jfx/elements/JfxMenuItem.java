@@ -33,156 +33,156 @@ import net.akehurst.holser.reflect.BetterMethodFinder;
 // can't extend JfxGuiElement because menuItems are not JfxNodes
 public class JfxMenuItem implements IGuiMenuItem {
 
-	public JfxMenuItem(final MenuItem menuItem) {
-		this.menuItem = menuItem;
+    public JfxMenuItem(final MenuItem menuItem) {
+        this.menuItem = menuItem;
 
-		final Menu parent = this.menuItem.getParentMenu();
-		if (null != parent) {
-			parent.addEventHandler(Menu.ON_SHOWING, (e) -> {
-				if (null != this.eventVisibleWhen) {
-					this.menuItem.setVisible(this.eventVisibleWhen.execute(e.getSource()));
-				}
-				if (null != this.eventEnabledWhen) {
-					this.menuItem.setVisible(this.eventEnabledWhen.execute(e.getSource()));
-				}
-			});
-		} else {
-			final ContextMenu cm = this.menuItem.getParentPopup();
-			if (null != cm) {
-				cm.addEventHandler(Menu.ON_SHOWING, (e) -> {
-					if (null != this.eventVisibleWhen) {
-						this.menuItem.setVisible(this.eventVisibleWhen.execute(e.getSource()));
-					}
-				});
-			}
-		}
+        final Menu parent = this.menuItem.getParentMenu();
+        if (null != parent) {
+            parent.addEventHandler(Menu.ON_SHOWING, (e) -> {
+                if (null != this.eventVisibleWhen) {
+                    this.menuItem.setVisible(this.eventVisibleWhen.execute(e.getSource()));
+                }
+                if (null != this.eventEnabledWhen) {
+                    this.menuItem.setVisible(this.eventEnabledWhen.execute(e.getSource()));
+                }
+            });
+        } else {
+            final ContextMenu cm = this.menuItem.getParentPopup();
+            if (null != cm) {
+                cm.addEventHandler(Menu.ON_SHOWING, (e) -> {
+                    if (null != this.eventVisibleWhen) {
+                        this.menuItem.setVisible(this.eventVisibleWhen.execute(e.getSource()));
+                    }
+                });
+            }
+        }
 
-	}
+    }
 
-	MenuItem menuItem;
+    MenuItem menuItem;
 
-	@Override
-	public String getElementId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getElementId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Object get(final UserSession session, final String propertyName) {
-		try {
-			final BetterMethodFinder bmf = new BetterMethodFinder(this.menuItem.getClass());
-			final String mName = "get" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
-			final Method m = bmf.findMethod(mName);
-			return m.invoke(this.menuItem);
-		} catch (final Throwable t) {
-			throw new RuntimeException("Unknown property " + propertyName + " on " + this.menuItem.getClass().getName(), t);
-		}
-	}
+    @Override
+    public Object get(final UserSession session, final String propertyName) {
+        try {
+            final BetterMethodFinder bmf = new BetterMethodFinder(this.menuItem.getClass());
+            final String mName = "get" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+            final Method m = bmf.findMethod(mName);
+            return m.invoke(this.menuItem);
+        } catch (final Throwable t) {
+            throw new RuntimeException("Unknown property " + propertyName + " on " + this.menuItem.getClass().getName(), t);
+        }
+    }
 
-	@Override
-	public void set(final UserSession session, final String propertyName, final Object value) {
-		try {
-			final BetterMethodFinder bmf = new BetterMethodFinder(this.menuItem.getClass());
-			final String mName = "set" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
-			final Method m = bmf.findMethod(mName, value.getClass());
-			m.invoke(this.menuItem);
-		} catch (final Throwable t) {
-			throw new RuntimeException("Unknown property " + propertyName + " on " + this.menuItem.getClass().getName(), t);
-		}
-	}
+    @Override
+    public void set(final UserSession session, final String propertyName, final Object value) {
+        try {
+            final BetterMethodFinder bmf = new BetterMethodFinder(this.menuItem.getClass());
+            final String mName = "set" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+            final Method m = bmf.findMethod(mName, value.getClass());
+            m.invoke(this.menuItem);
+        } catch (final Throwable t) {
+            throw new RuntimeException("Unknown property " + propertyName + " on " + this.menuItem.getClass().getName(), t);
+        }
+    }
 
-	@Override
-	public void onEvent(final UserSession session, final GuiEventType eventType, final OnEventHandler handler) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onEvent(final UserSession session, final GuiEventType eventType, final OnEventHandler handler) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void clear(final UserSession session) {
-		// TODO Auto-generated method stub
+    @Override
+    public void clear(final UserSession session) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void setDisabled(final UserSession session, final boolean value) {
-		// TODO Auto-generated method stub
+    @Override
+    public void setDisabled(final UserSession session, final boolean value) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void setLoading(final UserSession session, final boolean value) {
-		// TODO Auto-generated method stub
+    @Override
+    public void setLoading(final UserSession session, final boolean value) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void addClass(final UserSession session, final String className) {
-		// TODO Auto-generated method stub
+    @Override
+    public void addClass(final UserSession session, final String className) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void removeClass(final UserSession session, final String className) {
-		// TODO Auto-generated method stub
+    @Override
+    public void removeClass(final UserSession session, final String className) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
-			final Object content) {
-		// TODO Auto-generated method stub
+    @Override
+    public void addSubElement(final UserSession session, final String newElementId, final String newElementType, final String attributes,
+            final Object content) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void removeSubElement(final UserSession session, final String subElementId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void removeSubElement(final UserSession session, final String subElementId) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public IGuiText createText(final UserSession session, final String textId, final String content) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiText createText(final UserSession session, final String textId, final String content) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public IGuiTable createTable(final UserSession session, final String tableId, final String content) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiTable createTable(final UserSession session, final String tableId, final String content) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public <X, Y> IGuiChart<X, Y> createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
-			final String jsonChartOptions) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public <X, Y> IGuiChart<X, Y> createChart(final UserSession session, final String chartId, final String chartType, final String jsonChartData,
+            final String jsonChartOptions) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public IGuiGraphViewer createGraph(final UserSession session, final String graphId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiGraphViewer createGraph(final UserSession session, final String graphId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void onSelected(final EventSelected event) {
-		this.menuItem.setOnAction((e) -> {
-			event.execute();
-		});
-	}
+    @Override
+    public void onSelected(final EventSelected event) {
+        this.menuItem.setOnAction((e) -> {
+            event.execute();
+        });
+    }
 
-	EventEnabledWhen eventEnabledWhen;
+    EventEnabledWhen eventEnabledWhen;
 
-	@Override
-	public void enabledWhen(final EventEnabledWhen event) {
-		this.eventEnabledWhen = event;
-	}
+    @Override
+    public void enabledWhen(final EventEnabledWhen event) {
+        this.eventEnabledWhen = event;
+    }
 
-	EventVisibleWhen eventVisibleWhen;
+    EventVisibleWhen eventVisibleWhen;
 
-	@Override
-	public void visibleWhen(final EventVisibleWhen event) {
-		this.eventVisibleWhen = event;
-	}
+    @Override
+    public void visibleWhen(final EventVisibleWhen event) {
+        this.eventVisibleWhen = event;
+    }
 }

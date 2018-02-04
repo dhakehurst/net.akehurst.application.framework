@@ -27,51 +27,51 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 
 public class AuthenticatorChannel extends AbstractComponent implements ICAuthenticatorRequest, IAuthenticatorNotification {
 
-	public AuthenticatorChannel(final String id) {
-		super(id);
-	}
+    public AuthenticatorChannel(final String id) {
+        super(id);
+    }
 
-	// --------- ICAuthenticatorRequest ---------
-	@Override
-	public void requestLogin(final UserSession session, final String username, final String password) {
-		this.portTechnology().out(IAuthenticatorRequest.class).requestLogin(session, username, password);
-	}
+    // --------- ICAuthenticatorRequest ---------
+    @Override
+    public void requestLogin(final UserSession session, final String username, final String password) {
+        this.portTechnology().out(IAuthenticatorRequest.class).requestLogin(session, username, password);
+    }
 
-	@Override
-	public void requestLogout(final UserSession session) {
-		this.portTechnology().out(IAuthenticatorRequest.class).requestLogout(session);
-	}
+    @Override
+    public void requestLogout(final UserSession session) {
+        this.portTechnology().out(IAuthenticatorRequest.class).requestLogout(session);
+    }
 
-	// --------- IAuthenticatorNotification ---------
-	@Override
-	public void notifyAuthenticationFailure(final UserSession session, final String message) {
-		this.portComputational().out(ICAuthenticatorNotification.class).notifyAuthenticationFailure(session, message);
-	}
+    // --------- IAuthenticatorNotification ---------
+    @Override
+    public void notifyAuthenticationFailure(final UserSession session, final String message) {
+        this.portComputational().out(ICAuthenticatorNotification.class).notifyAuthenticationFailure(session, message);
+    }
 
-	@Override
-	public void notifyAuthenticationSuccess(final UserSession session) {
-		this.portComputational().out(ICAuthenticatorNotification.class).notifyAuthenticationSuccess(session);
-	}
+    @Override
+    public void notifyAuthenticationSuccess(final UserSession session) {
+        this.portComputational().out(ICAuthenticatorNotification.class).notifyAuthenticationSuccess(session);
+    }
 
-	@Override
-	public void notifyAuthenticationCleared(final UserSession session) {
-		this.portComputational().out(ICAuthenticatorNotification.class).notifyAuthenticationCleared(session);
-	}
+    @Override
+    public void notifyAuthenticationCleared(final UserSession session) {
+        this.portComputational().out(ICAuthenticatorNotification.class).notifyAuthenticationCleared(session);
+    }
 
-	// --------- Ports ---------
-	@PortInstance
-	@PortContract(provides = ICAuthenticatorRequest.class, requires = ICAuthenticatorNotification.class)
-	IPort portComputational;
+    // --------- Ports ---------
+    @PortInstance
+    @PortContract(provides = ICAuthenticatorRequest.class, requires = ICAuthenticatorNotification.class)
+    IPort portComputational;
 
-	public IPort portComputational() {
-		return this.portComputational;
-	}
+    public IPort portComputational() {
+        return this.portComputational;
+    }
 
-	@PortInstance
-	@PortContract(provides = IAuthenticatorNotification.class, requires = IAuthenticatorRequest.class)
-	IPort portTechnology;
+    @PortInstance
+    @PortContract(provides = IAuthenticatorNotification.class, requires = IAuthenticatorRequest.class)
+    IPort portTechnology;
 
-	public IPort portTechnology() {
-		return this.portTechnology;
-	}
+    public IPort portTechnology() {
+        return this.portTechnology;
+    }
 }

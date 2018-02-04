@@ -21,15 +21,15 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
 import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiText;
 
-public class VertxGuiText extends VertxGuiElement implements IGuiText {
+public class WebGuiText extends WebGuiElement implements IGuiText {
 
-	public VertxGuiText(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
-		super(guiRequest, scene, dialog, elementName);
-	}
+    public WebGuiText(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
+        super(guiRequest, scene, dialog, elementName);
+    }
 
-	@Override
-	public void setText(final UserSession session, final String value) {
-		this.getGuiRequest().textSetValue(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), value);
-	}
+    @Override
+    public void setText(final UserSession session, final String value) {
+        this.getGuiRequest().textSetValue(session, this.getScene().getStageId(), this.getScene().getSceneId(), this.getElementId(), value);
+    }
 
 }

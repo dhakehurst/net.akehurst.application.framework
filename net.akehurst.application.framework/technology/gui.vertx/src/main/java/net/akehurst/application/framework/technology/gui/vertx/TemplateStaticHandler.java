@@ -26,53 +26,53 @@ import io.vertx.ext.web.RoutingContext;
 
 public class TemplateStaticHandler extends StaticHandlerImpl {
 
-	public TemplateStaticHandler() {
-		this.values = new HashMap<>();
-	}
+    public TemplateStaticHandler() {
+        this.values = new HashMap<>();
+    }
 
-	Map<String, String> values;
+    Map<String, String> values;
 
-	@Override
-	protected void sendFile(final RoutingContext context, final String path, final FileProps fileProps) {
-		if (path.endsWith(".html") || path.endsWith(".css")) {
-			if (path.endsWith(".html")) {
-				context.response().putHeader("content-type", "text/html");
-			}
-			if (path.endsWith(".css")) {
-				context.response().putHeader("content-type", "text/css");
-			}
+    @Override
+    protected void sendFile(final RoutingContext context, final String path, final FileProps fileProps) {
+        if (path.endsWith(".html") || path.endsWith(".css")) {
+            if (path.endsWith(".html")) {
+                context.response().putHeader("content-type", "text/html");
+            }
+            if (path.endsWith(".css")) {
+                context.response().putHeader("content-type", "text/css");
+            }
 
-			// TODO maybe need to wrapInTCCLSwitch
-			final String content = this.getFileContent(path, context);
-			context.response().end(content);
-		} else {
-			super.sendFile(context, path, fileProps);
-		}
+            // TODO maybe need to wrapInTCCLSwitch
+            final String content = this.getFileContent(path, context);
+            context.response().end(content);
+        } else {
+            super.sendFile(context, path, fileProps);
+        }
 
-	}
+    }
 
-	protected String getFileContent(final String path, final RoutingContext context) {
-		final Buffer b = context.vertx().fileSystem().readFileBlocking(path);
-		final byte[] bytes = b.getBytes();
-		String fileContent = new String(bytes);
+    protected String getFileContent(final String path, final RoutingContext context) {
+        final Buffer b = context.vertx().fileSystem().readFileBlocking(path);
+        final byte[] bytes = b.getBytes();
+        String fileContent = new String(bytes);
 
-		final StrSubstitutor subs = new StrSubstitutor(this.values);
-		fileContent = subs.replace(fileContent);
+        final StrSubstitutor subs = new StrSubstitutor(this.values);
+        fileContent = subs.replace(fileContent);
 
-		return fileContent;
-	}
+        return fileContent;
+    }
 
-	public static TemplateStaticHandler create() {
-		return new TemplateStaticHandler();
-	}
+    public static TemplateStaticHandler create() {
+        return new TemplateStaticHandler();
+    }
 
-	public TemplateStaticHandler addVariable(final String name, final String value) {
-		this.values.put(name, value);
-		return this;
-	}
+    public TemplateStaticHandler addVariable(final String name, final String value) {
+        this.values.put(name, value);
+        return this;
+    }
 
-	public TemplateStaticHandler addVariables(final Map<String, String> values) {
-		this.values.putAll(values);
-		return this;
-	}
+    public TemplateStaticHandler addVariables(final Map<String, String> values) {
+        this.values.putAll(values);
+        return this;
+    }
 }

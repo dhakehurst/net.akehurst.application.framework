@@ -12,24 +12,24 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 @Component
 public class LdapAuthenticator extends AbstractComponent {
 
-	public LdapAuthenticator(final String afId) {
-		super(afId);
-	}
+    public LdapAuthenticator(final String afId) {
+        super(afId);
+    }
 
-	@ActiveObjectInstance
-	AuthenticationHandler handler;
+    @ActiveObjectInstance
+    AuthenticationHandler handler;
 
-	@Override
-	public void afConnectParts() {
-		this.portAuth().connectInternal(this.handler);
-	}
+    @Override
+    public void afConnectParts() {
+        this.portAuth().connectInternal(this.handler);
+    }
 
-	@PortInstance
-	@PortContract(provides = IAuthenticatorRequest.class, requires = IAuthenticatorNotification.class)
-	private IPort portAuth;
+    @PortInstance
+    @PortContract(provides = IAuthenticatorRequest.class, requires = IAuthenticatorNotification.class)
+    private IPort portAuth;
 
-	public IPort portAuth() {
-		return this.portAuth;
-	}
+    public IPort portAuth() {
+        return this.portAuth;
+    }
 
 }

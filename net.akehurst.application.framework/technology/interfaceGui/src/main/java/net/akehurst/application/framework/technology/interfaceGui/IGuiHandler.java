@@ -21,17 +21,17 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiHandler {
 
-	void addAuthentication(UserSession session) throws GuiException;
+    void addAuthentication(UserSession session) throws GuiException;
 
-	void clearAuthentication(UserSession session) throws GuiException;
+    void clearAuthentication(UserSession session) throws GuiException;
 
-	void navigateTo(UserSession session, String location);
+    void navigateTo(UserSession session, String location);
 
-	IGuiScene getScene(final SceneIdentity sceneId);
+    IGuiScene getScene(final SceneIdentity sceneId);
 
-	<T extends IGuiScene> T getScene(final SceneIdentity sceneId, final Class<T> sceneType);
+    <T extends IGuiScene> T getScene(final SceneIdentity sceneId, final Class<T> sceneType);
 
-	<T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, IGuiSceneHandler sceneHandler,
-			final URL content);
+    <T extends IGuiScene> T createScene(final StageIdentity stageId, final SceneIdentity sceneId, final Class<T> sceneClass, IGuiSceneHandler sceneHandler,
+            final URL content);
 
 }

@@ -20,11 +20,11 @@ import java.io.Reader;
 
 public interface IFile extends IDirectoryEntry {
 
-	byte[] readBytes() throws FilesystemException;
+    byte[] readBytes() throws FilesystemException;
 
-	Reader reader() throws FilesystemException;
+    Reader reader() throws FilesystemException;
 
-	BufferedReader bufferedReader() throws FilesystemException;
+    BufferedReader bufferedReader() throws FilesystemException;
 
-	IFile relativeTo(IDirectory directory);
+    IFile relativeTo(IDirectory directory);
 }

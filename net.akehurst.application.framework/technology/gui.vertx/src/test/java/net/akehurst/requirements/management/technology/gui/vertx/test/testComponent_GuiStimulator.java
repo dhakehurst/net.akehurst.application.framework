@@ -10,24 +10,24 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 
 public class testComponent_GuiStimulator extends AbstractComponent {
 
-	public testComponent_GuiStimulator(final String afId) {
-		super(afId);
-	}
+    public testComponent_GuiStimulator(final String afId) {
+        super(afId);
+    }
 
-	@MockPassiveObjectInstance
-	testObject_Handler handler;
+    @MockPassiveObjectInstance
+    testObject_Handler handler;
 
-	@Override
-	public void afConnectParts() {
-		this.portGui().connectInternal(this.handler);
-	}
+    @Override
+    public void afConnectParts() {
+        this.portGui().connectInternal(this.handler);
+    }
 
-	@PortInstance
-	@PortContract(provides = IGuiNotification.class, requires = IGuiRequest.class)
-	private IPort portGui;
+    @PortInstance
+    @PortContract(provides = IGuiNotification.class, requires = IGuiRequest.class)
+    private IPort portGui;
 
-	public IPort portGui() {
-		return this.portGui;
-	}
+    public IPort portGui() {
+        return this.portGui;
+    }
 
 }

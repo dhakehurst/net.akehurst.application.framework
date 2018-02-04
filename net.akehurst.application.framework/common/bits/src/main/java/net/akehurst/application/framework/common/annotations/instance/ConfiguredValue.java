@@ -23,11 +23,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfiguredValue {
-	String id() default "";
+    String id() default "";
 
-	String defaultValue();
+    String defaultValue();
 
-	String service() default "configuration";
+    String service() default "configuration";
 
-	String description() default "";
+    String description() default "";
 }

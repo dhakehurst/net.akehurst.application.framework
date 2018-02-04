@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandLineGroup {
-	String name();
-	String description();
+    String name();
+
+    String description();
 }

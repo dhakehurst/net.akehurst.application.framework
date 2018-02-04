@@ -23,37 +23,37 @@ import java.util.Objects;
 
 abstract public class AbstractDataType {
 
-	public AbstractDataType(final Object... identityValues) {
-		this.identityValues = identityValues;
-		this.hashCode_cache = Objects.hash(this.identityValues);
-	}
+    public AbstractDataType(final Object... identityValues) {
+        this.identityValues = identityValues;
+        this.hashCode_cache = Objects.hash(this.identityValues);
+    }
 
-	private final Object[] identityValues;
+    private final Object[] identityValues;
 
-	protected List<Object> getIdentityValues() {
-		return Collections.unmodifiableList(Arrays.asList(this.identityValues));
-	}
+    protected List<Object> getIdentityValues() {
+        return Collections.unmodifiableList(Arrays.asList(this.identityValues));
+    }
 
-	int hashCode_cache;
+    int hashCode_cache;
 
-	@Override
-	public int hashCode() {
-		return this.hashCode_cache;
-	}
+    @Override
+    public int hashCode() {
+        return this.hashCode_cache;
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this.getClass().isInstance(obj)) {
-			final AbstractDataType other = (AbstractDataType) obj;
-			return Arrays.equals(this.identityValues, other.identityValues);
-		} else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this.getClass().isInstance(obj)) {
+            final AbstractDataType other = (AbstractDataType) obj;
+            return Arrays.equals(this.identityValues, other.identityValues);
+        } else {
+            return false;
+        }
+    }
 
-	@Override
-	public String toString() {
-		return this.getClass().getSimpleName() + Arrays.asList(this.identityValues);
-	}
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + Arrays.asList(this.identityValues);
+    }
 
 }

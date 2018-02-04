@@ -27,13 +27,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandLineArgument {
-	String group() default "";
+    String group() default "";
 
-	String name() default "";
+    String name() default "";
 
-	boolean required() default false;
+    boolean required() default false;
 
-	boolean hasValue() default true;
+    boolean hasValue() default true;
 
-	String description();
+    String description();
 }

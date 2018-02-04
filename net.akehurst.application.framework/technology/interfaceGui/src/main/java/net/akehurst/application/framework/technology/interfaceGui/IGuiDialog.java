@@ -7,30 +7,30 @@ import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiE
 
 public interface IGuiDialog extends IIdentifiableObject {
 
-	DialogIdentity getId();
+    DialogIdentity getId();
 
-	/**
-	 * Register an event handler for an event.
-	 *
-	 * @param session
-	 * @param eventSignature
-	 * @param handler
-	 */
-	void onEvent(UserSession session, GuiEventSignature eventSignature, OnEventHandler handler);
+    /**
+     * Register an event handler for an event.
+     *
+     * @param session
+     * @param eventSignature
+     * @param handler
+     */
+    void onEvent(UserSession session, GuiEventSignature eventSignature, OnEventHandler handler);
 
-	/**
-	 * called by the framework to indicate that an event has occured
-	 *
-	 * @param event
-	 */
-	void notifyEventOccured(GuiEvent event);
+    /**
+     * called by the framework to indicate that an event has occured
+     *
+     * @param event
+     */
+    void notifyEventOccured(GuiEvent event);
 
-	void create(UserSession session);
+    void create(UserSession session);
 
-	void open(UserSession session);
+    void open(UserSession session);
 
-	void close(UserSession session);
+    void close(UserSession session);
 
-	IGuiElement getElement(String elementId);
+    IGuiElement getElement(String elementId);
 
 }

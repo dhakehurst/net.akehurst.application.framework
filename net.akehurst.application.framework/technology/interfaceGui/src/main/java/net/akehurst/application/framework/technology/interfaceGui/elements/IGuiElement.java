@@ -24,44 +24,44 @@ import net.akehurst.application.framework.technology.interfaceGui.data.table.IGu
 
 public interface IGuiElement {
 
-	String getElementId();
+    String getElementId();
 
-	Object get(UserSession session, String propertyName);
+    Object get(UserSession session, String propertyName);
 
-	void set(UserSession session, String propertyName, Object value);
+    void set(UserSession session, String propertyName, Object value);
 
-	void addClass(UserSession session, String className);
+    void addClass(UserSession session, String className);
 
-	void removeClass(UserSession session, String className);
+    void removeClass(UserSession session, String className);
 
-	void onEvent(UserSession session, GuiEventType eventType, OnEventHandler handler);
+    void onEvent(UserSession session, GuiEventType eventType, OnEventHandler handler);
 
-	void clear(UserSession session);
+    void clear(UserSession session);
 
-	void setDisabled(UserSession session, boolean value);
+    void setDisabled(UserSession session, boolean value);
 
-	void setLoading(UserSession session, boolean value);
+    void setLoading(UserSession session, boolean value);
 
-	void removeSubElement(UserSession session, String subElementId);
+    void removeSubElement(UserSession session, String subElementId);
 
-	IGuiText createText(final UserSession session, String textId, String content);
+    IGuiText createText(final UserSession session, String textId, String content);
 
-	IGuiTable createTable(final UserSession session, String tableId, String content);
+    IGuiTable createTable(final UserSession session, String tableId, String content);
 
-	IGuiGraphViewer createGraph(final UserSession session, String graphId);
+    IGuiGraphViewer createGraph(final UserSession session, String graphId);
 
-	<X, Y> IGuiChart<X, Y> createChart(UserSession session, String chartId, String chartType, String jsonChartData, String jsonChartOptions);
+    <X, Y> IGuiChart<X, Y> createChart(UserSession session, String chartId, String chartType, String jsonChartData, String jsonChartOptions);
 
-	/**
-	 * adds sub elements for which the content is expected to be html.
-	 * <p>
-	 * should not really be used as it is html specific.
-	 *
-	 * @param session
-	 * @param newElementId
-	 * @param newElementType
-	 * @param attributes
-	 * @param content
-	 */
-	void addSubElement(UserSession session, String newElementId, String newElementType, String attributes, Object content);
+    /**
+     * adds sub elements for which the content is expected to be html.
+     * <p>
+     * should not really be used as it is html specific.
+     *
+     * @param session
+     * @param newElementId
+     * @param newElementType
+     * @param attributes
+     * @param content
+     */
+    void addSubElement(UserSession session, String newElementId, String newElementType, String attributes, Object content);
 }

@@ -22,14 +22,14 @@ import net.akehurst.application.framework.realisation.AbstractIdentifiableObject
 
 public class AbstractMockConfigurationService extends AbstractIdentifiableObject implements IConfiguration {
 
-	public AbstractMockConfigurationService(final String afId) {
-		super(afId);
-	}
+    public AbstractMockConfigurationService(final String afId) {
+        super(afId);
+    }
 
-	@Override
-	public <T> T fetchValue(final Type itemType, final String idPath, final String defaultValueString) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public <T> T fetchValue(final Type itemType, final String idPath, final String defaultValueString) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

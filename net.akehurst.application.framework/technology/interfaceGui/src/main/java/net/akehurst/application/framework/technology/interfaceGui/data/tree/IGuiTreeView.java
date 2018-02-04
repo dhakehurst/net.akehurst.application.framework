@@ -17,6 +17,6 @@ package net.akehurst.application.framework.technology.interfaceGui.data.tree;
 
 public interface IGuiTreeView<T> {
 
-	public void setData(final IGuiTreeData<T> treeData);
+    public void setData(final IGuiTreeData<T> treeData);
 
 }

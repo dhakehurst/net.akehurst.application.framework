@@ -16,5 +16,5 @@
 package net.akehurst.application.framework.common;
 
 public interface IUser {
-	String getName();
+    String getName();
 }

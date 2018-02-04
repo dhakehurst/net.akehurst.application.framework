@@ -17,8 +17,8 @@ package net.akehurst.application.framework.common;
 
 public class ApplicationFrameworkException extends Exception {
 
-	public ApplicationFrameworkException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
+    public ApplicationFrameworkException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

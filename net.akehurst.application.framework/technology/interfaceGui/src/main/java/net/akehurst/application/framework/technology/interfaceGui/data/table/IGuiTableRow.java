@@ -20,10 +20,10 @@ import java.util.Map;
 
 public interface IGuiTableRow {
 
-	String getId();
+    String getId();
 
-	List<Map<String, Object>> getRowData();
+    List<Map<String, Object>> getRowData();
 
-	Map<String, Object> getDataForColumn(String columnId);
+    Map<String, Object> getDataForColumn(String columnId);
 
 }

@@ -6,18 +6,18 @@ import net.akehurst.application.framework.common.annotations.declaration.DataTyp
 @DataType
 public class GuiSyntaxHighlightDefinition extends AbstractDataType implements IGuiSyntaxHighlightDefinition {
 
-	public GuiSyntaxHighlightDefinition(final String pattern, final String label) {
-		super(pattern, label);
-	}
+    public GuiSyntaxHighlightDefinition(final String pattern, final String label) {
+        super(pattern, label);
+    }
 
-	@Override
-	public String getPattern() {
-		return (String) super.getIdentityValues().get(0);
-	}
+    @Override
+    public String getPattern() {
+        return (String) super.getIdentityValues().get(0);
+    }
 
-	@Override
-	public String getLable() {
-		return (String) super.getIdentityValues().get(1);
-	}
+    @Override
+    public String getLable() {
+        return (String) super.getIdentityValues().get(1);
+    }
 
 }

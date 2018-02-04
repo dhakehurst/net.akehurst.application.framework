@@ -18,12 +18,18 @@ package net.akehurst.application.framework.technology.gui.web.elements;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiDialog;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene;
-import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiTabSet;
+import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiContainer;
 
-public class VertxGuiTabSet extends VertxGuiElement implements IGuiTabSet {
+public class WebGuiContainer extends WebGuiElement implements IGuiContainer {
 
-	public VertxGuiTabSet(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
-		super(guiRequest, scene, dialog, elementName);
-	}
+    public WebGuiContainer(final IGuiRequest guiRequest, final IGuiScene scene, final IGuiDialog dialog, final String elementName) {
+        super(guiRequest, scene, dialog, elementName);
+    }
+
+    @Override
+    public void addElement() {
+        // TODO Auto-generated method stub
+
+    }
 
 }

@@ -19,14 +19,14 @@ import java.util.List;
 
 public interface IGuiTableData {
 
-	List<String> getColumnIds();
+    List<String> getColumnIds();
 
-	int getNumberOfRows();
+    int getNumberOfRows();
 
-	List<String> getRowIds();
+    List<String> getRowIds();
 
-	List<IGuiTableRow> getRows();
+    List<IGuiTableRow> getRows();
 
-	IGuiTableRow getRowData(String rowId);
+    IGuiTableRow getRowData(String rowId);
 
 }

@@ -5,16 +5,16 @@ import java.util.Map;
 
 public interface IGuiGraphEdge {
 
-	String getIdentity();
+    String getIdentity();
 
-	IGuiGraphNode getParent();
+    IGuiGraphNode getParent();
 
-	IGuiGraphNode getSource();
+    IGuiGraphNode getSource();
 
-	IGuiGraphNode getTarget();
+    IGuiGraphNode getTarget();
 
-	List<String> getClasses();
+    List<String> getClasses();
 
-	Map<String, Object> getData();
+    Map<String, Object> getData();
 
 }

@@ -29,44 +29,44 @@ import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesy
 
 public class StandardFilesystem extends AbstractComponent implements IFilesystem, IService {
 
-	public StandardFilesystem(final String id) {
-		super(id);
-	}
+    public StandardFilesystem(final String id) {
+        super(id);
+    }
 
-	@Override
-	public void afConnectParts() {}
+    @Override
+    public void afConnectParts() {}
 
-	@Override
-	public void afRun() {
-		// TODO Auto-generated method stub
+    @Override
+    public void afRun() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public Object createReference(final String locationId) {
-		return this;
-	}
+    @Override
+    public Object createReference(final String locationId) {
+        return this;
+    }
 
-	// ---------- IFilesystem ---------
-	@Override
-	public IFile file(final String pathName) {
-		final Path path = Paths.get(pathName);
-		return new FileImpl(this, path);
-	}
+    // ---------- IFilesystem ---------
+    @Override
+    public IFile file(final String pathName) {
+        final Path path = Paths.get(pathName);
+        return new FileImpl(this, path);
+    }
 
-	@Override
-	public IDirectory directory(final String pathName) {
-		final Path path = Paths.get(pathName);
-		return new DirectoryImpl(this, path);
-	}
+    @Override
+    public IDirectory directory(final String pathName) {
+        final Path path = Paths.get(pathName);
+        return new DirectoryImpl(this, path);
+    }
 
-	// ---------- Ports ---------
-	@PortInstance
-	@PortContract(provides = IFilesystem.class)
-	Port portFs;
+    // ---------- Ports ---------
+    @PortInstance
+    @PortContract(provides = IFilesystem.class)
+    Port portFs;
 
-	public Port portFs() {
-		return this.portFs;
-	}
+    public Port portFs() {
+        return this.portFs;
+    }
 
 }

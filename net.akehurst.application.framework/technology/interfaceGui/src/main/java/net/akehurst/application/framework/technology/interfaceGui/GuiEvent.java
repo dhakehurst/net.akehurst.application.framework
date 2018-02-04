@@ -25,60 +25,60 @@ import net.akehurst.application.framework.technology.interfaceGui.data.table.IGu
 
 public class GuiEvent {
 
-	public GuiEvent(final UserSession session, final GuiEventSignature signature, final Map<String, Object> eventData) {
-		this.session = session;
-		this.signature = signature;
-		this.eventData = eventData;
-	}
+    public GuiEvent(final UserSession session, final GuiEventSignature signature, final Map<String, Object> eventData) {
+        this.session = session;
+        this.signature = signature;
+        this.eventData = eventData;
+    }
 
-	UserSession session;
+    UserSession session;
 
-	public UserSession getSession() {
-		return this.session;
-	}
+    public UserSession getSession() {
+        return this.session;
+    }
 
-	GuiEventSignature signature;
+    GuiEventSignature signature;
 
-	public GuiEventSignature getSignature() {
-		return this.signature;
-	}
+    public GuiEventSignature getSignature() {
+        return this.signature;
+    }
 
-	Map<String, Object> eventData;
+    Map<String, Object> eventData;
 
-	public Map<String, Object> getEventData() {
-		return this.eventData;
-	}
+    public Map<String, Object> getEventData() {
+        return this.eventData;
+    }
 
-	public <T> T getDataItem(final String key) {
-		return (T) this.eventData.get(key);
-	}
+    public <T> T getDataItem(final String key) {
+        return (T) this.eventData.get(key);
+    }
 
-	public IGuiTableData getTableData(final String key) {
+    public IGuiTableData getTableData(final String key) {
 
-		final Map<String, Object> tableData = this.getDataItem(key);
-		final List<String> headerData = (List<String>) tableData.get("afHeaders");
-		final List<String> rowIds = (List<String>) tableData.get("afRowIds");
-		final List<List<Map<String, Object>>> rowData = (List<List<Map<String, Object>>>) tableData.get("afRows");
+        final Map<String, Object> tableData = this.getDataItem(key);
+        final List<String> headerData = (List<String>) tableData.get("afHeaders");
+        final List<String> rowIds = (List<String>) tableData.get("afRowIds");
+        final List<List<Map<String, Object>>> rowData = (List<List<Map<String, Object>>>) tableData.get("afRows");
 
-		final IGuiTableData td = new AbstractGuiTableData() {
-			@Override
-			public List<String> getColumnIds() {
-				return headerData;
-			}
+        final IGuiTableData td = new AbstractGuiTableData() {
+            @Override
+            public List<String> getColumnIds() {
+                return headerData;
+            }
 
-			@Override
-			public List<String> getRowIds() {
-				return rowIds;
-			}
+            @Override
+            public List<String> getRowIds() {
+                return rowIds;
+            }
 
-			@Override
-			public IGuiTableRow getRowData(final String rowId) {
-				final int index = this.getRowIds().indexOf(rowId);
-				return this.createRow(rowId, rowData.get(index));
-			}
+            @Override
+            public IGuiTableRow getRowData(final String rowId) {
+                final int index = this.getRowIds().indexOf(rowId);
+                return this.createRow(rowId, rowData.get(index));
+            }
 
-		};
+        };
 
-		return td;
-	}
+        return td;
+    }
 }

@@ -6,10 +6,10 @@ import net.akehurst.application.framework.technology.interfaceAuthentication.IAu
 
 abstract public class testHandler extends AbstractIdentifiableObject implements IAuthenticatorNotification {
 
-	public testHandler(final String afId) {
-		super(afId);
-	}
+    public testHandler(final String afId) {
+        super(afId);
+    }
 
-	public IAuthenticatorRequest authenticatorRequest;
+    public IAuthenticatorRequest authenticatorRequest;
 
 }

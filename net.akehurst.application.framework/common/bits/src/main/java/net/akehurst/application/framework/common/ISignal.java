@@ -17,6 +17,6 @@ package net.akehurst.application.framework.common;
 
 public interface ISignal {
 
-	void execute() throws Throwable;
+    void execute() throws Throwable;
 
 }

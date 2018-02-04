@@ -2,29 +2,29 @@ package net.akehurst.application.framework.technology.interfaceGui.data.editor;
 
 public interface IGuiLanguageService {
 
-	String getIdentity();
+    String getIdentity();
 
-	void load();
+    void load();
 
-	void revert();
+    void revert();
 
-	void save();
+    void save();
 
-	/**
-	 *
-	 * @return JSON String of the parseTree
-	 */
-	String update(String text);
+    /**
+     *
+     * @return JSON String of the parseTree
+     */
+    String update(String text);
 
-	void assist();
+    void assist();
 
-	void validate();
+    void validate();
 
-	void hover();
+    void hover();
 
-	void highlight();
+    void highlight();
 
-	void occurrences();
+    void occurrences();
 
-	void format();
+    void format();
 }

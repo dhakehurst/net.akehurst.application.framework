@@ -22,36 +22,36 @@ import net.akehurst.application.framework.common.AbstractDataType;
 
 public class UserSession extends AbstractDataType {
 
-	/**
-	 *
-	 * @param sessionId
-	 * @param user
-	 * @param data
-	 *            entries are copies into this UserSessions data
-	 */
-	public UserSession(final String sessionId, final UserDetails user, final Map<String, Object> data) {
-		this.sessionId = sessionId;
-		this.user = user;
-		this.data = null == data ? new HashMap<>() : new HashMap<>(data);
-	}
+    /**
+     *
+     * @param sessionId
+     * @param user
+     * @param data
+     *            entries are copies into this UserSessions data
+     */
+    public UserSession(final String sessionId, final UserDetails user, final Map<String, Object> data) {
+        this.sessionId = sessionId;
+        this.user = user;
+        this.data = null == data ? new HashMap<>() : new HashMap<>(data);
+    }
 
-	private final String sessionId;
-	private final UserDetails user;
-	private final Map<String, Object> data;
+    private final String sessionId;
+    private final UserDetails user;
+    private final Map<String, Object> data;
 
-	public String getId() {
-		return this.sessionId;
-	}
+    public String getId() {
+        return this.sessionId;
+    }
 
-	public UserDetails getUser() {
-		return this.user;
-	}
+    public UserDetails getUser() {
+        return this.user;
+    }
 
-	public boolean isAuthenticated() {
-		return null != this.getUser();
-	}
+    public boolean isAuthenticated() {
+        return null != this.getUser();
+    }
 
-	public Map<String, Object> getData() {
-		return this.data;
-	}
+    public Map<String, Object> getData() {
+        return this.data;
+    }
 }

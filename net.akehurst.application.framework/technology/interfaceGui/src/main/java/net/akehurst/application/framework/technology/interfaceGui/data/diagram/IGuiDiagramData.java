@@ -6,9 +6,9 @@ import net.akehurst.application.framework.technology.interfaceGui.data.graph.IGu
 
 public interface IGuiDiagramData {
 
-	IGuiGraph getGraph();
+    IGuiGraph getGraph();
 
-	String getStyle();
+    String getStyle();
 
-	Map<String, Object> getLayout();
+    Map<String, Object> getLayout();
 }

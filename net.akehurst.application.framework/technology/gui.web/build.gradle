@@ -21,7 +21,7 @@ dependencies {
 //	compile project(":${rootProject.name}.technology.interfaceAuthentication")
 //	compile project(":${rootProject.name}.technology.interfaceComms")
 	
-	compile 'org.json:json:+'
+	compile 'org.json:json:20180130'
 	
 //	compile 'org.apache.commons:commons-lang3:3.4'
 	

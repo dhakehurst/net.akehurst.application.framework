@@ -17,57 +17,57 @@ package net.akehurst.application.framework.realisation;
 
 public class ArgumentDefinition {
 
-	public ArgumentDefinition(final String group, final String name, final Class<?> type, final boolean required, final boolean hasValue,
-			final Object defaultValue, final String description) {
-		super();
-		this.group = group;
-		this.name = name;
-		this.type = type;
-		this.required = required;
-		this.hasValue = hasValue;
-		this.defaultValue = defaultValue;
-		this.description = description;
-	}
+    public ArgumentDefinition(final String group, final String name, final Class<?> type, final boolean required, final boolean hasValue,
+            final Object defaultValue, final String description) {
+        super();
+        this.group = group;
+        this.name = name;
+        this.type = type;
+        this.required = required;
+        this.hasValue = hasValue;
+        this.defaultValue = defaultValue;
+        this.description = description;
+    }
 
-	String group;
+    String group;
 
-	public String getGroup() {
-		return this.group;
-	}
+    public String getGroup() {
+        return this.group;
+    }
 
-	String name;
+    String name;
 
-	public String getName() {
-		return this.name;
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	Class<?> type;
+    Class<?> type;
 
-	public Class<?> getType() {
-		return this.type;
-	}
+    public Class<?> getType() {
+        return this.type;
+    }
 
-	boolean required;
+    boolean required;
 
-	public boolean getRequired() {
-		return this.required;
-	}
+    public boolean getRequired() {
+        return this.required;
+    }
 
-	boolean hasValue;
+    boolean hasValue;
 
-	public boolean getHasValue() {
-		return this.hasValue;
-	}
+    public boolean getHasValue() {
+        return this.hasValue;
+    }
 
-	Object defaultValue;
+    Object defaultValue;
 
-	public Object getDefaultValue() {
-		return this.defaultValue;
-	}
+    public Object getDefaultValue() {
+        return this.defaultValue;
+    }
 
-	String description;
+    String description;
 
-	public String getDescription() {
-		return this.description;
-	}
+    public String getDescription() {
+        return this.description;
+    }
 }

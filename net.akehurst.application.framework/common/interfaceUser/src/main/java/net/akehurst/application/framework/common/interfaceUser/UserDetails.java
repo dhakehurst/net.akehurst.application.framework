@@ -21,21 +21,21 @@ import net.akehurst.application.framework.common.AbstractDataType;
 
 public class UserDetails extends AbstractDataType {
 
-	public UserDetails(final String name) {
-		super(name);
-		this.name = name;
-	}
+    public UserDetails(final String name) {
+        super(name);
+        this.name = name;
+    }
 
-	String name;
+    String name;
 
-	public String getName() {
-		return this.name;
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	List<String> groups;
+    List<String> groups;
 
-	public List<String> getGroups() {
-		return this.groups;
-	}
+    public List<String> getGroups() {
+        return this.groups;
+    }
 
 }

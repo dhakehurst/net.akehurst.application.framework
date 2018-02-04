@@ -47,254 +47,254 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
 @SimpleObject
 public class HJsonFile implements IService, IIdentifiableObject, IPersistentStore {
 
-	@ServiceReference
-	IApplicationFramework af;
+    @ServiceReference
+    IApplicationFramework af;
 
-	@ServiceReference
-	IFilesystem fs;
+    @ServiceReference
+    IFilesystem fs;
 
-	public HJsonFile(final String afId) {
-		this.afId = afId;
-	}
+    public HJsonFile(final String afId) {
+        this.afId = afId;
+    }
 
-	private final String afId;
-	private JsonValue json_cache;
+    private final String afId;
+    private JsonValue json_cache;
 
-	@Override
-	public String afId() {
-		return this.afId;
-	}
+    @Override
+    public String afId() {
+        return this.afId;
+    }
 
-	@Override
-	public Object createReference(final String locationId) {
-		return this;
-	}
+    @Override
+    public Object createReference(final String locationId) {
+        return this;
+    }
 
-	public IFile getFile() {
-		final String fileName = this.afId() + ".hjson";
-		final IFile file = this.fs.file(fileName);
-		return file;
-	}
+    public IFile getFile() {
+        final String fileName = this.afId() + ".hjson";
+        final IFile file = this.fs.file(fileName);
+        return file;
+    }
 
-	JsonValue getJson() throws IOException, FilesystemException {
-		if (null == this.json_cache) {
-			final IFile file = this.getFile();
-			if (file.exists()) {
-				this.json_cache = JsonValue.readHjson(file.reader());
-			} else {
+    JsonValue getJson() throws IOException, FilesystemException {
+        if (null == this.json_cache) {
+            final IFile file = this.getFile();
+            if (file.exists()) {
+                this.json_cache = JsonValue.readHjson(file.reader());
+            } else {
 
-			}
-		}
-		return this.json_cache;
-	}
+            }
+        }
+        return this.json_cache;
+    }
 
-	JsonValue fetchJson(final JsonValue json, final String path) {
-		if (json instanceof JsonObject) {
-			final JsonObject jo = (JsonObject) json;
-			final int ix = path.indexOf(".");
-			if (-1 == ix) {
-				return jo.get(path);
-			} else {
-				final String hd = path.substring(0, ix);
-				final String tl = path.substring(ix + 1);
-				return this.fetchJson(jo.get(hd), tl);
-			}
+    JsonValue fetchJson(final JsonValue json, final String path) {
+        if (json instanceof JsonObject) {
+            final JsonObject jo = (JsonObject) json;
+            final int ix = path.indexOf(".");
+            if (-1 == ix) {
+                return jo.get(path);
+            } else {
+                final String hd = path.substring(0, ix);
+                final String tl = path.substring(ix + 1);
+                return this.fetchJson(jo.get(hd), tl);
+            }
 
-		} else {
-			return null;
-		}
-	}
+        } else {
+            return null;
+        }
+    }
 
-	private <T> T convertJsonTo(final JsonValue value, final Type itemType) throws PersistentStoreException {
-		try {
-			final Class<?> class_ = ApplicationFramework.getClass(itemType);
-			if (null == value) {
-				return null;
-			} else if (value.isString()) {
-				final T t = this.af.createDatatype(itemType, value.asString());
-				return t;
-			} else if (value.isNumber()) {
-				if (itemType == Double.TYPE || itemType == Double.class) {
-					return this.af.createDatatype(itemType, value.asDouble());
-				} else if (itemType == Float.TYPE || itemType == Float.class) {
-					return this.af.createDatatype(itemType, value.asFloat());
-				} else if (itemType == Integer.TYPE || itemType == Integer.class) {
-					return this.af.createDatatype(itemType, value.asInt());
-				} else if (itemType == Long.TYPE || itemType == Long.class) {
-					return this.af.createDatatype(itemType, value.asLong());
-				} else if (itemType == Short.TYPE || itemType == Short.class) {
-					return this.af.createDatatype(itemType, (short) value.asInt());
-				} else {
-					throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
-				}
-			} else if (value.isBoolean()) {
-				final T t = this.af.createDatatype(itemType, value.asBoolean());
-				return t;
-			} else if (value.isArray()) {
-				if (List.class.isAssignableFrom(class_)) {
-					final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[0];
-					final List list = new ArrayList<>();
-					for (final JsonValue av : value.asArray()) {
-						final Object o = this.convertJsonToJava(av, elType);
-						list.add(o);
-					}
-					return (T) list;
-				} else {
-					throw new PersistentStoreException("Cannot convert JSON Array to List.", null);
-				}
-			} else if (value.isObject()) {
-				if (Map.class.isAssignableFrom(class_)) {
-					final Map<String, Object> map = new HashMap<>();
-					for (final String k : value.asObject().names()) {
-						final JsonValue jv = value.asObject().get(k);
-						final Object v = this.convertJsonToJava(jv, itemType);
-						map.put(k, v);
-					}
-					return (T) map;
-				} else {
-					throw new PersistentStoreException("Cannot convert JSON Object to Map.", null);
-				}
-			} else {
-				throw new PersistentStoreException("Unknown JSON type.", null);
-			}
-		} catch (final ApplicationFrameworkException e) {
-			throw new PersistentStoreException(e.getMessage(), e);
-		}
-	}
+    private <T> T convertJsonTo(final JsonValue value, final Type itemType) throws PersistentStoreException {
+        try {
+            final Class<?> class_ = ApplicationFramework.getClass(itemType);
+            if (null == value) {
+                return null;
+            } else if (value.isString()) {
+                final T t = this.af.createDatatype(itemType, value.asString());
+                return t;
+            } else if (value.isNumber()) {
+                if (itemType == Double.TYPE || itemType == Double.class) {
+                    return this.af.createDatatype(itemType, value.asDouble());
+                } else if (itemType == Float.TYPE || itemType == Float.class) {
+                    return this.af.createDatatype(itemType, value.asFloat());
+                } else if (itemType == Integer.TYPE || itemType == Integer.class) {
+                    return this.af.createDatatype(itemType, value.asInt());
+                } else if (itemType == Long.TYPE || itemType == Long.class) {
+                    return this.af.createDatatype(itemType, value.asLong());
+                } else if (itemType == Short.TYPE || itemType == Short.class) {
+                    return this.af.createDatatype(itemType, (short) value.asInt());
+                } else {
+                    throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
+                }
+            } else if (value.isBoolean()) {
+                final T t = this.af.createDatatype(itemType, value.asBoolean());
+                return t;
+            } else if (value.isArray()) {
+                if (List.class.isAssignableFrom(class_)) {
+                    final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[0];
+                    final List list = new ArrayList<>();
+                    for (final JsonValue av : value.asArray()) {
+                        final Object o = this.convertJsonToJava(av, elType);
+                        list.add(o);
+                    }
+                    return (T) list;
+                } else {
+                    throw new PersistentStoreException("Cannot convert JSON Array to List.", null);
+                }
+            } else if (value.isObject()) {
+                if (Map.class.isAssignableFrom(class_)) {
+                    final Map<String, Object> map = new HashMap<>();
+                    for (final String k : value.asObject().names()) {
+                        final JsonValue jv = value.asObject().get(k);
+                        final Object v = this.convertJsonToJava(jv, itemType);
+                        map.put(k, v);
+                    }
+                    return (T) map;
+                } else {
+                    throw new PersistentStoreException("Cannot convert JSON Object to Map.", null);
+                }
+            } else {
+                throw new PersistentStoreException("Unknown JSON type.", null);
+            }
+        } catch (final ApplicationFrameworkException e) {
+            throw new PersistentStoreException(e.getMessage(), e);
+        }
+    }
 
-	private <T> T convertJsonToJava(final JsonValue value, final Type itemType) throws PersistentStoreException {
-		final Class<?> class_ = ApplicationFramework.getClass(itemType);
-		if (null == value) {
-			return null;
-		} else if (value.isString()) {
-			if (itemType == String.class) {
-				return (T) value.asString();
-			} else if (class_.isEnum()) {
-				return (T) Enum.valueOf((Class<? extends Enum>) itemType, value.asString());
-			} else {
-				throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
-			}
-		} else if (value.isNumber()) {
-			if (itemType == Double.TYPE || itemType == Double.class) {
-				return (T) Double.valueOf(value.asDouble());
-			} else if (itemType == Float.TYPE || itemType == Float.class) {
-				return (T) Float.valueOf(value.asFloat());
-			} else if (itemType == Integer.TYPE || itemType == Integer.class) {
-				return (T) Integer.valueOf(value.asInt());
-			} else if (itemType == Long.TYPE || itemType == Long.class) {
-				return (T) Long.valueOf(value.asLong());
-			} else if (itemType == Short.TYPE || itemType == Short.class) {
-				return (T) Short.valueOf((short) value.asInt());
-			} else {
-				throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
-			}
-		} else if (value.isBoolean()) {
-			return (T) Boolean.valueOf(value.asBoolean());
-		} else if (value.isArray()) {
-			final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[0];
-			final List<Object> list = new ArrayList<>();
-			for (final JsonValue av : value.asArray()) {
-				final Object o = this.convertJsonToJava(av, elType);
-				list.add(o);
-			}
-			return (T) list;
-		} else if (value.isObject()) {
-			if (Map.class.isAssignableFrom(class_)) {
-				final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[1];
-				final Map<String, Object> map = new HashMap<>();
-				for (final String k : value.asObject().names()) {
-					final JsonValue jv = value.asObject().get(k);
-					final Object v = this.convertJsonToJava(jv, elType);
-					map.put(k, v);
-				}
-				return (T) map;
-			} else {
-				throw new PersistentStoreException("Cannot convert JSON Object to Map.", null);
-			}
-		} else {
-			throw new PersistentStoreException("Unknown JSON type.", null);
-		}
-	}
+    private <T> T convertJsonToJava(final JsonValue value, final Type itemType) throws PersistentStoreException {
+        final Class<?> class_ = ApplicationFramework.getClass(itemType);
+        if (null == value) {
+            return null;
+        } else if (value.isString()) {
+            if (itemType == String.class) {
+                return (T) value.asString();
+            } else if (class_.isEnum()) {
+                return (T) Enum.valueOf((Class<? extends Enum>) itemType, value.asString());
+            } else {
+                throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
+            }
+        } else if (value.isNumber()) {
+            if (itemType == Double.TYPE || itemType == Double.class) {
+                return (T) Double.valueOf(value.asDouble());
+            } else if (itemType == Float.TYPE || itemType == Float.class) {
+                return (T) Float.valueOf(value.asFloat());
+            } else if (itemType == Integer.TYPE || itemType == Integer.class) {
+                return (T) Integer.valueOf(value.asInt());
+            } else if (itemType == Long.TYPE || itemType == Long.class) {
+                return (T) Long.valueOf(value.asLong());
+            } else if (itemType == Short.TYPE || itemType == Short.class) {
+                return (T) Short.valueOf((short) value.asInt());
+            } else {
+                throw new PersistentStoreException("Cannot convert JSON value to " + itemType, null);
+            }
+        } else if (value.isBoolean()) {
+            return (T) Boolean.valueOf(value.asBoolean());
+        } else if (value.isArray()) {
+            final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[0];
+            final List<Object> list = new ArrayList<>();
+            for (final JsonValue av : value.asArray()) {
+                final Object o = this.convertJsonToJava(av, elType);
+                list.add(o);
+            }
+            return (T) list;
+        } else if (value.isObject()) {
+            if (Map.class.isAssignableFrom(class_)) {
+                final Type elType = ((ParameterizedType) itemType).getActualTypeArguments()[1];
+                final Map<String, Object> map = new HashMap<>();
+                for (final String k : value.asObject().names()) {
+                    final JsonValue jv = value.asObject().get(k);
+                    final Object v = this.convertJsonToJava(jv, elType);
+                    map.put(k, v);
+                }
+                return (T) map;
+            } else {
+                throw new PersistentStoreException("Cannot convert JSON Object to Map.", null);
+            }
+        } else {
+            throw new PersistentStoreException("Unknown JSON type.", null);
+        }
+    }
 
-	// --------- IPersistentStore ---------
-	@Override
-	public void connect(final Map<String, Object> properties) {
+    // --------- IPersistentStore ---------
+    @Override
+    public void connect(final Map<String, Object> properties) {
 
-	};
+    };
 
-	@Override
-	public void disconnect() {
-		// TODO Auto-generated method stub
+    @Override
+    public void disconnect() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public IPersistenceTransaction startTransaction() {
-		return null;
-	}
+    @Override
+    public IPersistenceTransaction startTransaction() {
+        return null;
+    }
 
-	@Override
-	public void commitTransaction(final IPersistenceTransaction transaction) {
-		// TODO Auto-generated method stub
+    @Override
+    public void commitTransaction(final IPersistenceTransaction transaction) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void rollbackTransaction(final IPersistenceTransaction transaction) {
-		// TODO Auto-generated method stub
+    @Override
+    public void rollbackTransaction(final IPersistenceTransaction transaction) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public <T> void store(final IPersistenceTransaction transaction, final T item, final Class<T> itemType) throws PersistentStoreException {
+    @Override
+    public <T> void store(final IPersistenceTransaction transaction, final T item, final Class<T> itemType) throws PersistentStoreException {
 
-	}
+    }
 
-	@Override
-	public <T> List<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Map<String, Object> params)
-			throws PersistentStoreException {
-		return null;
-	}
+    @Override
+    public <T> List<T> retrieve(final IPersistenceTransaction transaction, final PersistentItemQuery query, final Map<String, Object> params)
+            throws PersistentStoreException {
+        return null;
+    }
 
-	@Override
-	public <T> void remove(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
-			throws PersistentStoreException {
-		// TODO Auto-generated method stub
+    @Override
+    public <T> void remove(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
+            throws PersistentStoreException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
-			throws PersistentStoreException {
-		return null;
-	}
+    @Override
+    public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter)
+            throws PersistentStoreException {
+        return null;
+    }
 
-	@Override
-	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Type itemType, final Map<String, Object> filter)
-			throws PersistentStoreException {
+    @Override
+    public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Type itemType, final Map<String, Object> filter)
+            throws PersistentStoreException {
 
-		final String path = (String) filter.get("path");
-		try {
+        final String path = (String) filter.get("path");
+        try {
 
-			final JsonValue value = this.fetchJson(this.getJson(), path);
-			final T t = this.convertJsonTo(value, itemType);
-			return new HashSet<>(Arrays.asList(t));
-		} catch (final Exception ex) {
-			throw new PersistentStoreException("Failed to retrieve item from location " + path, ex);
-		}
-	}
+            final JsonValue value = this.fetchJson(this.getJson(), path);
+            final T t = this.convertJsonTo(value, itemType);
+            return new HashSet<>(Arrays.asList(t));
+        } catch (final Exception ex) {
+            throw new PersistentStoreException("Failed to retrieve item from location " + path, ex);
+        }
+    }
 
-	@Override
-	public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter, final long rangeFrom,
-			final long rangeTo) throws PersistentStoreException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public <T> Set<T> retrieve(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter, final long rangeFrom,
+            final long rangeTo) throws PersistentStoreException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	// @Override
-	// public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
+    // @Override
+    // public <T> Set<T> retrieveAll(final IPersistenceTransaction transaction, final Class<T> itemType, final Map<String, Object> filter) {
+    // // TODO Auto-generated method stub
+    // return null;
+    // }
 
 }

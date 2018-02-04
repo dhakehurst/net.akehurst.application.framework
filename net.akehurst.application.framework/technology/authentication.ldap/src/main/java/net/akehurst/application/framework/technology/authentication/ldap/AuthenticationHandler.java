@@ -35,141 +35,141 @@ import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 public class AuthenticationHandler extends AbstractActiveSignalProcessingObject implements IAuthenticatorRequest {
 
-	@ServiceReference
-	ILogger logger;
+    @ServiceReference
+    ILogger logger;
 
-	public AuthenticationHandler(final String afId) {
-		super(afId);
-	}
+    public AuthenticationHandler(final String afId) {
+        super(afId);
+    }
 
-	@ExternalConnection
-	public IAuthenticatorNotification authenticationNotification;
+    @ExternalConnection
+    public IAuthenticatorNotification authenticationNotification;
 
-	@ConfiguredValue(defaultValue = "ldap://...")
-	private String url;
+    @ConfiguredValue(defaultValue = "ldap://...")
+    private String url;
 
-	@ConfiguredValue(defaultValue = "none")
-	private String adminSecurityLevel;
+    @ConfiguredValue(defaultValue = "none")
+    private String adminSecurityLevel;
 
-	@ConfiguredValue(defaultValue = "cn=%s,dc=company,dc=org")
-	private String adminUserPattern;
+    @ConfiguredValue(defaultValue = "cn=%s,dc=company,dc=org")
+    private String adminUserPattern;
 
-	@ConfiguredValue(defaultValue = "")
-	private String adminUser;
+    @ConfiguredValue(defaultValue = "")
+    private String adminUser;
 
-	@CommandLineArgument(description = "Password for LDAP admin")
-	@ConfiguredValue(defaultValue = "")
-	private String adminPassword;
+    @CommandLineArgument(description = "Password for LDAP admin")
+    @ConfiguredValue(defaultValue = "")
+    private String adminPassword;
 
-	@ConfiguredValue(defaultValue = "")
-	private List<String> userAttributes;
+    @ConfiguredValue(defaultValue = "")
+    private List<String> userAttributes;
 
-	@ConfiguredValue(defaultValue = "dn=org")
-	private String userSearchRoot;
+    @ConfiguredValue(defaultValue = "dn=org")
+    private String userSearchRoot;
 
-	@ConfiguredValue(defaultValue = "(uid=%s)")
-	private String userSearchPattern;
+    @ConfiguredValue(defaultValue = "(uid=%s)")
+    private String userSearchPattern;
 
-	@ConfiguredValue(defaultValue = "none")
-	private String userSecurityLevel;
+    @ConfiguredValue(defaultValue = "none")
+    private String userSecurityLevel;
 
-	@ConfiguredValue(defaultValue = "cn=%s,dc=company,dc=org")
-	private String userNamePattern;
+    @ConfiguredValue(defaultValue = "cn=%s,dc=company,dc=org")
+    private String userNamePattern;
 
-	@Override
-	public void requestLogin(final UserSession session, final String username, final String password) {
-		super.submit("requestLogin", () -> {
+    @Override
+    public void requestLogin(final UserSession session, final String username, final String password) {
+        super.submit("requestLogin", () -> {
 
-			try {
-			    this.logger.log(LogLevel.WARN, "Unsecure implementation, please fix it");
-			
-				// authenticate admin
-				final Hashtable<String, String> adminProps = new Hashtable<>();
-				adminProps.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-				adminProps.put(Context.PROVIDER_URL, this.url);
-				adminProps.put(Context.SECURITY_AUTHENTICATION, this.adminSecurityLevel);
-				final String principalName = String.format(this.adminUserPattern, this.adminUser);
-				adminProps.put(Context.SECURITY_PRINCIPAL, principalName);
-				adminProps.put(Context.SECURITY_CREDENTIALS, this.adminPassword);
+            try {
+                this.logger.log(LogLevel.WARN, "Unsecure implementation, please fix it");
 
-				final DirContext authContext = new InitialDirContext(adminProps);
+                // authenticate admin
+                final Hashtable<String, String> adminProps = new Hashtable<>();
+                adminProps.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+                adminProps.put(Context.PROVIDER_URL, this.url);
+                adminProps.put(Context.SECURITY_AUTHENTICATION, this.adminSecurityLevel);
+                final String principalName = String.format(this.adminUserPattern, this.adminUser);
+                adminProps.put(Context.SECURITY_PRINCIPAL, principalName);
+                adminProps.put(Context.SECURITY_CREDENTIALS, this.adminPassword);
 
-				// find user
-				final SearchControls search = new SearchControls();
-				search.setReturningAttributes(new String[] {});
-				search.setSearchScope(SearchControls.SUBTREE_SCOPE);
+                final DirContext authContext = new InitialDirContext(adminProps);
 
-				final String userSearch = String.format(this.userSearchPattern, username);
-				final NamingEnumeration<SearchResult> results = authContext.search(this.userSearchRoot, userSearch, search);
-				if (results.hasMoreElements()) {
-					final SearchResult result = results.nextElement();
-					final String user = result.getNameInNamespace();
+                // find user
+                final SearchControls search = new SearchControls();
+                search.setReturningAttributes(new String[] {});
+                search.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-					// authenticate user
-					final Hashtable<String, String> userProps = new Hashtable<>();
-					userProps.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-					userProps.put(Context.PROVIDER_URL, this.url);
-					userProps.put(Context.SECURITY_AUTHENTICATION, this.userSecurityLevel);
-					userProps.put(Context.SECURITY_PRINCIPAL, user);
-					final String decPswd = this.decrypt(password);
-					userProps.put(Context.SECURITY_CREDENTIALS, decPswd);
+                final String userSearch = String.format(this.userSearchPattern, username);
+                final NamingEnumeration<SearchResult> results = authContext.search(this.userSearchRoot, userSearch, search);
+                if (results.hasMoreElements()) {
+                    final SearchResult result = results.nextElement();
+                    final String user = result.getNameInNamespace();
 
-					final DirContext userContext = new InitialDirContext(userProps);
+                    // authenticate user
+                    final Hashtable<String, String> userProps = new Hashtable<>();
+                    userProps.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+                    userProps.put(Context.PROVIDER_URL, this.url);
+                    userProps.put(Context.SECURITY_AUTHENTICATION, this.userSecurityLevel);
+                    userProps.put(Context.SECURITY_PRINCIPAL, user);
+                    final String decPswd = this.decrypt(password);
+                    userProps.put(Context.SECURITY_CREDENTIALS, decPswd);
 
-					final UserSession authenticatedSession = new UserSession(session.getId(), new UserDetails(username), session.getData());
+                    final DirContext userContext = new InitialDirContext(userProps);
 
-					this.authenticationNotification.notifyAuthenticationSuccess(authenticatedSession);
-				} else {
-					this.authenticationNotification.notifyAuthenticationFailure(session, "Cannot find " + userSearch);
-				}
-			} catch (final NamingException e) {
-				this.logger.log(LogLevel.DEBUG, e.getMessage(), e);
-				this.authenticationNotification.notifyAuthenticationFailure(session, e.getMessage());
-			}
+                    final UserSession authenticatedSession = new UserSession(session.getId(), new UserDetails(username), session.getData());
 
-		});
-	}
+                    this.authenticationNotification.notifyAuthenticationSuccess(authenticatedSession);
+                } else {
+                    this.authenticationNotification.notifyAuthenticationFailure(session, "Cannot find " + userSearch);
+                }
+            } catch (final NamingException e) {
+                this.logger.log(LogLevel.DEBUG, e.getMessage(), e);
+                this.authenticationNotification.notifyAuthenticationFailure(session, e.getMessage());
+            }
 
-	static final String V = "1234567890abcdef1234567890abcdef";
+        });
+    }
 
-	private String decrypt(final String encrypted) {
-		try {
-        //TODO: unsecure dirty hack, please fix this, don't use constant salt
-			final byte[] bytes = DatatypeConverter.parseHexBinary(AuthenticationHandler.V);
-			final SecretKeySpec key = this.createKey(AuthenticationHandler.V, bytes);
-			final IvParameterSpec iv = new IvParameterSpec(bytes);
-			final String decrypted = this.decrypt(encrypted, key, iv);
-			return decrypted;
-		} catch (final GeneralSecurityException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    static final String V = "1234567890abcdef1234567890abcdef";
 
-	SecretKeySpec createKey(final String password, final byte[] saltBytes) throws GeneralSecurityException {
-        //TODO: unsecure dirty hack, please fix this,  use more iterations
-		final KeySpec keySpec = new PBEKeySpec(password.toCharArray(), saltBytes, 100, 128);
-		final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-		final SecretKey secretKey = keyFactory.generateSecret(keySpec);
-		return new SecretKeySpec(secretKey.getEncoded(), "AES");
-	}
+    private String decrypt(final String encrypted) {
+        try {
+            // TODO: unsecure dirty hack, please fix this, don't use constant salt
+            final byte[] bytes = DatatypeConverter.parseHexBinary(AuthenticationHandler.V);
+            final SecretKeySpec key = this.createKey(AuthenticationHandler.V, bytes);
+            final IvParameterSpec iv = new IvParameterSpec(bytes);
+            final String decrypted = this.decrypt(encrypted, key, iv);
+            return decrypted;
+        } catch (final GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	private String decrypt(final String encrypted, final SecretKeySpec key, final IvParameterSpec iv) throws GeneralSecurityException {
+    SecretKeySpec createKey(final String password, final byte[] saltBytes) throws GeneralSecurityException {
+        // TODO: unsecure dirty hack, please fix this, use more iterations
+        final KeySpec keySpec = new PBEKeySpec(password.toCharArray(), saltBytes, 100, 128);
+        final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        final SecretKey secretKey = keyFactory.generateSecret(keySpec);
+        return new SecretKeySpec(secretKey.getEncoded(), "AES");
+    }
 
-		final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		cipher.init(Cipher.DECRYPT_MODE, key, iv);
-		final byte[] decodedValue = Base64.getDecoder().decode(encrypted);
-		final byte[] decValue = cipher.doFinal(decodedValue);
-		final String decryptedValue = new String(decValue);
-		return decryptedValue;
-	}
+    private String decrypt(final String encrypted, final SecretKeySpec key, final IvParameterSpec iv) throws GeneralSecurityException {
 
-	@Override
-	public void requestLogout(final UserSession session) {
-		super.submit("requestLogout", () -> {
-			final UserSession clearedSession = new UserSession(session.getId(), null, null);
-			this.authenticationNotification.notifyAuthenticationCleared(clearedSession);
-		});
-	}
+        final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key, iv);
+        final byte[] decodedValue = Base64.getDecoder().decode(encrypted);
+        final byte[] decValue = cipher.doFinal(decodedValue);
+        final String decryptedValue = new String(decValue);
+        return decryptedValue;
+    }
+
+    @Override
+    public void requestLogout(final UserSession session) {
+        super.submit("requestLogout", () -> {
+            final UserSession clearedSession = new UserSession(session.getId(), null, null);
+            this.authenticationNotification.notifyAuthenticationCleared(clearedSession);
+        });
+    }
 
 }

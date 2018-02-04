@@ -19,13 +19,13 @@ import java.util.List;
 
 public interface IGuiTreeData<T> {
 
-	T root();
+    T root();
 
-	boolean isLeaf(T item);
+    boolean isLeaf(T item);
 
-	List<T> children(T item);
+    List<T> children(T item);
 
-	String style(T item);
+    String style(T item);
 
-	String label(T item);
+    String label(T item);
 }

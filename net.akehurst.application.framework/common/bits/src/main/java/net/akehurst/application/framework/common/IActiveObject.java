@@ -17,19 +17,19 @@ package net.akehurst.application.framework.common;
 
 public interface IActiveObject extends IIdentifiableObject {
 
-	void afRun();
+    void afRun();
 
-	void afStart();
+    void afStart();
 
-	void afJoin() throws InterruptedException;
+    void afJoin() throws InterruptedException;
 
-	/**
-	 * interrupt the active object. Current tasks will be interrupted.
-	 */
-	void afInterrupt();
+    /**
+     * interrupt the active object. Current tasks will be interrupted.
+     */
+    void afInterrupt();
 
-	/**
-	 * request politely that the object stops. Allow current tasks to finish.
-	 */
-	void afTerminate();
+    /**
+     * request politely that the object stops. Allow current tasks to finish.
+     */
+    void afTerminate();
 }

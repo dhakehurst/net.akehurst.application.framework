@@ -26,15 +26,14 @@ import javax.persistence.Id;
 
 @Entity
 public class Contacts {
-	public Contacts() {
-		this.people = new ArrayList<>();
-	}
+    public Contacts() {
+        this.people = new ArrayList<>();
+    }
 
-	@Id
-	public String id;
+    @Id
+    public String id;
 
-	public Person owner;
-	
+    public Person owner;
 
-	public List<Person> people;
+    public List<Person> people;
 }

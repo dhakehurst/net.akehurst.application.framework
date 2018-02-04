@@ -17,8 +17,8 @@ package net.akehurst.application.framework.technology.interfaceGui.data.tree;
 
 public interface IGuiTreeElement<T> {
 
-	String getLabel();
+    String getLabel();
 
-	T get();
+    T get();
 
 }

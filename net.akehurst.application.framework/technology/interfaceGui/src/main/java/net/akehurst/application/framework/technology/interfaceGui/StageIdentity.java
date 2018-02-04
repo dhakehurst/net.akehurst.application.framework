@@ -19,11 +19,11 @@ import net.akehurst.application.framework.common.AbstractDataType;
 
 public class StageIdentity extends AbstractDataType {
 
-	public StageIdentity(final String value) {
-		super(value);
-	}
+    public StageIdentity(final String value) {
+        super(value);
+    }
 
-	public String asPrimitive() {
-		return (String) super.getIdentityValues().get(0);
-	}
+    public String asPrimitive() {
+        return (String) super.getIdentityValues().get(0);
+    }
 }

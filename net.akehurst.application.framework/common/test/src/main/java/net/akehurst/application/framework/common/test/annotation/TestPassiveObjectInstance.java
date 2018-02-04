@@ -23,5 +23,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestPassiveObjectInstance {
-	String id() default "";
+    String id() default "";
 }

@@ -51,215 +51,215 @@ import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiT
 
 public class JfxGuiScene implements IGuiScene, InvocationHandler {
 
-	public JfxGuiScene(final String id) {
-		this.afId = id;
-	}
+    public JfxGuiScene(final String id) {
+        this.afId = id;
+    }
 
-	@Override
-	public StageIdentity getStageId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public StageIdentity getStageId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public SceneIdentity getSceneId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public SceneIdentity getSceneId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	Parent root;
+    Parent root;
 
-	public void setRoot(final Parent value) {
-		this.root = value;
+    public void setRoot(final Parent value) {
+        this.root = value;
 
-		value.addEventHandler(EventType.ROOT, (e) -> {
-			final UserSession session = null;
-			final StageIdentity stageId = null;
-			final SceneIdentity sceneId = null;
-			final String elementId = null;
-			final GuiEventType eventType = null;
-			final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, elementId, eventType);
-			final Map<String, Object> eventData = new HashMap<>();
-			this.notifyEventOccured(new GuiEvent(session, signature, eventData));
-		});
+        value.addEventHandler(EventType.ROOT, (e) -> {
+            final UserSession session = null;
+            final StageIdentity stageId = null;
+            final SceneIdentity sceneId = null;
+            final String elementId = null;
+            final GuiEventType eventType = null;
+            final GuiEventSignature signature = new GuiEventSignature(stageId, sceneId, null, elementId, eventType);
+            final Map<String, Object> eventData = new HashMap<>();
+            this.notifyEventOccured(new GuiEvent(session, signature, eventData));
+        });
 
-	}
+    }
 
-	@Override
-	public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-		if (method.getName().startsWith("get")) {
-			final Class<?> returnType = method.getReturnType();
-			final String name = method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4);
+    @Override
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+        if (method.getName().startsWith("get")) {
+            final Class<?> returnType = method.getReturnType();
+            final String name = method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4);
 
-			if (IGuiChart.class == returnType) {
-				// Node n = this.root.lookup("#" + name);
-				final Styleable s = this.lookup(this.root, "#" + name);
-				if (s instanceof Chart) {
-					final Chart jfx = (Chart) s;
-					return new JfxChart(jfx);
-				} else {
-					// TODO: element not found exception
-					return null;
-				}
-			} else if (IGuiText.class == returnType) {
-				// Node n = this.root.lookup("#" + name);
-				final Styleable s = this.lookup(this.root, "#" + name);
-				if (s instanceof Node) {
-					return new JfxText((Node) s);
-				} else {
-					return null;
-				}
-			} else if (IGuiMenuItem.class == returnType) {
-				// this.root.lookup("#" + name);
-				// can't use lookup for menuitems
-				// MenuItem menuItem = this.lookupMenuItemInNodes(this.root.getChildrenUnmodifiable(), name);
-				final Styleable s = this.lookup(this.root, "#" + name);
-				if (s instanceof MenuItem) {
-					return new JfxMenuItem((MenuItem) s);
-				} else {
-					return null;
-				}
-			} else if (IGuiTreeView.class == returnType) {
-				final Styleable s = this.lookup(this.root, "#" + name);
-				if (s instanceof TreeView<?>) {
-					return new JfxTreeView((TreeView<?>) s);
-				} else {
-					return null;
-				}
-			} else {
-				final Node n = this.root.lookup("#" + name);
-				if (n == null) {
-					// not found
-					return null;
-				} else {
-					return new JfxGuiElement(n);
-				}
-			}
-		} else {
-			return null;
-		}
-	}
+            if (IGuiChart.class == returnType) {
+                // Node n = this.root.lookup("#" + name);
+                final Styleable s = this.lookup(this.root, "#" + name);
+                if (s instanceof Chart) {
+                    final Chart jfx = (Chart) s;
+                    return new JfxChart(jfx);
+                } else {
+                    // TODO: element not found exception
+                    return null;
+                }
+            } else if (IGuiText.class == returnType) {
+                // Node n = this.root.lookup("#" + name);
+                final Styleable s = this.lookup(this.root, "#" + name);
+                if (s instanceof Node) {
+                    return new JfxText((Node) s);
+                } else {
+                    return null;
+                }
+            } else if (IGuiMenuItem.class == returnType) {
+                // this.root.lookup("#" + name);
+                // can't use lookup for menuitems
+                // MenuItem menuItem = this.lookupMenuItemInNodes(this.root.getChildrenUnmodifiable(), name);
+                final Styleable s = this.lookup(this.root, "#" + name);
+                if (s instanceof MenuItem) {
+                    return new JfxMenuItem((MenuItem) s);
+                } else {
+                    return null;
+                }
+            } else if (IGuiTreeView.class == returnType) {
+                final Styleable s = this.lookup(this.root, "#" + name);
+                if (s instanceof TreeView<?>) {
+                    return new JfxTreeView((TreeView<?>) s);
+                } else {
+                    return null;
+                }
+            } else {
+                final Node n = this.root.lookup("#" + name);
+                if (n == null) {
+                    // not found
+                    return null;
+                } else {
+                    return new JfxGuiElement(n);
+                }
+            }
+        } else {
+            return null;
+        }
+    }
 
-	Styleable lookup(final Styleable self, final String selector) {
-		if (null == selector) {
-			return null;
-		} else {
-			final Selector s = Selector.createSelector(selector);
-			return this.lookup(self, s);
-		}
-	}
+    Styleable lookup(final Styleable self, final String selector) {
+        if (null == selector) {
+            return null;
+        } else {
+            final Selector s = Selector.createSelector(selector);
+            return this.lookup(self, s);
+        }
+    }
 
-	Styleable lookup(final Styleable self, final Selector selector) {
-		if (null == selector) {
-			return null;
-		} else {
-			if (selector.applies(self)) {
-				return self;
-			} else {
-				final List<Styleable> children = new ArrayList<>();
-				if (self instanceof Parent) {
-					children.addAll(((Parent) self).getChildrenUnmodifiable());
-				}
-				if (self instanceof Control) {
-					final Control c = (Control) self;
-					if (null != c.getContextMenu()) {
-						children.addAll(c.getContextMenu().getItems());
-					}
-				}
-				if (self instanceof Menu) {
-					final Menu m = (Menu) self;
-					children.addAll(m.getItems());
-				}
-				for (final Styleable cs : children) {
-					final Styleable r = this.lookup(cs, selector);
-					if (null != r) {
-						return r;
-					}
-				}
-				return null;
-			}
-		}
-	}
+    Styleable lookup(final Styleable self, final Selector selector) {
+        if (null == selector) {
+            return null;
+        } else {
+            if (selector.applies(self)) {
+                return self;
+            } else {
+                final List<Styleable> children = new ArrayList<>();
+                if (self instanceof Parent) {
+                    children.addAll(((Parent) self).getChildrenUnmodifiable());
+                }
+                if (self instanceof Control) {
+                    final Control c = (Control) self;
+                    if (null != c.getContextMenu()) {
+                        children.addAll(c.getContextMenu().getItems());
+                    }
+                }
+                if (self instanceof Menu) {
+                    final Menu m = (Menu) self;
+                    children.addAll(m.getItems());
+                }
+                for (final Styleable cs : children) {
+                    final Styleable r = this.lookup(cs, selector);
+                    if (null != r) {
+                        return r;
+                    }
+                }
+                return null;
+            }
+        }
+    }
 
-	String afId;
+    String afId;
 
-	@Override
-	public String afId() {
-		return this.afId;
-	}
+    @Override
+    public String afId() {
+        return this.afId;
+    }
 
-	@Override
-	public IGuiRequest getGuiRequest() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiRequest getGuiRequest() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void notifyEventOccured(final GuiEvent event) {
-		// TODO Auto-generated method stub
+    @Override
+    public void notifyEventOccured(final GuiEvent event) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void switchTo(final UserSession session) {
-		// TODO Auto-generated method stub
+    @Override
+    public void switchTo(final UserSession session) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void switchTo(final UserSession session, final Map<String, String> sceneArguments) {
-		// TODO Auto-generated method stub
+    @Override
+    public void switchTo(final UserSession session, final Map<String, String> sceneArguments) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	// @Override
-	// public void navigateTo(final UserSession session, final String location) {
-	// // TODO Auto-generated method stub
-	//
-	// }
-	//
-	// @Override
-	// public void newWindow(final UserSession session, final String location) {
-	// // TODO Auto-generated method stub
-	//
-	// }
-	//
-	// @Override
-	// public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String
-	// tokenPath,
-	// final String authorisationPath, final String scopes) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
+    // @Override
+    // public void navigateTo(final UserSession session, final String location) {
+    // // TODO Auto-generated method stub
+    //
+    // }
+    //
+    // @Override
+    // public void newWindow(final UserSession session, final String location) {
+    // // TODO Auto-generated method stub
+    //
+    // }
+    //
+    // @Override
+    // public Future<String> oauthAuthorise(final UserSession session, final String clientId, final String clientSecret, final String site, final String
+    // tokenPath,
+    // final String authorisationPath, final String scopes) {
+    // // TODO Auto-generated method stub
+    // return null;
+    // }
 
-	@Override
-	public void onEvent(final UserSession session, final GuiEventSignature eventSignature, final OnEventHandler handler) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onEvent(final UserSession session, final GuiEventSignature eventSignature, final OnEventHandler handler) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void onUpload(final UserSession session, final String uploadLink, final String filenameElementId, final OnEventHandler handler) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onUpload(final UserSession session, final String uploadLink, final String filenameElementId, final OnEventHandler handler) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public IGuiElement getElement(final String elementName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiElement getElement(final String elementName) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final DialogIdentity dialogId, final String title,
-			final String dialogContent) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public <T extends IGuiDialog> T createDialog(final Class<T> dialogClass, final UserSession session, final DialogIdentity dialogId, final String title,
+            final String dialogContent) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public IGuiDialog getDialog(final DialogIdentity dialogId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public IGuiDialog getDialog(final DialogIdentity dialogId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

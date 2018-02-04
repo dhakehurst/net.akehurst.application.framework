@@ -6,10 +6,10 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiRequest;
 
 public abstract class testObject_Handler extends AbstractIdentifiableObject implements IGuiNotification {
 
-	public testObject_Handler(final String afId) {
-		super(afId);
-	}
+    public testObject_Handler(final String afId) {
+        super(afId);
+    }
 
-	public IGuiRequest guiRequest;
+    public IGuiRequest guiRequest;
 
 }

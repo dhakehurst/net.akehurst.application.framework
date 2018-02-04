@@ -21,9 +21,9 @@ import net.akehurst.application.framework.technology.interfaceGui.elements.IGuiT
 
 public interface ISignInScene extends IGuiScene {
 
-	IGuiElement getActionSignIn();
+    IGuiElement getActionSignIn();
 
-	IGuiElement getMessageBox();
+    IGuiElement getMessageBox();
 
-	IGuiText getMessageText();
+    IGuiText getMessageText();
 }

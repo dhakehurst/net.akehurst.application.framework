@@ -4,8 +4,8 @@ import java.util.Map;
 
 public interface IGuiGraph {
 
-	Map<String, IGuiGraphNode> getNodes();
+    Map<String, IGuiGraphNode> getNodes();
 
-	Map<String, IGuiGraphEdge> getEdges();
+    Map<String, IGuiGraphEdge> getEdges();
 
 }

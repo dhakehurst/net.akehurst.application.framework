@@ -21,9 +21,9 @@ import net.akehurst.application.framework.technology.interfacePersistence.IPersi
 
 public class JpaPersistenceTransaction implements IPersistenceTransaction {
 
-	public JpaPersistenceTransaction(final EntityManager em) {
-		this.em = em;
-	}
+    public JpaPersistenceTransaction(final EntityManager em) {
+        this.em = em;
+    }
 
-	EntityManager em;
+    EntityManager em;
 }

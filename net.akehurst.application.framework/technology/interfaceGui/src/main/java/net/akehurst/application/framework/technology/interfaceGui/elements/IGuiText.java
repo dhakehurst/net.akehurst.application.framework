@@ -19,6 +19,6 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiText extends IGuiElement {
 
-	void setText(UserSession session, String value);
+    void setText(UserSession session, String value);
 
 }

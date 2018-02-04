@@ -19,9 +19,9 @@ import net.akehurst.application.framework.common.annotations.declaration.Signal;
 
 public interface IConsoleRequest {
 
-	@Signal
-	void requestOutput(String str);
+    @Signal
+    void requestOutput(String str);
 
-	@Signal
-	void requestError(String str);
+    @Signal
+    void requestError(String str);
 }

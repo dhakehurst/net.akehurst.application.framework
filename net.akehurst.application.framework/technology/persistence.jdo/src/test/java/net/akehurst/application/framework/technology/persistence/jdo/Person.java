@@ -21,7 +21,7 @@ import javax.jdo.annotations.Persistent;
 @PersistenceCapable
 public class Person {
 
-	@Persistent
-	public String name;
-	
+    @Persistent
+    public String name;
+
 }

@@ -20,34 +20,34 @@ import java.util.List;
 
 public class AnnotationDetailsList<AET> {
 
-	AnnotationDetailsList(final Object object, final Field field, final Class<?> fieldType, final List<AET> annotations) {
-		this.object = object;
-		this.field = field;
-		this.annotations = annotations;
-	}
+    AnnotationDetailsList(final Object object, final Field field, final Class<?> fieldType, final List<AET> annotations) {
+        this.object = object;
+        this.field = field;
+        this.annotations = annotations;
+    }
 
-	Object object;
-	Field field;
-	List<AET> annotations;
+    Object object;
+    Field field;
+    List<AET> annotations;
 
-	public List<AET> getAnnotations() {
-		return this.annotations;
-	}
+    public List<AET> getAnnotations() {
+        return this.annotations;
+    }
 
-	public Field getField() {
-		return this.field;
-	}
+    public Field getField() {
+        return this.field;
+    }
 
-	public Object getValue() {
-		try {
-			this.field.get(this.object);
-		} catch (final IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (final IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public Object getValue() {
+        try {
+            this.field.get(this.object);
+        } catch (final IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (final IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
