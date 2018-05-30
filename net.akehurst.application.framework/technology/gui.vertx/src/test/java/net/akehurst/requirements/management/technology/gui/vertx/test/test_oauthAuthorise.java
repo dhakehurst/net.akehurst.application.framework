@@ -43,7 +43,7 @@ public class test_oauthAuthorise {
 
         final StageIdentity stageId = new StageIdentity("xxx");
         final SceneIdentity sceneId = new SceneIdentity("home");
-        this.testContext.sut.portGui().in(IGuiRequest.class).createStage(stageId, "/af", null, null);
+        this.testContext.sut.portGui().in(IGuiRequest.class).createStage(stageId, "/af", null, null, true);
         this.testContext.sut.portGui().in(IGuiRequest.class).createScene(stageId, sceneId, ITestScene.class, null);
 
         this.testContext.sut.portGui().in(IGuiRequest.class).oauthAuthorise(session, clientId, clientSecret, site, tokenPath, authorisationPath, scopes);

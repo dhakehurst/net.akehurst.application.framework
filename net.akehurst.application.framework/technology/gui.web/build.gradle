@@ -15,14 +15,15 @@
  */
 
 dependencies {
-	compile project(":${rootProject.name}.common.realisation")
-	compile project(":${rootProject.name}.technology.gui.common")
-	compile project(":${rootProject.name}.technology.interfaceGui")
+	implementation project(":${rootProject.name}.common.realisation")
+	implementation project(":${rootProject.name}.technology.gui.common")
+	implementation project(":${rootProject.name}.technology.interfaceGui")
 //	compile project(":${rootProject.name}.technology.interfaceAuthentication")
 //	compile project(":${rootProject.name}.technology.interfaceComms")
 	
-	compile 'org.json:json:20180130'
-	
+	implementation 'org.json:json:20180130'
+    implementation "org.hjson:hjson:${version_hjson}"
+    
 //	compile 'org.apache.commons:commons-lang3:3.4'
 	
 //	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro

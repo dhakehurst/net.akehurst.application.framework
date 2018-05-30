@@ -18,4 +18,6 @@ dependencies {
 	compile project(':net.akehurst.application.framework.technology.interfaceAuthentication')
 //	compile project(':net.akehurst.application.framework.technology.commsInterface')
 
+    compile "org.jooq:jool-java-8:0.9.13"
+    
 }

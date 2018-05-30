@@ -188,12 +188,19 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
     }
 
     @Override
-    public void onRequest(final UserSession session, final String channelId, final IGuiRequestMessage func) {
+    public void subscribe(final String channelId, final ISubscribe func) {
+        this.verticle.register(channelId, (session1, channelId1, data) -> {
+            func.receive(session1, channelId1, data);
+        });
+    }
+
+    @Override
+    public void onRequest(final String channelId, final IGuiRequestMessage func) {
         // TODO: maybe session should be used as part of register!
         this.verticle.register(channelId, (session1, channelId1, data) -> {
             final Object result = func.receive(session1, channelId1, data);
             final JsonObject jsonData = JsonObject.mapFrom(result);
-            this.verticle.getComms().send(session, channelId, jsonData);
+            this.verticle.getComms().send(session1, channelId, jsonData);
         });
     }
 
@@ -251,7 +258,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
 
     @Override
     public void createStage(final StageIdentity stageId, final String contentRoot, final StageIdentity authenticationStageId,
-            final SceneIdentity authenticationSceneId) {
+            final SceneIdentity authenticationSceneId, final boolean frontEndRouting) {
         try {
             final Map<String, String> variables = new HashMap<>();
             variables.put("af.rootPath", this.rootPath);
@@ -275,7 +282,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
             final String webroot = str.substring(str.lastIndexOf('/') + 1);
             final String routePath = this.getNormalisedRootPath() + stagePath;
             if (null == authenticationStageId || null == authenticationSceneId) {
-                this.verticle.addRoute(false, null, routePath, rc -> {
+                this.verticle.addRoute(false, null, routePath, frontEndRouting, rc -> {
                     this.verticle.getComms().activeSessions.put(rc.session().id(), rc.session());
                     final User u = rc.user();
                     final String path = rc.normalisedPath();
@@ -284,7 +291,7 @@ public class VertxWebsite extends AbstractComponent implements IGuiRequest {
                 }, webroot, variables);
             } else {
                 final String authenticationRedirect = "/" + authenticationStageId.asPrimitive() + "/" + authenticationSceneId.asPrimitive() + "/";
-                this.verticle.addRoute(true, authenticationRedirect, routePath, rc -> {
+                this.verticle.addRoute(true, authenticationRedirect, routePath, frontEndRouting, rc -> {
                     this.verticle.getComms().activeSessions.put(rc.session().id(), rc.session());
                     final User u = rc.user();
                     final String path = rc.normalisedPath();

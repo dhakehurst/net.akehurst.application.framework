@@ -58,7 +58,7 @@ public class WebGuiEditor extends WebGuiText implements IGuiEditor {
 
     @Override
     public void onProvideCompletionItems(final UserSession session, final IGuiEditor.onProvideCompletionItems handler) {
-        super.getGuiRequest().onRequest(session, "Editor.provideCompletionItems", (session1, channelId, data) -> {
+        super.getGuiRequest().onRequest("Editor.provideCompletionItems", (session1, channelId, data) -> {
             final String text = (String) data.get("text");
             final int position = (int) data.get("position");
             final List<Map<String, Object>> items = handler.provide(text, position);

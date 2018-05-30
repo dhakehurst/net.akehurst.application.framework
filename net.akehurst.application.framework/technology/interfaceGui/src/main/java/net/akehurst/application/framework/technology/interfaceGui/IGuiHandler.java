@@ -21,6 +21,8 @@ import net.akehurst.application.framework.common.interfaceUser.UserSession;
 
 public interface IGuiHandler {
 
+    IGuiRequest getGuiRequest();
+
     void addAuthentication(UserSession session) throws GuiException;
 
     void clearAuthentication(UserSession session) throws GuiException;

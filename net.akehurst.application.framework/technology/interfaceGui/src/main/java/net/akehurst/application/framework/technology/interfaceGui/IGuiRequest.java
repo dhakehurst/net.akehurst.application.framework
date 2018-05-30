@@ -33,7 +33,7 @@ public interface IGuiRequest {
      * @param authenticationRedirectURL
      *            pass null for non authenticated roots
      */
-    void createStage(StageIdentity stageId, String rootPath, StageIdentity authenticationStageId, SceneIdentity authenticationSceneId);
+    void createStage(StageIdentity stageId, String rootPath, StageIdentity authenticationStageId, SceneIdentity authenticationSceneId, boolean includeSub);
 
     <T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content);
 
@@ -86,7 +86,13 @@ public interface IGuiRequest {
      * @param channelId
      * @param func
      */
-    void onRequest(final UserSession session, final String channelId, final IGuiRequestMessage func);
+    void onRequest(final String channelId, final IGuiRequestMessage func);
+
+    public interface ISubscribe {
+        void receive(UserSession session, String channelId, Map<String, Object> data);
+    }
+
+    void subscribe(final String channelId, final ISubscribe func);
 
     void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, GuiEventType eventType);
 

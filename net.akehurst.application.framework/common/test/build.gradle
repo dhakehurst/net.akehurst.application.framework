@@ -16,8 +16,9 @@
  
  dependencies {
 
-	compile project(":${rootProject.name}.common.realisation")
+	api project(":${rootProject.name}.common.realisation")
 
-	compile "junit:junit:4.12"
-	compile "org.easymock:easymock:3.4"
+	api "junit:junit:4.12"
+	implementation "org.easymock:easymock:3.4"
+    implementation 'net.akehurst.miscellaneous:net.akehurst.holser.reflect:1.0.0'
  }

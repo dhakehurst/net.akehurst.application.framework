@@ -73,8 +73,8 @@ public class AVerticle implements Verticle {
         this.register.put(channelId, func);
     }
 
-    void addRoute(final boolean authenticated, final String authenticationRedirect, final String stagePath, final Handler<RoutingContext> requestHandler,
-            final String webroot, final Map<String, String> variables) {
+    void addRoute(final boolean authenticated, final String authenticationRedirect, final String stagePath, final boolean frontEndRouting,
+            final Handler<RoutingContext> requestHandler, final String webroot, final Map<String, String> variables) {
         final String routePath = stagePath + "*";
 
         this.comms.addSocksChannel(authenticated, authenticationRedirect, stagePath, this.ws.getSockjsPath(), (session, channelId, data) -> {
@@ -97,13 +97,23 @@ public class AVerticle implements Verticle {
         this.router.route(routePath)
                 .handler(SessionHandler.create(LocalSessionStore.create(this.getVertx())).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
         if (authenticated) {
-            this.router.route(routePath).handler(new MyUserHandler());
+            this.router.route(routePath).handler(UserSessionHandler.create(this.authProvider));
             // this.router.route(routePath).handler(this.authHandler);// BasicAuthHandler.create(authProvider, "Please Provide Valid Credentials" ));
             final String loginRedirectURL = this.ws.rootPath.isEmpty() ? authenticationRedirect : this.ws.rootPath + authenticationRedirect;
             this.router.route(routePath).handler(new MyAuthHandler(this.authProvider, loginRedirectURL, this.ws.rootPath));
         }
         this.router.route(routePath).handler(requestHandler);// ;
         this.router.route(routePath).handler(TemplateStaticHandler.create().addVariables(variables).setCachingEnabled(false).setWebRoot(webroot));
+
+        if (frontEndRouting) {
+            this.router.route(routePath).handler(rc -> {
+                // final int s = rc.request().path().lastIndexOf('/');
+                // final int s2 = rc.request().path().lastIndexOf('.');
+                // final String file = s2 > s ? rc.request().path().substring(s + 1) : "";
+                // rc.reroute(stagePath + file);
+                rc.reroute(stagePath.substring(0, stagePath.length() - 1));
+            });
+        }
 
         this.ws.logger.log(LogLevel.INFO, "Protected path:  " + "http://localhost:" + this.port + stagePath);
     }
@@ -228,7 +238,7 @@ public class AVerticle implements Verticle {
         this.router.route(downloadPath).handler(BodyHandler.create().setBodyLimit(50 * 1024 * 1024));
         this.router.route(downloadPath)
                 .handler(SessionHandler.create(LocalSessionStore.create(this.getVertx())).setCookieHttpOnlyFlag(false).setCookieSecureFlag(false));
-        this.router.route(downloadPath).handler(new MyUserHandler());
+        this.router.route(downloadPath).handler(UserSessionHandler.create(this.authProvider));
         this.router.route(downloadPath).handler(rc -> {
             final Map<String, List<String>> params = new HashMap<>();
             for (final Map.Entry<String, String> me : rc.request().params().entries()) {

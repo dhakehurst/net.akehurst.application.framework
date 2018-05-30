@@ -15,8 +15,8 @@
  */
 package net.akehurst.application.framework.technology.interfacePersistence;
 
-public class PersistentStoreException extends Exception {
-    public PersistentStoreException(String message, Throwable cause) {
+public class PersistentStoreException extends RuntimeException {
+    public PersistentStoreException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

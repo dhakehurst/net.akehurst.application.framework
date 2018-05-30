@@ -41,10 +41,15 @@ subprojects {
             jcenter()
     }
 
-    dependencies {
-        compile "org.jooq:jool:0.9.12"
+    ext {
+        
+        version_log4j = '2.10.0'
+        version_hjson = '3.0.0'
+    }
     
-        testCompile 'junit:junit:+'
+    
+    dependencies {
+        testCompile 'junit:junit:4.12'
     }
     
     checkstyle {

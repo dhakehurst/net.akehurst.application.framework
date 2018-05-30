@@ -1,0 +1,47 @@
+{
+	primitives : {
+		booleanValue : true
+		intValue : 1
+		realValue : 3.14
+		stringValue : 'hello world'
+	}
+	
+	list : {
+		listIntValue : [ 1, 2, 3, 4, 5 ]
+	}
+	
+	map: {
+		mapStringIntValue : {
+			'a' : 1
+			'b' : 2
+			'c' : 3
+		}
+		mapIntStringValue : {
+			1 : 'a'
+			2 : 'b'
+			3 : 'c'
+		}
+		mapColourStringValue : {
+			RED : 'red'
+			GREEN : 'green'
+			BLUE : 'blue'
+		}
+		mapStringPersonValue : {
+			Fred : {
+				name :'Fred'
+				age  : 13
+				hair : BLUE
+			}
+			Bob : {
+				name :'Bob'
+				age  : 18
+				hair : GREEN
+			}
+			Jane : {
+				name :'Jane'
+				age  : 23
+				hair : RED
+			}
+		}
+	}
+}

@@ -94,7 +94,7 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
 
     @Override
     public void createStage(final StageIdentity stageId, final String rootPath, final StageIdentity authenticationStageId,
-            final SceneIdentity authenticationSceneId) {
+            final SceneIdentity authenticationSceneId, final boolean includeSub) {
         Platform.runLater(() -> {
             final Stage primary = new Stage();
             primary.setTitle(stageId.asPrimitive());
@@ -218,7 +218,13 @@ public class JfxWindow extends AbstractComponent implements IGuiRequest {
     }
 
     @Override
-    public void onRequest(final UserSession session, final String channelId, final IGuiRequestMessage func) {
+    public void subscribe(final String channelId, final ISubscribe func) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onRequest(final String channelId, final IGuiRequestMessage func) {
         // TODO Auto-generated method stub
 
     }

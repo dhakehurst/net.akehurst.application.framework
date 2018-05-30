@@ -16,9 +16,16 @@
 
 
 dependencies {
-	compile project(":${rootProject.name}.technology.interfaceLogging")
+	api project(":${rootProject.name}.technology.interfaceLogging")
 
-	compile 'org.apache.logging.log4j:log4j-api:2.8.2'
-	compile 'org.apache.logging.log4j:log4j-core:2.8.2'
-	runtime 'org.apache.logging.log4j:log4j-1.2-api:2.8.2'
+	implementation "org.apache.logging.log4j:log4j-api:${version_log4j}"
+	implementation "org.apache.logging.log4j:log4j-core:${version_log4j}"
+	runtime "org.apache.logging.log4j:log4j-1.2-api:${version_log4j}"
+    
+    // add bridges to other common logging frameworks..not sure if we should do this here!
+    runtime "org.apache.logging.log4j:log4j-slf4j-impl:${version_log4j}"
+    runtime "org.apache.logging.log4j:log4j-jcl:${version_log4j}"
+    runtime "org.apache.logging.log4j:log4j-1.2-api:${version_log4j}"
+    runtime "org.apache.logging.log4j:log4j-jul:${version_log4j}"
+    
 }
