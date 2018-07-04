@@ -17,7 +17,7 @@
 rootProject.name = 'net.akehurst.application.framework'
  
 fileTree('.') {
-  include '**/build.gradle'
+  include '*/*/build.gradle'
   exclude 'build.gradle' // Exclude the root build file.
 }.each {
   def prj = rootProject.name+'.'+relativePath(it.parent).replace(File.separator, '.')
