@@ -35,7 +35,7 @@ import net.akehurst.application.framework.common.annotations.instance.PortContra
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.gui.web.elements.WebGuiDialogProxy;
 import net.akehurst.application.framework.technology.gui.web.elements.WebGuiSceneProxy;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
@@ -56,7 +56,7 @@ import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class VertxWebsite extends AbstractComponent implements IGuiRequest {
+public class VertxWebsite extends ComponentAbstract implements IGuiRequest {
 
     static final String EVENT_STAGE_CREATED = "IGuiNotification.notifyStageCreated";
     static final String EVENT_STAGE_CLOSED = "IGuiNotification.notifyStageClosed";

@@ -1,0 +1,10 @@
+dependencies {
+    
+    api project(":net.akehurst.application.framework.common.annotations.datatype")
+    
+    implementation "org.hjson:hjson:${version_hjson}"
+    implementation "net.akehurst.transform:binary:${version_transform}"
+
+    testImplementation "org.jooq:jool-java-8:${version_jool}"
+    
+}

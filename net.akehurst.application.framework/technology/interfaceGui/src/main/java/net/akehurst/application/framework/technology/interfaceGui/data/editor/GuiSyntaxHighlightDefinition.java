@@ -1,7 +1,7 @@
 package net.akehurst.application.framework.technology.interfaceGui.data.editor;
 
 import net.akehurst.application.framework.common.AbstractDataType;
-import net.akehurst.application.framework.common.annotations.declaration.DataType;
+import net.akehurst.application.framework.common.annotations.datatype.DataType;
 
 @DataType
 public class GuiSyntaxHighlightDefinition extends AbstractDataType implements IGuiSyntaxHighlightDefinition {

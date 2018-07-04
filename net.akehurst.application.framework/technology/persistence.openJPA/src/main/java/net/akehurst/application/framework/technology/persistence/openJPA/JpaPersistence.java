@@ -32,7 +32,7 @@ import javax.persistence.TypedQuery;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
@@ -43,7 +43,7 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
  * connection properties requires persistenceUnitName = ?
  *
  */
-public class JpaPersistence extends AbstractComponent implements IPersistentStore {
+public class JpaPersistence extends ComponentAbstract implements IPersistentStore {
 
     public JpaPersistence(final String id) {
         super(id);

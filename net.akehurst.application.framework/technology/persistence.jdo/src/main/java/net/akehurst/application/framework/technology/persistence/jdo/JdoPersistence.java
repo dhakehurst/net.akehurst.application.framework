@@ -48,7 +48,7 @@ import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
@@ -67,7 +67,7 @@ import net.akehurst.application.framework.technology.interfacePersistence.Persis
  * @author akehurst
  *
  */
-public class JdoPersistence extends AbstractComponent implements IPersistentStore {
+public class JdoPersistence extends ComponentAbstract implements IPersistentStore {
 
     static class DynClassloader extends ClassLoader {
         public DynClassloader(final ClassLoader parent) {

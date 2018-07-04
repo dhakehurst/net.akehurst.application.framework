@@ -17,9 +17,9 @@ package net.akehurst.application.framework.realisation;
 
 import net.akehurst.application.framework.common.IIdentifiableObject;
 
-public class AbstractIdentifiableObject implements IIdentifiableObject {
+public class IdentifiableObjectAbstract implements IIdentifiableObject {
 
-    public AbstractIdentifiableObject(final String afId) {
+    public IdentifiableObjectAbstract(final String afId) {
         this.afId = afId;
     }
 

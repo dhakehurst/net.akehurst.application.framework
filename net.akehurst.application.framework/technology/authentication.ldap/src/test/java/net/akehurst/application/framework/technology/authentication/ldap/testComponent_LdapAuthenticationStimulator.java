@@ -4,11 +4,11 @@ import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.test.annotation.MockPassiveObjectInstance;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 
-public class testComponent_LdapAuthenticationStimulator extends AbstractComponent {
+public class testComponent_LdapAuthenticationStimulator extends ComponentAbstract {
 
     public testComponent_LdapAuthenticationStimulator(final String afId) {
         super(afId);

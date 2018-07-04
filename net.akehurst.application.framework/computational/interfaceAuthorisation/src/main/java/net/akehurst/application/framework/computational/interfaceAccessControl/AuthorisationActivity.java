@@ -16,7 +16,7 @@
 package net.akehurst.application.framework.computational.interfaceAccessControl;
 
 import net.akehurst.application.framework.common.AbstractDataType;
-import net.akehurst.application.framework.common.annotations.declaration.DataType;
+import net.akehurst.application.framework.common.annotations.datatype.DataType;
 
 @DataType
 public class AuthorisationActivity extends AbstractDataType {

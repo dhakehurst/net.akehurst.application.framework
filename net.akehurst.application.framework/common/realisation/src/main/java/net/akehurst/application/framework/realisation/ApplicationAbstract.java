@@ -34,9 +34,9 @@ import net.akehurst.application.framework.common.annotations.instance.ServiceRef
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-abstract public class AbstractApplication extends AbstractActiveObject implements IApplication {
+abstract public class ApplicationAbstract extends ActiveObjectAbstract implements IApplication {
 
-    public AbstractApplication(final String id) {
+    public ApplicationAbstract(final String id) {
         super(id);
     }
 

@@ -18,9 +18,9 @@ package net.akehurst.application.framework.common.test;
 import java.lang.reflect.Type;
 
 import net.akehurst.application.framework.common.IConfiguration;
-import net.akehurst.application.framework.realisation.AbstractIdentifiableObject;
+import net.akehurst.application.framework.realisation.IdentifiableObjectAbstract;
 
-public class AbstractMockConfigurationService extends AbstractIdentifiableObject implements IConfiguration {
+public class AbstractMockConfigurationService extends IdentifiableObjectAbstract implements IConfiguration {
 
     public AbstractMockConfigurationService(final String afId) {
         super(afId);

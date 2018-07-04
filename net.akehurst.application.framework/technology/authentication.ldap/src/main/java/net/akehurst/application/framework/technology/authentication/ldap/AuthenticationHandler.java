@@ -27,13 +27,13 @@ import net.akehurst.application.framework.common.annotations.instance.Configured
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.realisation.AbstractActiveSignalProcessingObject;
+import net.akehurst.application.framework.realisation.ActiveSignalProcessingObjectAbstract;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class AuthenticationHandler extends AbstractActiveSignalProcessingObject implements IAuthenticatorRequest {
+public class AuthenticationHandler extends ActiveSignalProcessingObjectAbstract implements IAuthenticatorRequest {
 
     @ServiceReference
     ILogger logger;

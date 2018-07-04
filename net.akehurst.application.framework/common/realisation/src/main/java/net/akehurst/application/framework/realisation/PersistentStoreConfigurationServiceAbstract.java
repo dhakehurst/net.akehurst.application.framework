@@ -25,9 +25,9 @@ import net.akehurst.application.framework.technology.interfacePersistence.IPersi
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 
-abstract public class AbstractPersistentStoreConfigurationService extends AbstractConfigurationService {
+abstract public class PersistentStoreConfigurationServiceAbstract extends ConfigurationServiceAbstract {
 
-    public AbstractPersistentStoreConfigurationService(final String afId) {
+    public PersistentStoreConfigurationServiceAbstract(final String afId) {
         super(afId);
     }
 

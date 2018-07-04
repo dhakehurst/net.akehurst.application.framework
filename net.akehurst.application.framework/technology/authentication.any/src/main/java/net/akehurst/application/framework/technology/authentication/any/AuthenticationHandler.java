@@ -19,12 +19,12 @@ import net.akehurst.application.framework.common.annotations.declaration.Externa
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.realisation.AbstractActiveSignalProcessingObject;
+import net.akehurst.application.framework.realisation.ActiveSignalProcessingObjectAbstract;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 
-public class AuthenticationHandler extends AbstractActiveSignalProcessingObject implements IAuthenticatorRequest {
+public class AuthenticationHandler extends ActiveSignalProcessingObjectAbstract implements IAuthenticatorRequest {
 
     @ServiceReference
     ILogger logger;

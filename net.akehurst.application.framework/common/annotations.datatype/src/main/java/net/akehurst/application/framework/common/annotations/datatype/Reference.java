@@ -13,8 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.realisation;
+package net.akehurst.application.framework.common.annotations.datatype;
 
-public class AbstractServiceAwareObject {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Reference {
+    /**
+     * the property on the reference object that is used to identify the referenced object
+     */
+    String value() default "identity";
 }

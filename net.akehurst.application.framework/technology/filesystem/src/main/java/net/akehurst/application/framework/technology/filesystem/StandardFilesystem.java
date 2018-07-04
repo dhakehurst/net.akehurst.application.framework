@@ -21,13 +21,13 @@ import java.nio.file.Paths;
 import net.akehurst.application.framework.common.IService;
 import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.realisation.Port;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IDirectory;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFile;
 import net.akehurst.application.framework.technology.interfaceFilesystem.IFilesystem;
 
-public class StandardFilesystem extends AbstractComponent implements IFilesystem, IService {
+public class StandardFilesystem extends ComponentAbstract implements IFilesystem, IService {
 
     public StandardFilesystem(final String id) {
         super(id);

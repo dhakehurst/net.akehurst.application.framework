@@ -32,14 +32,14 @@ import net.akehurst.application.framework.common.annotations.declaration.Compone
 import net.akehurst.application.framework.common.annotations.instance.ConfiguredValue;
 import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistenceTransaction;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentItemQuery;
 import net.akehurst.application.framework.technology.interfacePersistence.PersistentStoreException;
 
 @Component
-public class ObjectDbDatabasePersistence extends AbstractComponent implements IPersistentStore {
+public class ObjectDbDatabasePersistence extends ComponentAbstract implements IPersistentStore {
 
     public ObjectDbDatabasePersistence(final String id) {
         super(id);

@@ -27,7 +27,7 @@ import net.akehurst.application.framework.common.annotations.instance.ServiceRef
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-abstract public class AbstractConfigurationService extends AbstractIdentifiableObject implements IConfiguration, IService {
+abstract public class ConfigurationServiceAbstract extends IdentifiableObjectAbstract implements IConfiguration, IService {
 
     @ServiceReference
     protected IApplicationFramework af;
@@ -35,7 +35,7 @@ abstract public class AbstractConfigurationService extends AbstractIdentifiableO
     @ServiceReference
     protected ILogger logger;
 
-    public AbstractConfigurationService(final String afId) {
+    public ConfigurationServiceAbstract(final String afId) {
         super(afId);
     }
 

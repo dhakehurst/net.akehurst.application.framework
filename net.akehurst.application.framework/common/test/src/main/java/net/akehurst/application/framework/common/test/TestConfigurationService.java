@@ -19,10 +19,10 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.akehurst.application.framework.realisation.AbstractConfigurationService;
+import net.akehurst.application.framework.realisation.ConfigurationServiceAbstract;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class TestConfigurationService extends AbstractConfigurationService {
+public class TestConfigurationService extends ConfigurationServiceAbstract {
 
     public TestConfigurationService(final String afId) {
         super(afId);

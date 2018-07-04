@@ -22,7 +22,7 @@ import java.util.Map;
 
 import net.akehurst.application.framework.common.annotations.declaration.ExternalConnection;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.realisation.AbstractActiveSignalProcessingObject;
+import net.akehurst.application.framework.realisation.ActiveSignalProcessingObjectAbstract;
 import net.akehurst.application.framework.technology.interfaceGui.DialogIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiException;
@@ -36,7 +36,7 @@ import net.akehurst.application.framework.technology.interfaceGui.SceneIdentity;
 import net.akehurst.application.framework.technology.interfaceGui.StageIdentity;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-abstract public class AbstractGuiHandler extends AbstractActiveSignalProcessingObject implements IGuiHandler, IGuiNotification {
+abstract public class AbstractGuiHandler extends ActiveSignalProcessingObjectAbstract implements IGuiHandler, IGuiNotification {
 
     @ExternalConnection
     private IGuiRequest guiRequest;

@@ -16,7 +16,7 @@
 package net.akehurst.application.framework.computational.authorisation;
 
 import net.akehurst.application.framework.common.AbstractDataType;
-import net.akehurst.application.framework.common.annotations.declaration.DataType;
+import net.akehurst.application.framework.common.annotations.datatype.DataType;
 import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationActivity;
 import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationSubject;
 import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationTarget;

@@ -20,12 +20,12 @@ import net.akehurst.application.framework.common.annotations.declaration.Compone
 import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.PortContract;
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 
 @Component
-public class AnyAuthenticator extends AbstractComponent {
+public class AnyAuthenticator extends ComponentAbstract {
     public AnyAuthenticator(final String afId) {
         super(afId);
     }

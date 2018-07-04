@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.akehurst.application.framework.common.annotations.declaration;
+package net.akehurst.application.framework.common.annotations.datatype;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,9 +22,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Reference {
+public @interface Query {
 
-    String value() default "id";
-
-    String opposite() default "";
 }

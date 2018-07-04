@@ -24,9 +24,9 @@ import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-abstract public class AbstractComponent extends AbstractActiveObject implements IComponent {
+abstract public class ComponentAbstract extends ActiveObjectAbstract implements IComponent {
 
-    public AbstractComponent(final String afId) {
+    public ComponentAbstract(final String afId) {
         super(afId);
         this.ports = new HashSet<>();
     }

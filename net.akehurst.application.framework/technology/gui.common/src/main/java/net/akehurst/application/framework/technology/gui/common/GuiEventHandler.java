@@ -19,14 +19,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
-import net.akehurst.application.framework.realisation.AbstractIdentifiableObject;
+import net.akehurst.application.framework.realisation.IdentifiableObjectAbstract;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEvent;
 import net.akehurst.application.framework.technology.interfaceGui.GuiEventSignature;
 import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEventHandler;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-public class GuiEventHandler extends AbstractIdentifiableObject {
+public class GuiEventHandler extends IdentifiableObjectAbstract {
 
     public GuiEventHandler(final String afId) {
         super(afId);

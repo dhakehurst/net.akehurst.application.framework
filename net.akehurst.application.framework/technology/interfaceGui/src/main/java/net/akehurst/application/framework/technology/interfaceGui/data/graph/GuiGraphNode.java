@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.AbstractDataType;
-import net.akehurst.application.framework.common.annotations.declaration.DataType;
+import net.akehurst.application.framework.common.annotations.datatype.DataType;
+import net.akehurst.application.framework.common.annotations.datatype.Reference;
 
 @DataType
 public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
@@ -27,6 +28,7 @@ public class GuiGraphNode extends AbstractDataType implements IGuiGraphNode {
         return (String) super.getIdentityValues().get(0);
     }
 
+    @Reference
     @Override
     public IGuiGraphNode getParent() {
         return this.parent;

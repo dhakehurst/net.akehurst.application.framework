@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.AbstractDataType;
-import net.akehurst.application.framework.common.annotations.declaration.DataType;
+import net.akehurst.application.framework.common.annotations.datatype.DataType;
+import net.akehurst.application.framework.common.annotations.datatype.Reference;
 
 @DataType
 public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
@@ -39,17 +40,20 @@ public class GuiGraphEdge extends AbstractDataType implements IGuiGraphEdge {
         return (String) super.getIdentityValues().get(0);
     }
 
+    @Reference
     @Override
     public IGuiGraphNode getParent() {
         return this.parent;
     }
 
+    @Reference
     @Override
     public IGuiGraphNode getSource() {
         final IGuiGraphNode source = this.graph.getNodes().get(this.sourceNodeId);
         return source;
     }
 
+    @Reference
     @Override
     public IGuiGraphNode getTarget() {
         final IGuiGraphNode target = this.graph.getNodes().get(this.targetNodeId);

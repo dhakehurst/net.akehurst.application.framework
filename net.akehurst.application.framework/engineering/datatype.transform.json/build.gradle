@@ -1,0 +1,5 @@
+dependencies {
+    
+    implementation "org.hjson:hjson:${version_hjson}"
+    
+}

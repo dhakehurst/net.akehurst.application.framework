@@ -18,13 +18,13 @@ package net.akehurst.application.framework.service.configuration.file;
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
 import net.akehurst.application.framework.common.annotations.instance.ServiceReference;
-import net.akehurst.application.framework.realisation.AbstractPersistentStoreConfigurationService;
+import net.akehurst.application.framework.realisation.PersistentStoreConfigurationServiceAbstract;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.technology.interfacePersistence.IPersistentStore;
 import net.akehurst.application.framework.technology.persistence.filesystem.HJsonFile;
 
-public class HJsonConfigurationService extends AbstractPersistentStoreConfigurationService {
+public class HJsonConfigurationService extends PersistentStoreConfigurationServiceAbstract {
 
     @CommandLineArgument(description = "name of a directory in which the configuration file can be found")
     protected String directory = "configuration";

@@ -21,12 +21,12 @@ import net.akehurst.application.framework.common.annotations.instance.PortContra
 import net.akehurst.application.framework.common.annotations.instance.PortInstance;
 import net.akehurst.application.framework.common.interfaceUser.UserDetails;
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.interfaceGui.console.IConsoleNotification;
 import net.akehurst.application.framework.technology.interfaceGui.console.IConsoleRequest;
 
 @Component
-public class StandardStreams extends AbstractComponent implements IConsoleRequest {
+public class StandardStreams extends ComponentAbstract implements IConsoleRequest {
 
     public StandardStreams(final String id) {
         super(id);

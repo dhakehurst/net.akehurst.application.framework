@@ -24,10 +24,10 @@ import net.akehurst.application.framework.computational.interfaceAuthenticator.I
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
 import net.akehurst.application.framework.computational.interfaceUser.authentication.IUserAuthenticationNotification;
 import net.akehurst.application.framework.computational.interfaceUser.authentication.IUserAuthenticationRequest;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 
 @Component
-public class AuthenticationDelegator extends AbstractComponent implements IUserAuthenticationRequest, ICAuthenticatorNotification {
+public class AuthenticationDelegator extends ComponentAbstract implements IUserAuthenticationRequest, ICAuthenticatorNotification {
 
     public AuthenticationDelegator(final String afId) {
         super(afId);

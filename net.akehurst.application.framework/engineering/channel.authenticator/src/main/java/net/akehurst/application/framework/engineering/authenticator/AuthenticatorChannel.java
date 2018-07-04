@@ -21,11 +21,11 @@ import net.akehurst.application.framework.common.annotations.instance.PortInstan
 import net.akehurst.application.framework.common.interfaceUser.UserSession;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorNotification;
 import net.akehurst.application.framework.computational.interfaceAuthenticator.ICAuthenticatorRequest;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorNotification;
 import net.akehurst.application.framework.technology.interfaceAuthentication.IAuthenticatorRequest;
 
-public class AuthenticatorChannel extends AbstractComponent implements ICAuthenticatorRequest, IAuthenticatorNotification {
+public class AuthenticatorChannel extends ComponentAbstract implements ICAuthenticatorRequest, IAuthenticatorNotification {
 
     public AuthenticatorChannel(final String id) {
         super(id);

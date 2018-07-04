@@ -18,11 +18,11 @@ package net.akehurst.application.framework.common.test;
 import java.util.List;
 
 import net.akehurst.application.framework.common.IActiveObject;
-import net.akehurst.application.framework.realisation.AbstractActiveObject;
+import net.akehurst.application.framework.realisation.ActiveObjectAbstract;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.test.ITestEnvironment;
 
-abstract public class AbstractTestContext extends AbstractActiveObject implements ITestEnvironment {
+abstract public class AbstractTestContext extends ActiveObjectAbstract implements ITestEnvironment {
 
     public AbstractTestContext() {
         super("testEnvironment");

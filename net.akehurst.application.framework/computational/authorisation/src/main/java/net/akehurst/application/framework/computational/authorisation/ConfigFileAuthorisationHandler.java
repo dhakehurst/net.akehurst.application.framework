@@ -33,12 +33,12 @@ import net.akehurst.application.framework.computational.interfaceAccessControl.A
 import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationSubject;
 import net.akehurst.application.framework.computational.interfaceAccessControl.AuthorisationTarget;
 import net.akehurst.application.framework.computational.interfaceAccessControl.IAuthorisationRequest;
-import net.akehurst.application.framework.realisation.AbstractComponent;
+import net.akehurst.application.framework.realisation.ComponentAbstract;
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
 @Component
-public class ConfigFileAuthorisationHandler extends AbstractComponent implements IAuthorisationRequest {
+public class ConfigFileAuthorisationHandler extends ComponentAbstract implements IAuthorisationRequest {
 
     public ConfigFileAuthorisationHandler(final String afId) {
         super(afId);

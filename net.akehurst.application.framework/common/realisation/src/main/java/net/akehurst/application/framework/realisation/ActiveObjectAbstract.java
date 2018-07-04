@@ -27,7 +27,7 @@ import net.akehurst.application.framework.common.annotations.instance.ServiceRef
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-abstract public class AbstractActiveObject implements IActiveObject {
+abstract public class ActiveObjectAbstract implements IActiveObject {
 
     @ServiceReference
     protected IApplicationFramework af;
@@ -35,7 +35,7 @@ abstract public class AbstractActiveObject implements IActiveObject {
     @ServiceReference
     protected ILogger logger;
 
-    public AbstractActiveObject(final String afId) {
+    public ActiveObjectAbstract(final String afId) {
         this.afId = afId;
     }
 
