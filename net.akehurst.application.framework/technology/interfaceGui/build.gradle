@@ -17,9 +17,9 @@
 dependencies {
     api project(":net.akehurst.application.framework.common.annotations.datatype")
     
-	compile project(':net.akehurst.application.framework.technology.interfaceAuthentication')
+	api project(':net.akehurst.application.framework.technology.interfaceAuthentication')
 //	compile project(':net.akehurst.application.framework.technology.commsInterface')
 
-    compile "org.jooq:jool-java-8:0.9.13"
+    implementation "org.jooq:jool-java-8:${version_jool}"
     
 }

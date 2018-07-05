@@ -15,10 +15,10 @@
  */
  
  dependencies {
- 	compile project(':net.akehurst.application.framework.common.bits')
- 	compile project(':net.akehurst.application.framework.common.realisation')
- 	compile project(':net.akehurst.application.framework.computational.interfaceAuthenticator')
- 	compile project(':net.akehurst.application.framework.computational.interfaceUser')
+ 	api project(':net.akehurst.application.framework.common.bits')
+ 	implementation project(':net.akehurst.application.framework.common.realisation')
+ 	api project(':net.akehurst.application.framework.computational.interfaceAuthenticator')
+ 	api project(':net.akehurst.application.framework.computational.interfaceUser')
 
  }
 

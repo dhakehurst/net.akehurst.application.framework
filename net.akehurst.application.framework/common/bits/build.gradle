@@ -16,7 +16,7 @@
  
  dependencies {
  
-	 api 'org.jooq:jool-java-8:0.9.13'
+	 api "org.jooq:jool-java-8:${version_jool}"
  
  }
 

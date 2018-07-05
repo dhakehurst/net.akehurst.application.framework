@@ -15,24 +15,24 @@
  */
 package net.akehurst.application.framework.technology.interfacePersistence;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+import net.akehurst.application.framework.common.DataTypeAbstract;
 
-public class PersistentItemQuery extends AbstractDataType {
+public class PersistentItemQuery extends DataTypeAbstract {
 
-    public PersistentItemQuery(final String language, final String value) {
-        super(language, value);
-        this.value = value;
-        this.language = language;
-    }
+	public PersistentItemQuery(final String language, final String value) {
+		super(language, value);
+		this.value = value;
+		this.language = language;
+	}
 
-    private final String language;
-    private final String value;
+	private final String language;
+	private final String value;
 
-    public String getLanguage() {
-        return this.language;
-    }
+	public String getLanguage() {
+		return this.language;
+	}
 
-    public String getValue() {
-        return this.value;
-    }
+	public String getValue() {
+		return this.value;
+	}
 }

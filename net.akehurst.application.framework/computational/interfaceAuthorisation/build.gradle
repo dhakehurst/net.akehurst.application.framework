@@ -19,7 +19,7 @@ dependencies {
 
     api project(":net.akehurst.application.framework.common.annotations.datatype")
     
-	compile project(":${rootProject.name}.common.bits")
-	compile project(":${rootProject.name}.common.interfaceUser")
+	api project(":${rootProject.name}.common.bits")
+	api project(":${rootProject.name}.common.interfaceUser")
 
 }

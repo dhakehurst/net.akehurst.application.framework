@@ -17,10 +17,10 @@
 
 
 dependencies {
-	compile project(":${rootProject.name}.common.realisation")
+	implementation project(":${rootProject.name}.common.realisation")
 	
-	compile project(":${rootProject.name}.technology.interfacePersistence")
-	compile 'org.apache.openjpa:openjpa:2.4.1'
+	api project(":${rootProject.name}.technology.interfacePersistence")
+	implementation 'org.apache.openjpa:openjpa:2.4.1'
 	
 	testRuntime 'org.apache.derby:derby:10.12.1.1'
 	

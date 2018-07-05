@@ -1,0 +1,17 @@
+{
+  "name": "net.akehurst.language.editor.api",
+  "version": "1.0.0",
+  "license": "Apache 2.0",
+  "private" : true,
+  "types": "Editor.d.ts",
+  "main": "Editor.js",
+  "devDependencies": {
+    "typescript": "2.7.2"
+  },
+  "scripts": {
+    "build": "tsc --module umd --moduleResolution node --target es5 --lib es6 --sourceMap Editor.ts"
+  },
+  "dependencies": {
+
+  }
+}

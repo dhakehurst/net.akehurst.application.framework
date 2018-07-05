@@ -15,9 +15,9 @@
  */
  
  dependencies {
- 	compile project(":${rootProject.name}.common.realisation");
- 	compile project(":${rootProject.name}.technology.interfaceLogging");
- 	compile project(":${rootProject.name}.technology.interfacePersistence")
- 	compile project(":${rootProject.name}.technology.persistence.filesystem")
+ 	implementation project(":${rootProject.name}.common.realisation");
+ 	api project(":${rootProject.name}.technology.interfaceLogging");
+ 	api project(":${rootProject.name}.technology.interfacePersistence")
+ 	implementation project(":${rootProject.name}.technology.persistence.filesystem")
  
  }

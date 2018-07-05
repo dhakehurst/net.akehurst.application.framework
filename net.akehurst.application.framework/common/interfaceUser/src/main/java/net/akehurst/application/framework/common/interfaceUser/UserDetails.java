@@ -17,25 +17,25 @@ package net.akehurst.application.framework.common.interfaceUser;
 
 import java.util.List;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+import net.akehurst.application.framework.common.DataTypeAbstract;
 
-public class UserDetails extends AbstractDataType {
+public class UserDetails extends DataTypeAbstract {
 
-    public UserDetails(final String name) {
-        super(name);
-        this.name = name;
-    }
+	public UserDetails(final String name) {
+		super(name);
+		this.name = name;
+	}
 
-    String name;
+	String name;
 
-    public String getName() {
-        return this.name;
-    }
+	public String getName() {
+		return this.name;
+	}
 
-    List<String> groups;
+	List<String> groups;
 
-    public List<String> getGroups() {
-        return this.groups;
-    }
+	public List<String> getGroups() {
+		return this.groups;
+	}
 
 }

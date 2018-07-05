@@ -20,16 +20,16 @@ ext {
 }
 
 dependencies {
-	compile project(":${rootProject.name}.common.realisation")
-	compile project(":${rootProject.name}.technology.interfaceLogging")
+	implementation project(":${rootProject.name}.common.realisation")
+	api project(":${rootProject.name}.technology.interfaceLogging")
 	
-	compile project(':net.akehurst.application.framework.technology.interfacePersistence')
-	compile 'commons-io:commons-io:2.5'
-	compile "org.datanucleus:javax.jdo:${javaxJdoVersion}"
-	compile "org.datanucleus:datanucleus-api-jdo:${jdoVersion}"
-	compile "org.datanucleus:datanucleus-core:${jdoVersion}"
+	api project(':net.akehurst.application.framework.technology.interfacePersistence')
+	implementation 'commons-io:commons-io:2.5'
+	implementation "org.datanucleus:javax.jdo:${javaxJdoVersion}"
+	implementation "org.datanucleus:datanucleus-api-jdo:${jdoVersion}"
+	implementation "org.datanucleus:datanucleus-core:${jdoVersion}"
 	
-	testCompile project(":${rootProject.name}.technology.logging.log4j")
+	testImplementation project(":${rootProject.name}.technology.logging.log4j")
 	//testRuntime 'org.datanucleus:datanucleus-rdbms:${jdoVersion}'
 	testRuntime 'org.apache.derby:derby:10.12.1.1'
 }

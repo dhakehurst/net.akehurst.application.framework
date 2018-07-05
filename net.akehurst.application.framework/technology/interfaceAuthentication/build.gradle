@@ -15,6 +15,6 @@
  */
  
  dependencies {
- 	compile project(':net.akehurst.application.framework.common.bits')
-  	compile project(':net.akehurst.application.framework.common.interfaceUser')
+ 	api project(':net.akehurst.application.framework.common.bits')
+  	api project(':net.akehurst.application.framework.common.interfaceUser')
  }

@@ -15,8 +15,8 @@
  */
  
 dependencies {
-	compile project(":${rootProject.name}.common.realisation")
+	implementation project(":${rootProject.name}.common.realisation")
 	
-	compile project(':net.akehurst.application.framework.technology.interfaceGui')
+	api project(':net.akehurst.application.framework.technology.interfaceGui')
 
 }

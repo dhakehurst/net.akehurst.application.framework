@@ -15,23 +15,23 @@
  */
 package net.akehurst.application.framework.technology.gui.vertx;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+import net.akehurst.application.framework.common.DataTypeAbstract;
 
-public class IpPort extends AbstractDataType {
+public class IpPort extends DataTypeAbstract {
 
-    public IpPort(String value) {
-        this(Integer.parseInt(value));
-    }
+	public IpPort(final String value) {
+		this(Integer.parseInt(value));
+	}
 
-    public IpPort(Integer value) {
-        super(value);
-        this.value = value;
-    }
+	public IpPort(final Integer value) {
+		super(value);
+		this.value = value;
+	}
 
-    Integer value;
+	Integer value;
 
-    public Integer asPrimitive() {
-        return this.value;
-    }
+	public Integer asPrimitive() {
+		return this.value;
+	}
 
 }

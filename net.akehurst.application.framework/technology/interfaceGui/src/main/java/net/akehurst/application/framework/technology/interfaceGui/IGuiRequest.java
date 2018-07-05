@@ -26,183 +26,183 @@ import net.akehurst.application.framework.technology.interfaceGui.IGuiScene.OnEv
 
 public interface IGuiRequest {
 
-    /**
-     *
-     * @param stageId
-     * @param rootPath
-     * @param authenticationRedirectURL
-     *            pass null for non authenticated roots
-     */
-    void createStage(StageIdentity stageId, String rootPath, StageIdentity authenticationStageId, SceneIdentity authenticationSceneId, boolean includeSub);
+	/**
+	 *
+	 * @param stageId
+	 * @param rootPath
+	 * @param authenticationRedirectURL
+	 *            pass null for non authenticated roots
+	 */
+	void createStage(StageIdentity stageId, String rootPath, StageIdentity authenticationStageId, SceneIdentity authenticationSceneId, boolean frontEndRouting);
 
-    <T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content);
+	<T extends IGuiScene> T createScene(StageIdentity stageId, SceneIdentity sceneId, Class<T> sceneClass, URL content);
 
-    /**
-     * add authentication to the gui
-     *
-     * @param session
-     * @throws GuiException
-     */
-    void addAuthentication(UserSession session) throws GuiException;
+	/**
+	 * add authentication to the gui
+	 *
+	 * @param session
+	 * @throws GuiException
+	 */
+	void addAuthentication(UserSession session) throws GuiException;
 
-    /**
-     * clear/remove authentication from the gui
-     *
-     * @param session
-     * @throws GuiException
-     */
-    void clearAuthentication(UserSession session) throws GuiException;
+	/**
+	 * clear/remove authentication from the gui
+	 *
+	 * @param session
+	 * @throws GuiException
+	 */
+	void clearAuthentication(UserSession session) throws GuiException;
 
-    Future<String> oauthAuthorise(UserSession session, String clientId, String clientSecret, String site, String tokenPath, String authorisationPath,
-            String scopes);
+	Future<String> oauthAuthorise(UserSession session, String clientId, String clientSecret, String site, String tokenPath, String authorisationPath,
+			String scopes);
 
-    void sendData(UserSession session, String channelId, String jsonStrData);
+	void sendData(UserSession session, String channelId, String jsonStrData);
 
-    /**
-     * if location starts with '/' then navigate to a location relative to the root of this site
-     *
-     * else
-     *
-     * assume a full URL and navigate to it
-     *
-     * @param session
-     * @param location
-     */
-    void navigateTo(UserSession session, String location);
+	/**
+	 * if location starts with '/' then navigate to a location relative to the root of this site
+	 *
+	 * else
+	 *
+	 * assume a full URL and navigate to it
+	 *
+	 * @param session
+	 * @param location
+	 */
+	void navigateTo(UserSession session, String location);
 
-    void newWindow(UserSession session, String location);
+	void newWindow(UserSession session, String location);
 
-    void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId, Map<String, String> sceneArguments);
+	void switchTo(UserSession session, StageIdentity stageId, SceneIdentity sceneId, Map<String, String> sceneArguments);
 
-    void download(UserSession session, String location, String filename);
+	void download(UserSession session, String location, String filename);
 
-    void upload(final UserSession session, StageIdentity stageId, SceneIdentity sceneId, final String uploadLink, final String filenameElementId,
-            OnEventHandler handler);
+	void upload(final UserSession session, StageIdentity stageId, SceneIdentity sceneId, final String uploadLink, final String filenameElementId,
+			OnEventHandler handler);
 
-    /**
-     * register a handler for a specific message
-     *
-     * @param session
-     * @param channelId
-     * @param func
-     */
-    void onRequest(final String channelId, final IGuiRequestMessage func);
+	/**
+	 * register a handler for a specific message
+	 *
+	 * @param session
+	 * @param channelId
+	 * @param func
+	 */
+	void onRequest(final String channelId, final IGuiRequestMessage func);
 
-    public interface ISubscribe {
-        void receive(UserSession session, String channelId, Map<String, Object> data);
-    }
+	public interface ISubscribe {
+		void receive(UserSession session, String channelId, Map<String, Object> data);
+	}
 
-    void subscribe(final String channelId, final ISubscribe func);
+	void subscribe(final String channelId, final ISubscribe func);
 
-    void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, GuiEventType eventType);
+	void requestRecieveEvent(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, GuiEventType eventType);
 
-    <T extends IGuiDialog> T dialogCreate(Class<T> dialogClass, UserSession session, IGuiScene scene, DialogIdentity dialogId, String title,
-            String dialogContent);
+	<T extends IGuiDialog> T dialogCreate(Class<T> dialogClass, UserSession session, IGuiScene scene, DialogIdentity dialogId, String title,
+			String dialogContent);
 
-    void dialogCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId, String dialogContent);
+	void dialogCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId, String dialogContent);
 
-    void dialogOpen(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId);
+	void dialogOpen(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId);
 
-    void dialogClose(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId);
+	void dialogClose(UserSession session, StageIdentity stageId, SceneIdentity sceneId, DialogIdentity dialogId);
 
-    void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type);
+	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type);
 
-    /**
-     *
-     * @param parentId
-     * @param newElementId
-     * @param type
-     * @param attributes
-     *            as a JSON string, using single quotes, e.g. "{ 'xxx':2, 'aa':'bb' }"
-     * @param content
-     */
-    void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type, String attributes,
-            Object content);
+	/**
+	 *
+	 * @param parentId
+	 * @param newElementId
+	 * @param type
+	 * @param attributes
+	 *            as a JSON string, using single quotes, e.g. "{ 'xxx':2, 'aa':'bb' }"
+	 * @param content
+	 */
+	void addElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String newElementId, String type, String attributes,
+			Object content);
 
-    /**
-     * remove an element from the scene
-     *
-     * @param session
-     * @param stageId
-     * @param sceneId
-     * @param dialogId
-     */
-    void removeElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
+	/**
+	 * remove an element from the scene
+	 *
+	 * @param session
+	 * @param stageId
+	 * @param sceneId
+	 * @param dialogId
+	 */
+	void removeElement(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
 
-    /**
-     * clear the content of an element, but leave it present
-     *
-     * @param session
-     * @param stageId
-     * @param sceneId
-     * @param elementId
-     */
-    void elementClear(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
+	/**
+	 * clear the content of an element, but leave it present
+	 *
+	 * @param session
+	 * @param stageId
+	 * @param sceneId
+	 * @param elementId
+	 */
+	void elementClear(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
 
-    void elementSetDisabled(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
+	void elementSetDisabled(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
 
-    void elementSetLoading(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
+	void elementSetLoading(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, boolean value);
 
-    void elementSetProperty(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
+	void elementSetProperty(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String propertyName, Object value);
 
-    void elementAddClass(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String className);
+	void elementAddClass(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String className);
 
-    void elementRemoveClass(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String className);
+	void elementRemoveClass(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementName, String className);
 
-    void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String text);
+	void setTitle(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String text);
 
-    void textSetValue(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
+	void textSetValue(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String id, String text);
 
-    void diagramCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
+	void diagramCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 
-    void diagramUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
+	void diagramUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String jsonDiagramData);
 
-    void diagramRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
+	void diagramRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId);
 
-    void tableCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
+	void tableCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
 
-    void tableRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
+	void tableRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
 
-    void tableAddColumn(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String colHeaderContent,
-            String rowTemplateCellContent, String existingRowCellContent);
+	void tableAddColumn(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId, String colHeaderContent,
+			String rowTemplateCellContent, String existingRowCellContent);
 
-    void tableClearAllColumnHeaders(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
+	void tableClearAllColumnHeaders(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String elementId);
 
-    void tableAppendRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, Map<String, Object> rowData);
+	void tableAppendRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, Map<String, Object> rowData);
 
-    void tableRemoveRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, String rowId);
+	void tableRemoveRow(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId, String rowId);
 
-    void tableClearAllRows(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
+	void tableClearAllRows(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String tableId);
 
-    void editorCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent, String languageId,
-            String optionsHJsonStr);
+	void editorCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String initialContent, String languageId,
+			String optionsHJsonStr);
 
-    void editorDefineTextColourTheme(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String themeName,
-            Map<String, Tuple3<String, String, String>> colourMap);
+	void editorDefineTextColourTheme(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String themeName,
+			Map<String, Tuple3<String, String, String>> colourMap);
 
-    void editorUpdateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
-            final String jsonParseTreeData);
+	void editorUpdateParseTree(final UserSession session, final StageIdentity stageId, final SceneIdentity sceneId, final String editorId,
+			final String jsonParseTreeData);
 
-    void chartCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, String chartType, String jsonChartData,
-            String jsonChartOptions);
+	void chartCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String parentId, String chartId, String chartType, String jsonChartData,
+			String jsonChartOptions);
 
-    void chartRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId);
+	void chartRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId);
 
-    <X, Y> void chartAddDataItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId, String seriesName, X x, Y y);
+	<X, Y> void chartAddDataItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String chartId, String seriesName, X x, Y y);
 
-    void graphCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId, String jsonGraphData);
+	void graphCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId, String jsonGraphData);
 
-    void graphUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId, String jsonGraphData);
+	void graphUpdate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId, String jsonGraphData);
 
-    void graphRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId);
+	void graphRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String graphId);
 
-    void gridCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, String jsonOptions);
+	void gridCreate(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, String jsonOptions);
 
-    void gridRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId);
+	void gridRemove(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId);
 
-    void gridAppendItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, Map<String, Object> data,
-            Map<String, Integer> location);
+	void gridAppendItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, Map<String, Object> data,
+			Map<String, Integer> location);
 
-    void gridRemoveItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, String elementId);
+	void gridRemoveItem(UserSession session, StageIdentity stageId, SceneIdentity sceneId, String gridId, String elementId);
 
 }

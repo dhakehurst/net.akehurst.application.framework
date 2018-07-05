@@ -18,7 +18,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1'
     }
 }
 subprojects {
@@ -71,19 +71,23 @@ subprojects {
 	
 		repositories {
 			maven {
-			    name "snapshot"
+				name 'itemis-akehurst'
+				url "https://projects.itemis.de/nexus/content/repositories/akehurst/"
+			}
+			maven {
+			    name "jfrog"
 				url ="https://oss.jfrog.org/artifactory/oss-snapshot-local"
 				credentials {
-                		username project.property('bintrayUser')
-                		password project.property('bintrayApiKey')
-            		}
+                	username project.property('bintrayUser')
+                	password project.property('bintrayApiKey')
+            	}
 			}
 		}
 	
 	    publications {
 	        mavenJava(MavenPublication) {
-	        	    groupId "${group}"
-	        	    artifactId "${project.name}"
+	        	groupId "${group}"
+	        	artifactId "${project.name}"
 				version "${version}"
 	        
 	            from components.java

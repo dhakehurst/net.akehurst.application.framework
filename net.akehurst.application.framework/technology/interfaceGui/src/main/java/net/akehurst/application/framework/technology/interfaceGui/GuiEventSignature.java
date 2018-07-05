@@ -15,44 +15,44 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+import net.akehurst.application.framework.common.DataTypeAbstract;
 
-public class GuiEventSignature extends AbstractDataType {
+public class GuiEventSignature extends DataTypeAbstract {
 
-    public GuiEventSignature(final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId, final String elementId,
-            final GuiEventType eventType) {
-        super(stageId, sceneId, dialogId, elementId, eventType);
-        this.stageId = stageId;
-        this.sceneId = sceneId;
-        this.dialogId = dialogId;
-        this.elementId = elementId;
-        this.eventType = eventType;
-    }
+	public GuiEventSignature(final StageIdentity stageId, final SceneIdentity sceneId, final DialogIdentity dialogId, final String elementId,
+			final GuiEventType eventType) {
+		super(stageId, sceneId, dialogId, elementId, eventType);
+		this.stageId = stageId;
+		this.sceneId = sceneId;
+		this.dialogId = dialogId;
+		this.elementId = elementId;
+		this.eventType = eventType;
+	}
 
-    private final StageIdentity stageId;
-    private final SceneIdentity sceneId;
-    private final DialogIdentity dialogId;
-    private final String elementId;
+	private final StageIdentity stageId;
+	private final SceneIdentity sceneId;
+	private final DialogIdentity dialogId;
+	private final String elementId;
 
-    public StageIdentity getStageId() {
-        return this.stageId;
-    }
+	public StageIdentity getStageId() {
+		return this.stageId;
+	}
 
-    public SceneIdentity getSceneId() {
-        return this.sceneId;
-    }
+	public SceneIdentity getSceneId() {
+		return this.sceneId;
+	}
 
-    public DialogIdentity getDialogId() {
-        return this.dialogId;
-    }
+	public DialogIdentity getDialogId() {
+		return this.dialogId;
+	}
 
-    public String getElementId() {
-        return this.elementId;
-    }
+	public String getElementId() {
+		return this.elementId;
+	}
 
-    private final GuiEventType eventType;
+	private final GuiEventType eventType;
 
-    public GuiEventType getEventType() {
-        return this.eventType;
-    }
+	public GuiEventType getEventType() {
+		return this.eventType;
+	}
 }

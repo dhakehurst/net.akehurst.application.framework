@@ -15,17 +15,17 @@
  */
 package net.akehurst.application.framework.computational.interfaceAccessControl;
 
-import net.akehurst.application.framework.common.AbstractDataType;
+import net.akehurst.application.framework.common.DataTypeAbstract;
 import net.akehurst.application.framework.common.annotations.datatype.DataType;
 
 @DataType
-public class AuthorisationSubject extends AbstractDataType {
+public class AuthorisationSubject extends DataTypeAbstract {
 
-    public AuthorisationSubject(final String identity) {
-        super(identity);
-    }
+	public AuthorisationSubject(final String identity) {
+		super(identity);
+	}
 
-    public String getIdentity() {
-        return (String) super.getIdentityValues().get(0);
-    }
+	public String getIdentity() {
+		return (String) super.getIdentityValues().get(0);
+	}
 }

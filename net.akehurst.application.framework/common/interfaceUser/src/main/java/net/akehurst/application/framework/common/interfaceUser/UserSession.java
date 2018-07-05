@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.akehurst.application.framework.common.AbstractDataType;
 import net.akehurst.application.framework.common.Context;
+import net.akehurst.application.framework.common.DataTypeAbstract;
 
-public class UserSession extends AbstractDataType {
+public class UserSession extends DataTypeAbstract {
 
 	/**
 	 *

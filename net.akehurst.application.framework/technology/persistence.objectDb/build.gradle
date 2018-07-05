@@ -19,11 +19,11 @@ repositories {
 }
 
 dependencies {
-	compile project(":${rootProject.name}.common.realisation")
+	implementation project(":${rootProject.name}.common.realisation")
 	
-	compile project(":${rootProject.name}.technology.interfacePersistence")
+	api project(":${rootProject.name}.technology.interfacePersistence")
 //	compile 'javax.persistence:persistence-api:1.0.2'
-	compile 'org.eclipse.persistence:javax.persistence:2.1.0'
-	compile 'com.objectdb:objectdb:2.6.6'
-	compile 'javax.transaction:jta:1.1'
+	implementation 'org.eclipse.persistence:javax.persistence:2.1.0'
+	implementation 'com.objectdb:objectdb:2.6.6'
+	implementation 'javax.transaction:jta:1.1'
 }

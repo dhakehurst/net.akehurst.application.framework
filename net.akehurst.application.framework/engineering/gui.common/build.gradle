@@ -15,8 +15,8 @@
  */
  
 dependencies {
-	compile project(":${rootProject.name}.common.realisation")
-	compile project(":${rootProject.name}.technology.interfaceGui")
+	implementation project(":${rootProject.name}.common.realisation")
+	api project(":${rootProject.name}.technology.interfaceGui")
 	
-	compile project(":${rootProject.name}.technology.webjar.dynamic")
+	implementation project(":${rootProject.name}.technology.webjar.dynamic")
 }

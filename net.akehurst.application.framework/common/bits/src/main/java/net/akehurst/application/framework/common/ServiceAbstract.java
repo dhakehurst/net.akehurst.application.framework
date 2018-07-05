@@ -15,9 +15,9 @@
  */
 package net.akehurst.application.framework.common;
 
-abstract public class AbstractService implements IService {
+abstract public class ServiceAbstract implements IService {
 
-    public AbstractService(final String afId) {
+    public ServiceAbstract(final String afId) {
         this.afId = afId;
     }
 

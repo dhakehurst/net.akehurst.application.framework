@@ -16,8 +16,8 @@
 
 
 dependencies {
-	compile project(":${rootProject.name}.common.realisation")
+	implementation project(":${rootProject.name}.common.realisation")
 	
-	compile project(":${rootProject.name}.technology.interfaceFilesystem")
+	api project(":${rootProject.name}.technology.interfaceFilesystem")
 
 }

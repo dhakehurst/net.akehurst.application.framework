@@ -17,32 +17,32 @@ package net.akehurst.application.framework.technology.gui.vertx;
 
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.impl.UserHolder;
-import net.akehurst.application.framework.common.AbstractDataType;
+import net.akehurst.application.framework.common.DataTypeAbstract;
 import net.akehurst.application.framework.common.IUser;
 
-public class UserData extends AbstractDataType implements IUser {
+public class UserData extends DataTypeAbstract implements IUser {
 
-    public UserData(Session session) {
-        this.session = session;
-    }
+	public UserData(final Session session) {
+		this.session = session;
+	}
 
-    Session session;
+	Session session;
 
-    public UserData(String name) {
-        super(name);
-        this.name = name;
-    }
+	public UserData(final String name) {
+		super(name);
+		this.name = name;
+	}
 
-    String name;
+	String name;
 
-    @Override
-    public String getName() {
-        if (null == this.session) {
-            return this.name;
-        } else {
-            UserHolder holder = this.session.get("__vertx.userHolder");
-            return (null == holder.user) ? null : holder.user.principal().getString("username");
-        }
-    }
+	@Override
+	public String getName() {
+		if (null == this.session) {
+			return this.name;
+		} else {
+			final UserHolder holder = this.session.get("__vertx.userHolder");
+			return null == holder.user ? null : holder.user.principal().getString("username");
+		}
+	}
 
 }

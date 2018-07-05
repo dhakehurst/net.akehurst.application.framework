@@ -17,9 +17,9 @@
 
 dependencies {
 	
-	compile project(":${rootProject.name}.technology.interfaceAuthentication")
-	compile project(":${rootProject.name}.common.realisation")
+	api project(":${rootProject.name}.technology.interfaceAuthentication")
+	implementation project(":${rootProject.name}.common.realisation")
 	
-	testCompile project(":${rootProject.name}.common.test")
+	testImplementation project(":${rootProject.name}.common.test")
 
 }

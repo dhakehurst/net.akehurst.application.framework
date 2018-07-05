@@ -1,0 +1,100 @@
+plugins {
+  id "com.moowork.node" version "1.2.0"
+}
+
+configurations {
+	nodeDep
+	nodeDev
+}
+
+dependencies {
+	
+	nodeDev 'org.webjars.npm:typescript:2.5.3'
+	
+	nodeDep 'org.webjars.npm:monaco-editor:0.13.1'
+
+}
+
+ext {
+	tsBuild = "${project.buildDir}/nodeBuild"
+}
+
+node {
+	version = '8.9.0'
+	yarnVersion = '1.5.1'
+	distBaseUrl = 'https://nodejs.org/dist'
+	download = true
+	workDir = file("${project.buildDir}/node")
+	yarnWorkDir = file("${project.buildDir}/yarn")
+	nodeModulesDir = file("${tsBuild}/node_modules")
+}
+
+
+sourceSets {
+	main {
+		java {
+			srcDir "${projectDir}/src/main/typescript"
+		}
+	}
+}
+
+jar {
+	into("META-INF/resources/webjars/net.akehurst.language.editor/${project.version}") {
+	   from "${tsBuild}/dist"
+	   include '**/*.*'
+	}
+   
+}
+
+task extractWebjars(type: Sync) {
+	dependsOn configurations.nodeDep
+
+	configurations.nodeDep.resolvedConfiguration.resolvedArtifacts.each{ dep ->
+		//println it.moduleVersion
+		from zipTree(dep.file)
+		into "${tsBuild}/node_modules"
+		include 'META-INF/resources/webjars/**'
+		eachFile { f ->
+			if (f.path.contains('__')) {
+				f.path = '@'+f.path.replaceFirst('META-INF/resources/webjars/', '').replaceFirst('__','/')
+			} else {
+				f.path = f.path.replaceFirst('META-INF/resources/webjars/', '')
+			}
+			f.path = f.path.replaceFirst(dep.moduleVersion.id.version,'')
+		}
+		includeEmptyDirs false
+	}
+	
+	configurations.nodeDev.resolvedConfiguration.resolvedArtifacts.each{ dep ->
+		//println it.moduleVersion
+		from zipTree(dep.file)
+		into "${tsBuild}/node_modules"
+		include 'META-INF/resources/webjars/**'
+		eachFile { f ->
+			if (f.path.contains('__')) {
+				f.path = '@'+f.path.replaceFirst('META-INF/resources/webjars/', '').replaceFirst('__','/')
+			} else {
+				f.path = f.path.replaceFirst('META-INF/resources/webjars/', '')
+			}
+			f.path = f.path.replaceFirst(dep.moduleVersion.id.version,'')
+		}
+		includeEmptyDirs false
+	}
+}
+
+task copySource(type: Sync) {
+	from "${projectDir}/src/main/typescript"
+	into "${tsBuild}"
+}
+
+task tsc(type: NodeTask) {
+	dependsOn 'extractWebjars'
+	dependsOn 'copySource'
+	workingDir = file("${tsBuild}")
+	script = file("${tsBuild}/node_modules/typescript/lib/tsc.js")
+	if (project.hasProperty('tscArgs')) {
+		args = project.findProperty('tscArgs').tokenize()
+	}
+}
+
+processResources.dependsOn 'tsc'

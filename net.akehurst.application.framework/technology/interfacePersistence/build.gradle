@@ -17,5 +17,5 @@
 
 dependencies {
 
-	compile project(":${rootProject.name}.common.bits")
+	api project(":${rootProject.name}.common.bits")
 }
