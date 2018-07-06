@@ -12,7 +12,9 @@ dependencies {
 	nodeDev 'org.webjars.npm:typescript:2.5.3'
 	
 	nodeDep 'org.webjars.npm:monaco-editor:0.13.1'
-
+	nodeDep "org.webjars.npm:rxjs:6.2.1"
+	nodeDep "org.webjars.npm:angular__common:6.0.7"
+	nodeDep "org.webjars.npm:angular__core:6.0.7"
 }
 
 ext {
