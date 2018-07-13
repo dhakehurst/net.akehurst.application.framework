@@ -109,6 +109,7 @@ task copyResources(type: Copy) {
 	dependsOn 'tsc'
 	from "${projectDir}/src/main/typescript"
 	into "${tsBuild}/dist"
+	exclude "**/*.ts"
 }
 
 processResources.dependsOn 'copyResources'

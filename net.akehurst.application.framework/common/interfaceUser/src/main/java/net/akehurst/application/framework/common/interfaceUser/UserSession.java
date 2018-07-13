@@ -68,10 +68,10 @@ public class UserSession extends DataTypeAbstract {
 		}
 	}
 
-	public Context pushNewContext() {
+	public UserSession pushNewContext() {
 		final Context c = new ContextDefault(this);
 		this.contexts.add(c);
-		return c;
+		return this;
 	}
 
 	public Context popContext() {

@@ -5,10 +5,16 @@ import * as nalM from '../language-editor-monaco/EditorMonaco'
 
 @Component({
   selector: 'nal-editor',
-  templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.css']
+  template: "<div #editorDiv class='editorDiv'></div>",
+  styles: [
+    `
+     .editorDiv {
+	   height: 100%;
+     }
+    `
+  ]
 })
-export class EditorComponent implements AfterViewInit, OnDestroy {
+export class NalEditorComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('editorDiv') editorRef: ElementRef;
   private editor: nal.Editor;
@@ -19,7 +25,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
   
   ngAfterViewInit(): void {
-    this.editor = new nalM.EditorMonaco(this.editorRef.nativeElement, 'dot', '');
+    this.editor = new nalM.EditorMonaco(this.editorRef.nativeElement, 'dot', 'graph { }');
   }
 
   ngOnDestroy() {

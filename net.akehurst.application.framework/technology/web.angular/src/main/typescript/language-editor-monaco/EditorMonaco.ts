@@ -21,7 +21,7 @@ export class EditorMonaco implements api.Editor {
   	
   	this.monacoEditor.onDidChangeModelContent((evt:any)=> {
   	  const text = this.getText();
-	  this.onChangeHandler(text);
+	  if (this.onChangeHandler) { this.onChangeHandler(text); }
 	})
   }
   

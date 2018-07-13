@@ -12,6 +12,6 @@
     "build": "tsc --module umd --moduleResolution node --target es5 --lib es6 --sourceMap Editor.ts"
   },
   "dependencies": {
-
+     "monaco-editor": "^0.13.1"
   }
 }
