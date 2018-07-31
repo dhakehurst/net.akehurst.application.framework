@@ -23,7 +23,7 @@ import java.util.Set;
 
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
 import net.akehurst.application.framework.common.DataTypeAbstract;
-import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.ActiveObject;
 import net.akehurst.application.framework.common.IApplication;
 import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IIdentifiableObject;
@@ -160,13 +160,13 @@ public class TestCompositionTreeWalker {
 		if (null == ann2) {
 			// do nothing
 		} else {
-			pi = TestCompositionTreeWalker.findPartInfo((Class<? extends IActiveObject>) f.getType(), idPrefix, ann2.id(), f, TestPartKind.TEST_ACTIVE_OBJECT);
+			pi = TestCompositionTreeWalker.findPartInfo((Class<? extends ActiveObject>) f.getType(), idPrefix, ann2.id(), f, TestPartKind.TEST_ACTIVE_OBJECT);
 		}
 		final MockActiveObjectInstance ann3 = f.getAnnotation(MockActiveObjectInstance.class);
 		if (null == ann3) {
 			// do nothing
 		} else {
-			pi = TestCompositionTreeWalker.findPartInfo((Class<? extends IActiveObject>) f.getType(), idPrefix, ann3.id(), f, TestPartKind.MOCK_ACTIVE_OBJECT);
+			pi = TestCompositionTreeWalker.findPartInfo((Class<? extends ActiveObject>) f.getType(), idPrefix, ann3.id(), f, TestPartKind.MOCK_ACTIVE_OBJECT);
 		}
 
 		final TestPassiveObjectInstance ann4 = f.getAnnotation(TestPassiveObjectInstance.class);

@@ -15,8 +15,21 @@
  */
 package net.akehurst.application.framework.common;
 
-public interface ISignal {
+public interface ActiveObject extends IIdentifiableObject {
 
-    void execute() throws Throwable;
+    void afRun();
 
+    void afStart();
+
+    void afJoin() throws InterruptedException;
+
+    /**
+     * interrupt the active object. Current tasks will be interrupted.
+     */
+    void afInterrupt();
+
+    /**
+     * request politely that the object stops. Allow current tasks to finish.
+     */
+    void afTerminate();
 }

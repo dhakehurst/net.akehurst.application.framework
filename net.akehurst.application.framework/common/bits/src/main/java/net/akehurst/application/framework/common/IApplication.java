@@ -15,7 +15,7 @@
  */
 package net.akehurst.application.framework.common;
 
-public interface IApplication extends IActiveObject {
+public interface IApplication extends ActiveObject {
 
     void afConnectParts();
 

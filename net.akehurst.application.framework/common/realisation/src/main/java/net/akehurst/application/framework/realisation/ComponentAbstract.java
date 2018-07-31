@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.ActiveObject;
 import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IPort;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
@@ -61,13 +61,13 @@ abstract public class ComponentAbstract extends ActiveObjectAbstract implements 
     public void afRun() {
         this.logger.log(LogLevel.TRACE, "AbstractComponent.afRun");
         try {
-            final List<IActiveObject> objects = super.afActiveParts();
+            final List<ActiveObject> objects = super.afActiveParts();
 
-            for (final IActiveObject ao : objects) {
+            for (final ActiveObject ao : objects) {
                 ao.afStart();
             }
 
-            for (final IActiveObject ao : objects) {
+            for (final ActiveObject ao : objects) {
                 ao.afJoin();
             }
 
@@ -79,8 +79,8 @@ abstract public class ComponentAbstract extends ActiveObjectAbstract implements 
     @Override
     public void afInterrupt() {
         try {
-            final List<IActiveObject> objects = super.afActiveParts();
-            for (final IActiveObject ao : objects) {
+            final List<ActiveObject> objects = super.afActiveParts();
+            for (final ActiveObject ao : objects) {
                 ao.afInterrupt();
             }
         } catch (final Exception ex) {
@@ -91,8 +91,8 @@ abstract public class ComponentAbstract extends ActiveObjectAbstract implements 
     @Override
     public void afTerminate() {
         try {
-            final List<IActiveObject> objects = super.afActiveParts();
-            for (final IActiveObject ao : objects) {
+            final List<ActiveObject> objects = super.afActiveParts();
+            for (final ActiveObject ao : objects) {
                 ao.afTerminate();
             }
         } catch (final Exception ex) {

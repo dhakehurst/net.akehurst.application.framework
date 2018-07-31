@@ -20,6 +20,12 @@ import java.util.concurrent.TimeUnit;
 import org.jooq.lambda.function.Consumer0;
 import org.jooq.lambda.function.Consumer1;
 import org.jooq.lambda.function.Consumer2;
+import org.jooq.lambda.function.Consumer3;
+import org.jooq.lambda.function.Consumer4;
+import org.jooq.lambda.function.Function1;
+import org.jooq.lambda.function.Function2;
+import org.jooq.lambda.function.Function3;
+import org.jooq.lambda.function.Function4;
 
 import net.akehurst.application.framework.common.ActiveSignalProcessingObject;
 import net.akehurst.application.framework.common.AsyncCall;
@@ -29,9 +35,11 @@ public class AsyncCallDefault implements AsyncCall {
 
 	private final ActiveSignalProcessingObject activeSignalProcessingObject;
 	private final boolean completed;
+	private final Runnable toSend;
 
-	public AsyncCallDefault(final ActiveSignalProcessingObject activeSignalProcessingObject) {
+	public AsyncCallDefault(final ActiveSignalProcessingObject activeSignalProcessingObject, final Runnable toSend) {
 		this.activeSignalProcessingObject = activeSignalProcessingObject;
+		this.toSend = toSend;
 		this.completed = false;
 	}
 
@@ -64,18 +72,64 @@ public class AsyncCallDefault implements AsyncCall {
 	}
 
 	@Override
-	public void andWhen(final Context ctx, final Class<?> class_, final String signalName, final Consumer0 func) {
-		this.activeSignalProcessingObject.whenReceivedThenExecute0(class_, signalName, ctx, -1, func);
+	public <I> AsyncCall andWhen(final Context ctx, final Class<I> class_, final Consumer1<I> signalSignature, final long timeout, final TimeUnit unit,
+			final Consumer0 body) {
+		this.activeSignalProcessingObject.whenReceivedThenExecute0(class_, signalSignature, ctx, timeout, body);
+		return this;
 	}
 
 	@Override
-	public <T1> void andWhen(final Context ctx, final Class<?> class_, final String signalName, final Consumer1<T1> func) {
-		this.activeSignalProcessingObject.whenReceivedThenExecute1(class_, signalName, ctx, -1, func);
+	public <I, R> AsyncCall andWhen(final Context ctx, final Class<I> class_, final Function1<I, R> signalSignature, final long timeout, final TimeUnit unit,
+			final Consumer0 body) {
+		this.activeSignalProcessingObject.whenReceivedThenExecute0(class_, signalSignature, ctx, timeout, body);
+		return this;
 	}
 
 	@Override
-	public <T1, T2> void andWhen(final Context ctx, final Class<?> class_, final String signalName, final Consumer2<T1, T2> func) {
-		this.activeSignalProcessingObject.whenReceivedThenExecute2(class_, signalName, ctx, -1, func);
+	public <I, P1> AsyncCall andWhen(final Context ctx, final Class<I> class_, final Consumer2<I, P1> signalSignature, final long timeout, final TimeUnit unit,
+			final Consumer1<P1> body) {
+		this.activeSignalProcessingObject.whenReceivedThenExecute1(class_, signalSignature, ctx, timeout, body);
+		return this;
+	}
+
+	@Override
+	public <I, P1, R> AsyncCall andWhen(final Context ctx, final Class<I> class_, final Function2<I, P1, R> signalSignature, final long timeout,
+			final TimeUnit unit, final Consumer1<P1> body) {
+		this.activeSignalProcessingObject.whenReceivedThenExecute1(class_, signalSignature, ctx, timeout, body);
+		return this;
+	}
+
+	@Override
+	public <I, P1, P2> AsyncCall andWhen(final Context ctx, final Class<I> class_, final Consumer3<I, P1, P2> signalSignature, final long timeout,
+			final TimeUnit unit, final Consumer2<P1, P2> body) {
+		this.activeSignalProcessingObject.whenReceivedThenExecute2(class_, signalSignature, ctx, timeout, body);
+		return this;
+	}
+
+	@Override
+	public <I, P1, P2, R> AsyncCall andWhen(final Context ctx, final Class<I> class_, final Function3<I, P1, P2, R> signalSignature, final long timeout,
+			final TimeUnit unit, final Consumer2<P1, P2> body) {
+		this.activeSignalProcessingObject.whenReceivedThenExecute2(class_, signalSignature, ctx, timeout, body);
+		return this;
+	}
+
+	@Override
+	public <I, P1, P2, P3> AsyncCall andWhen(final Context ctx, final Class<I> class_, final Consumer4<I, P1, P2, P3> signalSignature, final long timeout,
+			final TimeUnit unit, final Consumer3<P1, P2, P3> body) {
+		this.activeSignalProcessingObject.whenReceivedThenExecute3(class_, signalSignature, ctx, timeout, body);
+		return this;
+	}
+
+	@Override
+	public <I, P1, P2, P3, R> AsyncCall andWhen(final Context ctx, final Class<I> class_, final Function4<I, P1, P2, P3, R> signalSignature, final long timeout,
+			final TimeUnit unit, final Consumer3<P1, P2, P3> body) {
+		this.activeSignalProcessingObject.whenReceivedThenExecute3(class_, signalSignature, ctx, timeout, body);
+		return this;
+	}
+
+	@Override
+	public void go() {
+		this.toSend.run();
 	}
 
 }

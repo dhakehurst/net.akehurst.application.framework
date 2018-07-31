@@ -30,7 +30,7 @@ subprojects {
 	apply plugin: 'com.jfrog.bintray'
 
 	group 'net.akehurst.application.framework'
-	version '1.0.0-SNAPSHOT'
+	version '1.0.1-SNAPSHOT'
 
 	sourceCompatibility = '1.8'
 	targetCompatibility = '1.8'
@@ -42,11 +42,11 @@ subprojects {
     }
 
     ext {
-        
         version_log4j = '2.11.0'
         version_jool = '0.9.13'
         version_hjson = '3.0.0'
         version_transform = '2.2.1'
+        version_vertx = '3.5.3'
     }
     
     

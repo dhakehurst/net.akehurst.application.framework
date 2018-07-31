@@ -22,7 +22,7 @@ import java.util.Map;
 import org.easymock.EasyMock;
 
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
-import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.ActiveObject;
 import net.akehurst.application.framework.common.IComponent;
 import net.akehurst.application.framework.common.IIdentifiableObject;
 import net.akehurst.application.framework.common.IService;
@@ -130,7 +130,7 @@ public class TestFramework extends ApplicationFramework {
         }
     }
 
-    public <T extends IActiveObject> T createTestActiveObject(final Class<T> class_, final String id) throws ApplicationFrameworkException {
+    public <T extends ActiveObject> T createTestActiveObject(final Class<T> class_, final String id) throws ApplicationFrameworkException {
         try {
             final BetterMethodFinder bmf = new BetterMethodFinder(class_);
             final Constructor<T> cons = bmf.findConstructor(String.class);
@@ -144,7 +144,7 @@ public class TestFramework extends ApplicationFramework {
         }
     }
 
-    public <T extends IActiveObject> T createMockActiveObject(final Class<T> class_, final String id) throws ApplicationFrameworkException {
+    public <T extends ActiveObject> T createMockActiveObject(final Class<T> class_, final String id) throws ApplicationFrameworkException {
         try {
             final T obj = EasyMock.mock(class_);
 
@@ -224,18 +224,18 @@ public class TestFramework extends ApplicationFramework {
                     return this.createMockComponent((Class<? extends IComponent>) partClass, partId);
                 }
                 case MOCK_ACTIVE_OBJECT: {
-                    return this.createMockActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createMockActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case MOCK_PASSIVE_OBJECT:
-                    return this.createMockObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createMockObject((Class<? extends ActiveObject>) partClass, partId);
                 case TEST_ACTIVE_OBJECT: {
-                    return this.createTestActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createTestActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case TEST_COMPONENT: {
                     return this.createTestComponent((Class<? extends IComponent>) partClass, partId);
                 }
                 case TEST_PASSIVE_OBJECT: {
-                    return this.createTestObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createTestObject((Class<? extends ActiveObject>) partClass, partId);
 
                 }
                 default:
@@ -256,18 +256,18 @@ public class TestFramework extends ApplicationFramework {
                     return this.createMockComponent((Class<? extends IComponent>) partClass, partId);
                 }
                 case MOCK_ACTIVE_OBJECT: {
-                    return this.createMockActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createMockActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case MOCK_PASSIVE_OBJECT:
-                    return this.createMockObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createMockObject((Class<? extends ActiveObject>) partClass, partId);
                 case TEST_ACTIVE_OBJECT: {
-                    return this.createTestActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createTestActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case TEST_COMPONENT: {
                     return this.createTestComponent((Class<? extends IComponent>) partClass, partId);
                 }
                 case TEST_PASSIVE_OBJECT: {
-                    return this.createTestObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createTestObject((Class<? extends ActiveObject>) partClass, partId);
 
                 }
                 default:
@@ -278,7 +278,7 @@ public class TestFramework extends ApplicationFramework {
 
     }
 
-    protected void injectMockParts(final IActiveObject obj) {
+    protected void injectMockParts(final ActiveObject obj) {
         final TestCompositionTreeWalker walker = new TestCompositionTreeWalker(this.logger());
         walker.build(obj, (partKind, partClass, partId) -> {
             switch (partKind) {
@@ -287,19 +287,19 @@ public class TestFramework extends ApplicationFramework {
                 }
                 break;
                 case MOCK_ACTIVE_OBJECT: {
-                    return this.createMockActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createMockActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case MOCK_PASSIVE_OBJECT:
-                    return this.createMockObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createMockObject((Class<? extends ActiveObject>) partClass, partId);
                 case TEST_ACTIVE_OBJECT: {
-                    return this.createTestActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createTestActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case TEST_COMPONENT: {
                     this.logError("A component may not be a part of an Active Object", null);
                 }
                 break;
                 case TEST_PASSIVE_OBJECT: {
-                    return this.createTestObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createTestObject((Class<? extends ActiveObject>) partClass, partId);
 
                 }
                 default:
@@ -322,16 +322,16 @@ public class TestFramework extends ApplicationFramework {
                 }
                 break;
                 case MOCK_PASSIVE_OBJECT:
-                    return this.createMockObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createMockObject((Class<? extends ActiveObject>) partClass, partId);
                 case TEST_ACTIVE_OBJECT: {
-                    return this.createTestActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createTestActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case TEST_COMPONENT: {
                     this.logError("A component may not be a part of an Active Object", null);
                 }
                 break;
                 case TEST_PASSIVE_OBJECT: {
-                    return this.createTestObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createTestObject((Class<? extends ActiveObject>) partClass, partId);
 
                 }
                 default:

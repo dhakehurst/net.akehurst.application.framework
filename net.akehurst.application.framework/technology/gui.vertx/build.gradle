@@ -36,10 +36,10 @@ dependencies {
     implementation "org.hjson:hjson:${version_hjson}"
 
 	implementation 'org.apache.commons:commons-lang3:3.4'
-	implementation "io.vertx:vertx-core:3.5.1"
-	implementation "io.vertx:vertx-web:3.5.1"
-	implementation "io.vertx:vertx-auth-shiro:3.5.1"
-	implementation "io.vertx:vertx-auth-oauth2:3.5.1"
+	implementation "io.vertx:vertx-core:${version_vertx}"
+	implementation "io.vertx:vertx-web:${version_vertx}"
+	implementation "io.vertx:vertx-auth-shiro:${version_vertx}"
+	implementation "io.vertx:vertx-auth-oauth2:${version_vertx}"
 	
 //	runtime 'org.slf4j:slf4j-api:1.7.14' //used by shiro
 	

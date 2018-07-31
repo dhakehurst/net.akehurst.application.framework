@@ -1,7 +1,17 @@
 import * as api from '../language-editor-api/Editor'
 
-import * as monaco from 'monaco-editor'
+// for more fetures see https://github.com/Microsoft/monaco-editor-samples/blob/master/browser-esm-webpack-small/index.js
+import 'monaco-editor/esm/vs/editor/browser/controller/coreCommands';
+import 'monaco-editor/esm/vs/editor/contrib/find/findController';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+
 //import {Observable, Subject} from 'rxjs';
+var self={ MonacoEnvironment:{} };
+self.MonacoEnvironment = {
+	getWorkerUrl: function (moduleId, label) {
+		return './main.js';
+	}
+}
 
 export class EditorMonaco implements api.Editor {
   
@@ -22,7 +32,8 @@ export class EditorMonaco implements api.Editor {
   	this.monacoEditor.onDidChangeModelContent((evt:any)=> {
   	  const text = this.getText();
 	  if (this.onChangeHandler) { this.onChangeHandler(text); }
-	})
+	});
+    
   }
   
   getMonaco() {

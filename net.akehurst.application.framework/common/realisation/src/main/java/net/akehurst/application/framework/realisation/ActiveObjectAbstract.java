@@ -19,7 +19,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.ActiveObject;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.ComponentInstance;
@@ -27,7 +27,7 @@ import net.akehurst.application.framework.common.annotations.instance.ServiceRef
 import net.akehurst.application.framework.technology.interfaceLogging.ILogger;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 
-abstract public class ActiveObjectAbstract implements IActiveObject {
+abstract public class ActiveObjectAbstract implements ActiveObject {
 
     @ServiceReference
     protected IApplicationFramework af;
@@ -69,18 +69,18 @@ abstract public class ActiveObjectAbstract implements IActiveObject {
         this.thread.interrupt();
     }
 
-    protected List<IActiveObject> afActiveParts() throws IllegalArgumentException, IllegalAccessException {
-        final List<IActiveObject> objects = this.afActiveParts(this.getClass());
+    protected List<ActiveObject> afActiveParts() throws IllegalArgumentException, IllegalAccessException {
+        final List<ActiveObject> objects = this.afActiveParts(this.getClass());
 
         return objects;
     }
 
-    private List<IActiveObject> afActiveParts(final Class<?> class_) throws IllegalArgumentException, IllegalAccessException {
-        final List<IActiveObject> objects = new ArrayList<>();
+    private List<ActiveObject> afActiveParts(final Class<?> class_) throws IllegalArgumentException, IllegalAccessException {
+        final List<ActiveObject> objects = new ArrayList<>();
 
         if (null == class_.getSuperclass()) {
         } else {
-            final List<IActiveObject> superObjs = this.afActiveParts(class_.getSuperclass());
+            final List<ActiveObject> superObjs = this.afActiveParts(class_.getSuperclass());
             objects.addAll(superObjs);
         }
 
@@ -91,7 +91,7 @@ abstract public class ActiveObjectAbstract implements IActiveObject {
             if (null == annC && null == annAO) {
                 // do nothing
             } else {
-                final IActiveObject ao = (IActiveObject) f.get(this);
+                final ActiveObject ao = (ActiveObject) f.get(this);
                 // TODO: support ordering of objects
                 objects.add(ao);
             }
@@ -106,8 +106,8 @@ abstract public class ActiveObjectAbstract implements IActiveObject {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj instanceof IActiveObject) {
-            final IActiveObject other = (IActiveObject) obj;
+        if (obj instanceof ActiveObject) {
+            final ActiveObject other = (ActiveObject) obj;
             return this.afId().equals(other.afId());
         } else {
             return false;

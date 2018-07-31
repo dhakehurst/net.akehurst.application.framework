@@ -17,7 +17,7 @@ package net.akehurst.application.framework.common.test;
 
 import java.util.List;
 
-import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.ActiveObject;
 import net.akehurst.application.framework.realisation.ActiveObjectAbstract;
 import net.akehurst.application.framework.technology.interfaceLogging.LogLevel;
 import net.akehurst.application.framework.test.ITestEnvironment;
@@ -31,13 +31,13 @@ abstract public class AbstractTestContext extends ActiveObjectAbstract implement
     @Override
     public void afRun() {
         try {
-            final List<IActiveObject> objects = super.afActiveParts();
+            final List<ActiveObject> objects = super.afActiveParts();
 
-            for (final IActiveObject ao : objects) {
+            for (final ActiveObject ao : objects) {
                 ao.afStart();
             }
 
-            for (final IActiveObject ao : objects) {
+            for (final ActiveObject ao : objects) {
                 ao.afJoin();
             }
 
@@ -49,8 +49,8 @@ abstract public class AbstractTestContext extends ActiveObjectAbstract implement
     @Override
     public void afInterrupt() {
         try {
-            final List<IActiveObject> objects = super.afActiveParts();
-            for (final IActiveObject ao : objects) {
+            final List<ActiveObject> objects = super.afActiveParts();
+            for (final ActiveObject ao : objects) {
                 ao.afInterrupt();
             }
         } catch (final Exception ex) {
@@ -61,8 +61,8 @@ abstract public class AbstractTestContext extends ActiveObjectAbstract implement
     @Override
     public void afTerminate() {
         try {
-            final List<IActiveObject> objects = super.afActiveParts();
-            for (final IActiveObject ao : objects) {
+            final List<ActiveObject> objects = super.afActiveParts();
+            for (final ActiveObject ao : objects) {
                 ao.afTerminate();
             }
         } catch (final Exception ex) {

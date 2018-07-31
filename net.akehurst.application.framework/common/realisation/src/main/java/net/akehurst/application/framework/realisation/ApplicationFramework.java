@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
-import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.ActiveObject;
 import net.akehurst.application.framework.common.IApplication;
 import net.akehurst.application.framework.common.IApplicationFramework;
 import net.akehurst.application.framework.common.IComponent;
@@ -183,7 +183,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
     }
 
     @Override
-    public <T extends IActiveObject> T createActiveObject(final Class<T> class_, final String id) throws ApplicationFrameworkException {
+    public <T extends ActiveObject> T createActiveObject(final Class<T> class_, final String id) throws ApplicationFrameworkException {
         try {
             final BetterMethodFinder bmf = new BetterMethodFinder(class_);
             final Constructor<T> cons = bmf.findConstructor(String.class);
@@ -340,7 +340,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
     }
 
     @Override
-    public <T extends IActiveObject> T injectIntoActiveObject(final T obj) throws ApplicationFrameworkException {
+    public <T extends ActiveObject> T injectIntoActiveObject(final T obj) throws ApplicationFrameworkException {
         try {
             this.injectServiceReferences(obj.getClass(), obj);
             this.injectParts(obj);
@@ -711,10 +711,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
                     return this.createComponent((Class<? extends IComponent>) partClass, partId);
                 }
                 case ACTIVE_OBJECT: {
-                    return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case PASSIVE_OBJECT:
-                    return this.createObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createObject((Class<? extends ActiveObject>) partClass, partId);
                 default:
                 break;
             }
@@ -733,10 +733,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
                     return this.createComponent((Class<? extends IComponent>) partClass, partId);
                 }
                 case ACTIVE_OBJECT: {
-                    return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case PASSIVE_OBJECT:
-                    return this.createObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createObject((Class<? extends ActiveObject>) partClass, partId);
                 default:
                 break;
             }
@@ -755,10 +755,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
                     return this.createComponent((Class<? extends IComponent>) partClass, partId);
                 }
                 case ACTIVE_OBJECT: {
-                    return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case PASSIVE_OBJECT:
-                    return this.createObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createObject((Class<? extends ActiveObject>) partClass, partId);
                 default:
                 break;
             }
@@ -767,7 +767,7 @@ public class ApplicationFramework implements IApplicationFramework, IService {
 
     }
 
-    private void injectParts(final IActiveObject obj) {
+    private void injectParts(final ActiveObject obj) {
 
         final ApplicationCompositionTreeWalker walker = new ApplicationCompositionTreeWalker(this.logger());
 
@@ -778,10 +778,10 @@ public class ApplicationFramework implements IApplicationFramework, IService {
                 }
                 break;
                 case ACTIVE_OBJECT: {
-                    return this.createActiveObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createActiveObject((Class<? extends ActiveObject>) partClass, partId);
                 }
                 case PASSIVE_OBJECT:
-                    return this.createObject((Class<? extends IActiveObject>) partClass, partId);
+                    return this.createObject((Class<? extends ActiveObject>) partClass, partId);
                 default:
                 break;
             }

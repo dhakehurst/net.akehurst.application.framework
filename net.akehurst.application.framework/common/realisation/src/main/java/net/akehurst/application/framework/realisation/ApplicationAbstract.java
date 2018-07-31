@@ -24,7 +24,7 @@ import org.hjson.JsonValue;
 import org.hjson.Stringify;
 
 import net.akehurst.application.framework.common.ApplicationFrameworkException;
-import net.akehurst.application.framework.common.IActiveObject;
+import net.akehurst.application.framework.common.ActiveObject;
 import net.akehurst.application.framework.common.IApplication;
 import net.akehurst.application.framework.common.annotations.instance.ActiveObjectInstance;
 import net.akehurst.application.framework.common.annotations.instance.CommandLineArgument;
@@ -161,14 +161,14 @@ abstract public class ApplicationAbstract extends ActiveObjectAbstract implement
                 System.exit(0);
             }
 
-            final List<IActiveObject> objects = super.afActiveParts();
+            final List<ActiveObject> objects = super.afActiveParts();
             this.logger.log(LogLevel.TRACE, "Active Parts: %s", objects);
 
-            for (final IActiveObject ao : objects) {
+            for (final ActiveObject ao : objects) {
                 ao.afStart();
             }
 
-            for (final IActiveObject ao : objects) {
+            for (final ActiveObject ao : objects) {
                 ao.afJoin();
             }
 
@@ -180,8 +180,8 @@ abstract public class ApplicationAbstract extends ActiveObjectAbstract implement
     @Override
     public void afInterrupt() {
         try {
-            final List<IActiveObject> objects = super.afActiveParts();
-            for (final IActiveObject ao : objects) {
+            final List<ActiveObject> objects = super.afActiveParts();
+            for (final ActiveObject ao : objects) {
                 ao.afInterrupt();
             }
         } catch (final Exception ex) {
@@ -192,8 +192,8 @@ abstract public class ApplicationAbstract extends ActiveObjectAbstract implement
     @Override
     public void afTerminate() {
         try {
-            final List<IActiveObject> objects = super.afActiveParts();
-            for (final IActiveObject ao : objects) {
+            final List<ActiveObject> objects = super.afActiveParts();
+            for (final ActiveObject ao : objects) {
                 ao.afTerminate();
             }
         } catch (final Exception ex) {
