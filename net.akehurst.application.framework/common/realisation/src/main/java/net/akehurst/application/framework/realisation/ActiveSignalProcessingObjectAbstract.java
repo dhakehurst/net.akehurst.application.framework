@@ -17,9 +17,11 @@ package net.akehurst.application.framework.realisation;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,6 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jooq.lambda.Seq;
 import org.jooq.lambda.function.Consumer0;
 import org.jooq.lambda.function.Consumer1;
 import org.jooq.lambda.function.Consumer2;
@@ -61,13 +64,13 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 	private boolean terminateRequested;
 	private ExecutorService executor;
 	private final BlockingQueue<NamedSignal<?>> signals;
-	private final Map<SignalKey, Object> waiting;
+	private final Map<SignalKey, Set<Object>> whenReceived;
 
 	public ActiveSignalProcessingObjectAbstract(final String afId) {
 		super(afId);
 		this.terminateRequested = false;
 		this.signals = new LinkedBlockingQueue<>();
-		this.waiting = new HashMap<>();
+		this.whenReceived = new HashMap<>();
 	}
 
 	private class SignalKey extends Tuple2<Method, Context> {
@@ -138,6 +141,26 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			}
 		}
 		throw new RuntimeException(String.format("Method '%s' with %d arguments not found on type '%s'", methodName, numArgs, class_.getSimpleName()));
+	}
+
+	//TODO: handle waiting for more than one thing
+	private void putWhenReceived(final SignalKey key, final Object value) {
+		Set<Object> set = this.whenReceived.get(key);
+		if (null == set) {
+			set = new HashSet<>();
+			this.whenReceived.put(key, set);
+		}
+		set.add(value);
+	}
+
+	private Object removeWhenReceived(final SignalKey key) {
+		final Set<Object> set = this.whenReceived.get(key);
+		if (null != set) {
+			final Object value = Seq.seq(set).findFirst().get();
+			set.remove(value);
+			return value;
+		}
+		return null;
 	}
 
 	@Override
@@ -221,7 +244,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 
 	protected <I, R> void whenReceivedThenExecute(final Method signalSignature, final Context ctx, final long timeout, final Object body) {
 		final SignalKey key = new SignalKey(signalSignature, ctx);
-		this.waiting.put(key, body);
+		this.putWhenReceived(key, body);
 	}
 
 	@Override
@@ -330,7 +353,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 	protected <C, R> void receive(final Class<C> class_, final Consumer1<C> signalSignature, final Context ctx, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer0 body = (Consumer0) value;
 				body.accept();
@@ -345,7 +368,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 	protected <C, R> void receive(final Class<C> class_, final Function1<C, R> signalSignature, final Context ctx, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer0 body = (Consumer0) value;
 				body.accept();
@@ -360,7 +383,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 	protected <C, P1> void receive(final Class<C> class_, final Consumer2<C, P1> signalSignature, final Context ctx, final P1 p1, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer1<P1> body = (Consumer1<P1>) value;
 				body.accept(p1);
@@ -376,7 +399,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO:  handle timeout!
 			if (null != value) {
 				final Consumer1<P1> body = (Consumer1<P1>) value;
 				body.accept(p1);
@@ -392,7 +415,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer2<P1, P2> body = (Consumer2<P1, P2>) value;
 				body.accept(p1, p2);
@@ -408,7 +431,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer2<P1, P2> body = (Consumer2<P1, P2>) value;
 				body.accept(p1, p2);
@@ -424,7 +447,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final P3 p3, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer3<P1, P2, P3> body = (Consumer3<P1, P2, P3>) value;
 				body.accept(p1, p2, p3);
@@ -440,7 +463,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final P2 p2, final P3 p3, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer3<P1, P2, P3> body = (Consumer3<P1, P2, P3>) value;
 				body.accept(p1, p2, p3);
@@ -456,7 +479,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final P2 p2, final P3 p3, final P4 p4, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer4<P1, P2, P3, P4> body = (Consumer4<P1, P2, P3, P4>) value;
 				body.accept(p1, p2, p3, p4);
@@ -472,7 +495,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final P2 p2, final P3 p3, final P4 p4, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer4<P1, P2, P3, P4> body = (Consumer4<P1, P2, P3, P4>) value;
 				body.accept(p1, p2, p3, p4);
@@ -488,7 +511,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final P1 p1, final P2 p2, final P3 p3, final P4 p4, final P5 p5, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer5<P1, P2, P3, P4, P5> body = (Consumer5<P1, P2, P3, P4, P5>) value;
 				body.accept(p1, p2, p3, p4, p5);
@@ -504,7 +527,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final P1 p1, final P2 p2, final P3 p3, final P4 p4, final P5 p5, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer5<P1, P2, P3, P4, P5> body = (Consumer5<P1, P2, P3, P4, P5>) value;
 				body.accept(p1, p2, p3, p4, p5);
@@ -520,7 +543,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final P1 p1, final P2 p2, final P3 p3, final P4 p4, final P5 p5, final P6 p6, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer6<P1, P2, P3, P4, P5, P6> body = (Consumer6<P1, P2, P3, P4, P5, P6>) value;
 				body.accept(p1, p2, p3, p4, p5, p6);
@@ -536,7 +559,7 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 			final Context ctx, final P1 p1, final P2 p2, final P3 p3, final P4 p4, final P5 p5, final P6 p6, final Consumer0 defaultBody) {
 		final Method m = MethodUtils.getMethodLiteral(class_, signalSignature);
 		this.receive(m, ctx, (key) -> {
-			final Object value = this.waiting.get(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
+			final Object value = this.removeWhenReceived(key); //TODO: what if we process the receive before the whenRecieved...can this happen? and handle timeout!
 			if (null != value) {
 				final Consumer6<P1, P2, P3, P4, P5, P6> body = (Consumer6<P1, P2, P3, P4, P5, P6>) value;
 				body.accept(p1, p2, p3, p4, p5, p6);
