@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -156,9 +157,14 @@ abstract public class ActiveSignalProcessingObjectAbstract extends ActiveObjectA
 	private Object removeWhenReceived(final SignalKey key) {
 		final Set<Object> set = this.whenReceived.get(key);
 		if (null != set) {
-			final Object value = Seq.seq(set).findFirst().get();
-			set.remove(value);
-			return value;
+			final Optional<Object> valueOpt = Seq.seq(set).findFirst();
+			if (valueOpt.isPresent()) {
+				final Object value = valueOpt.get();
+				set.remove(value);
+				return value;
+			} else {
+				return null;
+			}
 		}
 		return null;
 	}

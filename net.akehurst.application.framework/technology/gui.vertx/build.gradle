@@ -25,7 +25,9 @@ repositories {
 }
 
 dependencies {
-	implementation project(":${rootProject.name}.common.realisation")
+    
+    
+    implementation project(":${rootProject.name}.common.realisation")
 	implementation project(":${rootProject.name}.technology.gui.common")
 	implementation project(":${rootProject.name}.technology.gui.web")
 	implementation project(":${rootProject.name}.technology.interfaceGui")
@@ -33,7 +35,7 @@ dependencies {
 	implementation project(":${rootProject.name}.technology.interfaceComms")
 	implementation project(":${rootProject.name}.technology.webjar.dynamic")
 	
-    implementation "org.hjson:hjson:${version_hjson}"
+    implementation "org.jooq:jool-java-8:${version_jool}"
 
 	implementation 'org.apache.commons:commons-lang3:3.4'
 	implementation "io.vertx:vertx-core:${version_vertx}"

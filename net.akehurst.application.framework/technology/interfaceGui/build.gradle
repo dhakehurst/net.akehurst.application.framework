@@ -18,6 +18,7 @@ dependencies {
     api project(":net.akehurst.application.framework.common.annotations.datatype")
     
 	api project(':net.akehurst.application.framework.technology.interfaceAuthentication')
+    api "org.hjson:hjson:${version_hjson}"
 //	compile project(':net.akehurst.application.framework.technology.commsInterface')
 
     implementation "org.jooq:jool-java-8:${version_jool}"
