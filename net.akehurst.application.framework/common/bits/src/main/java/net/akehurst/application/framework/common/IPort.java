@@ -49,10 +49,24 @@ public interface IPort extends IIdentifiableObject {
      */
     <T> T out(Class<T> requiredInterfaceType);
 
+    /**
+     * connect one port to another at the same level, i.e. provides is matched to requires in each direction
+     */
     void connect(IPort other);
 
+    /**
+     * connect one port to another at the same level, i.e. provides is matched to to @ExternalConnection fields and requires matched to implemented interfaces
+     */
+    void connect(IIdentifiableObject other);
+
+    /**
+     * connect one port to another internal port, i.e. provides is matched to provides and requires matched to requires
+     */
     void connectInternal(IPort other);
 
+    /**
+     * connect one port to an internal object, i.e. provides is matched to implemented interface and requires matched to @ExternalConnection fields
+     */
     void connectInternal(IIdentifiableObject other);
 
 }

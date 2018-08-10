@@ -280,6 +280,35 @@ public class Port implements IPort {
     }
 
     @Override
+    public void connect(final IIdentifiableObject other) {
+        for (final Class<?> req : this.getProvided()) {
+            for (final Field f : this.getAllExternalConnection(other.getClass())) {
+                try {
+                    if (f.getType().isAssignableFrom(req)) {
+                        final Class<Object> t = (Class<Object>) req;
+                        final Object o = this.in(req);
+                        f.setAccessible(true);
+                        f.set(other, o);
+                        this.logger.log(LogLevel.TRACE, "connected %s.%s to %s.", other.toString(), f.getName(), o.toString());
+                    }
+
+                } catch (final Exception ex) {
+                    this.logger.log(LogLevel.ERROR, "Trying to connected %s.%s to %s.", other.toString(), f.getName(), "port proxy");
+
+                }
+            }
+        }
+
+        for (final Class<?> prov : this.getRequired()) {
+            final Class<Object> t = (Class<Object>) prov;
+            if (t.isAssignableFrom(other.getClass())) {
+                this.provideRequired(t, other);
+                this.logger.log(LogLevel.TRACE, "connected %s[%s] to %s.", this.toString(), t.getName(), other.toString());
+            }
+        }
+    }
+
+    @Override
     public void connectInternal(final IPort internalPort) {
         for (final Class<?> intf : this.getProvided()) {
             final Set<Object> providers = (Set<Object>) internalPort.getProvided(intf);
@@ -304,15 +333,6 @@ public class Port implements IPort {
         for (final Class<?> req : this.getRequired()) {
             for (final Field f : this.getAllExternalConnection(internalProvider.getClass())) {
                 try {
-                    // for (final Field f : internalProvider.getClass().getFields()) {
-                    // if (f.getType().isAssignableFrom(req)) {
-                    // final Class<Object> t = (Class<Object>) req;
-                    // final Object o = this.out(req);
-                    // f.set(internalProvider, o);
-                    // this.logger.log(LogLevel.TRACE, "Internally connected %s.%s to %s.", internalProvider.toString(), f.getName(), o.toString());
-                    // }
-                    // }
-
                     if (f.getType().isAssignableFrom(req)) {
                         final Class<Object> t = (Class<Object>) req;
                         final Object o = this.out(req);
