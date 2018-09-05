@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hjson.JsonArray;
 import org.hjson.JsonObject;
 import org.hjson.JsonValue;
 import org.jooq.lambda.function.Consumer2;
@@ -29,7 +30,7 @@ public class WebsocketComms extends IdentifiableObjectAbstract implements Handle
 
     private final Map<String, ServerWebSocket> sockets;
     private final Map<String, Consumer2<String, Buffer>> socketHandlers;
-    private final Map<String, Consumer3<UserSession, String, JsonObject>> messageHandlers;
+    private final Map<String, Consumer3<UserSession, String, JsonArray>> messageHandlers;
 
     public WebsocketComms(final String afId) {
         super(afId);
@@ -45,10 +46,10 @@ public class WebsocketComms extends IdentifiableObjectAbstract implements Handle
             final UserSession session = new UserSession(sessionId, user, null);
             final JsonObject json = JsonValue.readJSON(message).asObject();
             final String channelId = json.getString("channelId", null);
-            final JsonObject data = json.get("data").asObject();
-            final Consumer3<UserSession, String, JsonObject> mh = this.messageHandlers.get(channelId);
+            final JsonArray args = null == json.get("args") ? new JsonArray() : json.get("args").asArray();
+            final Consumer3<UserSession, String, JsonArray> mh = this.messageHandlers.get(channelId);
             if (null != mh) {
-                mh.accept(session, channelId, data);
+                mh.accept(session, channelId, args);
             } else {
                 this.logger.log(LogLevel.WARN, "No handler for message " + message);
             }
@@ -101,16 +102,16 @@ public class WebsocketComms extends IdentifiableObjectAbstract implements Handle
         });
     }
 
-    public void send(final UserSession session, final String channelId, final JsonValue jsonData) {
+    public void send(final UserSession session, final String channelId, final JsonArray args) {
         final JsonObject packet = new JsonObject();
         packet.add("channelId", channelId);
-        packet.add("data", jsonData);
+        packet.add("args", args);
         final ServerWebSocket ss = this.sockets.get(session.getId());
         ss.writeTextMessage(packet.toString());
-        this.logger.log(LogLevel.TRACE, "publish to " + session.getId() + " on channel " + channelId + " data " + jsonData);
+        this.logger.log(LogLevel.TRACE, "publish to " + session.getId() + " on channel " + channelId + " data " + args);
     }
 
-    public void receive(final String channelId, final Consumer3<UserSession, String, JsonObject> handler) {
+    public void receive(final String channelId, final Consumer3<UserSession, String, JsonArray> handler) {
         this.messageHandlers.put(channelId, handler);
     }
 

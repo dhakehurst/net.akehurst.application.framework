@@ -3,8 +3,7 @@ package net.akehurst.application.framework.technology.gui.vertx.server;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hjson.JsonObject;
-import org.hjson.JsonValue;
+import org.hjson.JsonArray;
 import org.jooq.lambda.function.Consumer3;
 
 import io.vertx.core.Handler;
@@ -177,12 +176,12 @@ public class GuiTheaterHandler extends ActiveSignalProcessingObjectAbstract impl
     }
 
     @Override
-    public void requestSend(final UserSession session, final String channelId, final JsonValue jsonData) {
-        this.comms.send(session, channelId, jsonData);
+    public void requestSend(final UserSession session, final String channelId, final JsonArray args) {
+        this.comms.send(session, channelId, args);
     }
 
     @Override
-    public void requestReceive(final String channelId, final Consumer3<UserSession, String, JsonObject> handler) {
+    public void requestReceive(final String channelId, final Consumer3<UserSession, String, JsonArray> handler) {
         this.comms.receive(channelId, handler);
     }
 

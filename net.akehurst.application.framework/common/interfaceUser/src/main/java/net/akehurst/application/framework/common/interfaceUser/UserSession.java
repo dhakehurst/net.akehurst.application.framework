@@ -25,62 +25,62 @@ import net.akehurst.application.framework.common.DataTypeAbstract;
 
 public class UserSession extends DataTypeAbstract {
 
-	/**
-	 *
-	 * @param sessionId
-	 * @param user
-	 * @param data
-	 *            entries are copies into this UserSessions data
-	 */
-	public UserSession(final String sessionId, final UserDetails user, final Map<String, Object> data) {
-		this.sessionId = sessionId;
-		this.user = user;
-		this.data = null == data ? new HashMap<>() : new HashMap<>(data);
-		this.contexts = new ArrayList<>();
-	}
+    /**
+     *
+     * @param sessionId
+     * @param user
+     * @param data
+     *            entries are copies into this UserSessions data
+     */
+    public UserSession(final String sessionId, final UserDetails user, final Map<String, Object> data) {
+        this.sessionId = sessionId;
+        this.user = user;
+        this.data = null == data ? new HashMap<>() : new HashMap<>(data);
+        this.contexts = new ArrayList<>();
+    }
 
-	private final String sessionId;
-	private final UserDetails user;
-	private final Map<String, Object> data;
-	private final List<Context> contexts;
+    private final String sessionId;
+    private final UserDetails user;
+    private final Map<String, Object> data;
+    private final List<Context> contexts;
 
-	public String getId() {
-		return this.sessionId;
-	}
+    public String getId() {
+        return this.sessionId;
+    }
 
-	public UserDetails getUser() {
-		return this.user;
-	}
+    public UserDetails getUser() {
+        return this.user;
+    }
 
-	public boolean isAuthenticated() {
-		return null != this.getUser();
-	}
+    public boolean isAuthenticated() {
+        return null != this.getUser();
+    }
 
-	public Map<String, Object> getData() {
-		return this.data;
-	}
+    public Map<String, Object> getData() {
+        return this.data;
+    }
 
-	public Context getContext() {
-		if (this.contexts.isEmpty()) {
-			return null;
-		} else {
-			return this.contexts.get(this.contexts.size() - 1);
-		}
-	}
+    public Context getContext() {
+        if (this.contexts.isEmpty()) {
+            return null;
+        } else {
+            return this.contexts.get(this.contexts.size() - 1);
+        }
+    }
 
-	public UserSession pushNewContext() {
-		final Context c = new ContextDefault(this);
-		this.contexts.add(c);
-		return this;
-	}
+    public Context pushNewContext() {
+        final Context c = new ContextDefault(this);
+        this.contexts.add(c);
+        return c;
+    }
 
-	public Context popContext() {
-		if (this.contexts.isEmpty()) {
-			return null;
-		} else {
-			final Context c = this.getContext();
-			this.contexts.remove(this.contexts.size() - 1);
-			return c;
-		}
-	}
+    public Context popContext() {
+        if (this.contexts.isEmpty()) {
+            return null;
+        } else {
+            final Context c = this.getContext();
+            this.contexts.remove(this.contexts.size() - 1);
+            return c;
+        }
+    }
 }
