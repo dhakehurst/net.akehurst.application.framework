@@ -89,7 +89,7 @@ subprojects {
 		}
 	
 	    publications {
-	        mavenJava(MavenPublication) {
+	        all(MavenPublication) {
 	        	groupId "${group}"
 	        	artifactId "${project.name}"
 				version "${version}"

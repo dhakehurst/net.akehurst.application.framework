@@ -57,7 +57,10 @@ public class AsyncCallDefault implements AsyncCall {
                 return AsyncCall.WaitResult.timeout;
             } else {
                 for (;;) {
-                    this.wait(waitTime);
+                    synchronized (this) {
+                        this.wait(waitTime);
+                    }
+
                     if (this.completed) {
                         return AsyncCall.WaitResult.complete;
                     } else {

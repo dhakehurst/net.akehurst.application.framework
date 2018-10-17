@@ -2,8 +2,10 @@ package net.akehurst.application.framework.common;
 
 public interface MessageBuilder {
 
-	MessageBuilder andWhen();
+    MessageBuilder andWhen();
 
-	void go();
+    void go();
+
+    void waitForIt();
 
 }
