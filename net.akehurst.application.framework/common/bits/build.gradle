@@ -17,6 +17,7 @@
  dependencies {
  
 	 api "org.jooq:jool-java-8:${version_jool}"
+     api "net.akehurst.datatype:datatype-common:${version_datatype}"
  
  }
 

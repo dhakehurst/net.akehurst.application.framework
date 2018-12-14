@@ -17,22 +17,22 @@ package net.akehurst.application.framework.technology.interfaceGui;
 
 import java.util.regex.Pattern;
 
-import net.akehurst.application.framework.common.DataTypeAbstract;
+import net.akehurst.datatype.common.DatatypeAbstract;
 
-public class SceneIdentity extends DataTypeAbstract {
+public class SceneIdentity extends DatatypeAbstract {
 
-	private static Pattern valid = Pattern.compile("[a-zA-z][a-zA-Z0-9/]*");
+    private static Pattern valid = Pattern.compile("[a-zA-z][a-zA-Z0-9/]*");
 
-	public SceneIdentity(final String value) throws GuiException {
-		super(value);
-		if (value.isEmpty() || SceneIdentity.valid.matcher(value).matches()) {
-			// ok
-		} else {
-			throw new GuiException("Invalid SceneIdentity value - " + value, null);
-		}
-	}
+    public SceneIdentity(final String value) throws GuiException {
+        super(value);
+        if (value.isEmpty() || SceneIdentity.valid.matcher(value).matches()) {
+            // ok
+        } else {
+            throw new GuiException("Invalid SceneIdentity value - " + value, null);
+        }
+    }
 
-	public String asPrimitive() {
-		return (String) super.getIdentityValues().get(0);
-	}
+    public String asPrimitive() {
+        return (String) super.getIdentityValues().get(0);
+    }
 }

@@ -15,19 +15,19 @@
  */
 package net.akehurst.application.framework.technology.interfaceComms;
 
-import net.akehurst.application.framework.common.DataTypeAbstract;
+import net.akehurst.datatype.common.DatatypeAbstract;
 
-public class ChannelIdentity extends DataTypeAbstract {
+public class ChannelIdentity extends DatatypeAbstract {
 
-	public ChannelIdentity(final String value) {
-		super(value);
-		this.value = value;
-	}
+    public ChannelIdentity(final String value) {
+        super(value);
+        this.value = value;
+    }
 
-	String value;
+    String value;
 
-	public String getValue() {
-		return this.value;
-	}
+    public String getValue() {
+        return this.value;
+    }
 
 }

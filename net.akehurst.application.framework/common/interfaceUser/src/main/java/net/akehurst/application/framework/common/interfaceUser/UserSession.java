@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.akehurst.application.framework.common.Context;
-import net.akehurst.application.framework.common.DataTypeAbstract;
+import net.akehurst.datatype.common.DatatypeAbstract;
 
-public class UserSession extends DataTypeAbstract {
+public class UserSession extends DatatypeAbstract {
 
     /**
      *

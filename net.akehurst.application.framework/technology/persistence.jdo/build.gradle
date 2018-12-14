@@ -15,7 +15,7 @@
  */
 
 ext {
-  jdoVersion = '5.2.0-m1'
+  jdoVersion = '5.1.9'
   javaxJdoVersion = '3.2.0-m9'
 }
 

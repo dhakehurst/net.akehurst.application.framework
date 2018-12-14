@@ -15,15 +15,15 @@
  */
 package net.akehurst.application.framework.technology.interfaceGui;
 
-import net.akehurst.application.framework.common.DataTypeAbstract;
+import net.akehurst.datatype.common.DatatypeAbstract;
 
-public class StageIdentity extends DataTypeAbstract {
+public class StageIdentity extends DatatypeAbstract {
 
-	public StageIdentity(final String value) {
-		super(value);
-	}
+    public StageIdentity(final String value) {
+        super(value);
+    }
 
-	public String asPrimitive() {
-		return (String) super.getIdentityValues().get(0);
-	}
+    public String asPrimitive() {
+        return (String) super.getIdentityValues().get(0);
+    }
 }
