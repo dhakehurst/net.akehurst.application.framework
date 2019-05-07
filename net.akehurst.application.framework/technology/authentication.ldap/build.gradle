@@ -20,6 +20,9 @@ dependencies {
 	api project(":${rootProject.name}.technology.interfaceAuthentication")
 	implementation project(":${rootProject.name}.common.realisation")
 	
+	implementation "javax.xml.bind:jaxb-api:$version_jaxb"
+	implementation "org.glassfish.jaxb:jaxb-runtime:$version_jaxb"
+	
 	testImplementation project(":${rootProject.name}.common.test")
 
 }
