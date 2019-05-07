@@ -15,8 +15,7 @@
  */
 
 ext {
-  jdoVersion = '5.2.0-release'
-  javaxJdoVersion = '3.2.0-m11'
+
 }
 
 dependencies {
@@ -25,9 +24,9 @@ dependencies {
 	
 	api project(':net.akehurst.application.framework.technology.interfacePersistence')
 	implementation 'commons-io:commons-io:2.5'
-	implementation "org.datanucleus:javax.jdo:${javaxJdoVersion}"
-	implementation "org.datanucleus:datanucleus-api-jdo:${jdoVersion}"
-	implementation "org.datanucleus:datanucleus-core:${jdoVersion}"
+	implementation "org.datanucleus:javax.jdo:$version_javaxJdo"
+	implementation "org.datanucleus:datanucleus-api-jdo:$version_jdo"
+	implementation "org.datanucleus:datanucleus-core:$version_jdo"
 	
 	testImplementation project(":${rootProject.name}.technology.logging.log4j")
 	//testRuntime 'org.datanucleus:datanucleus-rdbms:${jdoVersion}'
